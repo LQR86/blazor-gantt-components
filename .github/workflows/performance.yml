@@ -44,26 +44,39 @@ jobs:
     - name: Run Lighthouse CI
       if: steps.build-check.outputs.can_build == 'true'
       run: |
-        # Start the app in background
-        dotnet run --configuration Release &
+        # Kill any existing processes on our ports
+        pkill -f "dotnet run" || true
+        sleep 2
+        
+        # Start the app in background with specific port
+        ASPNETCORE_URLS="http://localhost:5000" dotnet run --configuration Release --no-build &
         APP_PID=$!
         
         # Wait for app to start
-        echo "Waiting for Blazor app to start..."
-        for i in {1..30}; do
+        echo "Waiting for Blazor app to start on http://localhost:5000..."
+        APP_STARTED=false
+        for i in {1..15}; do
           if curl -f http://localhost:5000 >/dev/null 2>&1; then
-            echo "✅ App is running"
+            echo "✅ App is running on http://localhost:5000"
+            APP_STARTED=true
             break
           fi
-          echo "⏳ Waiting... ($i/30)"
-          sleep 2
+          echo "⏳ Waiting... ($i/15)"
+          sleep 3
         done
+        
+        if [ "$APP_STARTED" = "false" ]; then
+          echo "❌ App failed to start within timeout"
+          kill $APP_PID || true
+          exit 1
+        fi
         
         # Run Lighthouse with config
         lhci autorun
         
         # Clean up
         kill $APP_PID || true
+        pkill -f "dotnet run" || true
       env:
         LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
         LHCI_BUILD_CONTEXT__COMMIT_TIME: ${{ github.event.head_commit.timestamp }}

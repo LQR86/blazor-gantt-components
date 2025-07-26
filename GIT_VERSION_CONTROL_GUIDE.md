@@ -173,11 +173,28 @@ git reset --soft HEAD~1
 
 ### **Scenario 3: "I want to completely undo my last commit"**
 ```bash
-git reset --hard HEAD~1
+# ⚠️⚠️⚠️ **WARNING: This is a destructive command!** ⚠️⚠️⚠️
+# Deletes the commit AND the changes in your working directory.
+# **Before using this command:**
+# 1. Create a backup branch: `git branch backup-branch`
+# 2. Or stash your changes: `git stash`
+# Use this command ONLY if you're absolutely sure you don't need those changes.
 
-# ⚠️ DANGEROUS: Deletes the commit AND the changes
-# Only use if you're sure you don't want those changes
+git reset --hard HEAD~1
 ```
+
+> **🛡️ Safer Alternatives:**
+> ```bash
+> # Option 1: Keep changes but undo commit
+> git reset --soft HEAD~1
+> 
+> # Option 2: Create backup first, then reset
+> git branch backup-$(date +%Y%m%d-%H%M%S)
+> git reset --hard HEAD~1
+> 
+> # Option 3: Use revert instead (safer for shared repositories)
+> git revert HEAD
+> ```
 
 ### **Scenario 4: "I want to undo a commit from 3 commits ago"**
 ```bash

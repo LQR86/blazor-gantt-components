@@ -1,0 +1,316 @@
+@using GanttComponents.Models
+@using GanttComponents.Services
+@inject GanttRowAlignmentService RowAlignmentService
+
+<div class="task-grid-container">
+    <div class="task-grid-header">
+        <div class="header-cell" style="width: 200px;">Task Name</div>
+        <div class="header-cell" style="width: 120px;">Start Date</div>
+        <div class="header-cell" style="width: 120px;">End Date</div>
+        <div class="header-cell" style="width: 100px;">Duration</div>
+        <div class="header-cell" style="width: 80px;">Progress</div>
+        <div class="header-cell" style="width: 150px;">Resources</div>
+    </div>
+    
+    <div class="task-grid-body" @onscroll="OnScroll">
+        @if (Tasks != null)
+        {
+            @for (int i = 0; i < Tasks.Count; i++)
+            {
+                var task = Tasks[i];
+                var rowIndex = i;
+                var indentLevel = GetIndentLevel(task);
+                
+                <div class="task-grid-row @(SelectedTaskId == task.Id ? "selected" : "")" 
+                     data-task-id="@task.Id" 
+                     data-row-index="@rowIndex"
+                     @onclick="() => SelectTask(task.Id)">
+                    
+                    <div class="grid-cell task-name-cell" style="width: 200px; padding-left: @(indentLevel * 20)px;">
+                        @if (HasChildren(task))
+                        {
+                            <button class="expand-toggle @(IsExpanded(task.Id) ? "expanded" : "collapsed")" 
+                                    @onclick="() => ToggleExpand(task.Id)"
+                                    @onclick:stopPropagation="true">
+                                @if (IsExpanded(task.Id))
+                                {
+                                    <span>▼</span>
+                                }
+                                else
+                                {
+                                    <span>▶</span>
+                                }
+                            </button>
+                        }
+                        <span class="task-name">@task.Name</span>
+                    </div>
+                    
+                    <div class="grid-cell" style="width: 120px;">
+                        @task.StartDate.ToString("MM/dd/yyyy")
+                    </div>
+                    
+                    <div class="grid-cell" style="width: 120px;">
+                        @task.EndDate.ToString("MM/dd/yyyy")
+                    </div>
+                    
+                    <div class="grid-cell" style="width: 100px;">
+                        @task.Duration
+                    </div>
+                    
+                    <div class="grid-cell" style="width: 80px;">
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: @(task.Progress)%"></div>
+                            <span class="progress-text">@(task.Progress)%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-cell" style="width: 150px;">
+                        @GetResourceNames(task)
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<GanttTask>? Tasks { get; set; }
+    [Parameter] public EventCallback<int> OnTaskSelected { get; set; }
+    [Parameter] public EventCallback<EventArgs> OnScrollChanged { get; set; }
+
+    private int? SelectedTaskId { get; set; }
+    private Dictionary<int, bool> ExpandedTasks { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        // Initialize expanded state for all parent tasks
+        if (Tasks != null)
+        {
+            foreach (var task in Tasks.Where(t => HasChildren(t)))
+            {
+                ExpandedTasks[task.Id] = true; // Expand all by default
+            }
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        // Update row alignment when tasks change
+        if (Tasks != null)
+        {
+            var visibleTasks = GetVisibleTasks();
+            RowAlignmentService.CalculateRowPositions(visibleTasks, ExpandedTasks);
+        }
+    }
+
+    private async Task SelectTask(int taskId)
+    {
+        SelectedTaskId = taskId;
+        await OnTaskSelected.InvokeAsync(taskId);
+    }
+
+    private void ToggleExpand(int taskId)
+    {
+        ExpandedTasks[taskId] = !ExpandedTasks.GetValueOrDefault(taskId, true);
+        
+        // Update row alignment after expand/collapse
+        var visibleTasks = GetVisibleTasks();
+        RowAlignmentService.CalculateRowPositions(visibleTasks, ExpandedTasks);
+        
+        StateHasChanged();
+    }
+
+    private async Task OnScroll(EventArgs args)
+    {
+        await OnScrollChanged.InvokeAsync(args);
+    }
+
+    private List<GanttTask> GetVisibleTasks()
+    {
+        if (Tasks == null) return new List<GanttTask>();
+
+        var visible = new List<GanttTask>();
+        
+        foreach (var task in Tasks.Where(t => t.ParentId == null))
+        {
+            AddTaskAndChildren(task, visible, 0);
+        }
+        
+        return visible;
+    }
+
+    private void AddTaskAndChildren(GanttTask task, List<GanttTask> visible, int level)
+    {
+        visible.Add(task);
+        
+        if (IsExpanded(task.Id) && HasChildren(task))
+        {
+            var children = Tasks?.Where(t => t.ParentId == task.Id).OrderBy(t => t.Id) ?? Enumerable.Empty<GanttTask>();
+            foreach (var child in children)
+            {
+                AddTaskAndChildren(child, visible, level + 1);
+            }
+        }
+    }
+
+    private int GetIndentLevel(GanttTask task)
+    {
+        int level = 0;
+        var current = task;
+        
+        while (current?.ParentId != null)
+        {
+            level++;
+            current = Tasks?.FirstOrDefault(t => t.Id == current.ParentId);
+        }
+        
+        return level;
+    }
+
+    private bool HasChildren(GanttTask task)
+    {
+        return Tasks?.Any(t => t.ParentId == task.Id) ?? false;
+    }
+
+    private bool IsExpanded(int taskId)
+    {
+        return ExpandedTasks.GetValueOrDefault(taskId, true);
+    }
+
+    private string GetResourceNames(GanttTask task)
+    {
+        if (task.Assignments?.Any() != true)
+            return "-";
+
+        return string.Join(", ", task.Assignments.Select(a => a.Resource?.Name ?? "Unknown"));
+    }
+}
+
+<style>
+    .task-grid-container {
+        --row-height: 32px;
+        --header-height: 40px;
+        --border-width: 1px;
+        --grid-primary: #1976d2;
+        --grid-surface: #ffffff;
+        --grid-on-surface: #000000;
+        --grid-outline: #e0e0e0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        border: var(--border-width) solid var(--grid-outline);
+    }
+
+    .task-grid-header {
+        display: flex;
+        height: var(--header-height);
+        background: #f5f5f5;
+        border-bottom: var(--border-width) solid var(--grid-outline);
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .header-cell {
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        border-right: var(--border-width) solid var(--grid-outline);
+        font-weight: 600;
+        background: #f5f5f5;
+    }
+
+    .task-grid-body {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .task-grid-row {
+        display: flex;
+        height: var(--row-height);
+        border-bottom: var(--border-width) solid var(--grid-outline);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .task-grid-row:hover {
+        background-color: #f8f9fa;
+    }
+
+    .task-grid-row.selected {
+        background-color: #e3f2fd;
+        border-color: var(--grid-primary);
+    }
+
+    .grid-cell {
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        border-right: var(--border-width) solid var(--grid-outline);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .task-name-cell {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .expand-toggle {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 2px;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 2px;
+        transition: background-color 0.2s ease;
+    }
+
+    .expand-toggle:hover {
+        background-color: #e0e0e0;
+    }
+
+    .expand-toggle span {
+        font-size: 10px;
+        line-height: 1;
+    }
+
+    .task-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .progress-container {
+        position: relative;
+        width: 100%;
+        height: 16px;
+        background: #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: var(--grid-primary);
+        transition: width 0.3s ease;
+    }
+
+    .progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--grid-on-surface);
+        text-shadow: 0 0 2px rgba(255,255,255,0.8);
+    }
+</style>

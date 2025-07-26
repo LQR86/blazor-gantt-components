@@ -1,0 +1,304 @@
+@page "/gantt-demo"
+@using GanttComponents.Models
+@using GanttComponents.Components.TaskGrid
+
+<PageTitle>Gantt Demo</PageTitle>
+
+<h1>Custom Gantt UI Components Demo</h1>
+
+<div class="demo-container">
+    <div class="demo-section">
+        <h3>TaskGrid Component (Phase 1)</h3>
+        <p>Independent TaskGrid with hierarchical tree structure, expand/collapse, and selection.</p>
+        
+        <div class="grid-container">
+            <TaskGrid Tasks="@SampleTasks" 
+                     OnTaskSelected="HandleTaskSelected" 
+                     OnScrollChanged="HandleScrollChanged" />
+        </div>
+    </div>
+
+    @if (SelectedTaskInfo != null)
+    {
+        <div class="demo-section">
+            <h4>Selected Task Information</h4>
+            <div class="task-info">
+                <p><strong>ID:</strong> @SelectedTaskInfo.Id</p>
+                <p><strong>Name:</strong> @SelectedTaskInfo.Name</p>
+                <p><strong>Start Date:</strong> @SelectedTaskInfo.StartDate.ToString("MM/dd/yyyy")</p>
+                <p><strong>End Date:</strong> @SelectedTaskInfo.EndDate.ToString("MM/dd/yyyy")</p>
+                <p><strong>Duration:</strong> @SelectedTaskInfo.Duration</p>
+                <p><strong>Progress:</strong> @SelectedTaskInfo.Progress%</p>
+                <p><strong>Dependencies:</strong> @(SelectedTaskInfo.Predecessors ?? "None")</p>
+            </div>
+        </div>
+    }
+
+    <div class="demo-section">
+        <h4>Design Decisions Implemented</h4>
+        <ul>
+            <li>✅ <strong>Day-level scheduling</strong>: Dates displayed with day precision</li>
+            <li>✅ <strong>No batch operations</strong>: Single-task selection and immediate feedback</li>
+            <li>✅ <strong>Hierarchical structure</strong>: Parent-child relationships with expand/collapse</li>
+            <li>✅ <strong>Row alignment service</strong>: Foundation for TaskGrid + TimelineView sync</li>
+            <li>✅ <strong>Material Design</strong>: CSS custom properties and clean styling</li>
+            <li>🔄 <strong>Timeline component</strong>: Next milestone (Phase 1.2)</li>
+            <li>🔄 <strong>Dependency rendering</strong>: Coming in Phase 2</li>
+            <li>🔄 <strong>Resource management</strong>: Coming in Phase 2</li>
+        </ul>
+    </div>
+</div>
+
+@code {
+    private List<GanttTask> SampleTasks = new();
+    private GanttTask? SelectedTaskInfo;
+
+    protected override void OnInitialized()
+    {
+        CreateSampleData();
+    }
+
+    private void HandleTaskSelected(int taskId)
+    {
+        SelectedTaskInfo = SampleTasks.FirstOrDefault(t => t.Id == taskId);
+        StateHasChanged();
+    }
+
+    private void HandleScrollChanged(EventArgs args)
+    {
+        // This will be used for synchronizing with TimelineView scroll
+        // For now, just logging the scroll position
+        Console.WriteLine($"TaskGrid scrolled");
+    }
+
+    private void CreateSampleData()
+    {
+        var today = DateTime.Today;
+        
+        SampleTasks = new List<GanttTask>
+        {
+            // Project root
+            new GanttTask
+            {
+                Id = 1,
+                Name = "Custom Gantt Development Project",
+                StartDate = today,
+                EndDate = today.AddDays(56), // 8 weeks
+                Duration = "8w",
+                Progress = 15,
+                TaskType = TaskType.FixedDuration
+            },
+
+            // Phase 1: Independent Components
+            new GanttTask
+            {
+                Id = 2,
+                Name = "Phase 1: Independent Components Foundation",
+                ParentId = 1,
+                StartDate = today,
+                EndDate = today.AddDays(14),
+                Duration = "2w",
+                Progress = 30,
+                TaskType = TaskType.FixedDuration
+            },
+
+            new GanttTask
+            {
+                Id = 3,
+                Name = "TaskGrid Component Development",
+                ParentId = 2,
+                StartDate = today,
+                EndDate = today.AddDays(7),
+                Duration = "1w",
+                Progress = 80,
+                TaskType = TaskType.FixedDuration
+            },
+
+            new GanttTask
+            {
+                Id = 4,
+                Name = "Basic Grid Structure",
+                ParentId = 3,
+                StartDate = today,
+                EndDate = today.AddDays(2),
+                Duration = "2d",
+                Progress = 100,
+                TaskType = TaskType.FixedDuration
+            },
+
+            new GanttTask
+            {
+                Id = 5,
+                Name = "Tree Structure Support",
+                ParentId = 3,
+                StartDate = today.AddDays(2),
+                EndDate = today.AddDays(4),
+                Duration = "2d",
+                Progress = 100,
+                Predecessors = "4FS",
+                TaskType = TaskType.FixedDuration
+            },
+
+            new GanttTask
+            {
+                Id = 6,
+                Name = "Grid Interactions & Selection",
+                ParentId = 3,
+                StartDate = today.AddDays(4),
+                EndDate = today.AddDays(7),
+                Duration = "3d",
+                Progress = 60,
+                Predecessors = "5FS",
+                TaskType = TaskType.FixedDuration
+            },
+
+            new GanttTask
+            {
+                Id = 7,
+                Name = "TimelineView Component Development",
+                ParentId = 2,
+                StartDate = today.AddDays(7),
+                EndDate = today.AddDays(14),
+                Duration = "1w",
+                Progress = 0,
+                Predecessors = "3FS",
+                TaskType = TaskType.FixedDuration
+            },
+
+            new GanttTask
+            {
+                Id = 8,
+                Name = "SVG Timeline Foundation",
+                ParentId = 7,
+                StartDate = today.AddDays(7),
+                EndDate = today.AddDays(9),
+                Duration = "2d",
+                Progress = 0,
+                TaskType = TaskType.FixedDuration
+            },
+
+            new GanttTask
+            {
+                Id = 9,
+                Name = "Task Bar Rendering",
+                ParentId = 7,
+                StartDate = today.AddDays(9),
+                EndDate = today.AddDays(12),
+                Duration = "3d",
+                Progress = 0,
+                Predecessors = "8FS",
+                TaskType = TaskType.FixedDuration
+            },
+
+            new GanttTask
+            {
+                Id = 10,
+                Name = "Dependencies & Relationships",
+                ParentId = 7,
+                StartDate = today.AddDays(12),
+                EndDate = today.AddDays(14),
+                Duration = "2d",
+                Progress = 0,
+                Predecessors = "9FS",
+                TaskType = TaskType.FixedDuration
+            },
+
+            // Phase 2: Advanced Features
+            new GanttTask
+            {
+                Id = 11,
+                Name = "Phase 2: Advanced UI Features",
+                ParentId = 1,
+                StartDate = today.AddDays(14),
+                EndDate = today.AddDays(28),
+                Duration = "2w",
+                Progress = 0,
+                Predecessors = "2FS",
+                TaskType = TaskType.FixedDuration
+            },
+
+            new GanttTask
+            {
+                Id = 12,
+                Name = "TaskGrid Enhancements",
+                ParentId = 11,
+                StartDate = today.AddDays(14),
+                EndDate = today.AddDays(21),
+                Duration = "1w",
+                Progress = 0,
+                TaskType = TaskType.FixedDuration
+            },
+
+            new GanttTask
+            {
+                Id = 13,
+                Name = "TimelineView Interactions",
+                ParentId = 11,
+                StartDate = today.AddDays(21),
+                EndDate = today.AddDays(28),
+                Duration = "1w",
+                Progress = 0,
+                Predecessors = "12FS",
+                TaskType = TaskType.FixedDuration
+            }
+        };
+    }
+}
+
+<style>
+    .demo-container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .demo-section {
+        margin-bottom: 40px;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background: #fafafa;
+    }
+
+    .demo-section h3 {
+        margin-top: 0;
+        color: #1976d2;
+    }
+
+    .demo-section h4 {
+        margin-top: 0;
+        color: #333;
+    }
+
+    .grid-container {
+        height: 400px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        background: white;
+    }
+
+    .task-info {
+        background: white;
+        padding: 16px;
+        border-radius: 4px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .task-info p {
+        margin: 8px 0;
+    }
+
+    .demo-section ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .demo-section li {
+        padding: 8px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .demo-section li:last-child {
+        border-bottom: none;
+    }
+</style>

@@ -49,7 +49,7 @@ jobs:
         sleep 2
         
         # Start the app in background with specific port
-        ASPNETCORE_URLS="http://localhost:5000" dotnet run --configuration Release --no-build &
+        dotnet run --configuration Release --no-build --urls "http://localhost:5000" &
         APP_PID=$!
         
         # Wait for app to start

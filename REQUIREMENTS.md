@@ -98,18 +98,30 @@ This document captures the **immutable requirements** for our custom Gantt compo
 - ✅ **MUST**: Three-table relationship (Tasks, Resources, Assignments)
 - ✅ **MUST**: Data validation and constraint checking
 
+### 11. **WBS Code Task Identification**
+- ✅ **MUST**: WBS codes as the only user-facing task identifiers
+- ✅ **MUST**: Hierarchical WBS structure (e.g., "1", "1.1", "1.1.1", "1.2", "2")
+- ✅ **MUST**: Auto-generation of WBS codes based on task hierarchy
+- ✅ **MUST**: WBS codes visible in all user interfaces (grid, timeline, exports)
+- ✅ **MUST**: WBS codes used in dependency definitions (e.g., "1.2FS+3d")
+- ✅ **MUST**: Database IDs kept internal and never exposed to users
+- ✅ **MUST**: WBS code validation and uniqueness enforcement
+- ✅ **MUST**: WBS renumbering when task hierarchy changes
+
+**Rationale**: WBS codes provide meaningful, hierarchical identifiers that project managers understand, while database IDs are technical implementation details that should remain hidden from users.
+
 ---
 
 ## 🎨 **DESIGN & STYLING REQUIREMENTS**
 
-### 11. **Material Design Compliance**
+### 12. **Material Design Compliance**
 - ✅ **MUST**: Material Design color palette and spacing
 - ✅ **MUST**: Material Design typography and iconography
 - ✅ **MUST**: CSS custom properties for theming
 - ✅ **MUST**: Consistent elevation and shadow system
 - ✅ **MUST**: Material motion and animation principles
 
-### 12. **Visual Standards**
+### 13. **Visual Standards**
 - ✅ **MUST**: Clean, modern interface design
 - ✅ **MUST**: Consistent spacing and alignment
 - ✅ **MUST**: Professional appearance suitable for enterprise
@@ -120,14 +132,14 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## ⚡ **PERFORMANCE REQUIREMENTS**
 
-### 13. **Performance Targets**
+### 14. **Performance Targets**
 - ✅ **MUST**: TaskGrid handles 1000+ rows with smooth scrolling
 - ✅ **MUST**: TimelineView renders 500+ tasks at 60fps
 - ✅ **MUST**: Stable memory usage during interactions
 - ✅ **MUST**: Bundle size <100KB gzipped for core components
 - ✅ **MUST**: Fast initial load and responsive interactions
 
-### 14. **Technical Performance**
+### 15. **Technical Performance**
 - ✅ **MUST**: Efficient DOM updates and rendering
 - ✅ **MUST**: Virtual scrolling implementation
 - ✅ **MUST**: Optimized paint and layout operations
@@ -138,14 +150,14 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## 🔧 **TECHNICAL REQUIREMENTS**
 
-### 15. **Technology Stack**
+### 16. **Technology Stack**
 - ✅ **MUST**: Blazor Server as the primary framework
 - ✅ **MUST**: CSS Grid and Flexbox for layouts
 - ✅ **MUST**: SVG for timeline graphics
 - ✅ **MUST**: Standard web technologies (no exotic dependencies)
 - ✅ **MUST**: .NET 6+ compatibility
 
-### 16. **Code Quality**
+### 17. **Code Quality**
 - ✅ **MUST**: Clean, maintainable, well-documented code
 - ✅ **MUST**: Comprehensive testing strategy
 - ✅ **MUST**: TypeScript-like strong typing in C#
@@ -156,14 +168,14 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## 🛡️ **QUALITY & COMPLIANCE**
 
-### 17. **Accessibility**
+### 18. **Accessibility**
 - ✅ **MUST**: WCAG AA compliance
 - ✅ **MUST**: Screen reader support
 - ✅ **MUST**: Keyboard navigation for all features
 - ✅ **MUST**: Proper ARIA labels and roles
 - ✅ **MUST**: Focus indicators and logical tab order
 
-### 18. **Browser Compatibility**
+### 19. **Browser Compatibility**
 - ✅ **MUST**: Modern browser support (Chrome, Firefox, Safari, Edge)
 - ✅ **MUST**: Responsive design for different screen sizes
 - ✅ **MUST**: Cross-platform compatibility
@@ -173,14 +185,14 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## 📤 **EXPORT & INTEGRATION**
 
-### 19. **Export Capabilities**
+### 20. **Export Capabilities**
 - ✅ **MUST**: PDF export with vector graphics
 - ✅ **MUST**: Print-optimized layouts
 - ✅ **MUST**: Multiple page sizes and orientations
 - ✅ **MUST**: Export configuration options
 - ✅ **MUST**: High-quality output suitable for presentations
 
-### 20. **Integration Requirements**
+### 21. **Integration Requirements**
 - ✅ **MUST**: Easy integration into existing Blazor applications
 - ✅ **MUST**: Well-defined component APIs
 - ✅ **MUST**: Event-driven architecture for extensibility
@@ -191,14 +203,14 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## 📈 **DEVELOPMENT REQUIREMENTS**
 
-### 21. **Development Process**
+### 22. **Development Process**
 - ✅ **MUST**: Phase-based development (TaskGrid → TimelineView → Integration)
 - ✅ **MUST**: UI-first approach with immediate visual feedback
 - ✅ **MUST**: Incremental delivery of working features
 - ✅ **MUST**: Regular testing and validation
 - ✅ **MUST**: Version control with meaningful commit messages
 
-### 22. **DevOps & CI/CD**
+### 23. **DevOps & CI/CD**
 - ✅ **MUST**: GitHub version control with comprehensive workflows
 - ✅ **MUST**: Automated build, test, and deployment
 - ✅ **MUST**: Security scanning and dependency management
@@ -209,14 +221,14 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## 🎯 **SUCCESS CRITERIA**
 
-### 23. **Primary Goals**
+### 24. **Primary Goals**
 - ✅ **MUST**: Replace Syncfusion Gantt with zero feature regression
 - ✅ **MUST**: Eliminate vendor dependency and licensing costs
 - ✅ **MUST**: Provide superior user experience and performance
 - ✅ **MUST**: Enable unlimited customization and extension
 - ✅ **MUST**: Deliver enterprise-grade stability and reliability
 
-### 24. **Long-term Vision**
+### 25. **Long-term Vision**
 - ✅ **MUST**: Serve as foundation for future Gantt-related features
 - ✅ **MUST**: Demonstrate feasibility of custom component development
 - ✅ **MUST**: Create reusable pattern for other complex UI components
@@ -234,6 +246,7 @@ This document captures the **immutable requirements** for our custom Gantt compo
 - ❌ **NO** complex frameworks that add unnecessary complexity
 - ❌ **NO** performance compromises for large datasets
 - ❌ **NO** accessibility or browser compatibility shortcuts
+- ❌ **NO** exposing database IDs to users (WBS codes only)
 
 ### What We Will ALWAYS Do:
 - ✅ **ALWAYS** prioritize user experience and visual design
@@ -241,6 +254,7 @@ This document captures the **immutable requirements** for our custom Gantt compo
 - ✅ **ALWAYS** provide immediate feedback for user actions
 - ✅ **ALWAYS** follow Material Design principles
 - ✅ **ALWAYS** ensure enterprise-grade performance and reliability
+- ✅ **ALWAYS** use WBS codes as user-facing task identifiers
 
 ---
 

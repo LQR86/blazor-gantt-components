@@ -1,0 +1,209 @@
+name: Performance & Quality Monitoring
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    # Run performance tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  # Performance Testing
+  performance-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x'
+    
+    - name: Setup Node.js for Lighthouse
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install Lighthouse CI
+      run: npm install -g @lhci/cli@0.12.x
+    
+    - name: Build application
+      run: |
+        dotnet restore
+        dotnet build --configuration Release
+    
+    - name: Start application for testing
+      run: |
+        dotnet run --configuration Release &
+        sleep 30  # Wait for app to start
+      env:
+        ASPNETCORE_URLS: "http://localhost:5000"
+    
+    - name: Run Lighthouse CI
+      run: |
+        lhci autorun --upload.target=temporary-public-storage
+      env:
+        LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
+        LHCI_BUILD_CONTEXT__COMMIT_TIME: ${{ github.event.head_commit.timestamp }}
+    
+    - name: Upload Lighthouse results
+      uses: actions/upload-artifact@v3
+      with:
+        name: lighthouse-results
+        path: .lighthouseci/
+        retention-days: 30
+
+  # Bundle Size Analysis
+  bundle-analysis:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x'
+    
+    - name: Publish application
+      run: |
+        dotnet publish --configuration Release --output ./publish
+    
+    - name: Analyze bundle size
+      run: |
+        echo "📦 Bundle Size Analysis"
+        find ./publish -name "*.dll" -exec ls -lah {} \; | sort -k5 -hr
+        echo ""
+        echo "🎯 Performance Targets:"
+        echo "- TaskGrid: Target <50KB"
+        echo "- TimelineView: Target <75KB"
+        echo "- Total Components: Target <100KB gzipped"
+        echo ""
+        total_size=$(find ./publish -name "*.dll" -exec stat -c%s {} \; | awk '{sum+=$1} END {print sum}')
+        echo "📊 Total DLL Size: $(($total_size / 1024)) KB"
+    
+    - name: Check bundle size regression
+      run: |
+        # Store current bundle size for comparison
+        total_size=$(find ./publish -name "*.dll" -exec stat -c%s {} \; | awk '{sum+=$1} END {print sum}')
+        echo "BUNDLE_SIZE=$total_size" >> $GITHUB_ENV
+        
+        # Set thresholds (in bytes)
+        max_size=$((1024 * 1024 * 10))  # 10MB threshold
+        if [ $total_size -gt $max_size ]; then
+          echo "❌ Bundle size ($total_size bytes) exceeds threshold ($max_size bytes)"
+          exit 1
+        else
+          echo "✅ Bundle size within acceptable limits"
+        fi
+
+  # Load Testing
+  load-test:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || contains(github.event.head_commit.message, '[load-test]')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x'
+    
+    - name: Install NBomber
+      run: dotnet add package NBomber
+    
+    - name: Start application
+      run: |
+        dotnet run --configuration Release &
+        sleep 30
+      env:
+        ASPNETCORE_URLS: "http://localhost:5000"
+    
+    - name: Run load test
+      run: |
+        echo "🔥 Running load tests..."
+        echo "Target: 1000+ TaskGrid rows with smooth scrolling"
+        echo "Target: 500+ tasks with 60fps rendering"
+        
+        # Create a simple load test script
+        cat > loadtest.cs << 'EOF'
+        using NBomber.CSharp;
+        using NBomber.Http.CSharp;
+        
+        var scenario = Scenario.Create("gantt_load_test", async context =>
+        {
+            var response = await HttpClientArgs.New()
+                .WithHttpClient(new HttpClient())
+                .Build()
+                .GetAsync("http://localhost:5000/gantt-demo");
+            
+            return response.IsSuccessStatusCode ? Response.Ok() : Response.Fail();
+        })
+        .WithLoadSimulations(
+            Simulation.InjectPerSec(rate: 10, during: TimeSpan.FromMinutes(2))
+        );
+        
+        NBomberRunner
+            .RegisterScenarios(scenario)
+            .Run();
+        EOF
+        
+        # Run the load test (simplified version without NBomber for now)
+        curl -w "@curl-format.txt" -o /dev/null -s "http://localhost:5000/gantt-demo"
+    
+    - name: Generate performance report
+      run: |
+        echo "📈 Performance Test Results" > performance-report.md
+        echo "- Date: $(date)" >> performance-report.md
+        echo "- Commit: ${{ github.sha }}" >> performance-report.md
+        echo "- Build: ${{ github.run_number }}" >> performance-report.md
+    
+    - name: Upload performance report
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-report
+        path: performance-report.md
+        retention-days: 30
+
+  # Memory Usage Analysis
+  memory-analysis:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x'
+    
+    - name: Install dotMemory Unit
+      run: dotnet add package JetBrains.dotMemoryUnit
+    
+    - name: Run memory profiling
+      run: |
+        echo "🧠 Memory Analysis"
+        echo "Target: Stable memory usage during interactions"
+        echo "Monitoring TaskGrid and TimelineView components"
+        
+        # Build in Release mode for accurate memory analysis
+        dotnet build --configuration Release
+        
+        # Run basic memory checks
+        dotnet run --configuration Release &
+        app_pid=$!
+        sleep 10
+        
+        # Monitor memory usage
+        ps -p $app_pid -o pid,ppid,pcpu,pmem,rss,vsz,comm
+        
+        # Clean shutdown
+        kill $app_pid

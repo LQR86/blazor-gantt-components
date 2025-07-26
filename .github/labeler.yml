@@ -1,0 +1,82 @@
+# Automatic PR labeling configuration
+# Labels PRs based on which files are changed
+
+# Components
+'component: TaskGrid':
+  - 'Components/TaskGrid/**/*'
+  - '**/*TaskGrid*'
+
+'component: TimelineView':
+  - 'Components/TimelineView/**/*'
+  - '**/*TimelineView*'
+
+'component: GanttComposer':
+  - 'Components/GanttComposer/**/*'
+  - '**/*GanttComposer*'
+
+# File types
+'type: model':
+  - 'Models/**/*'
+
+'type: service':
+  - 'Services/**/*'
+
+'type: page':
+  - 'Pages/**/*'
+
+'type: style':
+  - '**/*.css'
+  - '**/*.scss'
+
+'type: test':
+  - '**/*Test*'
+  - '**/*Tests*'
+  - '**/test/**/*'
+  - '**/tests/**/*'
+
+# Areas
+'area: documentation':
+  - '*.md'
+  - 'docs/**/*'
+  - '.github/**/*.md'
+
+'area: ci/cd':
+  - '.github/workflows/**/*'
+  - '.github/dependabot.yml'
+
+'area: configuration':
+  - '*.json'
+  - '*.xml'
+  - '*.config'
+  - '*.settings'
+
+# Phases (based on development plan)
+'phase: 1.1':
+  - 'Components/TaskGrid/**/*'
+  - 'Models/**/*'
+  - 'Services/GanttRowAlignmentService.cs'
+
+'phase: 1.2':
+  - 'Components/TimelineView/**/*'
+
+'phase: 1.3':
+  - 'Components/GanttComposer/**/*'
+
+# Priority
+'priority: high':
+  - 'Program.cs'
+  - 'Startup.cs'
+  - '**/*Security*'
+
+'priority: medium':
+  - 'Pages/**/*'
+  - 'Components/**/*'
+
+# Size indicators
+'size: small':
+  - '*.md'
+  - '**/*.css'
+
+'size: large':
+  - 'Components/**/*'
+  - 'Services/**/*'

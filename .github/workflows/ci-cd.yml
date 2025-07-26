@@ -1,7 +1,7 @@
 name: CI/CD Pipeline v2
 
 on:
-  # Temporarily disabled to resolve phantom status check issue
+  # Temporarily disabled to resolve phantom status check issue - timestamp update
   # pull_request:
   #   branches: [ main, master ]
   workflow_dispatch:  # Manual trigger only

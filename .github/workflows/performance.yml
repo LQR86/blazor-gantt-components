@@ -21,7 +21,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '8.0.x'
     
     - name: Setup Node.js for Lighthouse
       uses: actions/setup-node@v4
@@ -106,7 +106,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '8.0.x'
     
     - name: Publish application
       run: |
@@ -152,7 +152,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '8.0.x'
     
     - name: Install NBomber
       run: dotnet add package NBomber
@@ -221,7 +221,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '8.0.x'
     
     - name: Install dotMemory Unit
       run: dotnet add package JetBrains.dotMemoryUnit

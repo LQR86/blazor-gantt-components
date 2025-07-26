@@ -1,10 +1,10 @@
 name: CI/CD Pipeline v2
 
 on:
-  push:
-    branches: [ main, master, develop ]
-  pull_request:
-    branches: [ main, master ]
+  # Temporarily disabled to resolve phantom status check issue
+  # pull_request:
+  #   branches: [ main, master ]
+  workflow_dispatch:  # Manual trigger only
 
 env:
   DOTNET_VERSION: '8.0.x'

@@ -59,4 +59,21 @@ Components/
 - Use date-fns for date calculations (day/hour precision only)
 - Apply CSS containment for paint/layout optimization
 
-Please refer to `basic_gantt_plan.md` for detailed implementation milestones and architecture decisions.
+## Git Workflow & Development Process
+- **Branch Protection**: Main branch is protected with PR requirements
+- **Feature Development**: Always use feature branches (feature/component-name)
+- **PR Workflow**: Create PRs for all changes, even solo development
+- **Commit Messages**: Use conventional commit format (feat:, fix:, docs:, etc.)
+- **Self-Review**: Thoroughly review your own PRs before merging
+- **Squash Merges**: Use squash merging to maintain clean history
+- **Automated Checks**: All PRs must pass GitHub Actions workflows
+- **Documentation**: Update relevant docs with each significant change
+
+## GitHub Actions Integration
+- **CI/CD Pipeline**: Runs on every push and PR
+- **Security Scanning**: Weekly vulnerability and dependency checks
+- **Performance Monitoring**: Daily performance tests and bundle analysis
+- **Feature Validation**: Branch-specific component testing
+- **Quality Gates**: All checks must pass before merging to main
+
+Please refer to `basic_gantt_plan.md` for detailed implementation milestones and `Setting_Up_Branch_Protection_&_PR_Workflow_for_Solo_Development.MD` for complete Git workflow guidance.

@@ -12,6 +12,8 @@
    - **DO NOT** initialize with README, .gitignore, or license (we already have these)
 
 ### Step 2: Connect Local Repository to GitHub
+
+#### Option A: HTTPS (Standard)
 ```bash
 # Add the remote origin (replace with your actual repository URL)
 git remote add origin https://github.com/LQR86/blazor-gantt-components.git
@@ -19,6 +21,37 @@ git remote add origin https://github.com/LQR86/blazor-gantt-components.git
 # Push your code to GitHub
 git branch -M main
 git push -u origin main
+```
+
+#### Option B: SSH (Recommended for China/GFW)
+```bash
+# Generate SSH key (if you haven't already)
+ssh-keygen -t ed25519 -C "lqr86@outlook.com"
+
+# Copy public key to clipboard
+cat ~/.ssh/id_ed25519.pub
+
+# Add SSH key to GitHub: Settings → SSH and GPG keys → New SSH key
+
+# Use SSH remote instead of HTTPS
+git remote add origin git@github.com:LQR86/blazor-gantt-components.git
+
+# Push using SSH (more reliable with VPN/firewall)
+git branch -M main
+git push -u origin main
+```
+
+#### Troubleshooting Connection Issues (China/GFW)
+If HTTPS fails with connection timeouts or HTTP2 errors:
+```bash
+# Force HTTP/1.1
+git config --global http.version HTTP/1.1
+
+# Increase buffer size
+git config --global http.postBuffer 524288000
+
+# Or switch to SSH (recommended)
+git remote set-url origin git@github.com:LQR86/blazor-gantt-components.git
 ```
 
 ### Step 3: GitHub Actions Setup

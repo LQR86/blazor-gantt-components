@@ -1,56 +1,9 @@
 # Automatic PR labeling configuration
 # Labels PRs based on which files are changed
+# Using common labels that typically exist in repositories
 
-# Components
-'component: TaskGrid':
-  - changed-files:
-    - any-glob-to-any-file: 'Components/TaskGrid/**/*'
-  - changed-files:
-    - any-glob-to-any-file: '**/*TaskGrid*'
-
-'component: TimelineView':
-  - changed-files:
-    - any-glob-to-any-file: 'Components/TimelineView/**/*'
-  - changed-files:
-    - any-glob-to-any-file: '**/*TimelineView*'
-
-'component: GanttComposer':
-  - changed-files:
-    - any-glob-to-any-file: 'Components/GanttComposer/**/*'
-  - changed-files:
-    - any-glob-to-any-file: '**/*GanttComposer*'
-
-# File types
-'type: model':
-  - changed-files:
-    - any-glob-to-any-file: 'Models/**/*'
-
-'type: service':
-  - changed-files:
-    - any-glob-to-any-file: 'Services/**/*'
-
-'type: page':
-  - changed-files:
-    - any-glob-to-any-file: 'Pages/**/*'
-
-'type: style':
-  - changed-files:
-    - any-glob-to-any-file: '**/*.css'
-  - changed-files:
-    - any-glob-to-any-file: '**/*.scss'
-
-'type: test':
-  - changed-files:
-    - any-glob-to-any-file: '**/*Test*'
-  - changed-files:
-    - any-glob-to-any-file: '**/*Tests*'
-  - changed-files:
-    - any-glob-to-any-file: '**/test/**/*'
-  - changed-files:
-    - any-glob-to-any-file: '**/tests/**/*'
-
-# Areas
-'area: documentation':
+# Basic file type labels
+'documentation':
   - changed-files:
     - any-glob-to-any-file: '*.md'
   - changed-files:
@@ -58,63 +11,36 @@
   - changed-files:
     - any-glob-to-any-file: '.github/**/*.md'
 
-'area: ci/cd':
+'enhancement':
+  - changed-files:
+    - any-glob-to-any-file: 'Components/**/*'
+  - changed-files:
+    - any-glob-to-any-file: 'Services/**/*'
+
+'dependencies':
+  - changed-files:
+    - any-glob-to-any-file: '*.csproj'
+  - changed-files:
+    - any-glob-to-any-file: 'packages.lock.json'
+
+'ci':
   - changed-files:
     - any-glob-to-any-file: '.github/workflows/**/*'
   - changed-files:
     - any-glob-to-any-file: '.github/dependabot.yml'
 
-'area: configuration':
+'configuration':
   - changed-files:
     - any-glob-to-any-file: '*.json'
-  - changed-files:
-    - any-glob-to-any-file: '*.xml'
   - changed-files:
     - any-glob-to-any-file: '*.config'
   - changed-files:
     - any-glob-to-any-file: '*.settings'
 
-# Phases (based on development plan)
-'phase: 1.1':
+'bug':
   - changed-files:
-    - any-glob-to-any-file: 'Components/TaskGrid/**/*'
+    - any-glob-to-any-file: '**/test/**/*'
   - changed-files:
-    - any-glob-to-any-file: 'Models/**/*'
+    - any-glob-to-any-file: '**/*Test*'
   - changed-files:
-    - any-glob-to-any-file: 'Services/GanttRowAlignmentService.cs'
-
-'phase: 1.2':
-  - changed-files:
-    - any-glob-to-any-file: 'Components/TimelineView/**/*'
-
-'phase: 1.3':
-  - changed-files:
-    - any-glob-to-any-file: 'Components/GanttComposer/**/*'
-
-# Priority
-'priority: high':
-  - changed-files:
-    - any-glob-to-any-file: 'Program.cs'
-  - changed-files:
-    - any-glob-to-any-file: 'Startup.cs'
-  - changed-files:
-    - any-glob-to-any-file: '**/*Security*'
-
-'priority: medium':
-  - changed-files:
-    - any-glob-to-any-file: 'Pages/**/*'
-  - changed-files:
-    - any-glob-to-any-file: 'Components/**/*'
-
-# Size indicators
-'size: small':
-  - changed-files:
-    - any-glob-to-any-file: '*.md'
-  - changed-files:
-    - any-glob-to-any-file: '**/*.css'
-
-'size: large':
-  - changed-files:
-    - any-glob-to-any-file: 'Components/**/*'
-  - changed-files:
-    - any-glob-to-any-file: 'Services/**/*'
+    - any-glob-to-any-file: '**/*Fix*'

@@ -43,11 +43,12 @@ jobs:
     
     - name: Upload coverage reports
       uses: codecov/codecov-action@v5
-      if: success() && hashFiles('./coverage.xml') != ''
+      if: success()
       with:
         files: ./coverage.xml
         flags: unittests
         name: codecov-umbrella
+        fail_ci_if_error: false
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4

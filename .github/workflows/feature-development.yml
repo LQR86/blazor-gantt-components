@@ -6,6 +6,7 @@ on:
       - 'feature/**'
       - 'bugfix/**'
       - 'hotfix/**'
+      - 'fix/**'
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -91,57 +92,53 @@ jobs:
         echo "📈 Development Phase Validation"
         echo "Current branch: ${{ github.ref_name }}"
         
-        # Check which phase features are implemented
-        phase_1_1_features=(
-          "Components/TaskGrid/TaskGrid.razor:TaskGrid with tree structure"
-          "Models/GanttTask.cs:Data models"
-          "Services/GanttRowAlignmentService.cs:Row alignment service"
-          "Pages/GanttDemo.razor:Demo page"
-        )
-        
-        phase_1_2_features=(
-          "Components/TimelineView/TimelineView.razor:TimelineView component"
-          "Components/TimelineView/TimelineView.razor.css:Timeline styling"
-        )
-        
-        phase_1_3_features=(
-          "Components/GanttComposer/GanttComposer.razor:Integration component"
-        )
-        
+        echo ""
         echo "🏗️ Phase 1.1 Features (TaskGrid):"
-        for feature in "${phase_1_1_features[@]}"; do
-          file="${feature%%:*}"
-          desc="${feature##*:}"
-          if [ -f "$file" ]; then
-            echo "  ✅ $desc"
-          else
-            echo "  ❌ $desc"
-          fi
-        done
+        if [ -f "Components/TaskGrid/TaskGrid.razor" ]; then
+          echo "  ✅ TaskGrid with tree structure"
+        else
+          echo "  ❌ TaskGrid with tree structure"
+        fi
+        
+        if [ -f "Models/GanttTask.cs" ]; then
+          echo "  ✅ Data models"
+        else
+          echo "  ❌ Data models"
+        fi
+        
+        if [ -f "Services/GanttRowAlignmentService.cs" ]; then
+          echo "  ✅ Row alignment service"
+        else
+          echo "  ❌ Row alignment service"
+        fi
+        
+        if [ -f "Pages/GanttDemo.razor" ]; then
+          echo "  ✅ Demo page"
+        else
+          echo "  ❌ Demo page"
+        fi
         
         echo ""
         echo "🏗️ Phase 1.2 Features (TimelineView):"
-        for feature in "${phase_1_2_features[@]}"; do
-          file="${feature%%:*}"
-          desc="${feature##*:}"
-          if [ -f "$file" ]; then
-            echo "  ✅ $desc"
-          else
-            echo "  🔄 $desc (planned)"
-          fi
-        done
+        if [ -f "Components/TimelineView/TimelineView.razor" ]; then
+          echo "  ✅ TimelineView component"
+        else
+          echo "  🔄 TimelineView component (planned)"
+        fi
+        
+        if [ -f "Components/TimelineView/TimelineView.razor.css" ]; then
+          echo "  ✅ Timeline styling"
+        else
+          echo "  🔄 Timeline styling (planned)"
+        fi
         
         echo ""
         echo "🏗️ Phase 1.3 Features (Integration):"
-        for feature in "${phase_1_3_features[@]}"; do
-          file="${feature%%:*}"
-          desc="${feature##*:}"
-          if [ -f "$file" ]; then
-            echo "  ✅ $desc"
-          else
-            echo "  📋 $desc (planned)"
-          fi
-        done
+        if [ -f "Components/GanttComposer/GanttComposer.razor" ]; then
+          echo "  ✅ Integration component"
+        else
+          echo "  📋 Integration component (planned)"
+        fi
 
   # PR readiness check
   pr-readiness:
@@ -160,18 +157,25 @@ jobs:
         echo "Base: ${{ github.event.pull_request.base.ref }}"
         echo "Head: ${{ github.event.pull_request.head.ref }}"
         
-        # Check for required files
-        required_files=("README.md" "basic_gantt_plan.md" ".github/copilot-instructions.md")
-        
         echo ""
         echo "📋 Required Files Check:"
-        for file in "${required_files[@]}"; do
-          if [ -f "$file" ]; then
-            echo "  ✅ $file"
-          else
-            echo "  ❌ $file (missing)"
-          fi
-        done
+        if [ -f "README.md" ]; then
+          echo "  ✅ README.md"
+        else
+          echo "  ❌ README.md (missing)"
+        fi
+        
+        if [ -f "basic_gantt_plan.md" ]; then
+          echo "  ✅ basic_gantt_plan.md"
+        else
+          echo "  ❌ basic_gantt_plan.md (missing)"
+        fi
+        
+        if [ -f ".github/copilot-instructions.md" ]; then
+          echo "  ✅ .github/copilot-instructions.md"
+        else
+          echo "  ❌ .github/copilot-instructions.md (missing)"
+        fi
         
         # Check commit message format
         echo ""

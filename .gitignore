@@ -416,3 +416,8 @@ $RECYCLE.BIN/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+##
+## Project-specific temporary files
+##
+TEMP_FILES/

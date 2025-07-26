@@ -144,7 +144,7 @@ git commit -m "test: Add unit tests for GanttTask model validation"
 # - Fixed a specific bug
 # - Added a complete feature
 
-# ❌ Bad times to commit:
+# **❌** Bad times to commit:
 # - Code doesn't compile
 # - In the middle of refactoring
 # - Just to backup (use git stash instead)

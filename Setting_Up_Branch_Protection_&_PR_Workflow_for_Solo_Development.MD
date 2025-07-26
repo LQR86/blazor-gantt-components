@@ -46,6 +46,14 @@ main
 
 ### **Rules applied to everyone**
 - [ ] Include administrators (leave unchecked so you can merge your own PRs)
+
+> **⚠️ Security Note:** Excluding administrators from branch protection rules allows you to merge your own pull requests without additional approvals, which streamlines solo development workflow. However, this also means you can bypass all branch protection rules, potentially introducing security risks. If your account is compromised, an attacker could push changes directly to the protected branch. 
+> 
+> **Recommendations:**
+> - **For learning/personal projects**: Leave unchecked for development efficiency
+> - **For production/sensitive projects**: Consider enabling this option for stricter safeguards
+> - **Alternative approach**: Use a separate "developer" account with limited permissions for daily work
+> - **Best practice**: Regularly review your account security (2FA, SSH keys, access tokens)
 ````
 
 ---

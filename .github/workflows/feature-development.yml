@@ -9,8 +9,12 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 env:
-  DOTNET_VERSION: '6.0.x'
+  DOTNET_VERSION: '8.0.x'
 
 jobs:
   # Quick validation for feature branches
@@ -27,7 +31,7 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     
     - name: Cache dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
@@ -174,20 +178,21 @@ jobs:
         echo "💬 Recent Commits:"
         git log --oneline -5
 
-  # Auto-labeling for PRs
-  auto-label:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Auto-label PR
-      uses: actions/labeler@v4
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        configuration-path: .github/labeler.yml
+  # Auto-labeling for PRs (disabled due to label creation permissions)
+  # auto-label:
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'pull_request'
+  #   
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v4
+  #   
+  #   - name: Auto-label PR
+  #     uses: actions/labeler@v5
+  #     with:
+  #       repo-token: ${{ secrets.GITHUB_TOKEN }}
+  #       configuration-path: .github/labeler.yml
+  #       sync-labels: false
 
   # Development metrics
   dev-metrics:

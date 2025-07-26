@@ -16,7 +16,17 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 **Rationale**: Eliminates complexity while serving 99% of project management use cases
 
-### 2. **No Batch Operations by Choice**
+### 2. **UTC Timestamps Only by Choice**
+- ✅ **MUST**: All timestamps stored and processed in UTC only
+- ✅ **MUST**: No timezone conversion or timezone-aware calculations
+- ✅ **MUST**: User interface displays dates in user's local timezone for viewing only
+- ✅ **MUST**: All date inputs converted to UTC immediately upon entry
+- ✅ **MUST**: No timezone selection or timezone management features
+- ✅ **MUST**: Simple date arithmetic without timezone complications
+
+**Rationale**: Eliminates timezone complexity, bugs, and edge cases while maintaining global usability through local display conversion
+
+### 3. **No Batch Operations by Choice**
 - ✅ **MUST**: Single-operation CRUD only (no batch editing)
 - ✅ **MUST**: Immediate feedback for each action
 - ✅ **MUST**: Real-time server synchronization (no batch mode)
@@ -25,7 +35,7 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 **Rationale**: Simpler UX, easier implementation, immediate feedback, reduced complexity
 
-### 3. **Complete Control Over Implementation**
+### 4. **Complete Control Over Implementation**
 - ✅ **MUST**: No dependency on Syncfusion or other third-party Gantt libraries
 - ✅ **MUST**: Full source code ownership and control
 - ✅ **MUST**: Ability to customize every aspect of behavior and styling
@@ -37,7 +47,7 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## 🏗️ **ARCHITECTURAL REQUIREMENTS**
 
-### 4. **Independent Component Design**
+### 5. **Independent Component Design**
 - ✅ **MUST**: TaskGrid component works standalone
 - ✅ **MUST**: TimelineView component works standalone  
 - ✅ **MUST**: Components can be composed together via GanttComposer
@@ -46,7 +56,7 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 **Rationale**: Flexibility, reusability, easier testing and maintenance
 
-### 5. **Pixel-Perfect Row Alignment**
+### 6. **Pixel-Perfect Row Alignment**
 - ✅ **MUST**: TaskGrid rows align perfectly with TimelineView task bars
 - ✅ **MUST**: Alignment maintained during scroll, zoom, resize
 - ✅ **MUST**: Alignment preserved during tree expand/collapse
@@ -55,7 +65,7 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 **Rationale**: Row misalignment breaks the entire Gantt user experience
 
-### 6. **UI-First Development Approach**
+### 7. **UI-First Development Approach**
 - ✅ **MUST**: Focus on user interface and interactions first
 - ✅ **MUST**: Visual design and UX before complex logic
 - ✅ **MUST**: Material Design principles and styling
@@ -68,7 +78,7 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## 📊 **SYNCFUSION FEATURE PARITY**
 
-### 7. **Core Gantt Functionality**
+### 8. **Core Gantt Functionality**
 - ✅ **MUST**: Hierarchical task tree with expand/collapse
 - ✅ **MUST**: Task dependencies (FS, SS, FF, SF types)
 - ✅ **MUST**: Resource management and assignment
@@ -76,14 +86,14 @@ This document captures the **immutable requirements** for our custom Gantt compo
 - ✅ **MUST**: Critical path calculation and highlighting
 - ✅ **MUST**: Baseline support (planned vs actual)
 
-### 8. **Grid Functionality**
+### 9. **Grid Functionality**
 - ✅ **MUST**: Inline cell editing with validation
 - ✅ **MUST**: Column resizing, reordering, show/hide
 - ✅ **MUST**: Sorting and filtering capabilities
 - ✅ **MUST**: Selection (single/multiple rows)
 - ✅ **MUST**: Keyboard navigation support
 
-### 9. **Timeline Functionality**
+### 10. **Timeline Functionality**
 - ✅ **MUST**: SVG-based timeline rendering
 - ✅ **MUST**: Multiple zoom levels (hour to quarter)
 - ✅ **MUST**: Pan and zoom interactions
@@ -91,25 +101,51 @@ This document captures the **immutable requirements** for our custom Gantt compo
 - ✅ **MUST**: Dependency line rendering
 - ✅ **MUST**: Today indicator and working time backgrounds
 
-### 10. **Data Management**
+### 11. **Data Management**
 - ✅ **MUST**: Support for large datasets (1000+ tasks)
 - ✅ **MUST**: Virtual scrolling for performance
 - ✅ **MUST**: Real-time data binding
 - ✅ **MUST**: Three-table relationship (Tasks, Resources, Assignments)
 - ✅ **MUST**: Data validation and constraint checking
 
+### 12. **WBS Code Task Identification**
+- ✅ **MUST**: WBS codes as the only user-facing task identifiers
+- ✅ **MUST**: Hierarchical WBS structure (e.g., "1", "1.1", "1.1.1", "1.2", "2")
+- ✅ **MUST**: Auto-generation of WBS codes based on task hierarchy
+- ✅ **MUST**: WBS codes visible in all user interfaces (grid, timeline, exports)
+- ✅ **MUST**: WBS codes used in dependency definitions (e.g., "1.2FS+3d")
+- ✅ **MUST**: Database IDs kept internal and never exposed to users
+- ✅ **MUST**: WBS code validation and uniqueness enforcement
+- ✅ **MUST**: WBS renumbering when task hierarchy changes
+
+**Rationale**: WBS codes provide meaningful, hierarchical identifiers that project managers understand, while database IDs are technical implementation details that should remain hidden from users.
+
 ---
 
 ## 🎨 **DESIGN & STYLING REQUIREMENTS**
 
-### 11. **Material Design Compliance**
+### 13. **Material Design Compliance**
 - ✅ **MUST**: Material Design color palette and spacing
 - ✅ **MUST**: Material Design typography and iconography
 - ✅ **MUST**: CSS custom properties for theming
 - ✅ **MUST**: Consistent elevation and shadow system
 - ✅ **MUST**: Material motion and animation principles
 
-### 12. **Visual Standards**
+### 14. **Internationalization (I18N) Support**
+- ✅ **MUST**: Support for English and Chinese (Simplified) languages only
+- ✅ **MUST**: All user-visible text externalized to resource files
+- ✅ **MUST**: Support for left-to-right (LTR) text direction only (no RTL)
+- ✅ **MUST**: Datetime format localization (US format vs Chinese format)
+- ✅ **MUST**: Common metrics and units localization (duration units, percentages)
+- ✅ **MUST**: Resource key management system for translatable strings
+- ✅ **MUST**: Fallback to English for missing Chinese translations
+- ✅ **MUST**: No hardcoded text strings in component code
+- ❌ **NOT**: Full cultural localization (business logic, data formats remain consistent)
+- ❌ **NOT**: Support for languages other than English and Chinese (Simplified)
+
+**Rationale**: Focused on English/Chinese markets with datetime and metrics localization for user familiarity, while keeping business logic standardized
+
+### 15. **Visual Standards**
 - ✅ **MUST**: Clean, modern interface design
 - ✅ **MUST**: Consistent spacing and alignment
 - ✅ **MUST**: Professional appearance suitable for enterprise
@@ -120,14 +156,14 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## ⚡ **PERFORMANCE REQUIREMENTS**
 
-### 13. **Performance Targets**
+### 16. **Performance Targets**
 - ✅ **MUST**: TaskGrid handles 1000+ rows with smooth scrolling
 - ✅ **MUST**: TimelineView renders 500+ tasks at 60fps
 - ✅ **MUST**: Stable memory usage during interactions
 - ✅ **MUST**: Bundle size <100KB gzipped for core components
 - ✅ **MUST**: Fast initial load and responsive interactions
 
-### 14. **Technical Performance**
+### 17. **Technical Performance**
 - ✅ **MUST**: Efficient DOM updates and rendering
 - ✅ **MUST**: Virtual scrolling implementation
 - ✅ **MUST**: Optimized paint and layout operations
@@ -138,14 +174,14 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## 🔧 **TECHNICAL REQUIREMENTS**
 
-### 15. **Technology Stack**
+### 18. **Technology Stack**
 - ✅ **MUST**: Blazor Server as the primary framework
 - ✅ **MUST**: CSS Grid and Flexbox for layouts
 - ✅ **MUST**: SVG for timeline graphics
 - ✅ **MUST**: Standard web technologies (no exotic dependencies)
-- ✅ **MUST**: .NET 6+ compatibility
+- ✅ **MUST**: .NET 8.0 target framework
 
-### 16. **Code Quality**
+### 19. **Code Quality**
 - ✅ **MUST**: Clean, maintainable, well-documented code
 - ✅ **MUST**: Comprehensive testing strategy
 - ✅ **MUST**: TypeScript-like strong typing in C#
@@ -156,14 +192,14 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## 🛡️ **QUALITY & COMPLIANCE**
 
-### 17. **Accessibility**
+### 20. **Accessibility**
 - ✅ **MUST**: WCAG AA compliance
 - ✅ **MUST**: Screen reader support
 - ✅ **MUST**: Keyboard navigation for all features
 - ✅ **MUST**: Proper ARIA labels and roles
 - ✅ **MUST**: Focus indicators and logical tab order
 
-### 18. **Browser Compatibility**
+### 21. **Browser Compatibility**
 - ✅ **MUST**: Modern browser support (Chrome, Firefox, Safari, Edge)
 - ✅ **MUST**: Responsive design for different screen sizes
 - ✅ **MUST**: Cross-platform compatibility
@@ -173,14 +209,14 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## 📤 **EXPORT & INTEGRATION**
 
-### 19. **Export Capabilities**
+### 22. **Export Capabilities**
 - ✅ **MUST**: PDF export with vector graphics
 - ✅ **MUST**: Print-optimized layouts
 - ✅ **MUST**: Multiple page sizes and orientations
 - ✅ **MUST**: Export configuration options
 - ✅ **MUST**: High-quality output suitable for presentations
 
-### 20. **Integration Requirements**
+### 23. **Integration Requirements**
 - ✅ **MUST**: Easy integration into existing Blazor applications
 - ✅ **MUST**: Well-defined component APIs
 - ✅ **MUST**: Event-driven architecture for extensibility
@@ -191,14 +227,14 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## 📈 **DEVELOPMENT REQUIREMENTS**
 
-### 21. **Development Process**
+### 24. **Development Process**
 - ✅ **MUST**: Phase-based development (TaskGrid → TimelineView → Integration)
 - ✅ **MUST**: UI-first approach with immediate visual feedback
 - ✅ **MUST**: Incremental delivery of working features
 - ✅ **MUST**: Regular testing and validation
 - ✅ **MUST**: Version control with meaningful commit messages
 
-### 22. **DevOps & CI/CD**
+### 25. **DevOps & CI/CD**
 - ✅ **MUST**: GitHub version control with comprehensive workflows
 - ✅ **MUST**: Automated build, test, and deployment
 - ✅ **MUST**: Security scanning and dependency management
@@ -209,14 +245,14 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## 🎯 **SUCCESS CRITERIA**
 
-### 23. **Primary Goals**
+### 26. **Primary Goals**
 - ✅ **MUST**: Replace Syncfusion Gantt with zero feature regression
 - ✅ **MUST**: Eliminate vendor dependency and licensing costs
 - ✅ **MUST**: Provide superior user experience and performance
 - ✅ **MUST**: Enable unlimited customization and extension
 - ✅ **MUST**: Deliver enterprise-grade stability and reliability
 
-### 24. **Long-term Vision**
+### 27. **Long-term Vision**
 - ✅ **MUST**: Serve as foundation for future Gantt-related features
 - ✅ **MUST**: Demonstrate feasibility of custom component development
 - ✅ **MUST**: Create reusable pattern for other complex UI components
@@ -234,6 +270,10 @@ This document captures the **immutable requirements** for our custom Gantt compo
 - ❌ **NO** complex frameworks that add unnecessary complexity
 - ❌ **NO** performance compromises for large datasets
 - ❌ **NO** accessibility or browser compatibility shortcuts
+- ❌ **NO** exposing database IDs to users (WBS codes only)
+- ❌ **NO** timezone management or timezone-aware calculations
+- ❌ **NO** full cultural localization (business logic remains standardized)
+- ❌ **NO** support for languages other than English and Chinese (Simplified)
 
 ### What We Will ALWAYS Do:
 - ✅ **ALWAYS** prioritize user experience and visual design
@@ -241,6 +281,10 @@ This document captures the **immutable requirements** for our custom Gantt compo
 - ✅ **ALWAYS** provide immediate feedback for user actions
 - ✅ **ALWAYS** follow Material Design principles
 - ✅ **ALWAYS** ensure enterprise-grade performance and reliability
+- ✅ **ALWAYS** use WBS codes as user-facing task identifiers
+- ✅ **ALWAYS** store and process timestamps in UTC only
+- ✅ **ALWAYS** support UI label translation for English and Chinese (Simplified)
+- ✅ **ALWAYS** localize datetime formats and common metrics for user familiarity
 
 ---
 

@@ -179,10 +179,9 @@
 
     private string GetResourceNames(GanttTask task)
     {
-        if (task.Assignments?.Any() != true)
-            return "-";
-
-        return string.Join(", ", task.Assignments.Select(a => a.Resource?.Name ?? "Unknown"));
+        // TODO: Implement resource lookup with flat model when needed
+        // For now, return placeholder since we're using flat/self-referential pattern
+        return "-";
     }
 }
 

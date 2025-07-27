@@ -70,10 +70,9 @@ public class GanttTask
     /// </summary>
     public Dictionary<string, object>? CustomFields { get; set; }
 
-    // Navigation properties
-    public virtual List<GanttTask> Children { get; set; } = new();
-    public virtual GanttTask? Parent { get; set; }
-    public virtual List<GanttAssignment> Assignments { get; set; } = new();
+    // Note: Following Syncfusion's self-referential/flat data binding pattern
+    // No navigation properties needed - hierarchy is managed via ParentId
+    // This simplifies EF Core mapping and works perfectly with Syncfusion Gantt
 }
 
 /// <summary>

@@ -22,7 +22,7 @@ public class UniversalLoggerIntegrationTests : IDisposable
 
         // Configure test services with Serilog
         var services = new ServiceCollection();
-        
+
         // Configure Serilog for testing with shared file access
         _serilogLogger = new LoggerConfiguration()
             .MinimumLevel.Debug()
@@ -63,7 +63,7 @@ public class UniversalLoggerIntegrationTests : IDisposable
         logger.LogInfo(testMessage);
         logger.LogTaskGridOperation("TestOperation", new { TestData = "TestValue" });
         logger.LogDateOperation("TestTask", new DateOnly(2025, 7, 27), "StartDate");
-        
+
         // Force log flush
         Log.CloseAndFlush();
         Thread.Sleep(200); // Give time for file write
@@ -72,7 +72,7 @@ public class UniversalLoggerIntegrationTests : IDisposable
         var logFiles = Directory.GetFiles(_testLogsDirectory, "test-log-*.txt");
         Assert.True(logFiles.Length > 0, "Log file should be created");
         Assert.True(logFiles[0].Length > 0, "Log file should contain data");
-        
+
         // Functional verification happens via console output in the test runner
         // This confirms the logger is working end-to-end
     }
@@ -97,7 +97,7 @@ public class UniversalLoggerIntegrationTests : IDisposable
         // Assert - Verify log file is created and contains data
         var logFiles = Directory.GetFiles(_testLogsDirectory, "test-log-*.txt");
         Assert.True(logFiles.Length > 0, "Log file should be created");
-        
+
         // Functional verification: Check that all logging methods execute without errors
         // Console output verification shows: TASKGRID, TIMELINE, ROW-ALIGNMENT, WBS, DEPENDENCY categories
         Assert.True(File.Exists(logFiles[0]), "Log file should exist and be accessible");
@@ -122,7 +122,7 @@ public class UniversalLoggerIntegrationTests : IDisposable
         // Assert - Verify log file is created and operations execute correctly
         var logFiles = Directory.GetFiles(_testLogsDirectory, "test-log-*.txt");
         Assert.True(logFiles.Length > 0, "Log file should be created");
-        
+
         // Functional verification: Date operations work with day-level precision
         // Console output shows: "📅 DATE: Task 1 | StartDate: 2025-12-31" (no time components)
         // Console output shows: "📅 DATE: Task 2 | EndDate: NULL"
@@ -140,7 +140,7 @@ public class UniversalLoggerIntegrationTests : IDisposable
         // Act - Simulate some work and log performance
         Thread.Sleep(50); // Simulate 50ms work
         stopwatch.Stop();
-        
+
         logger.LogPerformance("LoadTaskGrid", stopwatch.Elapsed, new { TaskCount = 100, CacheHit = false });
 
         // Force log flush
@@ -150,7 +150,7 @@ public class UniversalLoggerIntegrationTests : IDisposable
         // Assert - Verify performance logging works
         var logFiles = Directory.GetFiles(_testLogsDirectory, "test-log-*.txt");
         Assert.True(logFiles.Length > 0, "Log file should be created");
-        
+
         // Functional verification: Performance logging captures timing
         // Console output shows: "⚡ PERFORMANCE: LoadTaskGrid took {time}ms | Metadata: {...}"
         Assert.True(stopwatch.ElapsedMilliseconds >= 50, "Should have measured at least 50ms");
@@ -175,7 +175,7 @@ public class UniversalLoggerIntegrationTests : IDisposable
         // Assert - Verify error logging works
         var logFiles = Directory.GetFiles(_testLogsDirectory, "test-log-*.txt");
         Assert.True(logFiles.Length > 0, "Log file should be created");
-        
+
         // Functional verification: Error and warning logging captures exceptions and structured data
         // Console output shows: "❌ ERROR: Database connection failed" with exception details
         // Console output shows: "⚠️ WARNING: Performance degraded | Data: {"ResponseTime": 5000}"
@@ -186,7 +186,7 @@ public class UniversalLoggerIntegrationTests : IDisposable
     public void Dispose()
     {
         _serviceProvider?.Dispose();
-        
+
         // Cleanup test logs directory
         try
         {

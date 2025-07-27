@@ -47,22 +47,22 @@ namespace GanttComponents.Services
         void LogError(string message, Exception? exception = null);
         void LogWarning(string message, object? data = null);
         void LogInfo(string message, object? data = null);
-        
+
         // Gantt-specific logging methods
         void LogTaskGridOperation(string operation, object? data = null);
         void LogTimelineOperation(string operation, object? data = null);
         void LogRowAlignment(string operation, object? data = null);
         void LogWbsOperation(string operation, object? data = null);
         void LogDependencyOperation(string operation, object? data = null);
-        
+
         // Day-level date operations (REQUIREMENT 1)
         void LogDateOperation(string taskName, DateOnly? date, string dateType);
         void LogDurationCalculation(string operation, int days, object? context = null);
-        
+
         // Blazor-specific operations
         void LogComponentLifecycle(string componentName, string lifecycle, object? data = null);
         void LogStateChange(string component, string property, object? oldValue, object? newValue);
-        
+
         // General operations (from original)
         void LogUserAction(string action, object? context = null);
         void LogPerformance(string operation, TimeSpan duration, object? metadata = null);
@@ -192,7 +192,7 @@ namespace GanttComponents.Services
 
         public void LogStateChange(string component, string property, object? oldValue, object? newValue)
         {
-            _logger.LogInformation("🔀 STATE CHANGE: {Component}.{Property} | Old: {@OldValue} | New: {@NewValue}", 
+            _logger.LogInformation("🔀 STATE CHANGE: {Component}.{Property} | Old: {@OldValue} | New: {@NewValue}",
                 component, property, oldValue, newValue);
         }
 
@@ -213,12 +213,12 @@ namespace GanttComponents.Services
         {
             if (metadata != null)
             {
-                _logger.LogInformation("⚡ PERFORMANCE: {Operation} took {Duration}ms | Metadata: {@Metadata}", 
+                _logger.LogInformation("⚡ PERFORMANCE: {Operation} took {Duration}ms | Metadata: {@Metadata}",
                     operation, duration.TotalMilliseconds, metadata);
             }
             else
             {
-                _logger.LogInformation("⚡ PERFORMANCE: {Operation} took {Duration}ms", 
+                _logger.LogInformation("⚡ PERFORMANCE: {Operation} took {Duration}ms",
                     operation, duration.TotalMilliseconds);
             }
         }

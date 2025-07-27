@@ -22,11 +22,11 @@ public class GanttTaskService : IGanttTaskService
         try
         {
             _universalLogger.LogDatabaseOperation("GetAllTasks", new { Operation = "Retrieving all tasks from database" });
-            
+
             var tasks = await _context.Tasks
                 .OrderBy(t => t.Id)
                 .ToListAsync();
-                
+
             _universalLogger.LogDatabaseOperation("GetAllTasks", new { TaskCount = tasks.Count, Success = true });
             return tasks;
         }

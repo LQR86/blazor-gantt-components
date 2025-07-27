@@ -276,7 +276,7 @@ public class UniversalLoggerTests
             x => x.Log(
                 LogLevel.Information,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("📅 DATE: Task 1") 
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("📅 DATE: Task 1")
                     && v.ToString()!.Contains("StartDate: 2025-07-27")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
@@ -299,7 +299,7 @@ public class UniversalLoggerTests
             x => x.Log(
                 LogLevel.Information,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("📅 DATE: Task 1") 
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("📅 DATE: Task 1")
                     && v.ToString()!.Contains("EndDate: NULL")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
@@ -322,7 +322,7 @@ public class UniversalLoggerTests
             x => x.Log(
                 LogLevel.Information,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("⏱️ DURATION: CalculateProjectDuration") 
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("⏱️ DURATION: CalculateProjectDuration")
                     && v.ToString()!.Contains("Days: 15")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
@@ -345,7 +345,7 @@ public class UniversalLoggerTests
             x => x.Log(
                 LogLevel.Information,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("🔄 COMPONENT: TaskGrid") 
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("🔄 COMPONENT: TaskGrid")
                     && v.ToString()!.Contains("OnInitialized")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),

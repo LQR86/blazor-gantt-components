@@ -31,27 +31,27 @@ public class GanttRowAlignmentService
     /// <summary>
     /// Default row height in pixels
     /// </summary>
-    public int DefaultRowHeight 
-    { 
-        get => _defaultRowHeight; 
-        set 
-        { 
+    public int DefaultRowHeight
+    {
+        get => _defaultRowHeight;
+        set
+        {
             _defaultRowHeight = value;
             RecalculateAllPositions();
-        } 
+        }
     }
 
     /// <summary>
     /// Header height in pixels
     /// </summary>
-    public int HeaderHeight 
-    { 
-        get => _headerHeight; 
-        set 
-        { 
+    public int HeaderHeight
+    {
+        get => _headerHeight;
+        set
+        {
             _headerHeight = value;
             RecalculateAllPositions();
-        } 
+        }
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public class GanttRowAlignmentService
 
         _rowPositions = positions;
         RowPositionsChanged?.Invoke(new Dictionary<int, RowMetrics>(_rowPositions));
-        
+
         return positions;
     }
 
@@ -145,7 +145,7 @@ public class GanttRowAlignmentService
             return;
 
         _rowPositions[parentIndex] = _rowPositions[parentIndex] with { Expanded = expanded };
-        
+
         // Recalculate positions for all rows below the parent
         RecalculatePositionsFromIndex(parentIndex + 1);
     }
@@ -158,10 +158,10 @@ public class GanttRowAlignmentService
         foreach (var kvp in _rowPositions.OrderBy(x => x.Key))
         {
             var metrics = kvp.Value;
-            _rowPositions[kvp.Key] = metrics with 
-            { 
+            _rowPositions[kvp.Key] = metrics with
+            {
                 Top = currentTop,
-                Height = _defaultRowHeight 
+                Height = _defaultRowHeight
             };
             currentTop += _defaultRowHeight;
         }
@@ -173,10 +173,10 @@ public class GanttRowAlignmentService
     {
         var sortedRows = _rowPositions.OrderBy(x => x.Key).ToList();
         var startRow = sortedRows.FirstOrDefault(x => x.Key >= startIndex);
-        
+
         if (startRow.Key == 0 && startRow.Value == null) return;
 
-        var currentTop = startIndex > 0 
+        var currentTop = startIndex > 0
             ? _rowPositions[startIndex - 1].Top + _rowPositions[startIndex - 1].Height
             : _headerHeight;
 

@@ -1,0 +1,153 @@
+@page "/logger-demo"
+@using GanttComponents.Models
+@using GanttComponents.Services
+@inject IGanttTaskService TaskService
+@inject IUniversalLogger Logger
+
+<h1>Universal Logger Verification</h1>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Frontend (Component) Logging</h5>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-primary mb-2" @onclick="TestFrontendLogging">
+                        Test Frontend Logger
+                    </button>
+                    <div class="alert alert-info">
+                        <small>This tests logging from Blazor components (frontend)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Backend (Service) Logging</h5>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-success mb-2" @onclick="TestBackendLogging">
+                        Test Backend Logger
+                    </button>
+                    <div class="alert alert-info">
+                        <small>This tests logging from backend services</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Test Results</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h6>📋 Instructions:</h6>
+                        <ol>
+                            <li>Click the buttons above to test frontend and backend logging</li>
+                            <li>Check the console output in your terminal for log messages</li>
+                            <li>Check the log files in <code>./logs/</code> directory</li>
+                            <li>Look for emoji indicators: 🔄 COMPONENT, 🔧 DATABASE, 📅 DATE, etc.</li>
+                        </ol>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(lastMessage))
+                    {
+                        <div class="alert alert-success">
+                            <strong>Last Action:</strong> @lastMessage
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string lastMessage = "";
+
+    protected override void OnInitialized()
+    {
+        Logger.LogComponentLifecycle("LoggerDemo", "OnInitialized", new { 
+            ComponentName = "LoggerDemo",
+            Purpose = "Testing Universal Logger",
+            Timestamp = DateTime.Now
+        });
+        
+        Logger.LogInfo("📋 Logger Demo page initialized - Ready to test frontend and backend logging");
+    }
+
+    private void TestFrontendLogging()
+    {
+        lastMessage = "Testing Frontend Logging...";
+        StateHasChanged();
+
+        // Test all frontend logging methods
+        Logger.LogUserAction("TestButton", new { Action = "Frontend Logger Test", UserId = "DemoUser" });
+        
+        Logger.LogComponentLifecycle("LoggerDemo", "TestExecution", new { 
+            TestType = "Frontend",
+            ComponentState = "Active"
+        });
+        
+        Logger.LogTaskGridOperation("SimulateTaskSelection", new { 
+            TaskId = 999,
+            RowIndex = 5,
+            Action = "FrontendTest"
+        });
+        
+        Logger.LogTimelineOperation("SimulateTaskbarRender", new { 
+            TaskId = 999,
+            StartDate = new DateOnly(2025, 7, 27),
+            Duration = "5d"
+        });
+        
+        Logger.LogDateOperation("TestTask", new DateOnly(2025, 7, 27), "StartDate");
+        
+        Logger.LogStateChange("LoggerDemo", "TestStatus", "idle", "testing");
+        
+        lastMessage = "✅ Frontend logging test completed! Check console and log files.";
+        StateHasChanged();
+    }
+
+    private async Task TestBackendLogging()
+    {
+        lastMessage = "Testing Backend Logging...";
+        StateHasChanged();
+
+        try
+        {
+            // This will trigger backend service logging
+            var tasks = await TaskService.GetAllTasksAsync();
+            
+            Logger.LogInfo($"🔧 Backend test: Retrieved {tasks.Count} tasks from database");
+            
+            // Test performance logging
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            await Task.Delay(100); // Simulate some work
+            stopwatch.Stop();
+            
+            Logger.LogPerformance("BackendTestOperation", stopwatch.Elapsed, new { 
+                TaskCount = tasks.Count,
+                TestType = "Backend",
+                DatabaseQuery = "GetAllTasks"
+            });
+            
+            lastMessage = $"✅ Backend logging test completed! Retrieved {tasks.Count} tasks.";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError("Backend test failed", ex);
+            lastMessage = "❌ Backend logging test failed - check logs for details.";
+        }
+        
+        StateHasChanged();
+    }
+}

@@ -8,23 +8,31 @@ public class GanttTaskService : IGanttTaskService
 {
     private readonly GanttDbContext _context;
     private readonly ILogger<GanttTaskService> _logger;
+    private readonly IUniversalLogger _universalLogger;
 
-    public GanttTaskService(GanttDbContext context, ILogger<GanttTaskService> logger)
+    public GanttTaskService(GanttDbContext context, ILogger<GanttTaskService> logger, IUniversalLogger universalLogger)
     {
         _context = context;
         _logger = logger;
+        _universalLogger = universalLogger;
     }
 
     public async Task<List<GanttTask>> GetAllTasksAsync()
     {
         try
         {
-            return await _context.Tasks
+            _universalLogger.LogDatabaseOperation("GetAllTasks", new { Operation = "Retrieving all tasks from database" });
+            
+            var tasks = await _context.Tasks
                 .OrderBy(t => t.Id)
                 .ToListAsync();
+                
+            _universalLogger.LogDatabaseOperation("GetAllTasks", new { TaskCount = tasks.Count, Success = true });
+            return tasks;
         }
         catch (Exception ex)
         {
+            _universalLogger.LogError("Error retrieving all tasks from database", ex);
             _logger.LogError(ex, "Error retrieving all tasks");
             throw;
         }

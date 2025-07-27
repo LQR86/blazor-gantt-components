@@ -42,7 +42,7 @@ public class GanttRowAlignmentServiceTests
         // Arrange
         var service = new GanttRowAlignmentService();
         bool eventTriggered = false;
-        
+
         service.RowPositionsChanged += _ => eventTriggered = true;
 
         var metrics = new RowMetrics

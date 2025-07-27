@@ -11,4 +11,9 @@ public interface IGanttTaskService
     Task DeleteTaskAsync(int id);
     Task<List<GanttTask>> GetTasksByParentIdAsync(int? parentId);
     Task<bool> ValidateWbsCodeUniquenessAsync(string wbsCode, int? excludeTaskId = null);
+
+    // WBS Generation integration methods
+    Task<List<GanttTask>> RegenerateAllWbsCodesAsync();
+    Task<List<GanttTask>> ValidateAndFixWbsHierarchyAsync();
+    Task<string> GetNextAvailableWbsCodeAsync(string? parentWbsCode);
 }

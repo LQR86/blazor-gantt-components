@@ -9,12 +9,18 @@ public class GanttTaskService : IGanttTaskService
     private readonly GanttDbContext _context;
     private readonly ILogger<GanttTaskService> _logger;
     private readonly IUniversalLogger _universalLogger;
+    private readonly IWbsCodeGenerationService _wbsService;
 
-    public GanttTaskService(GanttDbContext context, ILogger<GanttTaskService> logger, IUniversalLogger universalLogger)
+    public GanttTaskService(
+        GanttDbContext context,
+        ILogger<GanttTaskService> logger,
+        IUniversalLogger universalLogger,
+        IWbsCodeGenerationService wbsService)
     {
         _context = context;
         _logger = logger;
         _universalLogger = universalLogger;
+        _wbsService = wbsService;
     }
 
     public async Task<List<GanttTask>> GetAllTasksAsync()
@@ -153,6 +159,105 @@ public class GanttTaskService : IGanttTaskService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error validating WBS code uniqueness for {WbsCode}", wbsCode);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Regenerates WBS codes for all tasks and saves to database
+    /// </summary>
+    public async Task<List<GanttTask>> RegenerateAllWbsCodesAsync()
+    {
+        try
+        {
+            _universalLogger.LogWbsOperation("Regenerating all WBS codes", new { Operation = "Starting regeneration" });
+
+            var allTasks = await GetAllTasksAsync();
+            var updatedTasks = await _wbsService.GenerateWbsCodesAsync(allTasks);
+
+            // Save updated tasks to database
+            foreach (var task in updatedTasks)
+            {
+                _context.Tasks.Update(task);
+            }
+
+            await _context.SaveChangesAsync();
+
+            _universalLogger.LogWbsOperation("Regenerated all WBS codes", new
+            {
+                TaskCount = updatedTasks.Count,
+                Success = true
+            });
+
+            return updatedTasks;
+        }
+        catch (Exception ex)
+        {
+            _universalLogger.LogError("Error regenerating WBS codes", ex);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Validates WBS hierarchy and fixes any issues found
+    /// </summary>
+    public async Task<List<GanttTask>> ValidateAndFixWbsHierarchyAsync()
+    {
+        try
+        {
+            _universalLogger.LogWbsOperation("Validating WBS hierarchy", new { Operation = "Starting validation" });
+
+            var allTasks = await GetAllTasksAsync();
+            var validationErrors = _wbsService.ValidateWbsHierarchy(allTasks);
+
+            if (validationErrors.Any())
+            {
+                _universalLogger.LogWarning("WBS hierarchy validation found errors", new
+                {
+                    ErrorCount = validationErrors.Count,
+                    Errors = validationErrors
+                });
+
+                // Fix by regenerating all WBS codes
+                return await RegenerateAllWbsCodesAsync();
+            }
+
+            _universalLogger.LogWbsOperation("WBS hierarchy validation passed", new
+            {
+                TaskCount = allTasks.Count,
+                Success = true
+            });
+
+            return allTasks;
+        }
+        catch (Exception ex)
+        {
+            _universalLogger.LogError("Error validating WBS hierarchy", ex);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Gets the next available WBS code for a new task
+    /// </summary>
+    public async Task<string> GetNextAvailableWbsCodeAsync(string? parentWbsCode)
+    {
+        try
+        {
+            var allTasks = await GetAllTasksAsync();
+            var nextWbsCode = _wbsService.GetNextAvailableWbsCode(allTasks, parentWbsCode);
+
+            _universalLogger.LogWbsOperation("Generated next available WBS code", new
+            {
+                ParentWbsCode = parentWbsCode ?? "ROOT",
+                NextWbsCode = nextWbsCode
+            });
+
+            return nextWbsCode;
+        }
+        catch (Exception ex)
+        {
+            _universalLogger.LogError($"Error getting next available WBS code for parent '{parentWbsCode}'", ex);
             throw;
         }
     }

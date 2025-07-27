@@ -5,26 +5,55 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ---
 
+## ⚡ **DEVELOPMENT PHILOSOPHY - KEEP IT SIMPLE**
+
+> **🎯 CORE PRINCIPLE: PRACTICAL, SIMPLE, REALISTIC ALWAYS**
+> 
+> Every decision in this project must pass the **SIMPLE TEST**:
+> - ✅ **PRACTICAL**: Will this actually work in the real world?
+> - ✅ **SIMPLE**: Is this the simplest approach that meets the requirement?
+> - ✅ **REALISTIC**: Can we actually build and maintain this?
+> 
+> **When in doubt, choose SIMPLE over CLEVER, WORKING over PERFECT, DONE over IDEAL**
+> 
+> **Success Metrics**: 
+> - ✅ Working software delivered in phases
+> - ✅ Each feature works completely before moving to next
+> - ✅ No over-engineering or premature optimization
+> - ✅ Clear, maintainable code that others can understand
+> 
+> **Red Flags to Avoid**:
+> - ❌ "This will be easy to add later" (add it now or don't plan for it)
+> - ❌ "We should make this configurable" (hard-code first, extract later)
+> - ❌ "This might scale better" (solve today's problems, not tomorrow's)
+> - ❌ "This is more elegant" (choose working over elegant)
+
+---
+
 ## 🔒 **CRITICAL DESIGN CONSTRAINTS**
 
-### 1. **Day-Level Scheduling ONLY**
-- ✅ **MUST**: Maximum hour-level granularity, NO minute/second precision
-- ✅ **MUST**: All date calculations use day boundaries
-- ✅ **MUST**: Timeline scales limited to: Hour, Day, Week, Month, Quarter
-- ✅ **MUST**: Duration format: "5d" or "8h" (no minutes/seconds)
-- ✅ **MUST**: Dependency offsets in day units: "+3d", "-2d"
+### 1. **Day-Level Scheduling ONLY - No Sub-Day Precision**
+- ✅ **MUST**: DAY precision ONLY - NO hours, minutes, or seconds in timestamps or calculations
+- ✅ **MUST**: All timestamps stored as DATE only (no time components)
+- ✅ **MUST**: All date calculations use day boundaries exclusively
+- ✅ **MUST**: Timeline scales limited to: Day, Week, Month, Quarter (NO hour scale)
+- ✅ **MUST**: Duration format: "5d" or "5D" ONLY - NO hour units in scheduling
+- ✅ **MUST**: Dependency offsets in day units ONLY: "+3d", "-2d"
+- ✅ **MUST**: Drop/ignore any hour/minute/second precision in all inputs
+- ✅ **MUST**: Hours ONLY used for daily working time settings (8h workday), NOT for task scheduling
 
-**Rationale**: Eliminates complexity while serving 99% of project management use cases
+**Rationale**: Pure day-level scheduling eliminates time zone issues, simplifies calculations, and serves 99% of project management use cases. Hours are configuration only, never scheduling units.
 
-### 2. **UTC Timestamps Only by Choice**
-- ✅ **MUST**: All timestamps stored and processed in UTC only
-- ✅ **MUST**: No timezone conversion or timezone-aware calculations
-- ✅ **MUST**: User interface displays dates in user's local timezone for viewing only
-- ✅ **MUST**: All date inputs converted to UTC immediately upon entry
-- ✅ **MUST**: No timezone selection or timezone management features
-- ✅ **MUST**: Simple date arithmetic without timezone complications
+### 2. **UTC Date Storage Only (No Time Components)**
+- ✅ **MUST**: All dates stored as DATE only in UTC (no time components whatsoever)
+- ✅ **MUST**: No time zone conversion or time zone-aware calculations
+- ✅ **MUST**: User interface displays dates in user's local date format for viewing only
+- ✅ **MUST**: All date inputs converted to UTC DATE immediately upon entry (time dropped)
+- ✅ **MUST**: No time zone selection or time zone management features
+- ✅ **MUST**: Simple date arithmetic using day boundaries only
+- ✅ **MUST**: Hours used ONLY for working time configuration (e.g., "8 hours per workday")
 
-**Rationale**: Eliminates timezone complexity, bugs, and edge cases while maintaining global usability through local display conversion
+**Rationale**: Eliminates all timezone complexity, time precision bugs, and edge cases while maintaining global usability
 
 ### 3. **No Batch Operations by Choice**
 - ✅ **MUST**: Single-operation CRUD only (no batch editing)
@@ -95,30 +124,31 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ### 10. **Timeline Functionality**
 - ✅ **MUST**: SVG-based timeline rendering
-- ✅ **MUST**: Multiple zoom levels (hour to quarter)
-- ✅ **MUST**: Pan and zoom interactions
-- ✅ **MUST**: Task bar drag and resize
-- ✅ **MUST**: Dependency line rendering
-- ✅ **MUST**: Today indicator and working time backgrounds
+- ✅ **MUST**: Multiple zoom levels (day to quarter) - NO hour-level zoom
+- ✅ **MUST**: Pan and zoom interactions using day boundaries
+- ✅ **MUST**: Task bar drag and resize using day increments only
+- ✅ **MUST**: Dependency line rendering between day-based tasks
+- ✅ **MUST**: Today indicator and working day backgrounds (no hour divisions)
 
-### 11. **Data Management**
-- ✅ **MUST**: Support for large datasets (1000+ tasks)
-- ✅ **MUST**: Virtual scrolling for performance
+### 11. **Data Management (Keep It Simple)**
 - ✅ **MUST**: Real-time data binding
 - ✅ **MUST**: Three-table relationship (Tasks, Resources, Assignments)
 - ✅ **MUST**: Data validation and constraint checking
+- ✅ **MUST**: Support typical project datasets
+
+**Note**: No specific dataset size requirements - build it simple first, optimize later if needed.
 
 ### 12. **WBS Code Task Identification**
 - ✅ **MUST**: WBS codes as the only user-facing task identifiers
 - ✅ **MUST**: Hierarchical WBS structure (e.g., "1", "1.1", "1.1.1", "1.2", "2")
 - ✅ **MUST**: Auto-generation of WBS codes based on task hierarchy
 - ✅ **MUST**: WBS codes visible in all user interfaces (grid, timeline, exports)
-- ✅ **MUST**: WBS codes used in dependency definitions (e.g., "1.2FS+3d")
+- ✅ **MUST**: WBS codes used in dependency definitions with DAY units only (e.g., "1.2FS+3d")
 - ✅ **MUST**: Database IDs kept internal and never exposed to users
 - ✅ **MUST**: WBS code validation and uniqueness enforcement
 - ✅ **MUST**: WBS renumbering when task hierarchy changes
 
-**Rationale**: WBS codes provide meaningful, hierarchical identifiers that project managers understand, while database IDs are technical implementation details that should remain hidden from users.
+**Rationale**: WBS codes provide meaningful, hierarchical identifiers that project managers understand, while database IDs are technical implementation details that should remain hidden from users. All dependencies use day-level precision only.
 
 ---
 
@@ -135,15 +165,16 @@ This document captures the **immutable requirements** for our custom Gantt compo
 - ✅ **MUST**: Support for English and Chinese (Simplified) languages only
 - ✅ **MUST**: All user-visible text externalized to resource files
 - ✅ **MUST**: Support for left-to-right (LTR) text direction only (no RTL)
-- ✅ **MUST**: Datetime format localization (US format vs Chinese format)
-- ✅ **MUST**: Common metrics and units localization (duration units, percentages)
+- ✅ **MUST**: Date format localization (US format vs Chinese format) - dates only, no times
+- ✅ **MUST**: Duration unit localization ("days", "天") - DAY units only
 - ✅ **MUST**: Resource key management system for translatable strings
 - ✅ **MUST**: Fallback to English for missing Chinese translations
 - ✅ **MUST**: No hardcoded text strings in component code
 - ❌ **NOT**: Full cultural localization (business logic, data formats remain consistent)
 - ❌ **NOT**: Support for languages other than English and Chinese (Simplified)
+- ❌ **NOT**: Hour/time-based unit localization (only day units exist)
 
-**Rationale**: Focused on English/Chinese markets with datetime and metrics localization for user familiarity, while keeping business logic standardized
+**Rationale**: Focused on English/Chinese markets with date format localization for user familiarity, while keeping business logic standardized and day-based only
 
 ### 15. **Visual Standards**
 - ✅ **MUST**: Clean, modern interface design
@@ -156,19 +187,13 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ## ⚡ **PERFORMANCE REQUIREMENTS**
 
-### 16. **Performance Targets**
-- ✅ **MUST**: TaskGrid handles 1000+ rows with smooth scrolling
-- ✅ **MUST**: TimelineView renders 500+ tasks at 60fps
-- ✅ **MUST**: Stable memory usage during interactions
-- ✅ **MUST**: Bundle size <100KB gzipped for core components
-- ✅ **MUST**: Fast initial load and responsive interactions
+### 16. **Performance Requirements (Basic Only)**
+- ✅ **MUST**: Responsive user interactions (no specific targets)
+- ✅ **MUST**: Stable memory usage during normal operation
+- ✅ **MUST**: Fast initial load with reasonable bundle size
+- ✅ **MUST**: Smooth scrolling with typical project datasets
 
-### 17. **Technical Performance**
-- ✅ **MUST**: Efficient DOM updates and rendering
-- ✅ **MUST**: Virtual scrolling implementation
-- ✅ **MUST**: Optimized paint and layout operations
-- ✅ **MUST**: Smooth animations using RAF
-- ✅ **MUST**: Memory management and cleanup
+**Note**: All specific performance targets and optimizations deferred to Phase 5+ when we have working components to optimize.
 
 ---
 
@@ -194,8 +219,7 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ### 20. **Accessibility**
 - ✅ **MUST**: WCAG AA compliance
-- ✅ **MUST**: Screen reader support
-- ✅ **MUST**: Keyboard navigation for all features
+- ✅ **MUST**: Keyboard navigation for core features
 - ✅ **MUST**: Proper ARIA labels and roles
 - ✅ **MUST**: Focus indicators and logical tab order
 
@@ -253,7 +277,7 @@ This document captures the **immutable requirements** for our custom Gantt compo
 - ✅ **MUST**: Deliver enterprise-grade stability and reliability
 
 ### 27. **Long-term Vision**
-- ✅ **MUST**: Serve as foundation for future Gantt-related features
+- ✅ **MUST**: Serve as the foundation of future multi-user Gantt collaboration app
 - ✅ **MUST**: Demonstrate feasibility of custom component development
 - ✅ **MUST**: Create reusable pattern for other complex UI components
 - ✅ **MUST**: Establish technical leadership in custom component development
@@ -264,41 +288,46 @@ This document captures the **immutable requirements** for our custom Gantt compo
 
 ### What We Will NOT Do:
 - ❌ **NO** minute/second precision scheduling
+- ❌ **NO** hour-based task scheduling or duration units (hours only for daily work time configuration)
 - ❌ **NO** batch operations or bulk editing modes  
 - ❌ **NO** dependency on Syncfusion or similar libraries
 - ❌ **NO** compromise on row alignment quality
 - ❌ **NO** complex frameworks that add unnecessary complexity
-- ❌ **NO** performance compromises for large datasets
 - ❌ **NO** accessibility or browser compatibility shortcuts
 - ❌ **NO** exposing database IDs to users (WBS codes only)
 - ❌ **NO** timezone management or timezone-aware calculations
+- ❌ **NO** time component storage or processing (dates only)
 - ❌ **NO** full cultural localization (business logic remains standardized)
 - ❌ **NO** support for languages other than English and Chinese (Simplified)
+- ❌ **NO** premature optimization for extreme performance requirements
+- ❌ **NO** over-engineering for enterprise-scale features in Phase 1
 
 ### What We Will ALWAYS Do:
 - ✅ **ALWAYS** prioritize user experience and visual design
 - ✅ **ALWAYS** maintain pixel-perfect row alignment
 - ✅ **ALWAYS** provide immediate feedback for user actions
 - ✅ **ALWAYS** follow Material Design principles
-- ✅ **ALWAYS** ensure enterprise-grade performance and reliability
 - ✅ **ALWAYS** use WBS codes as user-facing task identifiers
-- ✅ **ALWAYS** store and process timestamps in UTC only
+- ✅ **ALWAYS** store and process dates only in UTC (no time components)
+- ✅ **ALWAYS** use DAY units exclusively for all scheduling and duration calculations
 - ✅ **ALWAYS** support UI label translation for English and Chinese (Simplified)
-- ✅ **ALWAYS** localize datetime formats and common metrics for user familiarity
+- ✅ **ALWAYS** localize date formats for user familiarity (no time localization needed)
+- ✅ **ALWAYS** start simple and enhance in phases for higher success probability
+- ✅ **ALWAYS** deliver working features before adding complexity
 
 ---
 
 ## 📝 **VALIDATION CHECKLIST**
 
 Before considering any requirement "complete":
-- [ ] Tested with 1000+ task dataset
 - [ ] Verified pixel-perfect row alignment in all scenarios
 - [ ] Confirmed Material Design compliance
-- [ ] Validated performance targets
 - [ ] Tested accessibility compliance
 - [ ] Verified cross-browser compatibility
 - [ ] Confirmed export functionality
 - [ ] Validated integration capabilities
+
+**Note**: Focus on functionality first, performance optimization comes later when we have working components.
 
 ---
 

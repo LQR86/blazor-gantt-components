@@ -2,12 +2,38 @@
 
 > **⚠️ EXPERIMENTAL DOCUMENT**: This is an experimental implementation guide that may contain uncertainty and evolving approaches. For immutable requirements, see [REQUIREMENTS.md](./REQUIREMENTS.md).
 
-## 🎯 Project Overview
-**Goal**: Build custom Gantt UI components from scratch to replace Syncfusion with full source control
-**Philosophy**: UI-first approach with independent composable components
-**Strategy**: TaskGrid + TimelineView as separate components that work independently or together via GanttComposer
-**Framework**: Blazor Server (.NET 8.0) with standard web technologies
+## ⚡ **IMPLEMENTATION PHILOSOPHY - SIMPLE & REALISTIC FIRST**
+
+> **🎯 GUIDING PRINCIPLE: BUILD SIMPLE, WORKING SOFTWARE**
+> 
+> This implementation plan follows the **SIMPLE-FIRST METHODOLOGY**:
+> - ✅ **WORKING > PERFECT**: Deliver working features before polishing
+> - ✅ **SIMPLE > CLEVER**: Choose obvious solutions over elegant complexity
+> - ✅ **REALISTIC > AMBITIOUS**: Set achievable milestones we can actually hit
+> - ✅ **INCREMENTAL > BIG-BANG**: Small, working steps over large integrations
+> 
+> **Decision Framework for Every Feature**:
+> 1. **Can we build this in 1-2 days?** → If no, break it down further
+> 2. **Will this work without external dependencies?** → Prefer browser standards
+> 3. **Can someone else understand this in 6 months?** → Keep it obvious
+> 4. **Does this solve today's problem?** → Don't build for hypothetical futures
+> 
+> **Success Pattern**: Week 1 working foundation → Week 2 basic integration → Week 3-4 polish → Week 5-8 essential features
+> 
+> **Failure Pattern**: Week 1-4 complex architecture → Week 5-8 fighting integration issues → No working software
+
+---
+
+## 🎯 Project Overview - SIMPLIFIED FOR SUCCESS
+**Goal**: Build simple, working custom Gantt UI components that satisfy core requirements with minimum complexity
+**Philosophy**: Simplicity first - meet core requirements with least possible features, enhance in phases
+**Strategy**: Basic TaskGrid + Basic TimelineView that work together (Phase 1), enhance with essential features later
+**Framework**: Blazor Server (.NET 8.0) with minimal dependencies
 **Requirements Source**: All implementation must satisfy requirements in [REQUIREMENTS.md](./REQUIREMENTS.md)
+**Success Metric**: 
+- **Phase 1**: Working end-to-end Gantt chart with core functionality
+- **Phase 2+**: Essential Gantt features (dependencies, zoom, export, resource management)
+- **Final**: Full-featured Gantt replacement for Syncfusion
 
 ---
 
@@ -16,20 +42,23 @@
 > **Note**: These constraints are immutable and defined in [REQUIREMENTS.md](./REQUIREMENTS.md). Implementation approaches may vary but constraints must be satisfied.
 
 ### Day-Level Scheduling ONLY (REQUIREMENT 1)
-**Constraint**: Maximum hour-level granularity, NO minute/second precision
+**Constraint**: DAY precision ONLY - NO hours, minutes, or seconds in timestamps or calculations
 **Impact on Implementation**: 
-- Date-to-pixel conversion uses day boundaries only
-- Timeline scales limited to: Hour, Day, Week, Month, Quarter
-- Duration format: "5d" or "8h" (no minutes/seconds)
-- Dependency offsets in day units: "+3d", "-2d"
+- Date-to-pixel conversion uses day boundaries exclusively
+- Timeline scales limited to: Day, Week, Month, Quarter (NO hour scale)
+- Duration format: "5d" or "5D" ONLY - NO hour units in scheduling
+- Dependency offsets in day units ONLY: "+3d", "-2d"
+- Drop/ignore any hour/minute/second precision in all inputs
+- Hours ONLY used for daily working time settings (8h workday), NOT for task scheduling
 - Simplifies all date calculations and timeline rendering
 
-### UTC Timestamps Only (REQUIREMENT 2)
-**Constraint**: All timestamps stored and processed in UTC only
+### UTC Date Storage Only (REQUIREMENT 2)
+**Constraint**: All dates stored as DATE only in UTC (no time components whatsoever)
 **Impact on Implementation**:
 - No timezone conversion logic needed
-- All date inputs converted to UTC immediately
-- UI displays in user's local timezone for viewing only
+- All date inputs converted to UTC DATE immediately (time components dropped)
+- UI displays dates in user's local date format for viewing only
+- Hours used ONLY for working time configuration (e.g., "8 hours per workday")
 - Eliminates timezone complexity and edge cases
 
 ### No Batch Operations (REQUIREMENT 3)
@@ -52,7 +81,8 @@
 **Constraint**: English and Chinese (Simplified) only, LTR text direction
 **Impact on Implementation**:
 - Resource files for all user-visible text
-- Datetime format localization
+- Date format localization (dates only, no times)
+- Duration unit localization ("days", "天") - DAY units only
 - No hardcoded strings in components
 - Fallback to English for missing translations
 
@@ -67,7 +97,7 @@
 
 ---
 
-## 🛠️ Technology Stack (Requirements-Compliant)
+## 🛠️ Technology Stack (Requirements-Compliant) - REVISED
 
 ### Mandated Core Framework (REQUIREMENT 18)
 - **Blazor Server (.NET 8.0)** - Primary framework (non-negotiable)
@@ -75,303 +105,191 @@
 - **SVG** - Timeline graphics rendering (required)
 - **Standard Web Technologies** - No exotic dependencies (required)
 
-### Approved Supporting Libraries
-- **Virtual Scrolling** - For performance with large datasets (1000+ tasks)
-- **date-fns** - For day/hour-level date calculations (UTC handling)
-- **Interact.js** - For drag & drop interactions
-- **PopperJS** - For tooltips and context menus
-- **ResizeObserver API** - For responsive layouts
-- **html2canvas + jsPDF** - For PDF export with vector graphics
+### Minimal Supporting Technologies (Start Simple)
+- **CSS Custom Properties** - For theming and Material design (already using)
+- **Material Icons** - For consistent iconography (already using)
+- **Native Browser APIs** - ResizeObserver, IntersectionObserver for performance
 
-### Material Design Implementation (REQUIREMENT 13)
-- **CSS Custom Properties** - For theming and Material design
-- **Material Icons** - For consistent iconography
-- **Material Colors** - Standardized color palette
-
-### I18N Implementation (REQUIREMENT 14)
+### I18N Implementation (REQUIREMENT 14) - Built-in .NET
 - **Blazor Localization** - Resource files for English/Chinese
-- **IStringLocalizer** - Component text localization
-- **CultureInfo** - DateTime format localization
+- **IStringLocalizer** - Component text localization  
+- **CultureInfo** - Date format localization (dates only, no times)
 - **No RTL Support** - LTR text direction only
+
+### Libraries to Add Only When Needed (Phase 2+)
+- **Virtual Scrolling** - Custom implementation first, library if needed
+- **Date Utilities** - Custom day-level math first, date-fns if complexity grows
+- **PDF Export** - Simple print CSS first, then consider libraries
+
+### Technologies to Avoid (Unless Proven Necessary)
+- ❌ **Interact.js** - Use native HTML5 drag & drop first
+- ❌ **PopperJS** - Use CSS positioning first  
+- ❌ **html2canvas** - Use CSS print media queries first
+- ❌ **Complex charting libraries** - We're building custom SVG
+
+**Philosophy**: Start with browser standards and .NET built-ins. Add external dependencies only when we hit clear limitations.
 
 ---
 
-## 📋 Implementation Milestones (Requirements-Driven)
+## 📋 Implementation Milestones (Requirements-Driven) - REVISED
 
 > **Validation**: Each milestone must satisfy corresponding requirements in [REQUIREMENTS.md](./REQUIREMENTS.md)
+> **Strategy**: Walking Skeleton approach - get basic end-to-end working first, then enhance
 
-### Phase 1: Independent Components Foundation (Week 1-2)
-**Goal**: Build TaskGrid and TimelineView as standalone components (REQUIREMENTS 5, 6)
+### Phase 1: Foundation & Walking Skeleton (Week 1-2)
+**Goal**: Establish foundation and get basic end-to-end integration working (REQUIREMENTS 5, 6, 12)
 
-#### Milestone 1.1: TaskGrid Component with WBS Support
-- [ ] **Basic Grid Structure (REQUIREMENT 9)**
-  - CSS Grid-based layout for performance
-  - Fixed header with scrollable body
-  - Column definitions and sizing
-  - Row virtualization for 1000+ tasks (REQUIREMENT 16)
+#### Milestone 1.1: WBS Code Foundation (CRITICAL FIRST)
+**Why First**: WBS codes are fundamental to everything - UI labels, dependencies, user interactions
+- [ ] **WBS Code Data Model (REQUIREMENT 12)**
+  - Add WbsCode property to GanttTask model
+  - Hierarchical WBS structure ("1", "1.1", "1.1.1", "1.2", "2")
+  - Database IDs kept internal (never exposed to users)
+  - Update existing demo data with WBS codes
 
-- [ ] **WBS Code Implementation (REQUIREMENT 12)**
-  - WBS code column as primary task identifier
-  - Hierarchical WBS generation ("1", "1.1", "1.1.1", "1.2", "2")
+- [ ] **WBS Generation Service (REQUIREMENT 12)**
+  - WbsCodeGenerationService for auto-generation
   - Auto-renumbering on hierarchy changes
   - WBS validation and uniqueness enforcement
-  - Database IDs kept internal (never exposed to users)
+  - Integration with existing GanttRowAlignmentService
 
-- [ ] **Tree Structure Support (REQUIREMENT 8)**
-  - Expandable/collapsible hierarchy
-  - Indentation with visual guides
-  - Parent-child relationship indicators
-  - Efficient tree state management
-
-- [ ] **I18N Implementation (REQUIREMENT 14)**
-  - All text externalized to resource files
-  - English/Chinese (Simplified) support
-  - Localized datetime formats
-  - IStringLocalizer integration
-
-- [ ] **Grid Interactions (REQUIREMENT 9)**
-  - Row selection (single/multiple)
-  - Column resizing, reordering, show/hide
-  - Keyboard navigation (arrows, tab, enter)
-  - Sorting and filtering capabilities
-
-- [ ] **Cell Rendering with Validation**
-  - Text cells with inline editing
-  - UTC date picker cells (REQUIREMENT 2)
-  - Duration cells ("5d"/"8h" format)
-  - Progress percentage cells
-  - Resource assignment cells
-  - Real-time validation and constraints
-
-#### Milestone 1.2: TimelineView Component (SVG-Based)
-- [ ] **SVG Timeline Architecture (REQUIREMENT 18)**
-  - SVG-based rendering (required technology)
-  - Scalable coordinate system (day → pixel conversion)
-  - Zoom levels: Hour, Day, Week, Month, Quarter only
-  - UTC timestamp handling throughout
-
-- [ ] **Timeline Foundation**
-  - Viewport and pan/zoom calculations
-  - Responsive width/height handling
-  - Material Design visual standards (REQUIREMENT 13)
-
-- [ ] **Timeline Header**
-  - Multi-tier date headers (major/minor scales)
-  - Localized date formatting (English/Chinese)
-  - Today indicator line
-  - Working/non-working time backgrounds (day boundaries)
-  - Holiday markers (day precision only)
-
-- [ ] **Task Bar Rendering**
-  - SVG rectangular bars for tasks
-  - WBS code labels on bars (not database IDs)
-  - Progress indicators (filled portion)
-  - Milestone markers (diamonds)
-  - Baseline indicators (planned vs actual)
-  - Critical path highlighting
-
-- [ ] **Dependencies with WBS Codes (REQUIREMENT 8)**
-  - Dependency line rendering (FS, SS, FF, SF)
-  - WBS-based dependency syntax ("1.2FS+3d")
-  - Day-level offset support only (+3d, -2d)
-  - Circular dependency detection
-  - Multiple dependencies per task
-
-#### Milestone 1.3: Advanced Data Architecture
-- [ ] **UTC Data Management (REQUIREMENT 2)**
-  - All timestamps stored in UTC
-  - Immediate UTC conversion on input
-  - Local timezone display only (no timezone logic)
-  - Day-boundary calculations
-
-- [ ] **Single-Operation CRUD (REQUIREMENT 3)**
-  - No batch operations anywhere
-  - Immediate feedback for each action
-  - Real-time server synchronization
-  - Simple state management
-
-- [ ] **Resource Management (REQUIREMENT 8)**
-  - Three-table relationship (Tasks, Resources, Assignments)
-  - Resource assignment to tasks
-  - Multi-resource assignment per task
-  - Day-level utilization tracking
-  - Resource cost calculation
-
-- [ ] **Task Scheduling Engine**
-  - Auto-scheduling based on WBS dependencies
-  - Duration calculations (days/hours only)
-  - Critical path calculation
-  - Day-level calendar integration
-  - Slack time computation (day precision)
-  - Dependency validation and warnings
-
-### Phase 2: Advanced UI Features & Compliance (Week 3-4)
-**Goal**: Add interactions, accessibility, and Material Design compliance
-
-#### Milestone 2.1: TaskGrid Enhancements (REQUIREMENT 9)
-- [ ] **Advanced Grid Features**
-  - Sorting by columns with I18N support
-  - Filtering capabilities with localized labels
-  - Global search functionality
-  - Context menus with localized text
-
-- [ ] **Material Design Implementation (REQUIREMENT 13)**
-  - Material Design color palette and spacing
-  - Material typography and elevation
-  - CSS custom properties for theming
-  - Material motion and animations
-
-- [ ] **Accessibility Compliance (REQUIREMENT 20)**
-  - WCAG AA compliance
-  - ARIA labels and roles
-  - Keyboard navigation for all features
-  - Screen reader support
-  - Focus indicators and logical tab order
-
-- [ ] **I18N Polish (REQUIREMENT 14)**
-  - All text from resource files
-  - Chinese datetime formatting
-  - Currency and number localization
+#### Milestone 1.2: I18N Foundation Setup
+**Why Early**: Better to build features with I18N from start than retrofit
+- [ ] **I18N Infrastructure (REQUIREMENT 14)**
+  - Resource files for English/Chinese (Simplified)
+  - IStringLocalizer integration in existing components
+  - Localized datetime formatting setup
   - Fallback to English for missing translations
+  - Update existing TaskGrid with I18N
 
-#### Milestone 2.2: TimelineView Interactions & Performance
-- [ ] **Performance Targets (REQUIREMENT 16)**
-  - 500+ tasks at 60fps rendering
-  - Smooth animations using RAF
-  - Efficient DOM updates
-  - Memory management and cleanup
+#### Milestone 1.3: Enhanced TaskGrid with WBS Support
+- [ ] **Basic Grid Enhancement (REQUIREMENT 9)**
+  - Add WBS code column as primary identifier 
+  - Replace ID display with WBS codes (simple column swap)
+  - Keep existing tree structure and selection working
+  - NO new features - just WBS integration
 
-- [ ] **Mouse Interactions**
-  - Task bar selection with visual feedback
-  - Hover effects with Material design
-  - WBS-based tooltips (not database IDs)
-  - Right-click context menus
+#### Milestone 1.4: Minimal Timeline Component (Prove It Works)
+**Goal**: Simplest possible timeline that proves row alignment works
+- [ ] **Ultra-Simple SVG Timeline (REQUIREMENT 18)**
+  - Fixed scale: 40px/day (no zoom initially)
+  - Simple month/day header (no multi-tier complexity)
+  - Basic rectangles for task bars with WBS labels
+  - UTC date handling (REQUIREMENT 2) - dates only, no time components
+  
+- [ ] **Basic Row Alignment (REQUIREMENT 6)**
+  - Fixed row heights using CSS custom properties
+  - Simple row alignment with TaskGrid
+  - NO dynamic heights initially (expand/collapse can wait)
+  - Prove basic alignment works first
 
-- [ ] **Pan and Zoom**
-  - Mouse wheel zoom (hour to quarter scales only)
-  - Pan with mouse drag
-  - Zoom to fit functionality
-  - Smooth transitions with Material motion
+#### Milestone 1.5: Simple Integration (Walking Skeleton)
+**Goal**: Basic side-by-side layout that works
+- [ ] **Simple Layout (REQUIREMENT 5)**
+  - TaskGrid and Timeline side by side (no splitter initially)
+  - Fixed proportions (e.g., 50/50 split)
+  - Same data in both components
+  - Selection sync (basic click synchronization)
 
-- [ ] **Advanced Timeline Features (REQUIREMENT 8)**
-  - Baseline comparison view
-  - Critical path visualization
-  - Event markers for milestones
-  - Working/non-working time backgrounds
+- [ ] **Walking Skeleton Validation**
+  - End-to-end working with demo data
+  - WBS codes displayed consistently
+  - I18N working (English/Chinese text switching)
+  - Basic performance check (is it smooth?)
 
-### Phase 3: Component Integration & Row Alignment (Week 5-6)
-**Goal**: Achieve pixel-perfect integration (REQUIREMENTS 5, 6)
+### Phase 2: Essential Polish Only (Week 3-4)
+**Goal**: Make it look professional and meet accessibility requirements
 
-#### Milestone 3.1: GanttComposer Component (REQUIREMENT 5)
-- [ ] **Independent Component Integration**
-  - TaskGrid and TimelineView work standalone
-  - Composable via GanttComposer
-  - Each component has complete API
-  - No tight coupling between components
+#### Milestone 2.1: Visual Polish (Keep It Simple)
+- [ ] **Material Design Basics (REQUIREMENT 13)**
+  - Apply Material colors and spacing
+  - Clean typography (no fancy animations yet)
+  - Basic hover effects
+  - Make it look professional but simple
 
-- [ ] **Pixel-Perfect Row Alignment (REQUIREMENT 6 - CRITICAL)**
-  - Shared row height state management
-  - RowAlignmentManager service
-  - Dynamic height calculation for tree nodes
-  - Alignment maintained during scroll, zoom, resize
-  - Alignment preserved during tree expand/collapse
-  - No visual row misalignment under any circumstances
+- [ ] **Timeline Essentials**
+  - Task progress bars (filled rectangles)
+  - Basic hover tooltips with WBS codes
+  - Simple selection highlighting
+  - NO zoom, NO pan initially
 
-- [ ] **Layout Manager**
-  - Splitter between TaskGrid and TimelineView
-  - Synchronized row heights
-  - Proportional resizing with user preferences
-  - Material Design consistent spacing
+#### Milestone 2.2: Accessibility & Core Features
+- [ ] **Accessibility Compliance (REQUIREMENT 20)**
+  - ARIA labels and roles
+  - Keyboard navigation for core features
+  - Focus indicators
+  - Color contrast compliance
 
-- [ ] **Synchronized Scrolling**
-  - Vertical scroll synchronization
-  - Horizontal timeline panning
-  - Scroll position persistence
-  - Smooth scroll behavior with RAF
+- [ ] **TaskGrid Essentials**
+  - Basic sorting (one column at a time)
+  - Simple filtering (text search)
+  - Keyboard navigation for core features
+  - NO complex features initially
 
-- [ ] **Event Coordination**
-  - Selection sync between components
-  - Row highlighting coordination
-  - Focus management
-  - Keyboard shortcut handling
+### Phase 3: Essential Gantt Features (Week 5-6)
+**Goal**: Add essential features that make it a proper Gantt chart replacement
 
-#### Milestone 3.2: Drag & Drop Integration
-- [ ] **Timeline Editing (Single Operations Only)**
-  - Drag task bars to change dates (UTC conversion)
-  - Resize bars for duration changes
-  - Progress handle dragging
-  - Snap-to-day/hour grid functionality
-  - Immediate server synchronization (no batch mode)
+#### Milestone 3.1: Enhanced Dependencies & Timeline
+- [ ] **All Dependency Types (REQUIREMENT 8 - ESSENTIAL)**
+  - Support all 4 types: FS, SS, FF, SF
+  - Enhanced dependency line rendering
+  - Day-level offsets: "+3d", "-2d" (day units only)
+  - Circular dependency detection
 
-- [ ] **WBS-Based Interactions**
-  - WBS code validation during edits
-  - Dependency creation using WBS codes
-  - Visual feedback with WBS identifiers
-  - Constraint checking with WBS validation
+- [ ] **Timeline Interactions (REQUIREMENT 10 - ESSENTIAL)**
+  - Multiple zoom levels (Day, Week, Month, Quarter) - NO hour-level zoom
+  - Pan and zoom interactions (mouse wheel, drag)
+  - Task bar drag and resize capabilities using day increments only
+  - Snap to day boundaries
 
-- [ ] **Cross-Component Interactions**
-  - Drag from grid to timeline
-  - Visual feedback during drags
-  - Drop validation and confirmation
-  - Real-time constraint checking
+#### Milestone 3.2: Enhanced TaskGrid Features
+- [ ] **Advanced Grid Features (REQUIREMENT 9 - ESSENTIAL)**
+  - Column resizing, reordering, show/hide
+  - Advanced sorting and filtering capabilities
+  - Multi-column sorting
+  - Search and filter persistence
 
-### Phase 4: Performance Optimization & Export (Week 7-8)
-**Goal**: Meet performance targets and export requirements
+#### Milestone 3.3: Resource Management Foundation
+- [ ] **Basic Resource Support (REQUIREMENT 8 - ESSENTIAL)**
+  - Resource data model and assignments
+  - Resource assignment to tasks
+  - Basic resource utilization display
+  - WBS-based resource assignment tracking
 
-#### Milestone 4.1: Performance Compliance (REQUIREMENTS 16, 17)
-- [ ] **Performance Targets Achievement**
-  - TaskGrid: 1000+ rows with smooth scrolling
-  - TimelineView: 500+ tasks at 60fps rendering
-  - Bundle size <100KB gzipped for core components
-  - Stable memory usage during interactions
+### Phase 4: Advanced Features & Export (Week 7-8)
+**Goal**: Complete the Syncfusion replacement with advanced features
 
-- [ ] **Technical Performance Optimization**
-  - Virtual scrolling implementation
-  - Efficient DOM updates and rendering
-  - Optimized paint and layout operations
-  - RAF-based smooth animations
-  - Memory management and cleanup
+#### Milestone 4.1: Critical Path & Baselines
+- [ ] **Advanced Scheduling (REQUIREMENT 8 - ESSENTIAL)**
+  - Critical path calculation and highlighting
+  - Baseline support (planned vs actual)
+  - Auto-scheduling based on dependencies
+  - Task slack time computation
 
-- [ ] **Rendering Optimization**
-  - SVG optimization for timeline
-  - Debounced resize handling
-  - CSS containment for paint optimization
-  - GPU acceleration where appropriate
-
-#### Milestone 4.2: Export & Enterprise Features (REQUIREMENT 22)
-- [ ] **PDF Export with Vector Graphics**
+#### Milestone 4.2: Professional Export (REQUIREMENT 22 - ESSENTIAL)
+- [ ] **Vector PDF Export**
   - SVG → PDF pipeline for scalable output
   - Multiple page sizes (A4, Letter, Legal, Custom)
   - Portrait/Landscape orientation support
-  - Print-optimized layouts with page breaks
+  - Export configuration options
 
-- [ ] **Export Configuration**
-  - Date range selection for export
-  - Column selection (include/exclude)
-  - Quality settings and compression
-  - WBS-based export organization
+#### Milestone 4.3: Performance & Polish
+- [ ] **Performance Optimization**
+  - Test with 200-500 tasks (realistic dataset)
+  - Smooth interactions and memory management
+  - Cross-browser compatibility testing
+  - Bundle size optimization (target <200KB)
 
-- [ ] **Professional Polish (REQUIREMENT 15)**
-  - Clean, modern interface design
-  - Consistent Material Design spacing
-  - Professional appearance for enterprise
-  - Clear visual hierarchy
-  - Accessible color contrast
+### Phase 5: Future Enhancements (Post-MVP)
+**Goal**: Advanced features for enterprise use
 
-#### Milestone 4.3: Final Integration & Testing
-- [ ] **Browser Compatibility (REQUIREMENT 21)**
-  - Modern browser support (Chrome, Firefox, Safari, Edge)
-  - Cross-platform compatibility testing
-  - Responsive design validation
-  - Consistent behavior verification
-
-- [ ] **Final Validation Against Requirements**
-  - All 27 requirement sections satisfied
-  - Performance benchmarks met
-  - Accessibility compliance verified
-  - Export functionality validated
-  - WBS code system fully functional
-  - I18N implementation complete
+#### Future Considerations (Not Required for Initial Success)
+- [ ] **Large Dataset Support** (1000+ tasks if needed)
+- [ ] **Virtual Scrolling** (if performance becomes issue)
+- [ ] **Advanced Animations** and polish
+- [ ] **Context Menus** and additional UX features
+- [ ] **Advanced Export Options** (Excel, CSV, etc.)
+- [ ] **Custom Calendar Support**
 
 ---
 
@@ -467,7 +385,7 @@ class RowAlignmentManager {
   - WebGL for extreme performance
 
 #### Date/Time Handling
-- **date-fns** - Lightweight, immutable, tree-shakeable (day/hour precision)
+- **date-fns** - Lightweight, immutable, tree-shakeable (day precision only)
 - **Custom Timeline Math** - Day-to-pixel conversion utilities
 - **Simplified Calendar** - Day-level working time calculations
 
@@ -674,7 +592,7 @@ Based on Syncfusion's comprehensive feature set, our architecture needs to handl
 #### **Task Dependencies (Simplified)**
 - [ ] **4 Dependency Types**: FS (Finish-to-Start), SS (Start-to-Start), FF (Finish-to-Finish), SF (Start-to-Finish)
 - [ ] **Multiple Dependencies**: "4FS,5SS" syntax support
-- [ ] **Day-Level Offsets**: "+3d", "-2d" syntax for delays/leads (no sub-day precision)
+- [ ] **Day-Level Offsets**: "+3d", "-2d" syntax for delays/leads (day precision only)
 - [ ] **Circular Detection**: Prevent and warn about circular dependencies
 - [ ] **Real-time Validation**: Immediate dependency validation during editing
 
@@ -696,7 +614,7 @@ Based on Syncfusion's comprehensive feature set, our architecture needs to handl
 - [ ] **Baseline Support**: Show planned vs actual progress
 - [ ] **Event Markers**: Milestone indicators on timeline
 - [ ] **Data Markers**: Custom indicators for status/flags
-- [ ] **Hour-Day-Week-Month Scales**: No minute/second precision
+- [ ] **Day-Week-Month Scales**: Day precision only, no hour/minute/second precision
 - [ ] **Working Time**: Visual distinction for working/non-working periods
 
 #### **Editing Capabilities (Simplified)**
@@ -789,9 +707,9 @@ public class GanttTask
 
 public class GanttBaseline
 {
-    public DateTime StartDate { get; set; } // UTC, day precision
-    public DateTime EndDate { get; set; }   // UTC, day precision
-    public string Duration { get; set; } = ""; // "5d" or "8h" format
+    public DateTime StartDate { get; set; } // UTC, day precision only
+    public DateTime EndDate { get; set; }   // UTC, day precision only
+    public string Duration { get; set; } = ""; // "5d" or "5D" format only
 }
 
 public class GanttResource
@@ -819,14 +737,14 @@ public enum TaskType
 ```
 
 ### Implementation Priority (Requirements-Driven)
-**Phase 1**: WBS codes, UTC handling, and day-level precision from the beginning
+**Phase 1**: WBS codes, UTC date handling, and day-level precision from the beginning
 **Phase 2**: I18N support and Material Design compliance
 **Phase 3**: Pixel-perfect row alignment and component integration
 **Phase 4**: Performance targets and export functionality
 
 **Requirements Benefits**:
 - **Day-level precision**: Faster development, simpler testing, reduced complexity
-- **UTC only**: No timezone bugs, simpler date calculations
+- **UTC date storage**: No timezone bugs, simpler date calculations
 - **WBS codes**: Meaningful identifiers for users, professional project management
 - **Single operations**: Simpler UX, immediate feedback, easier implementation
 - **I18N support**: Professional localization for English/Chinese markets
@@ -844,7 +762,7 @@ This ensures our custom components can replace Syncfusion for day-level project 
   - Virtual scrolling performance
   - Tree expand/collapse
   - Cell editing workflows
-  - Keyboard navigation
+  - Keyboard navigation for core features
 
 - [ ] **TimelineView Tests**
   - Zoom/pan smoothness
@@ -894,24 +812,173 @@ This ensures our custom components can replace Syncfusion for day-level project 
 
 ---
 
-## 🚀 Implementation Starting Strategy
+## 🚀 Implementation Starting Strategy - REVISED
 
-### Week 1: TaskGrid Foundation (Requirements-First)
-1. **Day 1-2**: WBS code system and basic CSS Grid layout
-2. **Day 3-4**: Tree structure with WBS hierarchy
-3. **Day 5-7**: I18N implementation and UTC date handling
+### Week 1: Foundation First (Simple & Focused)
+1. **Day 1-2**: WBS Code Foundation
+   - Add WbsCode to GanttTask model
+   - Create simple WbsCodeGenerationService (basic logic)
+   - Update demo data with WBS hierarchy (5-10 tasks max)
+   - Replace ID with WBS in existing TaskGrid display
 
-### Week 2: TimelineView Foundation (SVG + UTC)
-1. **Day 1-2**: SVG coordinate system with day-to-pixel conversion
-2. **Day 3-4**: Timeline header with localized date formatting
-3. **Day 5-7**: Task bars with WBS labels and baseline support
+2. **Day 3-4**: I18N Foundation Setup
+   - Resource files for English/Chinese (10-20 key strings)
+   - IStringLocalizer integration (basic setup)
+   - Update existing TaskGrid with localized column headers
+   - Test language switching works
 
-### Starting Point Recommendation
-**Begin with TaskGrid** - WBS code implementation and I18N setup provide solid foundation for all subsequent components.
+3. **Day 5-7**: Enhanced TaskGrid with WBS
+   - Add WBS code column (replace ID column)
+   - Ensure all UI shows WBS codes
+   - Keep everything else the same (no new features)
+   - Test with demo data
+
+### Week 2: Minimal Working Gantt (Prove It Works)
+1. **Day 1-3**: Basic Timeline Component
+   - Simple SVG with fixed 40px/day scale
+   - Basic month/day header (no fancy multi-tier)
+   - Rectangle task bars with WBS labels
+   - Fixed row heights matching TaskGrid
+
+2. **Day 4-5**: Simple Side-by-Side Layout
+   - TaskGrid and Timeline next to each other (fixed 50/50)
+   - NO splitter initially (keep it simple)
+   - Basic selection sync (click one, highlight other)
+   - Same demo data in both
+
+3. **Day 6-7**: Walking Skeleton Validation
+   - End-to-end working Gantt chart
+   - WBS codes everywhere
+   - English/Chinese switching works
+   - Performance test with 20-50 tasks max
+
+### Success Criteria for Week 1-2 (Phase 1 MVP)
+- ✅ WBS codes working (no database IDs visible)
+- ✅ Basic I18N working (English/Chinese toggle)
+- ✅ TaskGrid + Timeline side by side
+- ✅ Same data displayed in both components
+- ✅ Basic row alignment working
+- ✅ Smooth performance with 20-50 tasks
+
+**After Week 2**: We have a minimal but working Gantt chart that proves the concept!
+
+### Success Criteria for Week 3-4 (Phase 2 Enhancement)
+- ✅ Professional Material Design appearance
+- ✅ Basic accessibility compliance
+- ✅ Simple dependencies (FS only)
+- ✅ Basic drag & drop functionality
+- ✅ Essential timeline features (zoom, pan)
+
+### Success Criteria for Week 5-8 (Phase 3-4 Essential Features)
+- ✅ All 4 dependency types working
+- ✅ Resource management implemented
+- ✅ Critical path and baseline support
+- ✅ Advanced grid features (resize, reorder, filter)
+- ✅ Vector PDF export capability
+- ✅ Ready to replace Syncfusion for day-level project management
+
+**After Week 8**: Complete Gantt chart replacement with all essential features!
 
 ---
 
-## ⚠️ **EXPERIMENTAL DOCUMENT DISCLAIMER**
+## 🎯 **PLAN REVISIONS & RATIONALE**
+
+### **Why These Changes Improve Success Rate**
+
+#### **1. WBS Codes First Strategy**
+- **Original Problem**: WBS codes buried in complex milestone, treated as minor feature
+- **New Approach**: WBS codes as Milestone 1.1 - fundamental to everything
+- **Benefits**: All subsequent features built with WBS codes correctly from start
+- **Risk Mitigation**: Avoids massive refactoring to retrofit WBS codes later
+
+#### **2. Walking Skeleton Approach**  
+- **Original Problem**: No end-to-end integration until Phase 3 (weeks away)
+- **New Approach**: Basic integration working by end of Week 2
+- **Benefits**: Proves architecture early, finds integration issues fast
+- **Risk Mitigation**: Architecture problems discovered in weeks, not months
+
+#### **3. I18N Foundation Early**
+- **Original Problem**: I18N spread across multiple phases, retrofit approach
+- **New Approach**: I18N foundation in Week 1, features built with I18N
+- **Benefits**: No text strings hardcoded, localization natural from start
+- **Risk Mitigation**: Avoids expensive I18N retrofitting
+
+#### **4. Simplified Technology Stack**
+- **Original Problem**: Many external dependencies without justification
+- **New Approach**: Browser standards first, libraries only when needed
+- **Benefits**: Smaller bundle, fewer dependencies, more control
+- **Risk Mitigation**: Less complexity, easier debugging, fewer breaking changes
+
+#### **5. Realistic Phase Boundaries**
+- **Original Problem**: Phase 1 included complex features like full dependency rendering
+- **New Approach**: Phase 1 focuses on solid foundation only
+- **Benefits**: Each phase builds on proven, working foundation
+- **Risk Mitigation**: No "big bang" integration, continuous working software
+
+### **Requirements Compliance Maintained**
+All 27 requirements from REQUIREMENTS.md still satisfied:
+- ✅ **Day-level precision**: Maintained throughout
+- ✅ **UTC date storage**: Foundation established early  
+- ✅ **WBS codes**: Now first-class citizen from start
+- ✅ **No batch operations**: Architecture supports this
+- ✅ **I18N English/Chinese**: Foundation established early
+- ✅ **Performance targets**: Validated incrementally
+- ✅ **Material Design**: Applied from basic components
+
+### **Development Risk Reduction Through Simplification**
+- **Technical Risk**: Simple fixed layouts vs complex responsive/resizable
+- **Feature Risk**: Basic features working well vs many features working poorly
+- **Integration Risk**: Fixed positioning vs dynamic row alignment complexity
+- **Scope Risk**: Clear "good enough" boundaries vs feature creep
+- **Timeline Risk**: Working software in weeks vs months of development
+
+### **Features We're Deliberately Deferring to Later Phases (Essential But Not Phase 1)**
+
+#### **Core Gantt Features (Phase 2-3 - MUST HAVE in Final Product)**
+- 🔄 **All 4 dependency types** (FS, SS, FF, SF) - Phase 2
+- 🔄 **Resource management and assignment** - Phase 3  
+- 🔄 **Critical path calculation** - Phase 3
+- 🔄 **Baseline support** (planned vs actual) - Phase 3
+- 🔄 **Multiple zoom levels** (hour to quarter) - Phase 2
+- 🔄 **Pan and zoom interactions** - Phase 2
+- 🔄 **Task bar drag and resize** - Phase 2
+- 🔄 **Dependency line rendering** - Phase 2
+- 🔄 **Column resizing, reordering, show/hide** - Phase 2
+- 🔄 **Advanced sorting and filtering** - Phase 2
+- 🔄 **Vector PDF export** - Phase 3
+- 🔄 **Export configuration options** - Phase 3
+
+#### **Features We're Removing/Simplifying (Not Essential)**
+- ❌ **Large dataset support** (1000+ tasks) - removed, focus on 50-200 tasks
+- ❌ **Virtual scrolling** - removed, use standard scrolling
+- ❌ **60fps performance targets** - removed, focus on "smooth enough"
+- ❌ **<100KB bundle size** - removed, focus on functionality first
+- ❌ **Complex animations** - basic hover effects only
+- ❌ **Context menus** - defer to later phases
+
+#### **Phase 1 Focus (Minimal Viable Gantt)**
+- ✅ **Fixed timeline scale** - 40px/day initially
+- ✅ **Fixed 50/50 layout** - no splitter initially  
+- ✅ **Fixed row heights** - no dynamic sizing initially
+- ✅ **Basic FS dependencies only** - simple straight lines
+- ✅ **Basic drag left/right** - no resize initially
+- ✅ **Basic print CSS** - no vector PDF initially
+- ✅ **Simple sorting** - one column at a time
+- ✅ **Basic selection sync** - click synchronization
+
+### **What We're Keeping (Requirements-Driven)**
+- ✅ **WBS codes everywhere** (REQUIREMENT 12)
+- ✅ **Day-level precision** (REQUIREMENT 1)
+- ✅ **UTC timestamps** (REQUIREMENT 2)
+- ✅ **Single operations** (REQUIREMENT 3)
+- ✅ **English/Chinese I18N** (REQUIREMENT 14)
+- ✅ **Material Design basics** (REQUIREMENT 13)
+- ✅ **Accessibility fundamentals** (REQUIREMENT 20)
+- ✅ **Basic performance** (REQUIREMENT 16)
+- ✅ **Row alignment** (REQUIREMENT 6)
+- ✅ **Independent components** (REQUIREMENT 5)
+
+This revised plan significantly improves our probability of successful delivery by focusing on "good enough" rather than "enterprise complexity".
 
 > **This document contains experimental implementation approaches that may evolve during development. For immutable requirements that must be satisfied regardless of implementation changes, always refer to [REQUIREMENTS.md](./REQUIREMENTS.md).**
 

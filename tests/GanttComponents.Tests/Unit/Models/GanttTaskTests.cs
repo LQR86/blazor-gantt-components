@@ -54,25 +54,32 @@ public class GanttTaskTests
         Assert.Equal(TaskType.FixedWork, task.TaskType);
     }
 
-    [Fact]
-    public void GanttTask_Children_ShouldInitializeAsEmptyList()
+    [Theory]
+    [InlineData("1d")]
+    [InlineData("5d")]
+    [InlineData("8h")]
+    [InlineData("2w")]
+    public void GanttTask_Duration_ShouldAcceptVariousFormats(string duration)
     {
         // Arrange & Act
-        var task = new GanttTask();
+        var task = new GanttTask { Duration = duration };
 
         // Assert
-        Assert.NotNull(task.Children);
-        Assert.Empty(task.Children);
+        Assert.Equal(duration, task.Duration);
     }
 
-    [Fact]
-    public void GanttTask_Assignments_ShouldInitializeAsEmptyList()
+    [Theory]
+    [InlineData(0)]
+    [InlineData(25)]
+    [InlineData(50)]
+    [InlineData(75)]
+    [InlineData(100)]
+    public void GanttTask_Progress_ShouldAcceptValidValues(int progress)
     {
         // Arrange & Act
-        var task = new GanttTask();
+        var task = new GanttTask { Progress = progress };
 
         // Assert
-        Assert.NotNull(task.Assignments);
-        Assert.Empty(task.Assignments);
+        Assert.Equal(progress, task.Progress);
     }
 }

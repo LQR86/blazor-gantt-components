@@ -1,0 +1,112 @@
+[
+  {
+    "Id": 1,
+    "Name": "Project Planning",
+    "StartDate": "2025-07-27",
+    "EndDate": "2025-08-02",
+    "Duration": "5d",
+    "Progress": 20,
+    "TaskType": "FixedDuration",
+    "ParentId": null,
+    "Predecessors": null
+  },
+  {
+    "Id": 2,
+    "Name": "Requirements Analysis", 
+    "StartDate": "2025-07-28",
+    "EndDate": "2025-07-30",
+    "Duration": "2d",
+    "Progress": 50,
+    "TaskType": "FixedDuration",
+    "ParentId": 1,
+    "Predecessors": null
+  },
+  {
+    "Id": 3,
+    "Name": "System Design",
+    "StartDate": "2025-08-03",
+    "EndDate": "2025-08-07",
+    "Duration": "4d", 
+    "Progress": 0,
+    "TaskType": "FixedDuration",
+    "ParentId": null,
+    "Predecessors": "1FS"
+  },
+  {
+    "Id": 4,
+    "Name": "Database Design",
+    "StartDate": "2025-08-04",
+    "EndDate": "2025-08-06",
+    "Duration": "2d",
+    "Progress": 25,
+    "TaskType": "FixedDuration", 
+    "ParentId": 3,
+    "Predecessors": null
+  },
+  {
+    "Id": 5,
+    "Name": "UI Mockups",
+    "StartDate": "2025-08-05",
+    "EndDate": "2025-08-07",
+    "Duration": "2d",
+    "Progress": 0,
+    "TaskType": "FixedDuration",
+    "ParentId": 3,
+    "Predecessors": "4SS+1d"
+  },
+  {
+    "Id": 6,
+    "Name": "Development Phase",
+    "StartDate": "2025-08-08",
+    "EndDate": "2025-08-22",
+    "Duration": "10d",
+    "Progress": 0,
+    "TaskType": "FixedDuration",
+    "ParentId": null,
+    "Predecessors": "3FS"
+  },
+  {
+    "Id": 7,
+    "Name": "Backend Development",
+    "StartDate": "2025-08-08",
+    "EndDate": "2025-08-15",
+    "Duration": "6d",
+    "Progress": 0,
+    "TaskType": "FixedDuration",
+    "ParentId": 6,
+    "Predecessors": null
+  },
+  {
+    "Id": 8,
+    "Name": "Frontend Development", 
+    "StartDate": "2025-08-12",
+    "EndDate": "2025-08-20",
+    "Duration": "6d",
+    "Progress": 0,
+    "TaskType": "FixedDuration",
+    "ParentId": 6,
+    "Predecessors": "7SS+3d"
+  },
+  {
+    "Id": 9,
+    "Name": "Testing",
+    "StartDate": "2025-08-21",
+    "EndDate": "2025-08-23",
+    "Duration": "2d",
+    "Progress": 0,
+    "TaskType": "FixedDuration",
+    "ParentId": null,
+    "Predecessors": "6FS"
+  },
+  {
+    "Id": 10,
+    "Name": "Deployment",
+    "StartDate": "2025-08-24",
+    "EndDate": "2025-08-24",
+    "Duration": "1d",
+    "Progress": 0,
+    "TaskType": "FixedDuration",
+    "ParentId": null,
+    "Predecessors": "9FS"
+  }
+]

@@ -56,7 +56,7 @@ public class GanttTaskService : IGanttTaskService
 
             _context.Tasks.Add(task);
             await _context.SaveChangesAsync();
-            
+
             _logger.LogInformation("Created new task with ID {TaskId} and WBS code {WbsCode}", task.Id, task.WbsCode);
             return task;
         }
@@ -79,7 +79,7 @@ public class GanttTaskService : IGanttTaskService
 
             _context.Tasks.Update(task);
             await _context.SaveChangesAsync();
-            
+
             _logger.LogInformation("Updated task with ID {TaskId} and WBS code {WbsCode}", task.Id, task.WbsCode);
             return task;
         }
@@ -103,7 +103,7 @@ public class GanttTaskService : IGanttTaskService
 
             _context.Tasks.Remove(task);
             await _context.SaveChangesAsync();
-            
+
             _logger.LogInformation("Deleted task with ID {TaskId} and WBS code {WbsCode}", id, task.WbsCode);
         }
         catch (Exception ex)
@@ -134,7 +134,7 @@ public class GanttTaskService : IGanttTaskService
         try
         {
             var query = _context.Tasks.Where(t => t.WbsCode == wbsCode);
-            
+
             if (excludeTaskId.HasValue)
             {
                 query = query.Where(t => t.Id != excludeTaskId.Value);

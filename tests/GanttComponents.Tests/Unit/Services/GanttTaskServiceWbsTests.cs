@@ -19,7 +19,7 @@ public class GanttTaskServiceWbsTests : IDisposable
         var options = new DbContextOptionsBuilder<GanttDbContext>()
             .UseSqlite("Data Source=:memory:")
             .Options;
-        
+
         _context = new GanttDbContext(options);
         _context.Database.OpenConnection();
         _context.Database.EnsureCreated();
@@ -175,7 +175,7 @@ public class GanttTaskServiceWbsTests : IDisposable
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _taskService.CreateTaskAsync(newTask));
-        
+
         Assert.Contains("WBS code '1' already exists", exception.Message);
     }
 
@@ -214,7 +214,7 @@ public class GanttTaskServiceWbsTests : IDisposable
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _taskService.UpdateTaskAsync(task2));
-        
+
         Assert.Contains("WBS code '1' already exists", exception.Message);
     }
 

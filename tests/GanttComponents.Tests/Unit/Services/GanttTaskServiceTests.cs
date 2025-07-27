@@ -23,7 +23,7 @@ public class GanttTaskServiceTests : IDisposable
         _context = new GanttDbContext(options);
         _context.Database.OpenConnection();
         _context.Database.EnsureCreated();
-        
+
         _mockLogger = new Mock<ILogger<GanttTaskService>>();
         _service = new GanttTaskService(_context, _mockLogger.Object);
     }

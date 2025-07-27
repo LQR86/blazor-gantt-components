@@ -20,14 +20,14 @@ public class DatabaseSeedServiceWbsTests : IDisposable
         var options = new DbContextOptionsBuilder<GanttDbContext>()
             .UseSqlite($"Data Source=:memory:")
             .Options;
-        
+
         _context = new GanttDbContext(options);
         _context.Database.OpenConnection();
         _context.Database.EnsureCreated();
 
         var mockLogger = new Mock<ILogger<DatabaseSeedService>>();
         var mockEnvironment = new Mock<IWebHostEnvironment>();
-        
+
         // Create a temporary JSON file for testing
         _tempFilePath = Path.Combine(Path.GetTempPath(), $"test-tasks-{Guid.NewGuid()}.json");
         var testJson = """
@@ -70,7 +70,7 @@ public class DatabaseSeedServiceWbsTests : IDisposable
           }
         ]
         """;
-        
+
         File.WriteAllText(_tempFilePath, testJson);
         mockEnvironment.Setup(e => e.ContentRootPath).Returns(Path.GetTempPath());
 
@@ -89,13 +89,13 @@ public class DatabaseSeedServiceWbsTests : IDisposable
         // Assert
         var tasks = await _context.Tasks.OrderBy(t => t.Id).ToListAsync();
         Assert.Equal(3, tasks.Count);
-        
+
         Assert.Equal("1", tasks[0].WbsCode);
         Assert.Equal("Project Planning", tasks[0].Name);
-        
+
         Assert.Equal("1.1", tasks[1].WbsCode);
         Assert.Equal("Requirements Analysis", tasks[1].Name);
-        
+
         Assert.Equal("2", tasks[2].WbsCode);
         Assert.Equal("System Design", tasks[2].Name);
     }
@@ -113,7 +113,7 @@ public class DatabaseSeedServiceWbsTests : IDisposable
         using var freshContext = new GanttDbContext(new DbContextOptionsBuilder<GanttDbContext>()
             .UseSqlite(_context.Database.GetDbConnection())
             .Options);
-            
+
         var tasks = await freshContext.Tasks.OrderBy(t => t.Id).ToListAsync();
         Assert.Equal(3, tasks.Count);
         Assert.All(tasks, task => Assert.NotNull(task.WbsCode));

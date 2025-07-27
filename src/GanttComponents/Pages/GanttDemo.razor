@@ -1,6 +1,8 @@
 @page "/gantt-demo"
 @using GanttComponents.Models
 @using GanttComponents.Components.TaskGrid
+@using GanttComponents.Services
+@inject IGanttTaskService TaskService
 
 <PageTitle>Gantt Demo</PageTitle>
 
@@ -24,6 +26,7 @@
             <h4>Selected Task Information</h4>
             <div class="task-info">
                 <p><strong>ID:</strong> @SelectedTaskInfo.Id</p>
+                <p><strong>WBS Code:</strong> @SelectedTaskInfo.WbsCode</p>
                 <p><strong>Name:</strong> @SelectedTaskInfo.Name</p>
                 <p><strong>Start Date:</strong> @SelectedTaskInfo.StartDate.ToString("MM/dd/yyyy")</p>
                 <p><strong>End Date:</strong> @SelectedTaskInfo.EndDate.ToString("MM/dd/yyyy")</p>
@@ -40,8 +43,10 @@
             <li>✅ <strong>Day-level scheduling</strong>: Dates displayed with day precision</li>
             <li>✅ <strong>No batch operations</strong>: Single-task selection and immediate feedback</li>
             <li>✅ <strong>Hierarchical structure</strong>: Parent-child relationships with expand/collapse</li>
+            <li>✅ <strong>WBS Code Foundation</strong>: Work Breakdown Structure codes with validation and service layer</li>
             <li>✅ <strong>Row alignment service</strong>: Foundation for TaskGrid + TimelineView sync</li>
             <li>✅ <strong>Material Design</strong>: CSS custom properties and clean styling</li>
+            <li>✅ <strong>Service Layer Architecture</strong>: Proper separation of concerns with IGanttTaskService</li>
             <li>🔄 <strong>Timeline component</strong>: Next milestone (Phase 1.2)</li>
             <li>🔄 <strong>Dependency rendering</strong>: Coming in Phase 2</li>
             <li>🔄 <strong>Resource management</strong>: Coming in Phase 2</li>
@@ -53,9 +58,15 @@
     private List<GanttTask> SampleTasks = new();
     private GanttTask? SelectedTaskInfo;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        CreateSampleData();
+        await LoadTasksFromDatabase();
+    }
+
+    private async Task LoadTasksFromDatabase()
+    {
+        SampleTasks = await TaskService.GetAllTasksAsync();
+        StateHasChanged();
     }
 
     private void HandleTaskSelected(int taskId)
@@ -69,179 +80,6 @@
         // This will be used for synchronizing with TimelineView scroll
         // For now, just logging the scroll position
         Console.WriteLine($"TaskGrid scrolled");
-    }
-
-    private void CreateSampleData()
-    {
-        var today = DateTime.Today;
-        
-        SampleTasks = new List<GanttTask>
-        {
-            // Project root
-            new GanttTask
-            {
-                Id = 1,
-                Name = "Custom Gantt Development Project",
-                StartDate = today,
-                EndDate = today.AddDays(56), // 8 weeks
-                Duration = "8w",
-                Progress = 15,
-                TaskType = TaskType.FixedDuration
-            },
-
-            // Phase 1: Independent Components
-            new GanttTask
-            {
-                Id = 2,
-                Name = "Phase 1: Independent Components Foundation",
-                ParentId = 1,
-                StartDate = today,
-                EndDate = today.AddDays(14),
-                Duration = "2w",
-                Progress = 30,
-                TaskType = TaskType.FixedDuration
-            },
-
-            new GanttTask
-            {
-                Id = 3,
-                Name = "TaskGrid Component Development",
-                ParentId = 2,
-                StartDate = today,
-                EndDate = today.AddDays(7),
-                Duration = "1w",
-                Progress = 80,
-                TaskType = TaskType.FixedDuration
-            },
-
-            new GanttTask
-            {
-                Id = 4,
-                Name = "Basic Grid Structure",
-                ParentId = 3,
-                StartDate = today,
-                EndDate = today.AddDays(2),
-                Duration = "2d",
-                Progress = 100,
-                TaskType = TaskType.FixedDuration
-            },
-
-            new GanttTask
-            {
-                Id = 5,
-                Name = "Tree Structure Support",
-                ParentId = 3,
-                StartDate = today.AddDays(2),
-                EndDate = today.AddDays(4),
-                Duration = "2d",
-                Progress = 100,
-                Predecessors = "4FS",
-                TaskType = TaskType.FixedDuration
-            },
-
-            new GanttTask
-            {
-                Id = 6,
-                Name = "Grid Interactions & Selection",
-                ParentId = 3,
-                StartDate = today.AddDays(4),
-                EndDate = today.AddDays(7),
-                Duration = "3d",
-                Progress = 60,
-                Predecessors = "5FS",
-                TaskType = TaskType.FixedDuration
-            },
-
-            new GanttTask
-            {
-                Id = 7,
-                Name = "TimelineView Component Development",
-                ParentId = 2,
-                StartDate = today.AddDays(7),
-                EndDate = today.AddDays(14),
-                Duration = "1w",
-                Progress = 0,
-                Predecessors = "3FS",
-                TaskType = TaskType.FixedDuration
-            },
-
-            new GanttTask
-            {
-                Id = 8,
-                Name = "SVG Timeline Foundation",
-                ParentId = 7,
-                StartDate = today.AddDays(7),
-                EndDate = today.AddDays(9),
-                Duration = "2d",
-                Progress = 0,
-                TaskType = TaskType.FixedDuration
-            },
-
-            new GanttTask
-            {
-                Id = 9,
-                Name = "Task Bar Rendering",
-                ParentId = 7,
-                StartDate = today.AddDays(9),
-                EndDate = today.AddDays(12),
-                Duration = "3d",
-                Progress = 0,
-                Predecessors = "8FS",
-                TaskType = TaskType.FixedDuration
-            },
-
-            new GanttTask
-            {
-                Id = 10,
-                Name = "Dependencies & Relationships",
-                ParentId = 7,
-                StartDate = today.AddDays(12),
-                EndDate = today.AddDays(14),
-                Duration = "2d",
-                Progress = 0,
-                Predecessors = "9FS",
-                TaskType = TaskType.FixedDuration
-            },
-
-            // Phase 2: Advanced Features
-            new GanttTask
-            {
-                Id = 11,
-                Name = "Phase 2: Advanced UI Features",
-                ParentId = 1,
-                StartDate = today.AddDays(14),
-                EndDate = today.AddDays(28),
-                Duration = "2w",
-                Progress = 0,
-                Predecessors = "2FS",
-                TaskType = TaskType.FixedDuration
-            },
-
-            new GanttTask
-            {
-                Id = 12,
-                Name = "TaskGrid Enhancements",
-                ParentId = 11,
-                StartDate = today.AddDays(14),
-                EndDate = today.AddDays(21),
-                Duration = "1w",
-                Progress = 0,
-                TaskType = TaskType.FixedDuration
-            },
-
-            new GanttTask
-            {
-                Id = 13,
-                Name = "TimelineView Interactions",
-                ParentId = 11,
-                StartDate = today.AddDays(21),
-                EndDate = today.AddDays(28),
-                Duration = "1w",
-                Progress = 0,
-                Predecessors = "12FS",
-                TaskType = TaskType.FixedDuration
-            }
-        };
     }
 }
 

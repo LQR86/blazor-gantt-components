@@ -4,8 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using GanttComponents.Data;
 using GanttComponents.Services;
 using GanttComponents.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog logging early
+GanttComponents.Services.LoggingConfiguration.ConfigureLogging();
+builder.Host.UseSerilog();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -20,6 +25,7 @@ builder.Services.AddDbContext<GanttDbContext>(options =>
 builder.Services.AddScoped<GanttRowAlignmentService>();
 builder.Services.AddScoped<IGanttTaskService, GanttTaskService>();
 builder.Services.AddScoped<IDatabaseSeedService, DatabaseSeedService>();
+builder.Services.AddScoped<IUniversalLogger, UniversalLogger>();
 
 var app = builder.Build();
 
@@ -54,5 +60,12 @@ app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+// Ensure proper logging cleanup on application shutdown
+var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+lifetime.ApplicationStopping.Register(() =>
+{
+    GanttComponents.Services.LoggingConfiguration.CloseLogging();
+});
 
 app.Run();

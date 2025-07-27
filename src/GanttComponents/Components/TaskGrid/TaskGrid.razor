@@ -1,6 +1,7 @@
 @using GanttComponents.Models
 @using GanttComponents.Services
 @inject GanttRowAlignmentService RowAlignmentService
+@inject IUniversalLogger Logger
 
 <div class="task-grid-container">
     <div class="task-grid-header">
@@ -88,6 +89,8 @@
 
     protected override void OnInitialized()
     {
+        Logger.LogComponentLifecycle("TaskGrid", "OnInitialized", new { TaskCount = Tasks?.Count ?? 0 });
+        
         // Initialize expanded state for all parent tasks
         if (Tasks != null)
         {
@@ -95,28 +98,56 @@
             {
                 ExpandedTasks[task.Id] = true; // Expand all by default
             }
+            
+            Logger.LogTaskGridOperation("InitializeExpandedState", new { 
+                ParentTaskCount = ExpandedTasks.Count,
+                AllExpanded = true 
+            });
         }
     }
 
     protected override void OnParametersSet()
     {
+        Logger.LogComponentLifecycle("TaskGrid", "OnParametersSet", new { TaskCount = Tasks?.Count ?? 0 });
+        
         // Update row alignment when tasks change
         if (Tasks != null)
         {
             var visibleTasks = GetVisibleTasks();
             RowAlignmentService.CalculateRowPositions(visibleTasks, ExpandedTasks);
+            
+            Logger.LogRowAlignment("CalculatePositions", new { 
+                VisibleTaskCount = visibleTasks.Count,
+                TotalTaskCount = Tasks.Count 
+            });
         }
     }
 
     private async Task SelectTask(int taskId)
     {
+        var oldTaskId = SelectedTaskId;
         SelectedTaskId = taskId;
+        
+        Logger.LogUserAction("SelectTask", new { TaskId = taskId, PreviousTaskId = oldTaskId });
+        Logger.LogStateChange("TaskGrid", "SelectedTaskId", oldTaskId, taskId);
+        
         await OnTaskSelected.InvokeAsync(taskId);
     }
 
     private void ToggleExpand(int taskId)
     {
-        ExpandedTasks[taskId] = !ExpandedTasks.GetValueOrDefault(taskId, true);
+        var wasExpanded = ExpandedTasks.GetValueOrDefault(taskId, true);
+        ExpandedTasks[taskId] = !wasExpanded;
+        
+        Logger.LogUserAction("ToggleExpand", new { 
+            TaskId = taskId, 
+            WasExpanded = wasExpanded, 
+            NowExpanded = !wasExpanded 
+        });
+        Logger.LogTaskGridOperation("ToggleExpand", new { 
+            TaskId = taskId, 
+            NewState = !wasExpanded ? "Expanded" : "Collapsed" 
+        });
         
         // Update row alignment after expand/collapse
         var visibleTasks = GetVisibleTasks();

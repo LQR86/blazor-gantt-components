@@ -25,6 +25,47 @@
 			"group": "build",
 			"isBackground": true,
 			"problemMatcher": []
+		},
+		{
+			"label": "Format Code (Pre-commit)",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"format",
+				"--verbosity",
+				"diagnostic"
+			],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			},
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "Format and Verify (CI Check)",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"format",
+				"--verify-no-changes",
+				"--verbosity",
+				"diagnostic"
+			],
+			"group": "test",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			},
+			"problemMatcher": "$msCompile"
 		}
 	]
 }

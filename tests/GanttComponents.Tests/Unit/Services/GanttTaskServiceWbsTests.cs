@@ -13,6 +13,7 @@ public class GanttTaskServiceWbsTests : IDisposable
     private readonly GanttDbContext _context;
     private readonly GanttTaskService _taskService;
     private readonly Mock<ILogger<GanttTaskService>> _mockLogger;
+    private readonly Mock<IUniversalLogger> _mockUniversalLogger;
 
     public GanttTaskServiceWbsTests()
     {
@@ -25,7 +26,8 @@ public class GanttTaskServiceWbsTests : IDisposable
         _context.Database.EnsureCreated();
 
         _mockLogger = new Mock<ILogger<GanttTaskService>>();
-        _taskService = new GanttTaskService(_context, _mockLogger.Object);
+        _mockUniversalLogger = new Mock<IUniversalLogger>();
+        _taskService = new GanttTaskService(_context, _mockLogger.Object, _mockUniversalLogger.Object);
     }
 
     [Fact]

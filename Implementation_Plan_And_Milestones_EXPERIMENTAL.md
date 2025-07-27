@@ -141,13 +141,13 @@
 
 #### Milestone 1.1: WBS Code Foundation (CRITICAL FIRST)
 **Why First**: WBS codes are fundamental to everything - UI labels, dependencies, user interactions
-- [ ] **WBS Code Data Model (REQUIREMENT 12)**
+- [COMPLETED] **WBS Code Data Model (REQUIREMENT 12)**
   - Add WbsCode property to GanttTask model
   - Hierarchical WBS structure ("1", "1.1", "1.1.1", "1.2", "2")
   - Database IDs kept internal (never exposed to users)
   - Update existing demo data with WBS codes
 
-- [ ] **WBS Generation Service (REQUIREMENT 12)**
+- [NEXT] **WBS Generation Service (REQUIREMENT 12)**
   - WbsCodeGenerationService for auto-generation
   - Auto-renumbering on hierarchy changes
   - WBS validation and uniqueness enforcement

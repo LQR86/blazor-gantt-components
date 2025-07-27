@@ -14,6 +14,7 @@ public class GanttTaskServiceWbsTests : IDisposable
     private readonly GanttTaskService _taskService;
     private readonly Mock<ILogger<GanttTaskService>> _mockLogger;
     private readonly Mock<IUniversalLogger> _mockUniversalLogger;
+    private readonly Mock<IWbsCodeGenerationService> _mockWbsService;
 
     public GanttTaskServiceWbsTests()
     {
@@ -27,7 +28,8 @@ public class GanttTaskServiceWbsTests : IDisposable
 
         _mockLogger = new Mock<ILogger<GanttTaskService>>();
         _mockUniversalLogger = new Mock<IUniversalLogger>();
-        _taskService = new GanttTaskService(_context, _mockLogger.Object, _mockUniversalLogger.Object);
+        _mockWbsService = new Mock<IWbsCodeGenerationService>();
+        _taskService = new GanttTaskService(_context, _mockLogger.Object, _mockUniversalLogger.Object, _mockWbsService.Object);
     }
 
     [Fact]

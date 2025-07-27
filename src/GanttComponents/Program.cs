@@ -26,6 +26,7 @@ builder.Services.AddScoped<GanttRowAlignmentService>();
 builder.Services.AddScoped<IGanttTaskService, GanttTaskService>();
 builder.Services.AddScoped<IDatabaseSeedService, DatabaseSeedService>();
 builder.Services.AddScoped<IUniversalLogger, UniversalLogger>();
+builder.Services.AddScoped<IWbsCodeGenerationService, WbsCodeGenerationService>();
 
 var app = builder.Build();
 

@@ -139,7 +139,7 @@
 ### Phase 1: Foundation & Walking Skeleton (Week 1-2)
 **Goal**: Establish foundation and get basic end-to-end integration working (REQUIREMENTS 5, 6, 12)
 
-#### Milestone 1.1: WBS Code Foundation (CRITICAL FIRST)
+#### Milestone 1.1: WBS Code Foundation (CRITICAL FIRST) ✅ COMPLETED
 **Why First**: WBS codes are fundamental to everything - UI labels, dependencies, user interactions
 - [COMPLETED] **WBS Code Data Model (REQUIREMENT 12)**
   - Add WbsCode property to GanttTask model
@@ -147,15 +147,16 @@
   - Database IDs kept internal (never exposed to users)
   - Update existing demo data with WBS codes
 
-- [NEXT] **WBS Generation Service (REQUIREMENT 12)**
+- [COMPLETED] **WBS Generation Service (REQUIREMENT 12)**
   - WbsCodeGenerationService for auto-generation
   - Auto-renumbering on hierarchy changes
   - WBS validation and uniqueness enforcement
-  - Integration with existing GanttRowAlignmentService
+  - Integration with existing GanttTaskService
+  - Interactive demo page for validation
 
-#### Milestone 1.2: I18N Foundation Setup
+#### Milestone 1.2: I18N Foundation Setup (NEXT)
 **Why Early**: Better to build features with I18N from start than retrofit
-- [ ] **I18N Infrastructure (REQUIREMENT 14)**
+- [NEXT] **I18N Infrastructure (REQUIREMENT 14)**
   - Resource files for English/Chinese (Simplified)
   - IStringLocalizer integration in existing components
   - Localized datetime formatting setup

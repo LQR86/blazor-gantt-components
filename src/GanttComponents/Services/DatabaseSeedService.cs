@@ -34,7 +34,7 @@ public class DatabaseSeedService : IDatabaseSeedService
         try
         {
             var fullPath = Path.Combine(_environment.ContentRootPath, jsonFilePath);
-            
+
             if (!File.Exists(fullPath))
             {
                 _logger.LogWarning("Seed file not found: {FilePath}", fullPath);
@@ -56,7 +56,7 @@ public class DatabaseSeedService : IDatabaseSeedService
 
             // Clear existing data (for development/testing)
             context.Tasks.RemoveRange(context.Tasks);
-            
+
             // Add new tasks
             context.Tasks.AddRange(tasks);
             await context.SaveChangesAsync();

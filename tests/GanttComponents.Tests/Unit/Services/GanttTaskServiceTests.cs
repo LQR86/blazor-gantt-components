@@ -20,7 +20,7 @@ public class GanttTaskServiceTests : IDisposable
         _context = new GanttDbContext(options);
         _context.Database.OpenConnection();
         _context.Database.EnsureCreated();
-        
+
         _service = new GanttTaskService(_context);
     }
 

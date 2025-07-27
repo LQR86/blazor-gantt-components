@@ -27,10 +27,10 @@ public class DatabaseSeedServiceTests : IDisposable
         _context = new GanttDbContext(options);
         _context.Database.OpenConnection();
         _context.Database.EnsureCreated();
-        
+
         _loggerMock = new Mock<ILogger<DatabaseSeedService>>();
         _environmentMock = new Mock<IWebHostEnvironment>();
-        
+
         // Create temporary directory for test files
         _tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(_tempDirectory);
@@ -97,7 +97,7 @@ public class DatabaseSeedServiceTests : IDisposable
         // Assert
         var tasks = await _context.Tasks.ToListAsync();
         Assert.Empty(tasks);
-        
+
         // Verify warning was logged
         _loggerMock.Verify(
             x => x.Log(
@@ -173,7 +173,7 @@ public class DatabaseSeedServiceTests : IDisposable
         // Assert
         var tasks = await _context.Tasks.ToListAsync();
         Assert.Empty(tasks);
-        
+
         // Verify warning was logged
         _loggerMock.Verify(
             x => x.Log(

@@ -22,11 +22,11 @@ public class GanttDbContext : DbContext
             entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Duration).HasMaxLength(20);
             entity.Property(e => e.Predecessors).HasMaxLength(500);
-            
+
             // Ignore complex properties that can't be easily mapped to database
             entity.Ignore(e => e.CustomFields);
             entity.Ignore(e => e.Baseline);
-            
+
             // Following Syncfusion's self-referential pattern - no navigation properties needed
             // Hierarchy is managed via ParentId field only
         });

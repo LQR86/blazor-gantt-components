@@ -28,9 +28,9 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<GanttDbContext>();
     var seedService = scope.ServiceProvider.GetRequiredService<IDatabaseSeedService>();
-    
+
     context.Database.EnsureCreated();
-    
+
     // Seed with sample data from JSON if database is empty
     if (!context.Tasks.Any())
     {

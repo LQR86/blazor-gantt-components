@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using GanttComponents.Data;
 using GanttComponents.Models;
 using GanttComponents.Services;
+using Moq;
 using Xunit;
 
 namespace GanttComponents.Tests.Unit.Services;
@@ -10,6 +12,7 @@ public class GanttTaskServiceTests : IDisposable
 {
     private readonly GanttDbContext _context;
     private readonly GanttTaskService _service;
+    private readonly Mock<ILogger<GanttTaskService>> _mockLogger;
 
     public GanttTaskServiceTests()
     {
@@ -21,7 +24,8 @@ public class GanttTaskServiceTests : IDisposable
         _context.Database.OpenConnection();
         _context.Database.EnsureCreated();
 
-        _service = new GanttTaskService(_context);
+        _mockLogger = new Mock<ILogger<GanttTaskService>>();
+        _service = new GanttTaskService(_context, _mockLogger.Object);
     }
 
     [Fact]

@@ -4,6 +4,7 @@
 
 <div class="task-grid-container">
     <div class="task-grid-header">
+        <div class="header-cell" style="width: 80px;">WBS</div>
         <div class="header-cell" style="width: 200px;">Task Name</div>
         <div class="header-cell" style="width: 120px;">Start Date</div>
         <div class="header-cell" style="width: 120px;">End Date</div>
@@ -25,6 +26,10 @@
                      data-task-id="@task.Id" 
                      data-row-index="@rowIndex"
                      @onclick="() => SelectTask(task.Id)">
+                    
+                    <div class="grid-cell wbs-cell" style="width: 80px; text-align: center; font-weight: 500;">
+                        @task.WbsCode
+                    </div>
                     
                     <div class="grid-cell task-name-cell" style="width: 200px; padding-left: @(indentLevel * 20)px;">
                         @if (HasChildren(task))

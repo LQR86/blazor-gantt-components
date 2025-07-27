@@ -9,4 +9,6 @@ public interface IGanttTaskService
     Task<GanttTask> CreateTaskAsync(GanttTask task);
     Task<GanttTask> UpdateTaskAsync(GanttTask task);
     Task DeleteTaskAsync(int id);
+    Task<List<GanttTask>> GetTasksByParentIdAsync(int? parentId);
+    Task<bool> ValidateWbsCodeUniquenessAsync(string wbsCode, int? excludeTaskId = null);
 }

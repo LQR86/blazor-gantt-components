@@ -2,6 +2,7 @@
   {
     "Id": 1,
     "Name": "Project Planning",
+    "WbsCode": "1",
     "StartDate": "2025-07-27",
     "EndDate": "2025-08-02",
     "Duration": "5d",
@@ -13,6 +14,7 @@
   {
     "Id": 2,
     "Name": "Requirements Analysis", 
+    "WbsCode": "1.1",
     "StartDate": "2025-07-28",
     "EndDate": "2025-07-30",
     "Duration": "2d",
@@ -24,6 +26,7 @@
   {
     "Id": 3,
     "Name": "System Design",
+    "WbsCode": "2",
     "StartDate": "2025-08-03",
     "EndDate": "2025-08-07",
     "Duration": "4d", 
@@ -35,6 +38,7 @@
   {
     "Id": 4,
     "Name": "Database Design",
+    "WbsCode": "2.1",
     "StartDate": "2025-08-04",
     "EndDate": "2025-08-06",
     "Duration": "2d",
@@ -46,6 +50,7 @@
   {
     "Id": 5,
     "Name": "UI Mockups",
+    "WbsCode": "2.2",
     "StartDate": "2025-08-05",
     "EndDate": "2025-08-07",
     "Duration": "2d",
@@ -57,6 +62,7 @@
   {
     "Id": 6,
     "Name": "Development Phase",
+    "WbsCode": "3",
     "StartDate": "2025-08-08",
     "EndDate": "2025-08-22",
     "Duration": "10d",
@@ -68,6 +74,7 @@
   {
     "Id": 7,
     "Name": "Backend Development",
+    "WbsCode": "3.1",
     "StartDate": "2025-08-08",
     "EndDate": "2025-08-15",
     "Duration": "6d",
@@ -79,6 +86,7 @@
   {
     "Id": 8,
     "Name": "Frontend Development", 
+    "WbsCode": "3.2",
     "StartDate": "2025-08-12",
     "EndDate": "2025-08-20",
     "Duration": "6d",
@@ -90,6 +98,7 @@
   {
     "Id": 9,
     "Name": "Testing",
+    "WbsCode": "4",
     "StartDate": "2025-08-21",
     "EndDate": "2025-08-23",
     "Duration": "2d",
@@ -101,6 +110,7 @@
   {
     "Id": 10,
     "Name": "Deployment",
+    "WbsCode": "5",
     "StartDate": "2025-08-24",
     "EndDate": "2025-08-24",
     "Duration": "1d",

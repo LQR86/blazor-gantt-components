@@ -15,6 +15,14 @@ public class GanttTask
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
+    /// Work Breakdown Structure (WBS) code for task identification
+    /// Format examples: "1", "1.1", "1.1.1", "2", "2.1"
+    /// </summary>
+    [Required]
+    [StringLength(50)]
+    public string WbsCode { get; set; } = string.Empty;
+
+    /// <summary>
     /// Task start date (day precision)
     /// </summary>
     [Required]

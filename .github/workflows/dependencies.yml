@@ -1,0 +1,47 @@
+name: Dependency Management
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  # Check for outdated and vulnerable packages
+  dependency-check:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Restore packages
+      run: dotnet restore
+    
+    - name: List outdated packages
+      run: |
+        Write-Host "📦 Checking for outdated packages..."
+        dotnet list package --outdated
+    
+    - name: Check for vulnerable packages
+      run: |
+        Write-Host "🔒 Checking for vulnerable packages..."
+        dotnet list package --vulnerable --include-transitive
+    
+    - name: List deprecated packages
+      run: |
+        Write-Host "⚠️ Checking for deprecated packages..."
+        dotnet list package --deprecated
+    
+    - name: Create summary
+      run: |
+        Write-Host "📋 Dependency Check Summary"
+        Write-Host "=============================="
+        Write-Host "✅ Dependency check completed"
+        Write-Host "💡 Review the output above for any issues"
+        Write-Host "🔄 Dependabot will automatically create PRs for updates"

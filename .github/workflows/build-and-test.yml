@@ -1,4 +1,4 @@
-name: Windows CI/CD
+name: Build and Test
 
 on:
   push:
@@ -6,14 +6,17 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 env:
   DOTNET_VERSION: '8.0.x'
-  PROJECT_NAME: 'GanttComponents'
 
 jobs:
-  # Main build and test for Windows deployment
+  # Main build and test job - Windows focused
   build-and-test:
-    runs-on: windows-latest  # Windows-focused for Win 7/10 compatibility
+    runs-on: windows-latest  # Using Windows for Windows 7/10 compatibility
     
     steps:
     - name: Checkout code
@@ -35,32 +38,26 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     
-    - name: Build
+    - name: Build Debug
+      run: dotnet build --configuration Debug --no-restore
+    
+    - name: Build Release
       run: dotnet build --configuration Release --no-restore
     
     - name: Run tests
       run: dotnet test --configuration Release --no-build --verbosity normal
     
-    - name: Publish for Windows 7/10
-      run: |
-        dotnet publish --configuration Release --output .\publish\win-x64 --runtime win-x64 --self-contained false
-        dotnet publish --configuration Release --output .\publish\win-x86 --runtime win-x86 --self-contained false
+    - name: Publish for Windows
+      run: dotnet publish --configuration Release --output .\publish\windows
     
-    - name: Upload Windows x64 artifacts
+    - name: Upload Windows build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: windows-x64-build
-        path: .\publish\win-x64\
-        retention-days: 30
-    
-    - name: Upload Windows x86 artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-x86-build
-        path: .\publish\win-x86\
+        name: windows-build
+        path: .\publish\windows\
         retention-days: 30
 
-  # Basic code analysis
+  # Code quality check (basic)
   code-analysis:
     runs-on: windows-latest
     needs: build-and-test
@@ -76,8 +73,11 @@ jobs:
     
     - name: Build for analysis
       run: dotnet build --configuration Release
+    
+    - name: Check code formatting
+      run: dotnet format --verify-no-changes --verbosity diagnostic
 
-  # Security scan - basic package vulnerability check
+  # Basic security scan (Windows compatible)
   security-scan:
     runs-on: windows-latest
     needs: build-and-test
@@ -95,8 +95,6 @@ jobs:
       run: |
         dotnet restore
         dotnet list package --vulnerable --include-transitive
-        if ($LASTEXITCODE -ne 0) { 
-          Write-Host "⚠️ Vulnerable packages found"
-        } else {
-          Write-Host "✅ No vulnerable packages found"
-        }
+    
+    - name: Check for deprecated packages
+      run: dotnet list package --deprecated

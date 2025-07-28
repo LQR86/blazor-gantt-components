@@ -33,13 +33,12 @@ DESCRIPTION=$(echo "$MILESTONE_DATA" | jq -r '.description')
 
 echo "📋 Description: $DESCRIPTION"
 
-# Find the matching phase
-PHASES=$(echo "$MILESTONE_DATA" | jq -r '.phases[] | @base64')
+# Find the matching phase - using jq without base64 encoding
+PHASE_COUNT=$(echo "$MILESTONE_DATA" | jq '.phases | length')
 
 PHASE_FOUND=false
-for phase_data in $PHASES; do
-    PHASE_JSON=$(echo "$phase_data" | base64 --decode)
-    PHASE_NAME=$(echo "$PHASE_JSON" | jq -r '.name')
+for ((i=0; i<$PHASE_COUNT; i++)); do
+    PHASE_NAME=$(echo "$MILESTONE_DATA" | jq -r ".phases[$i].name")
     
     # If no specific phase requested, validate all phases
     # If specific phase requested, only validate that phase
@@ -49,16 +48,16 @@ for phase_data in $PHASES; do
         echo "🔍 Validating Phase: $PHASE_NAME"
         
         # Get validations for this phase
-        VALIDATIONS=$(echo "$PHASE_JSON" | jq -r '.validations[] | @base64')
+        VALIDATION_COUNT=$(echo "$MILESTONE_DATA" | jq ".phases[$i].validations | length")
         
-        for validation_data in $VALIDATIONS; do
-            VALIDATION_JSON=$(echo "$validation_data" | base64 --decode)
-            TYPE=$(echo "$VALIDATION_JSON" | jq -r '.type')
-            DESCRIPTION=$(echo "$VALIDATION_JSON" | jq -r '.description')
+        for ((j=0; j<$VALIDATION_COUNT; j++)); do
+        for ((j=0; j<$VALIDATION_COUNT; j++)); do
+            TYPE=$(echo "$MILESTONE_DATA" | jq -r ".phases[$i].validations[$j].type")
+            DESCRIPTION=$(echo "$MILESTONE_DATA" | jq -r ".phases[$i].validations[$j].description")
             
             case $TYPE in
                 "file_exists")
-                    PATH=$(echo "$VALIDATION_JSON" | jq -r '.path')
+                    PATH=$(echo "$MILESTONE_DATA" | jq -r ".phases[$i].validations[$j].path")
                     if [[ -f "$PATH" ]]; then
                         echo "  ✅ $DESCRIPTION: $PATH"
                     else
@@ -68,7 +67,7 @@ for phase_data in $PHASES; do
                     ;;
                     
                 "directory_exists")
-                    PATH=$(echo "$VALIDATION_JSON" | jq -r '.path')
+                    PATH=$(echo "$MILESTONE_DATA" | jq -r ".phases[$i].validations[$j].path")
                     if [[ -d "$PATH" ]]; then
                         echo "  ✅ $DESCRIPTION: $PATH/"
                     else

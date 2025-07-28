@@ -14,22 +14,23 @@ if [[ -z "$MILESTONE" ]]; then
     exit 1
 fi
 
-# Check if jq is available
-if ! command -v jq &> /dev/null; then
-    echo "❌ jq is required but not found in PATH"
+# Check if jq is available and set JQ_CMD
+JQ_CMD=""
+if command -v jq &> /dev/null; then
+    JQ_CMD="jq"
+elif [[ -f "/usr/bin/jq" ]]; then
+    echo "Found jq at /usr/bin/jq"
+    JQ_CMD="/usr/bin/jq"
+elif [[ -f "/usr/local/bin/jq" ]]; then
+    echo "Found jq at /usr/local/bin/jq"
+    JQ_CMD="/usr/local/bin/jq"
+else
+    echo "❌ jq is required but not found"
     echo "Current PATH: $PATH"
-    echo "Trying common locations..."
-    if [[ -f "/usr/bin/jq" ]]; then
-        echo "Found jq at /usr/bin/jq"
-        export PATH="/usr/bin:$PATH"
-    elif [[ -f "/usr/local/bin/jq" ]]; then
-        echo "Found jq at /usr/local/bin/jq"
-        export PATH="/usr/local/bin:$PATH"
-    else
-        echo "jq not found in common locations"
-        exit 1
-    fi
+    exit 1
 fi
+
+echo "Using jq: $JQ_CMD"
 
 CONFIG_FILE=".github/milestone-validations/milestone-${MILESTONE}.json"
 
@@ -46,16 +47,16 @@ fi
 
 # Parse the configuration file
 MILESTONE_DATA=$(cat "$CONFIG_FILE")
-DESCRIPTION=$(echo "$MILESTONE_DATA" | jq -r '.description')
+DESCRIPTION=$($JQ_CMD -r '.description' <<< "$MILESTONE_DATA")
 
 echo "📋 Description: $DESCRIPTION"
 
 # Find the matching phase - using jq without base64 encoding
-PHASE_COUNT=$(echo "$MILESTONE_DATA" | jq '.phases | length')
+PHASE_COUNT=$($JQ_CMD '.phases | length' <<< "$MILESTONE_DATA")
 
 PHASE_FOUND=false
 for ((i=0; i<$PHASE_COUNT; i++)); do
-    PHASE_NAME=$(echo "$MILESTONE_DATA" | jq -r ".phases[$i].name")
+    PHASE_NAME=$($JQ_CMD -r ".phases[$i].name" <<< "$MILESTONE_DATA")
     
     # If no specific phase requested, validate all phases
     # If specific phase requested, only validate that phase
@@ -65,15 +66,15 @@ for ((i=0; i<$PHASE_COUNT; i++)); do
         echo "🔍 Validating Phase: $PHASE_NAME"
         
         # Get validations for this phase
-        VALIDATION_COUNT=$(echo "$MILESTONE_DATA" | jq ".phases[$i].validations | length")
+        VALIDATION_COUNT=$($JQ_CMD ".phases[$i].validations | length" <<< "$MILESTONE_DATA")
         
         for ((j=0; j<$VALIDATION_COUNT; j++)); do
-            TYPE=$(echo "$MILESTONE_DATA" | jq -r ".phases[$i].validations[$j].type")
-            DESCRIPTION=$(echo "$MILESTONE_DATA" | jq -r ".phases[$i].validations[$j].description")
+            TYPE=$($JQ_CMD -r ".phases[$i].validations[$j].type" <<< "$MILESTONE_DATA")
+            DESCRIPTION=$($JQ_CMD -r ".phases[$i].validations[$j].description" <<< "$MILESTONE_DATA")
             
             case $TYPE in
                 "file_exists")
-                    PATH=$(echo "$MILESTONE_DATA" | jq -r ".phases[$i].validations[$j].path")
+                    PATH=$($JQ_CMD -r ".phases[$i].validations[$j].path" <<< "$MILESTONE_DATA")
                     if [[ -f "$PATH" ]]; then
                         echo "  ✅ $DESCRIPTION: $PATH"
                     else
@@ -83,7 +84,7 @@ for ((i=0; i<$PHASE_COUNT; i++)); do
                     ;;
                     
                 "directory_exists")
-                    PATH=$(echo "$MILESTONE_DATA" | jq -r ".phases[$i].validations[$j].path")
+                    PATH=$($JQ_CMD -r ".phases[$i].validations[$j].path" <<< "$MILESTONE_DATA")
                     if [[ -d "$PATH" ]]; then
                         echo "  ✅ $DESCRIPTION: $PATH/"
                     else

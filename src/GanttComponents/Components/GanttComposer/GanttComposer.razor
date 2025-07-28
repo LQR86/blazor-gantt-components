@@ -1,0 +1,160 @@
+@using GanttComponents.Components.TaskGrid
+@using GanttComponents.Components.TimelineView
+@using GanttComponents.Models
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<div id="gantt-composer-@ComponentId" class="gantt-composer @(ShowDebugAlignment ? "debug-alignment" : "")" 
+     style="position: relative; width: 100%; height: @(ContainerHeight)px;">
+     
+    <!-- TaskGrid at fixed position and natural width -->
+    <div id="composer-grid-@ComponentId" class="composer-grid" 
+         style="position: absolute; left: 0; top: 0; width: @(GridWidth)px; height: 100%;">
+        <TaskGrid Tasks="@Tasks" 
+                 OnTaskSelected="HandleTaskSelection" 
+                 SelectedTaskId="@SelectedTaskId"
+                 OnTaskHovered="HandleTaskHover"
+                 HoveredTaskId="@HoveredTaskId"
+                 RowHeight="@RowHeight"
+                 HeaderHeight="@HeaderHeight"
+                 ShowVerticalScrollbar="false" />
+    </div>
+    
+    <!-- Draggable splitter at TaskGrid boundary -->
+    <div id="composer-splitter-@ComponentId" class="composer-splitter" 
+         style="position: absolute; left: @(GridWidth)px; top: 0; width: 4px; height: 100%; z-index: 10;"></div>
+    
+    <!-- TimelineView takes remaining space with natural width -->
+    <div id="composer-timeline-@ComponentId" class="composer-timeline" 
+         style="position: absolute; left: @(GridWidth + SplitterWidth)px; top: 0; right: 0; height: 100%;">
+        <TimelineView Tasks="@Tasks" 
+                     OnTaskSelected="HandleTaskSelection"
+                     SelectedTaskId="@SelectedTaskId"
+                     OnTaskHovered="HandleTaskHover"
+                     HoveredTaskId="@HoveredTaskId"
+                     RowHeight="@RowHeight"
+                     HeaderMonthHeight="@TimelineHeaderMonthHeight"
+                     HeaderDayHeight="@TimelineHeaderDayHeight" />
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<GanttTask>? Tasks { get; set; }
+    [Parameter] public EventCallback<int> OnTaskSelected { get; set; }
+    [Parameter] public bool ShowDebugAlignment { get; set; } = false;
+    [Parameter] public int RowHeight { get; set; } = 32; // Row height for alignment consistency
+    [Parameter] public int HeaderHeight { get; set; } = 56; // Total header height (should match TimelineView total)
+    [Parameter] public int ContainerHeight { get; set; } = 600; // Container height (configurable)
+    
+    private int? SelectedTaskId { get; set; }
+    private int? HoveredTaskId { get; set; }
+    private int GridWidth { get; set; } = 400; // TaskGrid width (draggable)
+    private int SplitterWidth { get; set; } = 4; // Splitter width
+    private int MinGridWidth { get; set; } = 200; // Minimum grid width
+    private double MaxGridWidthRatio { get; set; } = 0.8; // Maximum grid width as ratio of container
+    private string ComponentId { get; set; } = Guid.NewGuid().ToString("N")[..8];
+    
+    // Calculate TimelineView header components to match total
+    private int TimelineHeaderMonthHeight => 32; // Fixed for timeline aesthetics  
+    private int TimelineHeaderDayHeight => HeaderHeight - TimelineHeaderMonthHeight; // Adjust day height to match total
+    
+    // Calculate effective container width (for max width calculations)
+    private int EffectiveContainerWidth { get; set; } = 1200; // Default, will be updated by JS
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InitializeScrollSynchronization();
+            await InitializeSplitter();
+            await EnforceRowAlignment();
+        }
+    }
+    
+    private async Task InitializeSplitter()
+    {
+        try
+        {
+            // Pass container dimensions and constraints to JavaScript
+            await JSRuntime.InvokeVoidAsync("ganttComposer.initializeCoordinateSplitter", 
+                $"gantt-composer-{ComponentId}", 
+                GridWidth, SplitterWidth, MinGridWidth, MaxGridWidthRatio);
+        }
+        catch (Exception)
+        {
+            // Fallback if JS interop fails
+        }
+    }
+    
+    [JSInvokable]
+    public void UpdateGridWidth(int newWidth)
+    {
+        GridWidth = newWidth;
+        StateHasChanged(); // Re-render with new positions
+    }
+    
+    private async Task InitializeScrollSynchronization()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("ganttComposer.synchronizeVerticalScroll", 
+                $"composer-grid-{ComponentId}", $"composer-timeline-{ComponentId}");
+            await JSRuntime.InvokeVoidAsync("ganttComposer.synchronizeVerticalScroll", 
+                $"composer-timeline-{ComponentId}", $"composer-grid-{ComponentId}");
+        }
+        catch (Exception)
+        {
+            // Fallback if JS interop fails - component still works without sync
+        }
+    }
+    
+    private async Task EnforceRowAlignment()
+    {
+        try
+        {
+            await Task.Delay(100); // Give components time to render
+            await JSRuntime.InvokeVoidAsync("ganttComposer.enforceRowAlignment", 
+                $"gantt-composer-{ComponentId}");
+        }
+        catch (Exception)
+        {
+            // Fallback if JS interop fails
+        }
+    }
+    
+    private async Task HandleTaskSelection(int taskId)
+    {
+        SelectedTaskId = taskId;
+        
+        // Notify parent component if needed
+        if (OnTaskSelected.HasDelegate)
+        {
+            await OnTaskSelected.InvokeAsync(taskId);
+        }
+        
+        StateHasChanged(); // Sync both components
+    }
+    
+    private void HandleTaskHover(int? taskId)
+    {
+        HoveredTaskId = taskId;
+        StateHasChanged(); // Sync hover state between both components
+    }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        if (ShowDebugAlignment)
+        {
+            await Task.Delay(50); // Give component time to render
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("ganttComposer.toggleRowAlignmentDebug", 
+                    $"gantt-composer-{ComponentId}", true);
+            }
+            catch (Exception)
+            {
+                // Fallback if JS interop fails
+            }
+        }
+    }
+}

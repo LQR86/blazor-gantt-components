@@ -1,0 +1,130 @@
+/* GanttComposer Component Styling - Coordinate-Based Layout */
+.gantt-composer {
+    position: relative;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #f9f9f9;
+}
+
+/* TaskGrid: Fixed position, natural width with horizontal scrolling */
+.composer-grid {
+    position: absolute;
+    border-right: 1px solid #ddd;
+    background: white;
+    overflow-x: auto; /* Allow horizontal scrolling when TaskGrid content is wider */
+    overflow-y: hidden; /* TaskGrid handles its own vertical scrolling */
+}
+
+/* TaskGrid now uses CSS Grid by default - no overrides needed! */
+.composer-grid .task-grid-container {
+    min-width: 850px; /* Ensure minimum width for the grid columns */
+}
+
+/* Splitter: Positioned at TaskGrid boundary */
+.composer-splitter {
+    position: absolute;
+    background: #ddd;
+    cursor: col-resize;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    transition: background-color 0.2s ease;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.composer-splitter:hover {
+    background: #007acc;
+}
+
+.composer-splitter.dragging {
+    background: #0066cc;
+    box-shadow: 0 0 10px rgba(0, 102, 204, 0.5);
+}
+
+.composer-splitter::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 1px;
+    transition: background-color 0.2s ease;
+}
+
+/* TimelineView: Takes remaining space with natural width and horizontal scrolling */
+.composer-timeline {
+    position: absolute;
+    background: white;
+    overflow-x: auto; /* Allow horizontal scrolling for timeline content */
+    overflow-y: hidden; /* TimelineView handles its own vertical scrolling */
+}
+
+/* ROW ALIGNMENT SOLUTION - Parameter-Based Approach */
+/* Force consistent row heights via component parameters */
+.gantt-composer {
+    --row-height: 32px;
+    --header-height: 56px;
+}
+
+/* Components handle their own scrolling naturally */
+.composer-grid,
+.composer-timeline {
+    box-sizing: border-box;
+}
+
+/* Visual row alignment verification */
+.gantt-composer.debug-alignment::before {
+    content: '';
+    position: absolute;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(var(--row-height) - 1px),
+        rgba(255, 0, 0, 0.2) calc(var(--row-height) - 1px),
+        rgba(255, 0, 0, 0.2) var(--row-height)
+    );
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* Responsive behavior - Stack vertically on mobile */
+@media (max-width: 768px) {
+    .gantt-composer {
+        height: auto !important;
+    }
+    
+    .composer-grid {
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: 300px;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .composer-splitter {
+        display: none !important;
+    }
+    
+    .composer-timeline {
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+        right: auto !important;
+        width: 100% !important;
+        height: 300px;
+        margin-top: 300px; /* Account for TaskGrid height */
+    }
+}

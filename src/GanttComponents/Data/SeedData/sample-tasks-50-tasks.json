@@ -1,0 +1,502 @@
+[
+  {
+    "Id": 1,
+    "Name": "Project Planning Phase",
+    "StartDate": "2025-01-01",
+    "Duration": "10d",
+    "WbsCode": "1",
+    "ParentId": null,
+    "Dependencies": "",
+    "EndDate": "2025-01-10"
+  },
+  {
+    "Id": 2,
+    "Name": "Requirements Analysis",
+    "StartDate": "2025-01-01",
+    "Duration": "5d",
+    "WbsCode": "1.1",
+    "ParentId": 1,
+    "Dependencies": "",
+    "EndDate": "2025-01-05"
+  },
+  {
+    "Id": 3,
+    "Name": "Stakeholder Interviews",
+    "StartDate": "2025-01-01",
+    "Duration": "3d",
+    "WbsCode": "1.1.1",
+    "ParentId": 2,
+    "Dependencies": "",
+    "EndDate": "2025-01-03"
+  },
+  {
+    "Id": 4,
+    "Name": "Requirements Documentation",
+    "StartDate": "2025-01-04",
+    "Duration": "2d",
+    "WbsCode": "1.1.2",
+    "ParentId": 2,
+    "Dependencies": "3FS",
+    "EndDate": "2025-01-05"
+  },
+  {
+    "Id": 5,
+    "Name": "Technical Specification",
+    "StartDate": "2025-01-06",
+    "Duration": "5d",
+    "WbsCode": "1.2",
+    "ParentId": 1,
+    "Dependencies": "2FS",
+    "EndDate": "2025-01-10"
+  },
+  {
+    "Id": 6,
+    "Name": "Architecture Design",
+    "StartDate": "2025-01-06",
+    "Duration": "3d",
+    "WbsCode": "1.2.1",
+    "ParentId": 5,
+    "Dependencies": "2FS",
+    "EndDate": "2025-01-08"
+  },
+  {
+    "Id": 7,
+    "Name": "Database Design",
+    "StartDate": "2025-01-09",
+    "Duration": "2d",
+    "WbsCode": "1.2.2",
+    "ParentId": 5,
+    "Dependencies": "6FS",
+    "EndDate": "2025-01-10"
+  },
+  {
+    "Id": 8,
+    "Name": "Development Phase",
+    "StartDate": "2025-01-13",
+    "Duration": "30d",
+    "WbsCode": "2",
+    "ParentId": null,
+    "Dependencies": "1FS",
+    "EndDate": "2025-02-11"
+  },
+  {
+    "Id": 9,
+    "Name": "Frontend Development",
+    "StartDate": "2025-01-13",
+    "Duration": "20d",
+    "WbsCode": "2.1",
+    "ParentId": 8,
+    "Dependencies": "5FS",
+    "EndDate": "2025-02-01"
+  },
+  {
+    "Id": 10,
+    "Name": "UI Components",
+    "StartDate": "2025-01-13",
+    "Duration": "10d",
+    "WbsCode": "2.1.1",
+    "ParentId": 9,
+    "Dependencies": "5FS",
+    "EndDate": "2025-01-22"
+  },
+  {
+    "Id": 11,
+    "Name": "TaskGrid Component",
+    "StartDate": "2025-01-13",
+    "Duration": "5d",
+    "WbsCode": "2.1.1.1",
+    "ParentId": 10,
+    "Dependencies": "5FS",
+    "EndDate": "2025-01-17"
+  },
+  {
+    "Id": 12,
+    "Name": "TimelineView Component",
+    "StartDate": "2025-01-18",
+    "Duration": "5d",
+    "WbsCode": "2.1.1.2",
+    "ParentId": 10,
+    "Dependencies": "11FS",
+    "EndDate": "2025-01-22"
+  },
+  {
+    "Id": 13,
+    "Name": "GanttComposer Component",
+    "StartDate": "2025-01-23",
+    "Duration": "5d",
+    "WbsCode": "2.1.1.3",
+    "ParentId": 10,
+    "Dependencies": "12FS",
+    "EndDate": "2025-01-27"
+  },
+  {
+    "Id": 14,
+    "Name": "State Management",
+    "StartDate": "2025-01-23",
+    "Duration": "10d",
+    "WbsCode": "2.1.2",
+    "ParentId": 9,
+    "Dependencies": "10FS",
+    "EndDate": "2025-02-01"
+  },
+  {
+    "Id": 15,
+    "Name": "Task Operations",
+    "StartDate": "2025-01-23",
+    "Duration": "5d",
+    "WbsCode": "2.1.2.1",
+    "ParentId": 14,
+    "Dependencies": "10FS",
+    "EndDate": "2025-01-27"
+  },
+  {
+    "Id": 16,
+    "Name": "Dependency Management",
+    "StartDate": "2025-01-28",
+    "Duration": "5d",
+    "WbsCode": "2.1.2.2",
+    "ParentId": 14,
+    "Dependencies": "15FS",
+    "EndDate": "2025-02-01"
+  },
+  {
+    "Id": 17,
+    "Name": "Backend Development",
+    "StartDate": "2025-01-13",
+    "Duration": "25d",
+    "WbsCode": "2.2",
+    "ParentId": 8,
+    "Dependencies": "7FS",
+    "EndDate": "2025-02-06"
+  },
+  {
+    "Id": 18,
+    "Name": "API Development",
+    "StartDate": "2025-01-13",
+    "Duration": "15d",
+    "WbsCode": "2.2.1",
+    "ParentId": 17,
+    "Dependencies": "7FS",
+    "EndDate": "2025-01-27"
+  },
+  {
+    "Id": 19,
+    "Name": "Task API Endpoints",
+    "StartDate": "2025-01-13",
+    "Duration": "5d",
+    "WbsCode": "2.2.1.1",
+    "ParentId": 18,
+    "Dependencies": "7FS",
+    "EndDate": "2025-01-17"
+  },
+  {
+    "Id": 20,
+    "Name": "Dependency API Endpoints",
+    "StartDate": "2025-01-18",
+    "Duration": "5d",
+    "WbsCode": "2.2.1.2",
+    "ParentId": 18,
+    "Dependencies": "19FS",
+    "EndDate": "2025-01-22"
+  },
+  {
+    "Id": 21,
+    "Name": "Resource API Endpoints",
+    "StartDate": "2025-01-23",
+    "Duration": "5d",
+    "WbsCode": "2.2.1.3",
+    "ParentId": 18,
+    "Dependencies": "20FS",
+    "EndDate": "2025-01-27"
+  },
+  {
+    "Id": 22,
+    "Name": "Database Implementation",
+    "StartDate": "2025-01-28",
+    "Duration": "10d",
+    "WbsCode": "2.2.2",
+    "ParentId": 17,
+    "Dependencies": "18FS",
+    "EndDate": "2025-02-06"
+  },
+  {
+    "Id": 23,
+    "Name": "Entity Framework Setup",
+    "StartDate": "2025-01-28",
+    "Duration": "3d",
+    "WbsCode": "2.2.2.1",
+    "ParentId": 22,
+    "Dependencies": "18FS",
+    "EndDate": "2025-01-30"
+  },
+  {
+    "Id": 24,
+    "Name": "Data Migrations",
+    "StartDate": "2025-01-31",
+    "Duration": "2d",
+    "WbsCode": "2.2.2.2",
+    "ParentId": 22,
+    "Dependencies": "23FS",
+    "EndDate": "2025-02-01"
+  },
+  {
+    "Id": 25,
+    "Name": "Repository Pattern",
+    "StartDate": "2025-02-02",
+    "Duration": "5d",
+    "WbsCode": "2.2.2.3",
+    "ParentId": 22,
+    "Dependencies": "24FS",
+    "EndDate": "2025-02-06"
+  },
+  {
+    "Id": 26,
+    "Name": "Testing Phase",
+    "StartDate": "2025-02-07",
+    "Duration": "15d",
+    "WbsCode": "3",
+    "ParentId": null,
+    "Dependencies": "8FS",
+    "EndDate": "2025-02-21"
+  },
+  {
+    "Id": 27,
+    "Name": "Unit Testing",
+    "StartDate": "2025-02-07",
+    "Duration": "8d",
+    "WbsCode": "3.1",
+    "ParentId": 26,
+    "Dependencies": "8FS",
+    "EndDate": "2025-02-14"
+  },
+  {
+    "Id": 28,
+    "Name": "Component Tests",
+    "StartDate": "2025-02-07",
+    "Duration": "4d",
+    "WbsCode": "3.1.1",
+    "ParentId": 27,
+    "Dependencies": "13FS",
+    "EndDate": "2025-02-10"
+  },
+  {
+    "Id": 29,
+    "Name": "Service Tests",
+    "StartDate": "2025-02-11",
+    "Duration": "4d",
+    "WbsCode": "3.1.2",
+    "ParentId": 27,
+    "Dependencies": "28FS",
+    "EndDate": "2025-02-14"
+  },
+  {
+    "Id": 30,
+    "Name": "Integration Testing",
+    "StartDate": "2025-02-15",
+    "Duration": "7d",
+    "WbsCode": "3.2",
+    "ParentId": 26,
+    "Dependencies": "27FS",
+    "EndDate": "2025-02-21"
+  },
+  {
+    "Id": 31,
+    "Name": "API Integration Tests",
+    "StartDate": "2025-02-15",
+    "Duration": "3d",
+    "WbsCode": "3.2.1",
+    "ParentId": 30,
+    "Dependencies": "25FS",
+    "EndDate": "2025-02-17"
+  },
+  {
+    "Id": 32,
+    "Name": "End-to-End Tests",
+    "StartDate": "2025-02-18",
+    "Duration": "4d",
+    "WbsCode": "3.2.2",
+    "ParentId": 30,
+    "Dependencies": "31FS",
+    "EndDate": "2025-02-21"
+  },
+  {
+    "Id": 33,
+    "Name": "Performance Testing",
+    "StartDate": "2025-02-22",
+    "Duration": "5d",
+    "WbsCode": "3.3",
+    "ParentId": 26,
+    "Dependencies": "30FS",
+    "EndDate": "2025-02-26"
+  },
+  {
+    "Id": 34,
+    "Name": "Load Testing",
+    "StartDate": "2025-02-22",
+    "Duration": "3d",
+    "WbsCode": "3.3.1",
+    "ParentId": 33,
+    "Dependencies": "30FS",
+    "EndDate": "2025-02-24"
+  },
+  {
+    "Id": 35,
+    "Name": "Stress Testing",
+    "StartDate": "2025-02-25",
+    "Duration": "2d",
+    "WbsCode": "3.3.2",
+    "ParentId": 33,
+    "Dependencies": "34FS",
+    "EndDate": "2025-02-26"
+  },
+  {
+    "Id": 36,
+    "Name": "Documentation Phase",
+    "StartDate": "2025-02-27",
+    "Duration": "10d",
+    "WbsCode": "4",
+    "ParentId": null,
+    "Dependencies": "26FS",
+    "EndDate": "2025-03-08"
+  },
+  {
+    "Id": 37,
+    "Name": "API Documentation",
+    "StartDate": "2025-02-27",
+    "Duration": "5d",
+    "WbsCode": "4.1",
+    "ParentId": 36,
+    "Dependencies": "21FS",
+    "EndDate": "2025-03-03"
+  },
+  {
+    "Id": 38,
+    "Name": "User Manual",
+    "StartDate": "2025-03-04",
+    "Duration": "5d",
+    "WbsCode": "4.2",
+    "ParentId": 36,
+    "Dependencies": "37FS",
+    "EndDate": "2025-03-08"
+  },
+  {
+    "Id": 39,
+    "Name": "Deployment Phase",
+    "StartDate": "2025-03-09",
+    "Duration": "8d",
+    "WbsCode": "5",
+    "ParentId": null,
+    "Dependencies": "36FS",
+    "EndDate": "2025-03-16"
+  },
+  {
+    "Id": 40,
+    "Name": "Environment Setup",
+    "StartDate": "2025-03-09",
+    "Duration": "3d",
+    "WbsCode": "5.1",
+    "ParentId": 39,
+    "Dependencies": "33FS",
+    "EndDate": "2025-03-11"
+  },
+  {
+    "Id": 41,
+    "Name": "Production Deployment",
+    "StartDate": "2025-03-12",
+    "Duration": "2d",
+    "WbsCode": "5.2",
+    "ParentId": 39,
+    "Dependencies": "40FS",
+    "EndDate": "2025-03-13"
+  },
+  {
+    "Id": 42,
+    "Name": "Go-Live Activities",
+    "StartDate": "2025-03-14",
+    "Duration": "3d",
+    "WbsCode": "5.3",
+    "ParentId": 39,
+    "Dependencies": "41FS",
+    "EndDate": "2025-03-16"
+  },
+  {
+    "Id": 43,
+    "Name": "Quality Assurance",
+    "StartDate": "2025-02-01",
+    "Duration": "20d",
+    "WbsCode": "6",
+    "ParentId": null,
+    "Dependencies": "",
+    "EndDate": "2025-02-20"
+  },
+  {
+    "Id": 44,
+    "Name": "Code Review Process",
+    "StartDate": "2025-02-01",
+    "Duration": "15d",
+    "WbsCode": "6.1",
+    "ParentId": 43,
+    "Dependencies": "16FS",
+    "EndDate": "2025-02-15"
+  },
+  {
+    "Id": 45,
+    "Name": "Security Audit",
+    "StartDate": "2025-02-16",
+    "Duration": "5d",
+    "WbsCode": "6.2",
+    "ParentId": 43,
+    "Dependencies": "44FS",
+    "EndDate": "2025-02-20"
+  },
+  {
+    "Id": 46,
+    "Name": "Risk Management",
+    "StartDate": "2025-01-15",
+    "Duration": "45d",
+    "WbsCode": "7",
+    "ParentId": null,
+    "Dependencies": "",
+    "EndDate": "2025-02-28"
+  },
+  {
+    "Id": 47,
+    "Name": "Risk Assessment",
+    "StartDate": "2025-01-15",
+    "Duration": "5d",
+    "WbsCode": "7.1",
+    "ParentId": 46,
+    "Dependencies": "9FS",
+    "EndDate": "2025-01-19"
+  },
+  {
+    "Id": 48,
+    "Name": "Mitigation Strategies",
+    "StartDate": "2025-01-20",
+    "Duration": "10d",
+    "WbsCode": "7.2",
+    "ParentId": 46,
+    "Dependencies": "47FS",
+    "EndDate": "2025-01-29"
+  },
+  {
+    "Id": 49,
+    "Name": "Monitoring & Control",
+    "StartDate": "2025-01-30",
+    "Duration": "30d",
+    "WbsCode": "7.3",
+    "ParentId": 46,
+    "Dependencies": "48FS",
+    "EndDate": "2025-02-28"
+  },
+  {
+    "Id": 50,
+    "Name": "Project Closure",
+    "StartDate": "2025-03-17",
+    "Duration": "3d",
+    "WbsCode": "8",
+    "ParentId": null,
+    "Dependencies": "42FS+39FS",
+    "EndDate": "2025-03-19"
+  }
+]

@@ -41,7 +41,7 @@ using (var scope = app.Services.CreateScope())
     // Seed with sample data from JSON if database is empty
     if (!context.Tasks.Any())
     {
-        seedService.SeedTasksFromJsonAsync("Data/SeedData/sample-tasks.json", context).Wait();
+        seedService.SeedTasksFromJsonAsync("Data/SeedData/sample-tasks-50-tasks.json", context).Wait();
     }
 }
 

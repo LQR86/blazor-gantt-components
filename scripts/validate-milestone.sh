@@ -51,7 +51,6 @@ for ((i=0; i<$PHASE_COUNT; i++)); do
         VALIDATION_COUNT=$(echo "$MILESTONE_DATA" | jq ".phases[$i].validations | length")
         
         for ((j=0; j<$VALIDATION_COUNT; j++)); do
-        for ((j=0; j<$VALIDATION_COUNT; j++)); do
             TYPE=$(echo "$MILESTONE_DATA" | jq -r ".phases[$i].validations[$j].type")
             DESCRIPTION=$(echo "$MILESTONE_DATA" | jq -r ".phases[$i].validations[$j].description")
             

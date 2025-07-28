@@ -16,14 +16,15 @@ fi
 
 # Check if jq is available and set JQ_CMD
 JQ_CMD=""
-if command -v jq &> /dev/null; then
-    JQ_CMD="jq"
-elif [[ -f "/usr/bin/jq" ]]; then
+if [[ -f "/usr/bin/jq" ]]; then
     echo "Found jq at /usr/bin/jq"
     JQ_CMD="/usr/bin/jq"
 elif [[ -f "/usr/local/bin/jq" ]]; then
     echo "Found jq at /usr/local/bin/jq"
     JQ_CMD="/usr/local/bin/jq"
+elif command -v jq &> /dev/null; then
+    JQ_CMD=$(command -v jq)
+    echo "Found jq in PATH at: $JQ_CMD"
 else
     echo "❌ jq is required but not found"
     echo "Current PATH: $PATH"

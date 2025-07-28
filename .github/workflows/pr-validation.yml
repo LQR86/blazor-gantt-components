@@ -1,0 +1,137 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, synchronize]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  branch-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      branch-type: ${{ steps.validate.outputs.branch-type }}
+      
+    steps:
+      - name: Validate Branch Naming Convention
+        id: validate
+        run: |
+          echo "🔍 Validating branch naming convention: ${{ github.head_ref }}"
+          BRANCH_NAME="${{ github.head_ref }}"
+          
+          # Define allowed branch prefixes and their purposes
+          FEATURE_VERSION_PATTERN="^feat/v[0-9]+\.[0-9]+\.[0-9]+[^/]*-.*"
+          FIX_PATTERN="^fix/[a-z0-9-]+$"
+          HOTFIX_PATTERN="^hotfix/[a-z0-9-]+$"
+          DOCS_PATTERN="^docs/[a-z0-9-]+$"
+          CHORE_PATTERN="^chore/[a-z0-9-]+$"
+          CI_PATTERN="^ci/[a-z0-9-]+$"
+          STYLE_PATTERN="^style/[a-z0-9-]+$"
+          REFACTOR_PATTERN="^refactor/[a-z0-9-]+$"
+          TEST_PATTERN="^test/[a-z0-9-]+$"
+          PERF_PATTERN="^perf/[a-z0-9-]+$"
+          
+          # Check if branch matches any allowed pattern
+          if [[ "$BRANCH_NAME" =~ $FEATURE_VERSION_PATTERN ]]; then
+            echo "✅ Valid feature branch with version: $BRANCH_NAME"
+            echo "branch-type=feature-version" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH_NAME" =~ $FIX_PATTERN ]]; then
+            echo "✅ Valid fix branch: $BRANCH_NAME"
+            echo "branch-type=fix" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH_NAME" =~ $HOTFIX_PATTERN ]]; then
+            echo "✅ Valid hotfix branch: $BRANCH_NAME"
+            echo "branch-type=hotfix" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH_NAME" =~ $DOCS_PATTERN ]]; then
+            echo "✅ Valid documentation branch: $BRANCH_NAME"
+            echo "branch-type=docs" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH_NAME" =~ $CHORE_PATTERN ]]; then
+            echo "✅ Valid chore branch: $BRANCH_NAME"
+            echo "branch-type=chore" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH_NAME" =~ $CI_PATTERN ]]; then
+            echo "✅ Valid CI branch: $BRANCH_NAME"
+            echo "branch-type=ci" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH_NAME" =~ $STYLE_PATTERN ]]; then
+            echo "✅ Valid style branch: $BRANCH_NAME"
+            echo "branch-type=style" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH_NAME" =~ $REFACTOR_PATTERN ]]; then
+            echo "✅ Valid refactor branch: $BRANCH_NAME"
+            echo "branch-type=refactor" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH_NAME" =~ $TEST_PATTERN ]]; then
+            echo "✅ Valid test branch: $BRANCH_NAME"
+            echo "branch-type=test" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH_NAME" =~ $PERF_PATTERN ]]; then
+            echo "✅ Valid performance branch: $BRANCH_NAME"
+            echo "branch-type=perf" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Invalid branch naming convention: $BRANCH_NAME"
+            echo ""
+            echo "📋 Allowed branch naming patterns:"
+            echo "   feat/v0.3.0-alpha-component-name  (feature with version)"
+            echo "   fix/timeline-scrolling-bug        (bug fixes)"
+            echo "   hotfix/critical-security-patch    (urgent fixes)"
+            echo "   docs/update-readme                (documentation)"
+            echo "   chore/update-dependencies          (maintenance)"
+            echo "   ci/fix-build-pipeline              (CI/CD changes)"
+            echo "   style/format-components            (code formatting)"
+            echo "   refactor/cleanup-services          (code refactoring)"
+            echo "   test/add-unit-tests                (testing)"
+            echo "   perf/optimize-rendering            (performance)"
+            echo ""
+            echo "ℹ️  Branch names must use lowercase letters, numbers, and hyphens only"
+            exit 1
+          fi
+
+  pr-title-validation:
+    runs-on: ubuntu-latest
+    needs: branch-validation
+    timeout-minutes: 2
+    
+    steps:
+      - name: Validate PR Title Format
+        run: |
+          echo "🔍 Validating PR title format for branch: ${{ github.head_ref }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          BRANCH_NAME="${{ github.head_ref }}"
+          BRANCH_TYPE="${{ needs.branch-validation.outputs.branch-type }}"
+          
+          echo "📋 Branch type detected: $BRANCH_TYPE"
+          
+          # Check if this is a feature branch with version
+          if [[ "$BRANCH_TYPE" == "feature-version" ]]; then
+            echo "📋 Feature branch with version detected - version tag required in PR title"
+            
+            # Extract version from branch name (including alpha/beta suffixes)
+            EXPECTED_VERSION=$(echo "$BRANCH_NAME" | grep -o 'v[0-9]*\.[0-9]*\.[0-9]*[^-]*-[^-]*' | head -1)
+            if [[ -z "$EXPECTED_VERSION" ]]; then
+              EXPECTED_VERSION=$(echo "$BRANCH_NAME" | grep -o 'v[0-9]*\.[0-9]*\.[0-9]*[^-]*')
+            fi
+            
+            # Check if PR title contains the version tag
+            if [[ "$PR_TITLE" =~ \($EXPECTED_VERSION\) ]]; then
+              echo "✅ PR title correctly includes version tag: $EXPECTED_VERSION"
+            else
+              echo "❌ PR title must include version tag for feature branch with version"
+              echo "   Current title: $PR_TITLE"
+              echo "   Required format: feat: Complete Component Name ($EXPECTED_VERSION)"
+              echo "   Example: feat: Complete GanttComposer Component ($EXPECTED_VERSION)"
+              exit 1
+            fi
+          else
+            echo "📋 Regular branch detected - no version tag required"
+            
+            # Check that regular branches don't have version tags
+            if [[ "$PR_TITLE" =~ \(v[0-9]+\.[0-9]+\.[0-9]+.*\) ]]; then
+              echo "❌ Regular PR title should NOT include version tag"
+              echo "   Current title: $PR_TITLE"
+              echo "   Branch type: $BRANCH_TYPE"
+              echo "   Correct format: $BRANCH_TYPE: description of change"
+              exit 1
+            else
+              echo "✅ PR title correctly excludes version tag for regular branch"
+            fi
+          fi
+          
+          echo "✅ PR validation completed successfully"

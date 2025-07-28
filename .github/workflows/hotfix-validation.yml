@@ -1,0 +1,114 @@
+name: Hotfix Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+
+env:
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  validate-hotfix-branch:
+    runs-on: ubuntu-latest
+    if: startsWith(github.head_ref, 'hotfix/')
+    steps:
+      - name: Validate Hotfix Branch
+        run: |
+          echo "🚨 Hotfix branch detected: ${{ github.head_ref }}"
+          echo "🔍 Running critical path validation"
+          
+          # Ensure hotfix follows naming convention
+          if [[ ! "${{ github.head_ref }}" =~ ^hotfix/[a-z0-9-]+$ ]]; then
+            echo "❌ Invalid hotfix branch name: ${{ github.head_ref }}"
+            echo "   Required format: hotfix/security-patch-name"
+            exit 1
+          fi
+          
+          echo "✅ Hotfix branch name is valid"
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: validate-hotfix-branch
+    if: startsWith(github.head_ref, 'hotfix/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      
+      - name: Security Vulnerability Scan
+        run: |
+          echo "🔒 Running security vulnerability scan"
+          
+          # Check for known vulnerable packages
+          dotnet list package --vulnerable 2>&1 | tee vulnerable-packages.log
+          
+          # Fail if vulnerabilities found
+          if grep -q "has the following vulnerable packages" vulnerable-packages.log; then
+            echo "❌ Vulnerable packages detected in hotfix"
+            cat vulnerable-packages.log
+            exit 1
+          fi
+          
+          echo "✅ No vulnerable packages detected"
+      
+      - name: Critical Path Tests
+        run: |
+          echo "🧪 Running critical path tests for hotfix"
+          
+          # Build the project
+          dotnet build src/GanttComponents/GanttComponents.csproj --configuration Release --verbosity normal
+          
+          # Run tests with critical tag filter (if we add them)
+          dotnet test tests/GanttComponents.Tests/GanttComponents.Tests.csproj --configuration Release --logger "console;verbosity=detailed"
+          
+          echo "✅ Critical path tests passed"
+
+  fast-deployment-check:
+    runs-on: ubuntu-latest
+    needs: [validate-hotfix-branch, security-scan]
+    if: startsWith(github.head_ref, 'hotfix/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      
+      - name: Validate Fast Deployment Readiness
+        run: |
+          echo "⚡ Validating hotfix is ready for fast deployment"
+          
+          # Ensure build is optimized for production
+          dotnet build src/GanttComponents/GanttComponents.csproj --configuration Release --no-restore
+          
+          # Check assembly info
+          if [ -f "src/GanttComponents/bin/Release/net8.0/GanttComponents.dll" ]; then
+            echo "✅ Release build successful"
+          else
+            echo "❌ Release build failed"
+            exit 1
+          fi
+          
+          # Validate package references are stable
+          echo "📦 Checking package stability"
+          grep -r "IncludePrerelease" **/*.csproj && {
+            echo "❌ Hotfix should not include prerelease packages"
+            exit 1
+          } || echo "✅ No prerelease packages detected"
+          
+          echo "✅ Hotfix ready for fast deployment"

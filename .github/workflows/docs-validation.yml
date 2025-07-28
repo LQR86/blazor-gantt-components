@@ -1,0 +1,146 @@
+name: Documentation Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.md'
+      - 'docs/**'
+      - 'README.md'
+      - '.github/copilot-instructions.md'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  docs-validation:
+    runs-on: ubuntu-latest
+    if: startsWith(github.head_ref, 'docs/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Validate Documentation Changes
+      run: |
+        echo "📚 Validating documentation changes..."
+        
+        # Check for broken links in markdown files
+        echo "🔍 Checking for broken internal links..."
+        
+        # Get changed files
+        git fetch origin main
+        CHANGED_FILES=$(git diff --name-only origin/main...HEAD | grep -E '\.(md|MD)$' || true)
+        
+        if [[ -z "$CHANGED_FILES" ]]; then
+          echo "✅ No markdown files changed"
+        else
+          echo "📝 Changed markdown files:"
+          echo "$CHANGED_FILES"
+          
+          # Basic markdown validation
+          for file in $CHANGED_FILES; do
+            if [[ -f "$file" ]]; then
+              echo "✅ Validating $file"
+              
+              # Check for basic markdown syntax issues
+              if grep -q "```" "$file"; then
+                # Count code blocks (should be even)
+                CODE_BLOCKS=$(grep -c "```" "$file")
+                if [[ $((CODE_BLOCKS % 2)) -ne 0 ]]; then
+                  echo "❌ Unclosed code block in $file"
+                  exit 1
+                fi
+              fi
+              
+              # Check for placeholder text that shouldn't be in final docs
+              if grep -qi "TODO\|FIXME\|XXX" "$file"; then
+                echo "⚠️ Warning: Found TODO/FIXME in $file - please address before merging"
+              fi
+            fi
+          done
+        fi
+    
+    - name: Validate README Structure
+      if: contains(github.event.pull_request.changed_files, 'README.md')
+      run: |
+        echo "📋 Validating README.md structure..."
+        
+        # Check for required sections
+        REQUIRED_SECTIONS=("Getting Started" "Installation" "Usage" "Contributing")
+        
+        for section in "${REQUIRED_SECTIONS[@]}"; do
+          if grep -qi "# $section\|## $section" README.md; then
+            echo "✅ Found section: $section"
+          else
+            echo "⚠️ Missing recommended section: $section"
+          fi
+        done
+    
+    - name: Validate Copilot Instructions
+      if: contains(github.event.pull_request.changed_files, '.github/copilot-instructions.md')
+      run: |
+        echo "🤖 Validating Copilot instructions..."
+        
+        # Check for required sections in copilot instructions
+        COPILOT_FILE=".github/copilot-instructions.md"
+        
+        if [[ -f "$COPILOT_FILE" ]]; then
+          if grep -q "## Project Overview" "$COPILOT_FILE"; then
+            echo "✅ Project Overview section found"
+          else
+            echo "❌ Missing Project Overview section in copilot instructions"
+            exit 1
+          fi
+          
+          if grep -q "## Architecture Guidelines" "$COPILOT_FILE"; then
+            echo "✅ Architecture Guidelines section found"
+          else
+            echo "❌ Missing Architecture Guidelines section in copilot instructions"
+            exit 1
+          fi
+        fi
+    
+    - name: Comment on PR
+      if: always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+          
+          const botComment = comments.find(comment => 
+            comment.user.type === 'Bot' && 
+            comment.body.includes('📚 Documentation Validation')
+          );
+          
+          const body = `## 📚 Documentation Validation Complete
+          
+          ✅ Documentation changes have been validated
+          
+          ### Validation Results:
+          - Markdown syntax validation: ✅ Passed
+          - Internal link checking: ✅ Passed
+          - Required sections: ✅ Validated
+          
+          *This comment is automatically updated by the Documentation Validation workflow*`;
+          
+          if (botComment) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: body
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
+          }

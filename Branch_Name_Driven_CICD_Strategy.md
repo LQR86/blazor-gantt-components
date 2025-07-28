@@ -29,16 +29,16 @@ Our CI/CD system is built on a **Branch Name Driven** architecture where the bra
 ### **Feature Branches (Version-Tagged)**
 ```bash
 feat/v{version}-{feature-name}
-├── feat/v0.4.0-alpha-gantt-composer    # Major component implementation
-├── feat/v0.5.0-beta-resource-mgmt      # New feature with version bump
+├── feat/v0.5.0-task-centering          # Task bar centering feature  
+├── feat/v0.6.0-dependency-rendering    # Dependency visualization
 └── feat/v1.0.0-stable-release          # Production-ready release
 
 # Automatic Extraction:
-# Branch: feat/v0.4.0-alpha-gantt-composer
-# → Version: 0.4.0-alpha
-# → Feature: GanttComposer Component
-# → Tag: v0.4.0-alpha
-# → Release: "v0.4.0-alpha: GanttComposer Component"
+# Branch: feat/v0.5.0-task-centering
+# → Version: 0.5.0
+# → Feature: Task Centering
+# → Tag: v0.5.0
+# → Release: "v0.5.0: Task Centering Feature"
 ```
 
 ### **Non-Version Branches**
@@ -95,13 +95,13 @@ perf/{description}          # Performance optimizations
 ### **Starting a Feature (Version-Tagged)**
 ```bash
 # 1. Create branch with version and feature name
-git checkout -b feat/v0.4.0-alpha-gantt-composer
+git checkout -b feat/v0.5.0-task-centering
 
 # 2. Implement feature
 # ... write code ...
 
-# 3. Create PR with version tag in title
-# Title: "feat: Complete GanttComposer Component (v0.4.0-alpha)"
+# 3. Create PR with version tag in title (simplified format)
+# Title: "feat: Add horizontal task bar centering (v0.5.0)"
 
 # 4. Merge → Automatic tag and release creation
 ```
@@ -303,11 +303,14 @@ docs/update-readme
 ### **PR Title Validation**
 ```bash
 # ✅ Feature branch (feat/v*) - MUST include version tag
-"feat: Complete GanttComposer Component (v0.4.0-alpha)"
+"feat: Add horizontal task bar centering (v0.5.0)"
+"feat: Complete GanttComposer Component (v0.4.0)"
+"feat: Implement dependency rendering (v0.6.0)"
 
 # ✅ Non-feature branch - MUST NOT include version tag
 "fix: resolve timeline scrolling issue"
 "docs: update API documentation"
+"chore: update dependencies"
 ```
 
 ### **Automated Error Messages**

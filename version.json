@@ -1,8 +1,8 @@
 {
   "version": "0.3.0-alpha",
-  "milestone": "1.3",
+  "milestone": "1.2",
   "phase": "TimelineView Component",
-  "status": "in-progress",
-  "nextMilestone": "1.4",
+  "status": "completed",
+  "nextMilestone": "1.3",
   "nextPhase": "GanttComposer Integration"
 }

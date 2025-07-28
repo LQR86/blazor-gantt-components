@@ -1,19 +1,72 @@
-name: Windows CI/CD
+name: Specialized CI/CD
 
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+    # This workflow handles specialized branch types
+
+permissions:
+  contents: read
+  pull-requests: write
 
 env:
   DOTNET_VERSION: '8.0.x'
   PROJECT_NAME: 'GanttComponents'
 
 jobs:
-  # Main build and test for Windows deployment
-  build-and-test:
+  # Branch type detection for specialized workflows
+  branch-routing:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    outputs:
+      is-milestone: ${{ steps.detect.outputs.is-milestone }}
+      is-ci-branch: ${{ steps.detect.outputs.is-ci-branch }}
+      is-perf-branch: ${{ steps.detect.outputs.is-perf-branch }}
+    steps:
+      - name: Detect Specialized Branch Types
+        id: detect
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "🔍 Analyzing branch type: $BRANCH_NAME"
+          
+          # Detect milestone feature branches
+          if [[ "$BRANCH_NAME" =~ ^feat/v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "is-milestone=true" >> $GITHUB_OUTPUT
+            echo "is-ci-branch=false" >> $GITHUB_OUTPUT
+            echo "is-perf-branch=false" >> $GITHUB_OUTPUT
+            echo "🎯 Milestone feature branch detected - full CI/CD pipeline required"
+          # Detect CI/CD branches
+          elif [[ "$BRANCH_NAME" =~ ^ci/ ]]; then
+            echo "is-milestone=false" >> $GITHUB_OUTPUT
+            echo "is-ci-branch=true" >> $GITHUB_OUTPUT
+            echo "is-perf-branch=false" >> $GITHUB_OUTPUT
+            echo "🔄 CI/CD branch detected - testing workflow changes"
+          # Detect performance branches
+          elif [[ "$BRANCH_NAME" =~ ^perf/ ]]; then
+            echo "is-milestone=false" >> $GITHUB_OUTPUT
+            echo "is-ci-branch=false" >> $GITHUB_OUTPUT
+            echo "is-perf-branch=true" >> $GITHUB_OUTPUT
+            echo "⚡ Performance branch detected - benchmarking required"
+          else
+            echo "is-milestone=false" >> $GITHUB_OUTPUT
+            echo "is-ci-branch=false" >> $GITHUB_OUTPUT
+            echo "is-perf-branch=false" >> $GITHUB_OUTPUT
+            echo "📝 Standard branch - using default CI/CD"
+          fi
+
+  # Milestone-specific CI/CD with enhanced validation
+  milestone-cicd:
     runs-on: windows-latest  # Windows-focused for Win 7/10 compatibility
+    needs: branch-routing
+    if: |
+      github.event_name == 'push' || 
+      (github.event_name == 'pull_request' && (
+        needs.branch-routing.outputs.is-milestone == 'true' ||
+        needs.branch-routing.outputs.is-ci-branch == 'true' ||
+        needs.branch-routing.outputs.is-perf-branch == 'true'
+      ))
     
     steps:
     - name: Checkout code
@@ -63,7 +116,7 @@ jobs:
   # Basic code analysis
   code-analysis:
     runs-on: windows-latest
-    needs: build-and-test
+    needs: milestone-cicd
     
     steps:
     - name: Checkout code
@@ -80,7 +133,7 @@ jobs:
   # Security scan - basic package vulnerability check
   security-scan:
     runs-on: windows-latest
-    needs: build-and-test
+    needs: milestone-cicd
     
     steps:
     - name: Checkout code

@@ -1,0 +1,247 @@
+@using GanttComponents.Models
+@using GanttComponents.Services
+@inject IUniversalLogger Logger
+
+<div class="timeline-container">
+    <div class="timeline-header">
+        <div class="timeline-header-months">
+            @for (var month = StartDate; month <= EndDate; month = month.AddMonths(1))
+            {
+                var monthWidth = GetMonthWidth(month);
+                <div class="timeline-month" style="width: @(monthWidth)px;">
+                    @month.ToString("MMM yyyy")
+                </div>
+            }
+        </div>
+        <div class="timeline-header-days">
+            @for (var day = StartDate; day <= EndDate; day = day.AddDays(1))
+            {
+                <div class="timeline-day" style="width: @(DayWidth)px;">
+                    @day.Day
+                </div>
+            }
+        </div>
+    </div>
+    
+    <div class="timeline-body" @onscroll="OnScroll">
+        <svg class="timeline-svg" width="@(TotalWidth)" height="@(TotalHeight)">
+            <!-- Grid lines for days -->
+            @for (var day = StartDate; day <= EndDate; day = day.AddDays(1))
+            {
+                var x = DayToPixel(day);
+                <line x1="@x" y1="0" x2="@x" y2="@TotalHeight" 
+                      class="timeline-grid-line" />
+            }
+            
+            <!-- Task bars -->
+            @if (Tasks != null)
+            {
+                @for (int i = 0; i < Tasks.Count; i++)
+                {
+                    var task = Tasks[i];
+                    var y = i * RowHeight;
+                    var x = DayToPixel(task.StartDate);
+                    var width = CalculateTaskWidth(task);
+                    var rowIndex = i;
+                    
+                    <!-- Task background row -->
+                    <rect x="0" y="@y" width="@TotalWidth" height="@RowHeight"
+                          class="timeline-row @(SelectedTaskId == task.Id ? "selected" : "")"
+                          @onclick="() => SelectTask(task.Id)" />
+                    
+                    <!-- Task bar -->
+                    <rect x="@x" y="@(y + TaskBarMargin)" 
+                          width="@width" height="@(TaskBarHeight)"
+                          class="timeline-task-bar"
+                          data-task-id="@task.Id" />
+                    
+                    <!-- Task label (WBS Code) - TODO: Add text labels -->
+                    @* <svg:text x="@(x + 4)" y="@(y + RowHeight/2 + 4)" class="timeline-task-label">@task.WbsCode</svg:text> *@
+                }
+            }
+        </svg>
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<GanttTask>? Tasks { get; set; }
+    [Parameter] public EventCallback<int> OnTaskSelected { get; set; }
+    [Parameter] public EventCallback<EventArgs> OnScrollChanged { get; set; }
+    
+    private int? SelectedTaskId { get; set; }
+    
+    // Timeline configuration
+    private const int DayWidth = 40; // 40px per day (fixed scale)
+    private const int RowHeight = 32; // Match TaskGrid row height
+    private const int TaskBarHeight = 20;
+    private const int TaskBarMargin = 6; // Center task bar in row
+    
+    // Timeline date range
+    private DateTime StartDate { get; set; }
+    private DateTime EndDate { get; set; }
+    private int TotalWidth { get; set; }
+    private int TotalHeight { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Logger.LogComponentLifecycle("TimelineView", "OnInitialized", new { TaskCount = Tasks?.Count ?? 0 });
+        CalculateTimelineRange();
+    }
+
+    protected override void OnParametersSet()
+    {
+        CalculateTimelineRange();
+        StateHasChanged();
+    }
+
+    private void CalculateTimelineRange()
+    {
+        if (Tasks == null || !Tasks.Any())
+        {
+            // Default range if no tasks
+            StartDate = DateTime.UtcNow.Date.AddDays(-30);
+            EndDate = DateTime.UtcNow.Date.AddDays(90);
+        }
+        else
+        {
+            StartDate = Tasks.Min(t => t.StartDate).Date.AddDays(-7);
+            EndDate = Tasks.Max(t => t.EndDate).Date.AddDays(7);
+        }
+        
+        var totalDays = (EndDate - StartDate).Days + 1;
+        TotalWidth = totalDays * DayWidth;
+        TotalHeight = (Tasks?.Count ?? 0) * RowHeight;
+    }
+
+    private double DayToPixel(DateTime date)
+    {
+        var days = (date.Date - StartDate).TotalDays;
+        return days * DayWidth;
+    }
+
+    private double CalculateTaskWidth(GanttTask task)
+    {
+        var duration = (task.EndDate.Date - task.StartDate.Date).TotalDays + 1;
+        return duration * DayWidth;
+    }
+
+    private int GetMonthWidth(DateTime month)
+    {
+        var daysInMonth = DateTime.DaysInMonth(month.Year, month.Month);
+        return daysInMonth * DayWidth;
+    }
+
+    private async Task SelectTask(int taskId)
+    {
+        SelectedTaskId = taskId;
+        Logger.LogUserAction("TimelineView_TaskSelected", new { TaskId = taskId });
+        
+        if (OnTaskSelected.HasDelegate)
+        {
+            await OnTaskSelected.InvokeAsync(taskId);
+        }
+        
+        StateHasChanged();
+    }
+
+    private async Task OnScroll(EventArgs e)
+    {
+        if (OnScrollChanged.HasDelegate)
+        {
+            await OnScrollChanged.InvokeAsync(e);
+        }
+    }
+}
+
+<style>
+    .timeline-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        border: 1px solid var(--gantt-outline, #e0e0e0);
+        background: var(--gantt-surface, #ffffff);
+    }
+
+    .timeline-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--gantt-surface, #ffffff);
+        border-bottom: 1px solid var(--gantt-outline, #e0e0e0);
+    }
+
+    .timeline-header-months {
+        display: flex;
+        height: 32px;
+        border-bottom: 1px solid var(--gantt-outline, #e0e0e0);
+    }
+
+    .timeline-month {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        border-right: 1px solid var(--gantt-outline, #e0e0e0);
+        background: var(--gantt-surface-variant, #f5f5f5);
+    }
+
+    .timeline-header-days {
+        display: flex;
+        height: 24px;
+    }
+
+    .timeline-day {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        border-right: 1px solid var(--gantt-outline, #e0e0e0);
+        background: var(--gantt-surface, #ffffff);
+    }
+
+    .timeline-body {
+        flex: 1;
+        overflow: auto;
+        position: relative;
+    }
+
+    .timeline-svg {
+        display: block;
+    }
+
+    .timeline-grid-line {
+        stroke: var(--gantt-outline-variant, #f0f0f0);
+        stroke-width: 1;
+    }
+
+    .timeline-row {
+        fill: transparent;
+        cursor: pointer;
+    }
+
+    .timeline-row:hover {
+        fill: var(--gantt-state-hover, rgba(25, 118, 210, 0.04));
+    }
+
+    .timeline-row.selected {
+        fill: var(--gantt-state-selected, rgba(25, 118, 210, 0.08));
+    }
+
+    .timeline-task-bar {
+        fill: var(--gantt-primary, #1976d2);
+        rx: 2;
+        cursor: pointer;
+    }
+
+    .timeline-task-bar:hover {
+        fill: var(--gantt-primary-dark, #1565c0);
+    }
+
+    .timeline-task-label {
+        fill: var(--gantt-on-surface, #000000);
+        font-size: 12px;
+        font-family: var(--gantt-font-family, system-ui);
+        pointer-events: none;
+        user-select: none;
+    }
+</style>

@@ -154,52 +154,51 @@
   - Integration with existing GanttTaskService
   - Interactive demo page for validation
 
-#### Milestone 1.2: I18N Foundation Setup (NEXT)
-**Why Early**: Better to build features with I18N from start than retrofit
-- [NEXT] **I18N Infrastructure (REQUIREMENT 14)**
-  - Resource files for English/Chinese (Simplified)
-  - IStringLocalizer integration in existing components
-  - Localized datetime formatting setup
-  - Fallback to English for missing translations
-  - Update existing TaskGrid with I18N
+#### Milestone 1.2: Basic TimelineView Component (NEXT - ARCHITECTURE FIRST)
+**Why Architecture-First**: Satisfies REQUIREMENT 5 (Independent Component Design) early and reduces integration risk
+- [NEXT] **TimelineView Standalone Component (REQUIREMENT 5)**
+  - Basic SVG timeline with day-based scale (40px/day fixed)
+  - Simple task bar rendering with WBS code labels
+  - Row height matching with TaskGrid for alignment
+  - UTC date handling (day precision only)
+  - Horizontal and vertical scrolling
+  - Own demo page: `/timeline-demo`
 
-#### Milestone 1.3: Enhanced TaskGrid with WBS Support
-- [ ] **Basic Grid Enhancement (REQUIREMENT 9)**
-  - Add WBS code column as primary identifier 
-  - Replace ID display with WBS codes (simple column swap)
-  - Keep existing tree structure and selection working
-  - NO new features - just WBS integration
+#### Milestone 1.3: Basic GanttComposer Integration (ARCHITECTURE FOUNDATION)
+- [ ] **Component Composition (REQUIREMENT 5)**
+  - Side-by-side layout of TaskGrid + TimelineView
+  - Shared data passed to both components
+  - Selection synchronization between components
+  - Basic row alignment validation
+  - Vertical scroll coordination
+  - Own demo page: `/gantt-composer-demo`
 
-#### Milestone 1.4: Minimal Timeline Component (Prove It Works)
-**Goal**: Simplest possible timeline that proves row alignment works
-- [ ] **Ultra-Simple SVG Timeline (REQUIREMENT 18)**
-  - Fixed scale: 40px/day (no zoom initially)
-  - Simple month/day header (no multi-tier complexity)
-  - Basic rectangles for task bars with WBS labels
-  - UTC date handling (REQUIREMENT 2) - dates only, no time components
+#### Milestone 1.4: Architecture Validation & Core API (PROVE IT WORKS)
+#### Milestone 1.4: Architecture Validation & Core API (PROVE IT WORKS)
+**Goal**: Validate that all three components work independently and together
+- [ ] **Independent Component Testing (REQUIREMENT 5)**
+  - TaskGrid works standalone with different data sets
+  - TimelineView works standalone with different data sets
+  - GanttComposer demonstrates perfect integration
+  - No tight coupling between components
+  - Clean event-driven communication patterns
   
-- [ ] **Basic Row Alignment (REQUIREMENT 6)**
-  - Fixed row heights using CSS custom properties
-  - Simple row alignment with TaskGrid
-  - NO dynamic heights initially (expand/collapse can wait)
-  - Prove basic alignment works first
+- [ ] **Row Alignment Validation (REQUIREMENT 6)**
+  - Pixel-perfect alignment in all scenarios
+  - Alignment maintained during scroll and selection
+  - Performance validation with 20-50 tasks
 
-#### Milestone 1.5: Simple Integration (Walking Skeleton)
-**Goal**: Basic side-by-side layout that works
-- [ ] **Simple Layout (REQUIREMENT 5)**
-  - TaskGrid and Timeline side by side (no splitter initially)
-  - Fixed proportions (e.g., 50/50 split)
-  - Same data in both components
-  - Selection sync (basic click synchronization)
+### Phase 2: Feature Development Within Components (Week 3-4)
+**Goal**: Add functionality within the proven component architecture
 
-- [ ] **Walking Skeleton Validation**
-  - End-to-end working with demo data
-  - WBS codes displayed consistently
-  - I18N working (English/Chinese text switching)
-  - Basic performance check (is it smooth?)
+#### Milestone 2.1: I18N Foundation (MOVED FROM PHASE 1)
+- [ ] **I18N Infrastructure (REQUIREMENT 14)**
+  - Resource files for English/Chinese across all components
+  - IStringLocalizer integration in TaskGrid, TimelineView, GanttComposer
+  - Localized datetime formatting setup
+  - Language switching functionality in all demo pages
 
-### Phase 2: Essential Polish Only (Week 3-4)
-**Goal**: Make it look professional and meet accessibility requirements
+#### Milestone 2.2: Enhanced Component Features
 
 #### Milestone 2.1: Visual Polish (Keep It Simple)
 - [ ] **Material Design Basics (REQUIREMENT 13)**

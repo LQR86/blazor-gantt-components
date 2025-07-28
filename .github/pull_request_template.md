@@ -1,6 +1,6 @@
 ## 🏷️ Version Information
-<!-- For milestone feature branches only (feat/v*) -->
-- **Version**: <!-- CI will validate this matches branch for feat/v* branches -->
+<!-- For feature branches only (feat/v*) -->
+- **Version**: <!-- Auto-extracted from branch name for feat/v* branches -->
 - **Type**: <!-- Feature/Fix/Docs/Chore/etc. -->
 
 ## 📋 Implementation Checklist
@@ -22,11 +22,10 @@
 ## 🤖 Automated Checks
 <!-- These are enforced by CI/CD based on branch type -->
 - [ ] Branch naming convention followed
-- [ ] Version.json updated (for feat/v* branches only)
 - [ ] All tests passing
 - [ ] Build successful
 - [ ] Code formatting validated
-- [ ] PR title format correct (version tag for feat/v* branches)
+- [ ] PR title format correct (version tag for feat/v* branches only)
 
 ## 📝 Changes Made
 <!-- Describe what was implemented/fixed -->

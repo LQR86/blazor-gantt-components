@@ -1,5 +1,9 @@
 name: Post-Merge Automation
 
+# Automatically creates Git tags and GitHub releases for feature branches
+# Extracts version and feature info from branch naming convention (feat/v*-feature-name)
+# Only runs when feature branches are merged to main
+
 on:
   push:
     branches: [main]
@@ -14,8 +18,10 @@ jobs:
     timeout-minutes: 5
     outputs:
       version: ${{ steps.tag.outputs.version }}
-      status: ${{ steps.tag.outputs.status }}
+      feature-branch: ${{ steps.tag.outputs.feature-branch }}
+      feature-name: ${{ steps.tag.outputs.feature-name }}
       tag-created: ${{ steps.tag.outputs.tag-created }}
+      is-feature: ${{ steps.validate.outputs.is-feature }}
       
     steps:
       - name: Checkout code
@@ -24,45 +30,64 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
       
-      - name: Validate version.json before tagging
+      - name: Extract version info from merged branch
         id: validate
         run: |
-          echo "🔍 Validating version.json for auto-tagging"
+          echo "🔍 Extracting version info from merged branch"
           
-          # Check if version.json exists and is valid JSON
-          if [[ ! -f "version.json" ]]; then
-            echo "❌ version.json file missing"
+          # Get the most recent merge commit and extract the merged branch name
+          MERGE_COMMIT=$(git log --merges -n 1 --pretty=format:"%H")
+          if [[ -z "$MERGE_COMMIT" ]]; then
+            echo "❌ No merge commit found - this might be a direct push"
             exit 1
           fi
           
-          VERSION=$(jq -r '.version' version.json 2>/dev/null || echo "invalid")
-          STATUS=$(jq -r '.status' version.json 2>/dev/null || echo "invalid")
-          PHASE=$(jq -r '.phase' version.json 2>/dev/null || echo "unknown")
+          # Extract branch name from merge commit message
+          MERGE_MESSAGE=$(git log --format=%B -n 1 "$MERGE_COMMIT")
+          BRANCH_NAME=$(echo "$MERGE_MESSAGE" | grep -o "from [^/]*/[^']*" | sed 's/from [^/]*\///' | head -1)
           
-          if [[ "$VERSION" == "invalid" || "$VERSION" == "null" ]]; then
-            echo "❌ Invalid version in version.json"
-            exit 1
+          if [[ -z "$BRANCH_NAME" ]]; then
+            echo "⚠️ Could not extract branch name from merge commit, trying alternative method"
+            # Alternative: Get branch name from commit parents
+            BRANCH_NAME=$(git show --format="%D" "$MERGE_COMMIT" | grep -o "origin/[^,]*" | sed 's/origin\///' | grep -v "main" | head -1)
           fi
           
-          echo "✅ Version validation passed:"
-          echo "   Version: $VERSION"
-          echo "   Phase: $PHASE"
-          echo "   Status: $STATUS"
+          echo "📋 Detected merged branch: $BRANCH_NAME"
           
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "status=$STATUS" >> $GITHUB_OUTPUT
-          echo "phase=$PHASE" >> $GITHUB_OUTPUT
+          # Check if this is a feature branch with version
+          if [[ "$BRANCH_NAME" =~ ^feat/v([0-9]+\.[0-9]+\.[0-9]+[^-]*)-(.+)$ ]]; then
+            VERSION="${BASH_REMATCH[1]}"
+            FEATURE_SLUG="${BASH_REMATCH[2]}"
+            
+            # Convert slug to readable name (gantt-composer -> GanttComposer)
+            FEATURE_NAME=$(echo "$FEATURE_SLUG" | sed 's/-/ /g' | sed 's/\b\w/\U&/g')
+            
+            echo "✅ Feature branch detected:"
+            echo "   Branch: $BRANCH_NAME"
+            echo "   Version: $VERSION"
+            echo "   Feature: $FEATURE_NAME"
+            
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "feature-branch=$BRANCH_NAME" >> $GITHUB_OUTPUT
+            echo "feature-name=$FEATURE_NAME" >> $GITHUB_OUTPUT
+            echo "is-feature=true" >> $GITHUB_OUTPUT
+          else
+            echo "ℹ️ Not a feature branch - skipping version extraction"
+            echo "   Branch: $BRANCH_NAME"
+            echo "is-feature=false" >> $GITHUB_OUTPUT
+          fi
       
       - name: Auto-create Git Tag
         id: tag
+        if: steps.validate.outputs.is-feature == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ steps.validate.outputs.version }}"
-          PHASE="${{ steps.validate.outputs.phase }}"
-          STATUS="${{ steps.validate.outputs.status }}"
+          FEATURE_NAME="${{ steps.validate.outputs.feature-name }}"
           
           echo "🏷️ Processing auto-tag for version: $VERSION"
+          echo "   Feature: $FEATURE_NAME"
           
           # Check if tag already exists
           if git tag -l | grep -q "^v$VERSION$"; then
@@ -73,13 +98,8 @@ jobs:
             git config user.name "GitHub Actions"
             git config user.email "actions@github.com"
             
-            # Create annotated tag with phase information
-            TAG_MESSAGE="$PHASE"
-            if [[ "$STATUS" == "complete" ]]; then
-              TAG_MESSAGE="$TAG_MESSAGE (Complete)"
-            fi
-            
-            git tag -a "v$VERSION" -m "$TAG_MESSAGE"
+            # Create annotated tag with feature name
+            git tag -a "v$VERSION" -m "$FEATURE_NAME"
             git push origin "v$VERSION"
             
             echo "✅ Successfully created and pushed tag v$VERSION"
@@ -88,13 +108,13 @@ jobs:
           
           # Pass through outputs for next job
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "milestone=$MILESTONE" >> $GITHUB_OUTPUT
-          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "feature-branch=${{ steps.validate.outputs.feature-branch }}" >> $GITHUB_OUTPUT
+          echo "feature-name=$FEATURE_NAME" >> $GITHUB_OUTPUT
 
   auto-release:
     runs-on: ubuntu-latest
     needs: auto-tag
-    if: needs.auto-tag.outputs.status == 'complete' && needs.auto-tag.outputs.tag-created == 'true'
+    if: needs.auto-tag.outputs.is-feature == 'true' && needs.auto-tag.outputs.tag-created == 'true'
     timeout-minutes: 5
     
     steps:
@@ -108,8 +128,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ needs.auto-tag.outputs.version }}"
+          FEATURE_NAME="${{ needs.auto-tag.outputs.feature-name }}"
           
-          echo "📦 Creating GitHub release for completed feature"
+          echo "📦 Creating GitHub release for feature: $FEATURE_NAME"
           echo "   Version: $VERSION"
           
           # Check if release already exists
@@ -118,23 +139,17 @@ jobs:
             exit 0
           fi
           
-          # Get phase information for release title
-          PHASE=$(jq -r '.phase' version.json 2>/dev/null || echo "Unknown Phase")
-          
-          # Create release title
-          RELEASE_TITLE="v$VERSION: $PHASE"
-          if [[ "$PHASE" == *"GanttComposer"* ]]; then
-            RELEASE_TITLE="$RELEASE_TITLE - Architectural Breakthrough"
-          fi
+          # Create release title with feature name
+          RELEASE_TITLE="v$VERSION: $FEATURE_NAME"
           
           # Create comprehensive release notes
-          echo "# 🎯 Milestone Complete" > release_notes.md
+          echo "# 🎯 Feature Release" > release_notes.md
           echo "" >> release_notes.md
           echo "## 📋 Overview" >> release_notes.md
-          echo "This release completes milestone $MILESTONE: $PHASE" >> release_notes.md
+          echo "This release delivers **$FEATURE_NAME** (v$VERSION)" >> release_notes.md
           echo "" >> release_notes.md
           echo "## 🚀 Key Features" >> release_notes.md
-          echo "- All milestone requirements implemented and validated" >> release_notes.md
+          echo "- New feature implementation completed and validated" >> release_notes.md
           echo "- Comprehensive testing completed with full coverage" >> release_notes.md
           echo "- Documentation updated and verified" >> release_notes.md
           echo "- CI/CD validation passed with all checks" >> release_notes.md
@@ -144,7 +159,7 @@ jobs:
           echo "## 📚 Documentation" >> release_notes.md
           echo "See project documentation for detailed implementation information:" >> release_notes.md
           echo "- [README.md](README.md) - Project overview and setup" >> release_notes.md
-          echo "- [Implementation Documentation](.) - Detailed milestone documentation" >> release_notes.md
+          echo "- [Implementation Documentation](.) - Detailed feature documentation" >> release_notes.md
           echo "" >> release_notes.md
           echo "## 🧪 Testing" >> release_notes.md
           echo "- All automated tests passing ✅" >> release_notes.md
@@ -159,7 +174,7 @@ jobs:
           echo "" >> release_notes.md
           echo "---" >> release_notes.md
           echo "" >> release_notes.md
-          echo "*This release was automatically created by GitHub Actions upon milestone completion.*" >> release_notes.md
+          echo "*This release was automatically created by GitHub Actions upon feature completion.*" >> release_notes.md
           
           # Create the release
           gh release create "v$VERSION" \

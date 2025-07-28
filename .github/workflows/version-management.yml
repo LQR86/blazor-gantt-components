@@ -10,6 +10,51 @@ permissions:
   pull-requests: read
 
 jobs:
+  pr-title-validation:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Validate PR Title Format
+        run: |
+          echo "🔍 Validating PR title format for branch: ${{ github.head_ref }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          BRANCH_NAME="${{ github.head_ref }}"
+          
+          # Check if this is a milestone feature branch
+          if [[ "$BRANCH_NAME" =~ ^feat/v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "📋 Milestone feature branch detected - version tag required in PR title"
+            
+            # Extract version from branch name (including alpha/beta suffixes)
+            EXPECTED_VERSION=$(echo "$BRANCH_NAME" | grep -o 'v[0-9]*\.[0-9]*\.[0-9]*[^-]*-[^-]*' | head -1)
+            if [[ -z "$EXPECTED_VERSION" ]]; then
+              EXPECTED_VERSION=$(echo "$BRANCH_NAME" | grep -o 'v[0-9]*\.[0-9]*\.[0-9]*[^-]*')
+            fi
+            
+            # Check if PR title contains the version tag
+            if [[ "$PR_TITLE" =~ \($EXPECTED_VERSION\) ]]; then
+              echo "✅ PR title correctly includes version tag: $EXPECTED_VERSION"
+            else
+              echo "❌ PR title must include version tag for milestone branch"
+              echo "   Current title: $PR_TITLE"
+              echo "   Required format: feat: Complete Component Name ($EXPECTED_VERSION)"
+              echo "   Example: feat: Complete GanttComposer Component ($EXPECTED_VERSION)"
+              exit 1
+            fi
+          else
+            echo "📋 Non-milestone branch detected - no version tag required"
+            
+            # Check that non-milestone branches don't have version tags
+            if [[ "$PR_TITLE" =~ \(v[0-9]+\.[0-9]+\.[0-9]+[^)]*\) ]]; then
+              echo "❌ Non-milestone PR title should NOT include version tag"
+              echo "   Current title: $PR_TITLE"
+              echo "   Branch type: $BRANCH_NAME"
+              echo "   Correct format: fix: description of fix"
+              exit 1
+            else
+              echo "✅ PR title correctly excludes version tag for non-milestone branch"
+            fi
+          fi
+
   version-check:
     runs-on: ubuntu-latest
     steps:
@@ -25,10 +70,14 @@ jobs:
           CURRENT_MILESTONE=$(jq -r '.milestone' version.json)
           
           # Check if this is a milestone PR (feature/ branch with milestone change)
-          if [[ "${{ github.head_ref }}" =~ ^feature/v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+          if [[ "${{ github.head_ref }}" =~ ^feat/v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
             echo "Milestone PR detected"
-            # Extract expected version from branch name
-            EXPECTED_VERSION=$(echo "${{ github.head_ref }}" | grep -o 'v[0-9]*\.[0-9]*\.[0-9]*' | sed 's/v//')
+            # Extract expected version from branch name (including alpha/beta suffixes)
+            EXPECTED_VERSION=$(echo "${{ github.head_ref }}" | grep -o 'v[0-9]*\.[0-9]*\.[0-9]*[^-]*-[^-]*' | head -1)
+            if [[ -z "$EXPECTED_VERSION" ]]; then
+              EXPECTED_VERSION=$(echo "${{ github.head_ref }}" | grep -o 'v[0-9]*\.[0-9]*\.[0-9]*[^-]*')
+            fi
+            EXPECTED_VERSION=$(echo "$EXPECTED_VERSION" | sed 's/v//')
             
             # Validate version was updated
             if [[ "$CURRENT_VERSION" != "$EXPECTED_VERSION"* ]]; then

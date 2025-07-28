@@ -1,43 +1,45 @@
 ## 🏷️ Version Information
-<!-- This section is auto-populated from version.json -->
-- **Version**: <!-- CI will validate this matches branch -->
-- **Milestone**: <!-- Auto-extracted from version.json -->
-- **Phase**: <!-- Auto-extracted from version.json -->
+<!-- For milestone feature branches only (feat/v*) -->
+- **Version**: <!-- CI will validate this matches branch for feat/v* branches -->
+- **Type**: <!-- Feature/Fix/Docs/Chore/etc. -->
 
-## 📋 Milestone Checklist
-<!-- Auto-generated based on milestone in version.json -->
+## 📋 Implementation Checklist
+<!-- General validation - not tied to specific milestones -->
 
-### For Milestone 1.2 (TimelineView Component):
-- [ ] TimelineView.razor component created
-- [ ] Standalone demo page `/timeline-demo` working
-- [ ] Basic SVG timeline rendering
-- [ ] Row height matching TaskGrid (32px)
-- [ ] Task selection events working
-- [ ] Tests added for component
+### Component Development (if applicable):
+- [ ] Component works standalone (no tight coupling)
+- [ ] Clean API design with clear props/events
+- [ ] Proper error handling and validation
+- [ ] Responsive design considerations
+- [ ] Accessibility features implemented
 
-### For Milestone 1.3 (GanttComposer):
-- [ ] GanttComposer.razor component created
-- [ ] Side-by-side layout working
-- [ ] Selection synchronization between components
-- [ ] Basic row alignment validation
-- [ ] Demo page `/gantt-composer-demo` working
+### Testing & Quality:
+- [ ] Unit tests added/updated
+- [ ] Manual testing completed
+- [ ] Performance considerations addressed
+- [ ] Code follows project conventions
 
 ## 🤖 Automated Checks
-<!-- These are enforced by CI/CD -->
-- [ ] Version.json updated correctly
-- [ ] Required files exist for milestone
+<!-- These are enforced by CI/CD based on branch type -->
+- [ ] Branch naming convention followed
+- [ ] Version.json updated (for feat/v* branches only)
 - [ ] All tests passing
 - [ ] Build successful
-- [ ] No breaking changes to existing components
+- [ ] Code formatting validated
+- [ ] PR title format correct (version tag for feat/v* branches)
 
 ## 📝 Changes Made
-- [ ] New component implementation
+<!-- Describe what was implemented/fixed -->
+- [ ] New feature implementation
 - [ ] Bug fixes
 - [ ] Documentation updates
 - [ ] Test coverage improvements
+- [ ] Performance optimizations
+- [ ] Refactoring/cleanup
 
 ## 🔄 Ready for Review
-- [ ] Component works standalone (REQUIREMENT 5)
-- [ ] No tight coupling with other components
-- [ ] Clean API design
-- [ ] Milestone objectives satisfied
+<!-- Final validation before review -->
+- [ ] Code is self-documenting with clear comments
+- [ ] Breaking changes documented (if any)
+- [ ] Demo/example usage provided (if applicable)
+- [ ] Ready for production use

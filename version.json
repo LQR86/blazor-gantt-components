@@ -1,8 +1,8 @@
 {
-  "version": "0.2.0-alpha",
-  "milestone": "1.2",
-  "phase": "Auto-Versioning CI/CD System",
+  "version": "0.3.0-alpha",
+  "milestone": "1.3",
+  "phase": "TimelineView Component",
   "status": "in-progress",
-  "nextMilestone": "1.3",
-  "nextPhase": "TimelineView Component"
+  "nextMilestone": "1.4",
+  "nextPhase": "GanttComposer Integration"
 }

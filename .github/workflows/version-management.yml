@@ -66,37 +66,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Install jq for JSON parsing
+        run: sudo apt-get update && sudo apt-get install -y jq
+      
+      - name: Make validation script executable
+        run: chmod +x scripts/validate-milestone.sh
+      
       - name: Validate Milestone Progress
         run: |
           MILESTONE=$(jq -r '.milestone' version.json)
+          PHASE=$(jq -r '.phase' version.json)
           STATUS=$(jq -r '.status' version.json)
           
-          echo "🎯 Current Milestone: $MILESTONE"
           echo "📊 Status: $STATUS"
           
-          # Check if required files exist for milestone
-          case $MILESTONE in
-            "1.1")
-              echo "Validating WBS Foundation milestone..."
-              if [[ ! -f "src/GanttComponents/Services/WbsCodeGenerationService.cs" ]]; then
-                echo "❌ WBS Service missing for milestone 1.1"
-                exit 1
-              fi
-              ;;
-            "1.2")
-              echo "Validating TimelineView milestone..."
-              if [[ ! -f "src/GanttComponents/Components/TimelineView/TimelineView.razor" ]]; then
-                echo "❌ TimelineView component missing for milestone 1.2"
-                exit 1
-              fi
-              ;;
-            "1.3")
-              echo "Validating GanttComposer milestone..."
-              if [[ ! -f "src/GanttComponents/Components/GanttComposer/GanttComposer.razor" ]]; then
-                echo "❌ GanttComposer component missing for milestone 1.3"
-                exit 1
-              fi
-              ;;
-          esac
-          
-          echo "✅ Milestone $MILESTONE validation passed"
+          # Use the scalable validation script
+          ./scripts/validate-milestone.sh "$MILESTONE" "$PHASE"

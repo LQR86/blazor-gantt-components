@@ -1,0 +1,21 @@
+{
+  "milestone": "1.1",
+  "description": "WBS Foundation",
+  "phases": [
+    {
+      "name": "WBS Code Generation Service",
+      "validations": [
+        {
+          "type": "file_exists",
+          "path": "src/GanttComponents/Services/WbsCodeGenerationService.cs",
+          "description": "WBS Service implementation"
+        },
+        {
+          "type": "file_exists", 
+          "path": "src/GanttComponents/Services/IWbsCodeGenerationService.cs",
+          "description": "WBS Service interface"
+        }
+      ]
+    }
+  ]
+}

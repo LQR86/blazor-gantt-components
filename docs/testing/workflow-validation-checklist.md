@@ -82,19 +82,19 @@ This checklist validates the complete branch-specific CI workflow separation imp
 
 ### Test 5: Milestone Branch (Future Test)
 **Branch**: `feat/v0.5.0-alpha-test-component`  
-**Expected Workflows**: Build & Test (with milestone validation) + PR Validation
+**Expected Workflows**: Build & Test + PR Validation (same as regular branches)
 
 - [ ] Create branch `feat/v0.5.0-alpha-test-component`
 - [ ] Update `version.json` to `0.5.0-alpha`
 - [ ] Add milestone test component
 - [ ] Create PR with title: `feat: Test Component (v0.5.0-alpha)`
-- [ ] Verify `build-and-test.yml` runs with milestone detection ✅
-- [ ] Verify `pr-validation.yml` runs ✅
-- [ ] Check version validation passes
-- [ ] Check comprehensive testing runs
-- [ ] Check security scanning included
-- [ ] Check performance validation
+- [ ] Verify `build-and-test.yml` runs (same as other branches) ✅
+- [ ] Verify `pr-validation.yml` runs and validates version tag in title ✅
+- [ ] Check that NO special milestone validation occurs (it doesn't exist)
+- [ ] Confirm build, test, and artifact creation work normally
 - [ ] Merge and verify post-merge automation creates tag + release
+
+**Note**: Milestone branches get the same build/test as other branches. The "milestone" concept only matters for PR title validation and post-merge release creation.
 
 **Results**: ___________
 
@@ -156,9 +156,12 @@ This checklist validates the complete branch-specific CI workflow separation imp
 - [ ] Check error message specifies required format
 
 ### Test 11: Missing version.json for Milestone
-- [ ] Create milestone branch without updating version.json
-- [ ] Verify `build-and-test.yml` milestone validation fails ❌
-- [ ] Check error message explains version requirement
+**Note**: This test is not applicable since no special milestone validation exists. Milestone branches are treated the same as regular branches in build-and-test.yml.
+
+- [ ] ~~Create milestone branch without updating version.json~~
+- [ ] ~~Verify milestone validation fails~~
+- [ ] **Updated Test**: Verify that milestone branches build normally regardless of version.json
+- [ ] Confirm PR title validation catches missing version tags in titles
 
 ## 📊 Performance Validation
 
@@ -168,8 +171,8 @@ Record actual durations and compare to targets:
 | Workflow | Target Duration | Actual Duration | Status |
 |----------|----------------|-----------------|---------|
 | Build & Test (docs - skipped) | 1-2 min | _____ | _____ |
-| Build & Test (fix) | 3-8 min | _____ | _____ |
-| Build & Test (milestone) | 8-15 min | _____ | _____ |
+| Build & Test (code branches) | 3-8 min | _____ | _____ |
+| PR Validation | 1-2 min | _____ | _____ |
 | Hotfix Validation | 2-3 min | _____ | _____ |
 | Post-merge Automation | 3-5 min | _____ | _____ |
 

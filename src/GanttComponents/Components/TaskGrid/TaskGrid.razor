@@ -3,7 +3,7 @@
 @inject GanttRowAlignmentService RowAlignmentService
 @inject IUniversalLogger Logger
 
-<div class="task-grid-container">
+<div class="task-grid-container" style="--row-height: @(RowHeight)px; --header-height: @(HeaderHeight)px;">
     <div class="task-grid-header">
         <div class="header-cell" style="width: 80px;">WBS</div>
         <div class="header-cell" style="width: 200px;">Task Name</div>
@@ -14,7 +14,7 @@
         <div class="header-cell" style="width: 150px;">Resources</div>
     </div>
     
-    <div class="task-grid-body" @onscroll="OnScroll">
+    <div class="task-grid-body @(!ShowVerticalScrollbar ? "hide-scrollbar" : "")" @onscroll="OnScroll">
         @if (Tasks != null)
         {
             @for (int i = 0; i < Tasks.Count; i++)
@@ -23,10 +23,12 @@
                 var rowIndex = i;
                 var indentLevel = GetIndentLevel(task);
                 
-                <div class="task-grid-row @(SelectedTaskId == task.Id ? "selected" : "")" 
+                <div class="task-grid-row @(SelectedTaskId == task.Id ? "selected" : "") @(HoveredTaskId == task.Id ? "hovered" : "")" 
                      data-task-id="@task.Id" 
                      data-row-index="@rowIndex"
-                     @onclick="() => SelectTask(task.Id)">
+                     @onclick="() => SelectTask(task.Id)"
+                     @onmouseenter="() => HoverTask(task.Id)"
+                     @onmouseleave="() => HoverTask(null)">
                     
                     <div class="grid-cell wbs-cell" style="width: 80px; text-align: center; font-weight: 500;">
                         @task.WbsCode
@@ -83,8 +85,13 @@
     [Parameter] public List<GanttTask>? Tasks { get; set; }
     [Parameter] public EventCallback<int> OnTaskSelected { get; set; }
     [Parameter] public EventCallback<EventArgs> OnScrollChanged { get; set; }
+    [Parameter] public int? SelectedTaskId { get; set; }
+    [Parameter] public int RowHeight { get; set; } = 32; // Default row height for alignment
+    [Parameter] public int HeaderHeight { get; set; } = 40; // Default header height
+    [Parameter] public bool ShowVerticalScrollbar { get; set; } = true; // Controls scrollbar visibility
+    [Parameter] public EventCallback<int?> OnTaskHovered { get; set; }
+    [Parameter] public int? HoveredTaskId { get; set; }
 
-    private int? SelectedTaskId { get; set; }
     private Dictionary<int, bool> ExpandedTasks { get; set; } = new();
 
     protected override void OnInitialized()
@@ -132,6 +139,15 @@
         Logger.LogStateChange("TaskGrid", "SelectedTaskId", oldTaskId, taskId);
         
         await OnTaskSelected.InvokeAsync(taskId);
+    }
+
+    private async Task HoverTask(int? taskId)
+    {
+        if (HoveredTaskId != taskId)
+        {
+            HoveredTaskId = taskId;
+            await OnTaskHovered.InvokeAsync(taskId);
+        }
     }
 
     private void ToggleExpand(int taskId)
@@ -223,8 +239,6 @@
 
 <style>
     .task-grid-container {
-        --row-height: 32px;
-        --header-height: 40px;
         --border-width: 1px;
         --grid-primary: #1976d2;
         --grid-surface: #ffffff;
@@ -237,7 +251,8 @@
     }
 
     .task-grid-header {
-        display: flex;
+        display: grid;
+        grid-template-columns: 80px 200px 120px 120px 100px 80px 150px;
         height: var(--header-height);
         background: #f5f5f5;
         border-bottom: var(--border-width) solid var(--grid-outline);
@@ -261,8 +276,19 @@
         overflow-x: hidden;
     }
 
+    /* Hide scrollbar while maintaining scroll functionality */
+    .task-grid-body.hide-scrollbar {
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* Internet Explorer 10+ */
+    }
+
+    .task-grid-body.hide-scrollbar::-webkit-scrollbar {
+        display: none; /* WebKit browsers */
+    }
+
     .task-grid-row {
-        display: flex;
+        display: grid;
+        grid-template-columns: 80px 200px 120px 120px 100px 80px 150px;
         height: var(--row-height);
         border-bottom: var(--border-width) solid var(--grid-outline);
         cursor: pointer;
@@ -271,6 +297,10 @@
 
     .task-grid-row:hover {
         background-color: #f8f9fa;
+    }
+
+    .task-grid-row.hovered {
+        background-color: #f0f7ff;
     }
 
     .task-grid-row.selected {

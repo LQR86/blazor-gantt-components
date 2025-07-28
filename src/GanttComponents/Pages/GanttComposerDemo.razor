@@ -1,0 +1,139 @@
+@page "/gantt-composer-demo"
+@using GanttComponents.Components.GanttComposer
+@using GanttComponents.Models
+@using GanttComponents.Services
+@inject IGanttTaskService TaskService
+
+<PageTitle>GanttComposer Demo</PageTitle>
+
+<h1>🎯 GanttComposer Integration Demo</h1>
+
+<p>This page demonstrates the GanttComposer component integrating TaskGrid and TimelineView together.</p>
+
+<div class="demo-controls mb-3">
+    <div class="btn-group" role="group">
+        <button class="btn btn-outline-primary" @onclick="LoadSampleData">
+            📊 Load Sample Data
+        </button>
+        <button class="btn btn-outline-secondary" @onclick="ToggleDebugAlignment">
+            🔍 @(ShowDebugAlignment ? "Hide" : "Show") Row Alignment
+        </button>
+        <button class="btn btn-outline-info" @onclick="ClearSelection">
+            ❌ Clear Selection
+        </button>
+    </div>
+</div>
+
+@if (Tasks?.Any() == true)
+{
+    <div class="demo-info alert alert-info">
+        <strong>Integration Features:</strong>
+        <ul class="mb-0">
+            <li>✅ <strong>Side-by-side layout</strong>: TaskGrid on left, TimelineView on right</li>
+            <li>✅ <strong>Shared data</strong>: Same task list displayed in both components</li>
+            <li>✅ <strong>Selection sync</strong>: Click any task to highlight in both views</li>
+            <li>✅ <strong>Row alignment</strong>: Visual confirmation rows line up perfectly</li>
+            <li>✅ <strong>Independent operation</strong>: Each component remains fully functional</li>
+        </ul>
+    </div>
+
+    <div class="gantt-composer-container">
+        <GanttComposer Tasks="@Tasks" 
+                      OnTaskSelected="HandleTaskSelection" 
+                      ShowDebugAlignment="@ShowDebugAlignment" />
+    </div>
+
+    @if (SelectedTaskId.HasValue)
+    {
+        var selectedTask = Tasks.FirstOrDefault(t => t.Id == SelectedTaskId.Value);
+        if (selectedTask != null)
+        {
+            <div class="selected-task-info alert alert-success mt-3">
+                <strong>Selected Task:</strong> @selectedTask.WbsCode - @selectedTask.Name
+                <br />
+                <small>
+                    Duration: @selectedTask.Duration | 
+                    Start: @selectedTask.StartDate.ToString("yyyy-MM-dd") | 
+                    End: @selectedTask.EndDate.ToString("yyyy-MM-dd")
+                </small>
+            </div>
+        }
+    }
+}
+else
+{
+    <div class="alert alert-warning">
+        No tasks loaded. Click "Load Sample Data" to see the GanttComposer in action.
+    </div>
+}
+
+<div class="component-info mt-4">
+    <h3>🏗️ Component Architecture</h3>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <strong>TaskGrid Component</strong>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li>✅ Tree structure with WBS codes</li>
+                        <li>✅ Expandable/collapsible nodes</li>
+                        <li>✅ Task selection events</li>
+                        <li>✅ Independent data management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <strong>TimelineView Component</strong>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li>✅ SVG-based timeline rendering</li>
+                        <li>✅ Task bars with proper positioning</li>
+                        <li>✅ Horizontal and vertical scrolling</li>
+                        <li>✅ Pixel-perfect row alignment</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<GanttTask>? Tasks { get; set; }
+    private int? SelectedTaskId { get; set; }
+    private bool ShowDebugAlignment { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSampleData();
+    }
+
+    private async Task LoadSampleData()
+    {
+        Tasks = await TaskService.GetAllTasksAsync();
+        StateHasChanged();
+    }
+
+    private void HandleTaskSelection(int taskId)
+    {
+        SelectedTaskId = taskId;
+        StateHasChanged();
+    }
+
+    private void ToggleDebugAlignment()
+    {
+        ShowDebugAlignment = !ShowDebugAlignment;
+        StateHasChanged();
+    }
+
+    private void ClearSelection()
+    {
+        SelectedTaskId = null;
+        StateHasChanged();
+    }
+}

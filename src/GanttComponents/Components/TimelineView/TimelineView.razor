@@ -2,7 +2,7 @@
 @using GanttComponents.Services
 @inject IUniversalLogger Logger
 
-<div class="timeline-container">
+<div class="timeline-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
     <div class="timeline-scroll-container" @onscroll="OnScroll">
         <div class="timeline-header">
             <div class="timeline-header-months">
@@ -47,14 +47,20 @@
                     
                     <!-- Task background row -->
                     <rect x="0" y="@y" width="@TotalWidth" height="@RowHeight"
-                          class="timeline-row @(SelectedTaskId == task.Id ? "selected" : "")"
-                          @onclick="() => SelectTask(task.Id)" />
+                          class="timeline-row @(SelectedTaskId == task.Id ? "selected" : "") @(HoveredTaskId == task.Id ? "hovered" : "")"
+                          data-task-id="@task.Id"
+                          @onclick="() => SelectTask(task.Id)"
+                          @onmouseenter="() => HoverTask(task.Id)"
+                          @onmouseleave="() => HoverTask(null)" />
                     
                     <!-- Task bar -->
                     <rect x="@x" y="@(y + TaskBarMargin)" 
                           width="@width" height="@(TaskBarHeight)"
                           class="timeline-task-bar"
-                          data-task-id="@task.Id" />
+                          data-task-id="@task.Id"
+                          @onclick="() => SelectTask(task.Id)"
+                          @onmouseenter="() => HoverTask(task.Id)"
+                          @onmouseleave="() => HoverTask(null)" />
                     
                     <!-- Task label (WBS Code) - TODO: Add text labels -->
                     @* <svg:text x="@(x + 4)" y="@(y + RowHeight/2 + 4)" class="timeline-task-label">@task.WbsCode</svg:text> *@
@@ -69,14 +75,20 @@
     [Parameter] public List<GanttTask>? Tasks { get; set; }
     [Parameter] public EventCallback<int> OnTaskSelected { get; set; }
     [Parameter] public EventCallback<EventArgs> OnScrollChanged { get; set; }
-    
-    private int? SelectedTaskId { get; set; }
+    [Parameter] public int? SelectedTaskId { get; set; }
+    [Parameter] public int RowHeight { get; set; } = 32; // Default row height for alignment
+    [Parameter] public int HeaderMonthHeight { get; set; } = 32; // Month row height
+    [Parameter] public int HeaderDayHeight { get; set; } = 24; // Day row height
+    [Parameter] public EventCallback<int?> OnTaskHovered { get; set; }
+    [Parameter] public int? HoveredTaskId { get; set; }
     
     // Timeline configuration
     private const int DayWidth = 40; // 40px per day (fixed scale)
-    private const int RowHeight = 32; // Match TaskGrid row height
     private const int TaskBarHeight = 20;
     private const int TaskBarMargin = 6; // Center task bar in row
+    
+    // Calculated total header height
+    private int TotalHeaderHeight => HeaderMonthHeight + HeaderDayHeight;
     
     // Timeline date range
     private DateTime StartDate { get; set; }
@@ -146,6 +158,15 @@
         StateHasChanged();
     }
 
+    private async Task HoverTask(int? taskId)
+    {
+        if (HoveredTaskId != taskId)
+        {
+            HoveredTaskId = taskId;
+            await OnTaskHovered.InvokeAsync(taskId);
+        }
+    }
+
     private async Task OnScroll(EventArgs e)
     {
         if (OnScrollChanged.HasDelegate)
@@ -181,7 +202,7 @@
 
     .timeline-header-months {
         display: flex;
-        height: 32px;
+        height: var(--header-month-height);
         border-bottom: 1px solid var(--gantt-outline, #e0e0e0);
     }
 
@@ -200,7 +221,7 @@
 
     .timeline-header-days {
         display: flex;
-        height: 24px;
+        height: var(--header-day-height);
     }
 
     .timeline-day {
@@ -237,6 +258,10 @@
 
     .timeline-row:hover {
         fill: var(--gantt-state-hover, rgba(25, 118, 210, 0.04));
+    }
+
+    .timeline-row.hovered {
+        fill: var(--gantt-state-hovered, rgba(33, 150, 243, 0.06));
     }
 
     .timeline-row.selected {

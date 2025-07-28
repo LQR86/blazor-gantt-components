@@ -50,15 +50,24 @@ jobs:
           if [[ "$COMMIT_MESSAGE" =~ $VERSION_PATTERN ]]; then
             VERSION="${BASH_REMATCH[1]}"
             
-            # Extract feature name from commit message
-            # Pattern: "feat: Complete GanttComposer Component (v0.4.0-alpha)"
+            # Extract feature name from first line of commit message
+            # Handle both simple and complex commit messages (squash merges)
+            FIRST_LINE=$(echo "$COMMIT_MESSAGE" | head -n 1)
             FEAT_PATTERN="^feat: (.+) \\(v[^)]+\\)"
-            if [[ "$COMMIT_MESSAGE" =~ $FEAT_PATTERN ]]; then
+            if [[ "$FIRST_LINE" =~ $FEAT_PATTERN ]]; then
               FEATURE_TEXT="${BASH_REMATCH[1]}"
               # Convert to feature name format
               FEATURE_NAME="$FEATURE_TEXT"
             else
-              FEATURE_NAME="Feature Update"
+              # Fallback: extract everything after "feat: " before the version tag
+              FALLBACK_PATTERN="^feat: (.+)"
+              if [[ "$FIRST_LINE" =~ $FALLBACK_PATTERN ]]; then
+                FEATURE_TEXT="${BASH_REMATCH[1]}"
+                # Remove version tag if present
+                FEATURE_NAME=$(echo "$FEATURE_TEXT" | sed 's/ (v[^)]*)$//')
+              else
+                FEATURE_NAME="Feature Update"
+              fi
             fi
             
             echo "✅ Feature commit with version detected:"

@@ -103,11 +103,8 @@ jobs:
           if [[ "$BRANCH_TYPE" == "feature-version" ]]; then
             echo "📋 Feature branch with version detected - version tag required in PR title"
             
-            # Extract version from branch name (including alpha/beta suffixes)
-            EXPECTED_VERSION=$(echo "$BRANCH_NAME" | grep -o 'v[0-9]*\.[0-9]*\.[0-9]*[^-]*-[^-]*' | head -1)
-            if [[ -z "$EXPECTED_VERSION" ]]; then
-              EXPECTED_VERSION=$(echo "$BRANCH_NAME" | grep -o 'v[0-9]*\.[0-9]*\.[0-9]*[^-]*')
-            fi
+            # Extract version from branch name - simplified pattern
+            EXPECTED_VERSION=$(echo "$BRANCH_NAME" | grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+' | head -1)
             
             # Check if PR title contains the version tag
             if [[ "$PR_TITLE" =~ \($EXPECTED_VERSION\) ]]; then
@@ -115,8 +112,8 @@ jobs:
             else
               echo "❌ PR title must include version tag for feature branch with version"
               echo "   Current title: $PR_TITLE"
-              echo "   Required format: feat: Complete Component Name ($EXPECTED_VERSION)"
-              echo "   Example: feat: Complete GanttComposer Component ($EXPECTED_VERSION)"
+              echo "   Required format: feat: Description (${EXPECTED_VERSION})"
+              echo "   Example: feat: Add task centering feature (${EXPECTED_VERSION})"
               exit 1
             fi
           else

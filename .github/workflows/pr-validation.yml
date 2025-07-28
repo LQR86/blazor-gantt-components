@@ -23,7 +23,7 @@ jobs:
           BRANCH_NAME="${{ github.head_ref }}"
           
           # Define allowed branch prefixes and their purposes
-          MILESTONE_PATTERN="^feat/v[0-9]+\.[0-9]+\.[0-9]+[^/]*-.*"
+          FEATURE_VERSION_PATTERN="^feat/v[0-9]+\.[0-9]+\.[0-9]+[^/]*-.*"
           FIX_PATTERN="^fix/[a-z0-9-]+$"
           HOTFIX_PATTERN="^hotfix/[a-z0-9-]+$"
           DOCS_PATTERN="^docs/[a-z0-9-]+$"
@@ -35,9 +35,9 @@ jobs:
           PERF_PATTERN="^perf/[a-z0-9-]+$"
           
           # Check if branch matches any allowed pattern
-          if [[ "$BRANCH_NAME" =~ $MILESTONE_PATTERN ]]; then
-            echo "✅ Valid milestone feature branch: $BRANCH_NAME"
-            echo "branch-type=milestone" >> $GITHUB_OUTPUT
+          if [[ "$BRANCH_NAME" =~ $FEATURE_VERSION_PATTERN ]]; then
+            echo "✅ Valid feature branch with version: $BRANCH_NAME"
+            echo "branch-type=feature-version" >> $GITHUB_OUTPUT
           elif [[ "$BRANCH_NAME" =~ $FIX_PATTERN ]]; then
             echo "✅ Valid fix branch: $BRANCH_NAME"
             echo "branch-type=fix" >> $GITHUB_OUTPUT
@@ -69,7 +69,7 @@ jobs:
             echo "❌ Invalid branch naming convention: $BRANCH_NAME"
             echo ""
             echo "📋 Allowed branch naming patterns:"
-            echo "   feat/v0.3.0-alpha-component-name  (milestone features)"
+            echo "   feat/v0.3.0-alpha-component-name  (feature with version)"
             echo "   fix/timeline-scrolling-bug        (bug fixes)"
             echo "   hotfix/critical-security-patch    (urgent fixes)"
             echo "   docs/update-readme                (documentation)"
@@ -99,9 +99,9 @@ jobs:
           
           echo "📋 Branch type detected: $BRANCH_TYPE"
           
-          # Check if this is a milestone feature branch
-          if [[ "$BRANCH_TYPE" == "milestone" ]]; then
-            echo "📋 Milestone feature branch detected - version tag required in PR title"
+          # Check if this is a feature branch with version
+          if [[ "$BRANCH_TYPE" == "feature-version" ]]; then
+            echo "📋 Feature branch with version detected - version tag required in PR title"
             
             # Extract version from branch name (including alpha/beta suffixes)
             EXPECTED_VERSION=$(echo "$BRANCH_NAME" | grep -o 'v[0-9]*\.[0-9]*\.[0-9]*[^-]*-[^-]*' | head -1)
@@ -113,24 +113,24 @@ jobs:
             if [[ "$PR_TITLE" =~ \($EXPECTED_VERSION\) ]]; then
               echo "✅ PR title correctly includes version tag: $EXPECTED_VERSION"
             else
-              echo "❌ PR title must include version tag for milestone branch"
+              echo "❌ PR title must include version tag for feature branch with version"
               echo "   Current title: $PR_TITLE"
               echo "   Required format: feat: Complete Component Name ($EXPECTED_VERSION)"
               echo "   Example: feat: Complete GanttComposer Component ($EXPECTED_VERSION)"
               exit 1
             fi
           else
-            echo "📋 Non-milestone branch detected - no version tag required"
+            echo "📋 Regular branch detected - no version tag required"
             
-            # Check that non-milestone branches don't have version tags
+            # Check that regular branches don't have version tags
             if [[ "$PR_TITLE" =~ \(v[0-9]+\.[0-9]+\.[0-9]+.*\) ]]; then
-              echo "❌ Non-milestone PR title should NOT include version tag"
+              echo "❌ Regular PR title should NOT include version tag"
               echo "   Current title: $PR_TITLE"
               echo "   Branch type: $BRANCH_TYPE"
               echo "   Correct format: $BRANCH_TYPE: description of change"
               exit 1
             else
-              echo "✅ PR title correctly excludes version tag for non-milestone branch"
+              echo "✅ PR title correctly excludes version tag for regular branch"
             fi
           fi
           

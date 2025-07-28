@@ -14,7 +14,6 @@ jobs:
     timeout-minutes: 5
     outputs:
       version: ${{ steps.tag.outputs.version }}
-      milestone: ${{ steps.tag.outputs.milestone }}
       status: ${{ steps.tag.outputs.status }}
       tag-created: ${{ steps.tag.outputs.tag-created }}
       
@@ -37,7 +36,6 @@ jobs:
           fi
           
           VERSION=$(jq -r '.version' version.json 2>/dev/null || echo "invalid")
-          MILESTONE=$(jq -r '.milestone' version.json 2>/dev/null || echo "invalid")
           STATUS=$(jq -r '.status' version.json 2>/dev/null || echo "invalid")
           PHASE=$(jq -r '.phase' version.json 2>/dev/null || echo "unknown")
           
@@ -46,19 +44,12 @@ jobs:
             exit 1
           fi
           
-          if [[ "$MILESTONE" == "invalid" || "$MILESTONE" == "null" ]]; then
-            echo "❌ Invalid milestone in version.json"
-            exit 1
-          fi
-          
           echo "✅ Version validation passed:"
           echo "   Version: $VERSION"
-          echo "   Milestone: $MILESTONE"
           echo "   Phase: $PHASE"
           echo "   Status: $STATUS"
           
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "milestone=$MILESTONE" >> $GITHUB_OUTPUT
           echo "status=$STATUS" >> $GITHUB_OUTPUT
           echo "phase=$PHASE" >> $GITHUB_OUTPUT
       
@@ -68,7 +59,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ steps.validate.outputs.version }}"
-          MILESTONE="${{ steps.validate.outputs.milestone }}"
           PHASE="${{ steps.validate.outputs.phase }}"
           STATUS="${{ steps.validate.outputs.status }}"
           
@@ -83,8 +73,8 @@ jobs:
             git config user.name "GitHub Actions"
             git config user.email "actions@github.com"
             
-            # Create annotated tag with milestone information
-            TAG_MESSAGE="Milestone $MILESTONE: $PHASE"
+            # Create annotated tag with phase information
+            TAG_MESSAGE="$PHASE"
             if [[ "$STATUS" == "complete" ]]; then
               TAG_MESSAGE="$TAG_MESSAGE (Complete)"
             fi
@@ -113,16 +103,14 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Auto-create GitHub Release for completed milestones
+      - name: Auto-create GitHub Release for completed features
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ needs.auto-tag.outputs.version }}"
-          MILESTONE="${{ needs.auto-tag.outputs.milestone }}"
           
-          echo "📦 Creating GitHub release for completed milestone"
+          echo "📦 Creating GitHub release for completed feature"
           echo "   Version: $VERSION"
-          echo "   Milestone: $MILESTONE"
           
           # Check if release already exists
           if gh release view "v$VERSION" >/dev/null 2>&1; then
@@ -186,7 +174,6 @@ jobs:
           echo "🎉 Post-Merge Automation Complete"
           echo "================================="
           echo "Version: ${{ needs.auto-tag.outputs.version }}"
-          echo "Milestone: ${{ needs.auto-tag.outputs.milestone }}"
           echo "Tag Created: ${{ needs.auto-tag.outputs.tag-created }}"
           echo "Release Created: ✅"
           echo ""
@@ -196,4 +183,4 @@ jobs:
           echo "   - Release notes generated"
           echo "   - Latest release marked"
           echo ""
-          echo "🚀 Milestone delivery complete!"
+          echo "🚀 Feature delivery complete!"

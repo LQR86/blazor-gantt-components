@@ -80,21 +80,21 @@ This checklist validates the complete branch-specific CI workflow separation imp
 
 **Results**: ___________
 
-### Test 5: Milestone Branch (Future Test)
+### Test 5: Feature Branch with Version (Future Test)
 **Branch**: `feat/v0.5.0-alpha-test-component`  
 **Expected Workflows**: Build & Test + PR Validation (same as regular branches)
 
 - [ ] Create branch `feat/v0.5.0-alpha-test-component`
 - [ ] Update `version.json` to `0.5.0-alpha`
-- [ ] Add milestone test component
+- [ ] Add feature test component
 - [ ] Create PR with title: `feat: Test Component (v0.5.0-alpha)`
 - [ ] Verify `build-and-test.yml` runs (same as other branches) ✅
 - [ ] Verify `pr-validation.yml` runs and validates version tag in title ✅
-- [ ] Check that NO special milestone validation occurs (it doesn't exist)
+- [ ] Check that NO special version validation occurs (it doesn't exist)
 - [ ] Confirm build, test, and artifact creation work normally
 - [ ] Merge and verify post-merge automation creates tag + release
 
-**Note**: Milestone branches get the same build/test as other branches. The "milestone" concept only matters for PR title validation and post-merge release creation.
+**Note**: Feature branches with version tags get the same build/test as other branches. The version tag only matters for PR title validation and post-merge release creation.
 
 **Results**: ___________
 
@@ -123,16 +123,16 @@ This checklist validates the complete branch-specific CI workflow separation imp
 - [ ] Verify `post-merge-automation.yml` runs automatically
 - [ ] Check version.json validation passes
 - [ ] Verify Git tag creation (if version changed)
-- [ ] Check tag annotation includes milestone info
+- [ ] Check tag annotation includes phase info
 - [ ] Verify tag pushed to repository
 
 **Results**: ___________
 
 ### Test 8: Auto-Release Creation
-**Trigger**: Merge milestone with status "complete"
+**Trigger**: Merge feature branch with status "complete"
 
-- [ ] Set up completed milestone in version.json
-- [ ] Merge milestone PR to main
+- [ ] Set up completed feature version in version.json
+- [ ] Merge feature PR to main
 - [ ] Verify auto-tag runs first
 - [ ] Verify auto-release job runs after successful tag
 - [ ] Check GitHub release created with correct title
@@ -150,17 +150,17 @@ This checklist validates the complete branch-specific CI workflow separation imp
 - [ ] Verify other workflows don't run unnecessarily
 
 ### Test 10: Invalid PR Titles
-- [ ] Create milestone branch `feat/v0.5.0-alpha-test`
+- [ ] Create feature branch `feat/v0.5.0-alpha-test`
 - [ ] Create PR with title missing version tag
 - [ ] Verify `pr-validation.yml` fails ❌
 - [ ] Check error message specifies required format
 
-### Test 11: Missing version.json for Milestone
-**Note**: This test is not applicable since no special milestone validation exists. Milestone branches are treated the same as regular branches in build-and-test.yml.
+### Test 11: Missing version.json for Feature Branch
+**Note**: This test is not applicable since no special version validation exists. Feature branches are treated the same as regular branches in build-and-test.yml.
 
-- [ ] ~~Create milestone branch without updating version.json~~
-- [ ] ~~Verify milestone validation fails~~
-- [ ] **Updated Test**: Verify that milestone branches build normally regardless of version.json
+- [ ] ~~Create feature branch without updating version.json~~
+- [ ] ~~Verify version validation fails~~
+- [ ] **Updated Test**: Verify that feature branches build normally regardless of version.json
 - [ ] Confirm PR title validation catches missing version tags in titles
 
 ## 📊 Performance Validation

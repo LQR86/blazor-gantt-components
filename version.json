@@ -1,8 +1,6 @@
 {
   "version": "0.4.0-alpha",
-  "milestone": "1.3",
   "phase": "GanttComposer Component",
   "status": "complete",
-  "nextMilestone": "1.4",
   "nextPhase": "Architecture Validation"
 }

@@ -96,14 +96,14 @@ if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 ```
 
 ### 3. Optimized Validation Logic
-- **Version validation**: Handled by existing build-and-test.yml for milestone branches
+- **Version validation**: Handled by existing build-and-test.yml for feature branches
 - **Security scanning**: Dedicated hotfix and dependency workflows
 - **Documentation checks**: Isolated to documentation changes
 - **Performance testing**: Included in comprehensive build validation
 
 ### 4. Reliable Post-Merge Pipeline
 - **Independent validation**: Version.json validation within the auto-tag job
-- **Conditional release**: Only creates releases for completed milestones  
+- **Conditional release**: Only creates releases for completed features  
 - **Error handling**: Comprehensive validation before tag/release creation
 - **Idempotent operations**: Checks for existing tags/releases
 
@@ -112,7 +112,7 @@ if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 ### Workflow Architecture Validation
 
 The new architecture leverages existing workflows where possible:
-- **build-and-test.yml**: Already handles milestone validation with branch detection
+- **build-and-test.yml**: Already handles feature branch validation with branch detection
 - **Specialized workflows**: Handle branch-specific concerns
 - **New workflows**: Fill gaps in PR validation and post-merge automation
 
@@ -127,7 +127,7 @@ The new architecture leverages existing workflows where possible:
 | `chore/*`   | ✅ (build + test) | ✅ | ✅ dependencies.yml | ✅ |
 | `ci/*`      | ✅ (build + test) | ✅ | ❌ | ✅ |
 
-**Key Insight**: No special "milestone validation" exists. All `feat/v*` branches get the same build/test as other code branches. The value comes from the standardized branching strategy and post-merge automation, not from special validation logic.
+**Key Insight**: No special version validation exists. All `feat/v*` branches get the same build/test as other code branches. The value comes from the standardized branching strategy and post-merge automation, not from special validation logic.
 
 ## 📚 Documentation Updates
 

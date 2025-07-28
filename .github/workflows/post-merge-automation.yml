@@ -1,8 +1,8 @@
 name: Post-Merge Automation
 
-# Automatically creates Git tags and GitHub releases for feature branches
-# Extracts version and feature info from branch naming convention (feat/v*-feature-name)
-# Only runs when feature branches are merged to main
+# Automatically creates Git tags and GitHub releases for feature commits
+# Extracts version and feature info from commit message patterns (feat: Title (v*.*.*))
+# Works with both regular merges and squash merges
 
 on:
   push:
@@ -35,45 +35,41 @@ jobs:
         run: |
           echo "🔍 Extracting version info from merged branch"
           
-          # Get the most recent merge commit and extract the merged branch name
-          MERGE_COMMIT=$(git log --merges -n 1 --pretty=format:"%H")
-          if [[ -z "$MERGE_COMMIT" ]]; then
-            echo "❌ No merge commit found - this might be a direct push"
-            exit 1
-          fi
+          # Handle both merge commits and squash merges
+          LATEST_COMMIT=$(git log -n 1 --pretty=format:"%H")
+          COMMIT_MESSAGE=$(git log --format=%B -n 1 "$LATEST_COMMIT")
           
-          # Extract branch name from merge commit message
-          MERGE_MESSAGE=$(git log --format=%B -n 1 "$MERGE_COMMIT")
-          BRANCH_NAME=$(echo "$MERGE_MESSAGE" | grep -o "from [^/]*/[^']*" | sed 's/from [^/]*\///' | head -1)
+          echo "📋 Latest commit: $LATEST_COMMIT"
+          echo "📋 Commit message: $COMMIT_MESSAGE"
           
-          if [[ -z "$BRANCH_NAME" ]]; then
-            echo "⚠️ Could not extract branch name from merge commit, trying alternative method"
-            # Alternative: Get branch name from commit parents
-            BRANCH_NAME=$(git show --format="%D" "$MERGE_COMMIT" | grep -o "origin/[^,]*" | sed 's/origin\///' | grep -v "main" | head -1)
-          fi
+          # For squash merges, the branch info might not be available
+          # Instead, we'll determine if this is a feature branch based on commit message patterns
           
-          echo "📋 Detected merged branch: $BRANCH_NAME"
-          
-          # Check if this is a feature branch with version
-          if [[ "$BRANCH_NAME" =~ ^feat/v([0-9]+\.[0-9]+\.[0-9]+[^-]*)-(.+)$ ]]; then
+          # Check if commit message contains version tag pattern (indicates feature branch)
+          if [[ "$COMMIT_MESSAGE" =~ \(v([0-9]+\.[0-9]+\.[0-9]+[^)]*)\) ]]; then
             VERSION="${BASH_REMATCH[1]}"
-            FEATURE_SLUG="${BASH_REMATCH[2]}"
             
-            # Convert slug to readable name (gantt-composer -> GanttComposer)
-            FEATURE_NAME=$(echo "$FEATURE_SLUG" | sed 's/-/ /g' | sed 's/\b\w/\U&/g')
+            # Extract feature name from commit message
+            # Pattern: "feat: Complete GanttComposer Component (v0.4.0-alpha)"
+            if [[ "$COMMIT_MESSAGE" =~ ^feat:\ (.+)\ \(v[^)]+\) ]]; then
+              FEATURE_TEXT="${BASH_REMATCH[1]}"
+              # Convert to feature name format
+              FEATURE_NAME="$FEATURE_TEXT"
+            else
+              FEATURE_NAME="Feature Update"
+            fi
             
-            echo "✅ Feature branch detected:"
-            echo "   Branch: $BRANCH_NAME"
+            echo "✅ Feature commit with version detected:"
             echo "   Version: $VERSION"
             echo "   Feature: $FEATURE_NAME"
             
             echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "feature-branch=$BRANCH_NAME" >> $GITHUB_OUTPUT
+            echo "feature-branch=feat/v$VERSION-unknown" >> $GITHUB_OUTPUT
             echo "feature-name=$FEATURE_NAME" >> $GITHUB_OUTPUT
             echo "is-feature=true" >> $GITHUB_OUTPUT
           else
-            echo "ℹ️ Not a feature branch - skipping version extraction"
-            echo "   Branch: $BRANCH_NAME"
+            echo "ℹ️ No version tag found in commit message - not a feature release"
+            echo "   This is a regular commit (ci, fix, docs, etc.)"
             echo "is-feature=false" >> $GITHUB_OUTPUT
           fi
       

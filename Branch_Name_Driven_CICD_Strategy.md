@@ -86,9 +86,9 @@ perf/{description}          # Performance optimizations
 
 | Job Category | Trigger | Branch Filter | Purpose |
 |--------------|---------|---------------|---------|
-| **Auto-Tag** | Any merge to main | `feat/v*` only | Extract version from branch name, create Git tag |
-| **Auto-Release** | Tag created | `feat/v*` only | Create GitHub release with extracted feature name |
-| **Version Tracking** | Feature merge | `feat/v*` only | Update project version tracking |
+| **Auto-Tag** | Any merge to main | `feat:` commits with version tags | Extract version from commit message, create Git tag |
+| **Auto-Release** | Tag created | `feat:` commits with version tags | Create GitHub release with extracted feature name |
+| **Version Tracking** | Feature merge | `feat:` commits with version tags | Update project version tracking |
 
 ## 🚀 Developer Workflow
 
@@ -209,23 +209,33 @@ fi
 
 ### **Post-Merge Automation** (`post-merge-automation.yml`)
 **Triggers**: Push to main branch  
-**Purpose**: Extract version info from merged branch and create releases
+**Purpose**: Extract version info from merged commits and create releases
 
 ```yaml
-# Extract version from merged branch name
-MERGE_MESSAGE=$(git log --format=%B -n 1 "$MERGE_COMMIT")
-BRANCH_NAME=$(extract_branch_from_merge_message)
+# Handle both merge commits and squash merges
+LATEST_COMMIT=$(git log -n 1 --pretty=format:"%H")
+COMMIT_MESSAGE=$(git log --format=%B -n 1 "$LATEST_COMMIT")
 
-if [[ "$BRANCH_NAME" =~ ^feat/v([0-9]+\.[0-9]+\.[0-9]+[^-]*)-(.+)$ ]]; then
+# Check if commit message contains version tag pattern (indicates feature branch)
+if [[ "$COMMIT_MESSAGE" =~ \(v([0-9]+\.[0-9]+\.[0-9]+[^)]*)\) ]]; then
   VERSION="${BASH_REMATCH[1]}"           # 0.4.0-alpha
-  FEATURE_SLUG="${BASH_REMATCH[2]}"      # gantt-composer
-  FEATURE_NAME=$(slug_to_title)          # GanttComposer Component
+  
+  # Extract feature name from commit message
+  if [[ "$COMMIT_MESSAGE" =~ ^feat:\ (.+)\ \(v[^)]+\) ]]; then
+    FEATURE_NAME="${BASH_REMATCH[1]}"    # Complete GanttComposer Component
+  fi
   
   # Create tag and release
   git tag -a "v$VERSION" -m "$FEATURE_NAME"
   gh release create "v$VERSION" --title "v$VERSION: $FEATURE_NAME"
 fi
 ```
+
+**Key Features**:
+- **Squash Merge Support**: Works with both regular merges and squash merges
+- **Version Detection**: Extracts version from commit message patterns
+- **Smart Filtering**: Only `feat:` commits with version tags create releases
+- **Graceful Handling**: Non-feature commits are safely ignored
 
 ## 📊 Performance Benefits
 
@@ -254,26 +264,26 @@ fi
 
 ### **Intelligent Version Extraction**
 ```bash
-# From branch name: feat/v0.4.0-alpha-gantt-composer
+# From commit message: feat: Complete GanttComposer Component (v0.4.0-alpha)
 # Extracts:
-VERSION="0.4.0-alpha"
-FEATURE_SLUG="gantt-composer"
-FEATURE_NAME="GanttComposer Component"  # Auto-formatted
+VERSION="0.4.0-alpha"                   # From version tag pattern
+FEATURE_NAME="Complete GanttComposer Component"  # From commit message
 
 # Creates:
 TAG="v0.4.0-alpha"
-RELEASE_TITLE="v0.4.0-alpha: GanttComposer Component"
+RELEASE_TITLE="v0.4.0-alpha: Complete GanttComposer Component"
 ```
 
-### **Branch Detection Methods**
-1. **Primary**: Parse merge commit message
-2. **Fallback**: Analyze commit parents
-3. **Validation**: Regex pattern matching for feature branches
+### **Merge Detection Methods**
+1. **Primary**: Parse commit message for version tags
+2. **Squash Merge Compatible**: Works with GitHub's squash merge
+3. **Validation**: Regex pattern matching for version patterns
+4. **Graceful Fallback**: Non-feature commits safely ignored
 
 ### **Conditional Release Creation**
-- Only `feat/v*` branches create releases
-- Non-feature merges are included in next feature release
-- Prevents tag pollution from minor fixes
+- Only commits with version tags `(v*.*.*)` create releases
+- Non-feature commits are safely ignored
+- Prevents tag pollution from CI/docs/fix commits
 
 ## 🚨 Error Handling & Validation
 

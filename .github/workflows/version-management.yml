@@ -67,7 +67,10 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Install jq for JSON parsing
-        run: sudo apt-get update && sudo apt-get install -y jq
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+          which jq
+          jq --version
       
       - name: Make validation script executable
         run: chmod +x scripts/validate-milestone.sh
@@ -79,6 +82,10 @@ jobs:
           STATUS=$(jq -r '.status' version.json)
           
           echo "📊 Status: $STATUS"
+          
+          # Ensure jq is in PATH for the script
+          export PATH="/usr/bin:$PATH"
+          which jq
           
           # Use the scalable validation script
           ./scripts/validate-milestone.sh "$MILESTONE" "$PHASE"

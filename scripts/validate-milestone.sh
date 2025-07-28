@@ -14,6 +14,23 @@ if [[ -z "$MILESTONE" ]]; then
     exit 1
 fi
 
+# Check if jq is available
+if ! command -v jq &> /dev/null; then
+    echo "❌ jq is required but not found in PATH"
+    echo "Current PATH: $PATH"
+    echo "Trying common locations..."
+    if [[ -f "/usr/bin/jq" ]]; then
+        echo "Found jq at /usr/bin/jq"
+        export PATH="/usr/bin:$PATH"
+    elif [[ -f "/usr/local/bin/jq" ]]; then
+        echo "Found jq at /usr/local/bin/jq"
+        export PATH="/usr/local/bin:$PATH"
+    else
+        echo "jq not found in common locations"
+        exit 1
+    fi
+fi
+
 CONFIG_FILE=".github/milestone-validations/milestone-${MILESTONE}.json"
 
 if [[ ! -f "$CONFIG_FILE" ]]; then

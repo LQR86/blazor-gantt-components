@@ -85,16 +85,16 @@ This checklist validates the complete branch-specific CI workflow separation imp
 **Expected Workflows**: Build & Test + PR Validation (same as regular branches)
 
 - [ ] Create branch `feat/v0.5.0-alpha-test-component`
-- [ ] Update `version.json` to `0.5.0-alpha`
 - [ ] Add feature test component
 - [ ] Create PR with title: `feat: Test Component (v0.5.0-alpha)`
 - [ ] Verify `build-and-test.yml` runs (same as other branches) ✅
 - [ ] Verify `pr-validation.yml` runs and validates version tag in title ✅
 - [ ] Check that NO special version validation occurs (it doesn't exist)
 - [ ] Confirm build, test, and artifact creation work normally
-- [ ] Merge and verify post-merge automation creates tag + release
+- [ ] Merge and verify post-merge automation extracts version from branch name
+- [ ] Verify tag and release created with version from branch name (v0.5.0-alpha)
 
-**Note**: Feature branches with version tags get the same build/test as other branches. The version tag only matters for PR title validation and post-merge release creation.
+**Note**: Feature branches with version tags get the same build/test as other branches. Version and feature info is automatically extracted from branch naming convention (feat/v*-*). No version.json configuration needed.
 
 **Results**: ___________
 
@@ -117,25 +117,24 @@ This checklist validates the complete branch-specific CI workflow separation imp
 ## 🔧 Post-Merge Automation Testing
 
 ### Test 7: Auto-Tag Creation
-**Trigger**: Any merge to main  
+**Trigger**: Merge feature branch to main  
 
-- [ ] Merge any PR to main
+- [ ] Merge feature branch (feat/v*-*) to main
 - [ ] Verify `post-merge-automation.yml` runs automatically
-- [ ] Check version.json validation passes
-- [ ] Verify Git tag creation (if version changed)
-- [ ] Check tag annotation includes phase info
+- [ ] Check branch name parsing extracts version and feature info
+- [ ] Verify Git tag creation using extracted version
+- [ ] Check tag annotation includes extracted feature name
 - [ ] Verify tag pushed to repository
 
 **Results**: ___________
 
 ### Test 8: Auto-Release Creation
-**Trigger**: Merge feature branch with status "complete"
+**Trigger**: Merge feature branch to main
 
-- [ ] Set up completed feature version in version.json
-- [ ] Merge feature PR to main
-- [ ] Verify auto-tag runs first
+- [ ] Merge feature branch (feat/v*-*) to main
+- [ ] Verify auto-tag runs first with branch parsing
 - [ ] Verify auto-release job runs after successful tag
-- [ ] Check GitHub release created with correct title
+- [ ] Check GitHub release created with title: "v{version}: {FeatureName}"
 - [ ] Verify comprehensive release notes generated
 - [ ] Check release marked as "latest"
 
@@ -155,13 +154,14 @@ This checklist validates the complete branch-specific CI workflow separation imp
 - [ ] Verify `pr-validation.yml` fails ❌
 - [ ] Check error message specifies required format
 
-### Test 11: Missing version.json for Feature Branch
-**Note**: This test is not applicable since no special version validation exists. Feature branches are treated the same as regular branches in build-and-test.yml.
+### Test 11: Invalid Feature Branch Format
+**Note**: Since we now use convention-based parsing, this test validates branch naming format.
 
-- [ ] ~~Create feature branch without updating version.json~~
-- [ ] ~~Verify version validation fails~~
-- [ ] **Updated Test**: Verify that feature branches build normally regardless of version.json
-- [ ] Confirm PR title validation catches missing version tags in titles
+- [ ] Create feature branch with invalid format: `feat/invalid-format`
+- [ ] Merge to main and verify post-merge automation detects it's not a versioned feature
+- [ ] Confirm no tags or releases are created for non-versioned branches
+- [ ] Create proper format: `feat/v1.0.0-test-feature`
+- [ ] Verify automation works correctly with proper format
 
 ## 📊 Performance Validation
 

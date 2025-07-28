@@ -126,6 +126,9 @@
     {
         SelectedTaskId = taskId;
         
+        // Center the selected task bar in TimelineView viewport
+        await CenterTaskBarInTimeline(taskId);
+        
         // Notify parent component if needed
         if (OnTaskSelected.HasDelegate)
         {
@@ -139,6 +142,31 @@
     {
         HoveredTaskId = taskId;
         StateHasChanged(); // Sync hover state between both components
+    }
+    
+    private async Task CenterTaskBarInTimeline(int taskId)
+    {
+        if (Tasks == null) return;
+        
+        var selectedTask = Tasks.FirstOrDefault(t => t.Id == taskId);
+        if (selectedTask == null) return;
+        
+        try
+        {
+            // Calculate timeline start date (same logic as TimelineView.CalculateTimelineRange)
+            var startDate = Tasks.Min(t => t.StartDate).Date.AddDays(-7);
+            const int dayWidth = 40; // Same as TimelineView.DayWidth constant
+            
+            await JSRuntime.InvokeVoidAsync("ganttComposer.scrollTaskBarToCenter",
+                $"composer-timeline-{ComponentId}",
+                selectedTask.StartDate.ToString("yyyy-MM-dd"),
+                startDate.ToString("yyyy-MM-dd"),
+                dayWidth);
+        }
+        catch (Exception)
+        {
+            // Fallback if JS interop fails - component still works without centering
+        }
     }
     
     protected override async Task OnParametersSetAsync()

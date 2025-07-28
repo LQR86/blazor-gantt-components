@@ -1,0 +1,25 @@
+{
+  "milestone": "X.X",
+  "description": "Template for new milestones",
+  "phases": [
+    {
+      "name": "Phase Name",
+      "validations": [
+        {
+          "type": "file_exists",
+          "path": "path/to/required/file.cs",
+          "description": "Description of what this validates"
+        },
+        {
+          "type": "directory_exists", 
+          "path": "path/to/required/directory",
+          "description": "Description of required directory"
+        },
+        {
+          "type": "integration_test",
+          "description": "Description of integration requirement"
+        }
+      ]
+    }
+  ]
+}

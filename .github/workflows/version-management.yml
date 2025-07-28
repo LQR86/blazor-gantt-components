@@ -1,0 +1,91 @@
+name: Version Management
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  version-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check Version Update Required
+        id: version-check
+        run: |
+          # Get current version from version.json
+          CURRENT_VERSION=$(jq -r '.version' version.json)
+          CURRENT_MILESTONE=$(jq -r '.milestone' version.json)
+          
+          # Check if this is a milestone PR (feature/ branch with milestone change)
+          if [[ "${{ github.head_ref }}" =~ ^feature/v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "Milestone PR detected"
+            # Extract expected version from branch name
+            EXPECTED_VERSION=$(echo "${{ github.head_ref }}" | grep -o 'v[0-9]*\.[0-9]*\.[0-9]*' | sed 's/v//')
+            
+            # Validate version was updated
+            if [[ "$CURRENT_VERSION" != "$EXPECTED_VERSION"* ]]; then
+              echo "❌ Version in version.json must be updated to $EXPECTED_VERSION for milestone PR"
+              exit 1
+            fi
+            echo "✅ Version correctly updated for milestone"
+          fi
+          
+          echo "current-version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "current-milestone=$CURRENT_MILESTONE" >> $GITHUB_OUTPUT
+
+  auto-tag:
+    runs-on: ubuntu-latest
+    needs: version-check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Auto-create Git Tag
+        run: |
+          VERSION=$(jq -r '.version' version.json)
+          MILESTONE=$(jq -r '.milestone' version.json)
+          PHASE=$(jq -r '.phase' version.json)
+          
+          # Check if tag already exists
+          if git tag -l | grep -q "^v$VERSION$"; then
+            echo "Tag v$VERSION already exists"
+          else
+            echo "Creating tag v$VERSION"
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            git tag -a "v$VERSION" -m "Milestone $MILESTONE: $PHASE"
+            git push origin "v$VERSION"
+          fi
+
+  milestone-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install jq for JSON parsing
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+          which jq
+          jq --version
+      
+      - name: Make validation script executable
+        run: chmod +x scripts/validate-milestone.sh
+      
+      - name: Validate Milestone Progress
+        run: |
+          MILESTONE=$(jq -r '.milestone' version.json)
+          PHASE=$(jq -r '.phase' version.json)
+          STATUS=$(jq -r '.status' version.json)
+          
+          echo "📊 Status: $STATUS"
+          
+          # Ensure jq is in PATH for the script
+          export PATH="/usr/bin:$PATH"
+          which jq
+          
+          # Use the scalable validation script
+          ./scripts/validate-milestone.sh "$MILESTONE" "$PHASE"

@@ -1,0 +1,8 @@
+{
+  "version": "0.2.0-alpha",
+  "milestone": "1.2",
+  "phase": "Auto-Versioning CI/CD System",
+  "status": "in-progress",
+  "nextMilestone": "1.3",
+  "nextPhase": "TimelineView Component"
+}

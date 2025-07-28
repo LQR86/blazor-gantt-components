@@ -116,7 +116,7 @@ jobs:
             echo "📋 Non-milestone branch detected - no version tag required"
             
             # Check that non-milestone branches don't have version tags
-            if [[ "$PR_TITLE" =~ \(v[0-9]+\.[0-9]+\.[0-9]+[^)]*\) ]]; then
+            if [[ "$PR_TITLE" =~ \(v[0-9]+\.[0-9]+\.[0-9]+.*\) ]]; then
               echo "❌ Non-milestone PR title should NOT include version tag"
               echo "   Current title: $PR_TITLE"
               echo "   Branch type: $BRANCH_NAME"

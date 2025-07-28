@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: write  # Required for creating tags
+  pull-requests: read
+
 jobs:
   version-check:
     runs-on: ubuntu-latest
@@ -43,8 +47,12 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Auto-create Git Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=$(jq -r '.version' version.json)
           MILESTONE=$(jq -r '.milestone' version.json)

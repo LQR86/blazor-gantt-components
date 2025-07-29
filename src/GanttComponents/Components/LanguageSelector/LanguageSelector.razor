@@ -1,9 +1,11 @@
 @using GanttComponents.Services
 @inject IJSRuntime JSRuntime
+@inject IGanttI18N I18N
+@implements IDisposable
 
 <div class="language-selector">
-    <label class="selector-label">@GanttI18N.T("language.selector-label"):</label>
-    <select class="selector-dropdown" value="@CurrentLanguage" @onchange="OnLanguageChanged">
+    <label class="selector-label">@I18N.T("language.selector-label"):</label>
+    <select class="selector-dropdown" value="@I18N.CurrentCulture" @onchange="OnLanguageChanged">
         <option value="en-US">English</option>
         <option value="zh-CN">中文</option>
     </select>
@@ -15,10 +17,17 @@
     /// </summary>
     [Parameter] public EventCallback<string> OnLanguageChange { get; set; }
 
-    /// <summary>
-    /// Current selected language
-    /// </summary>
-    private string CurrentLanguage => GanttI18N.CurrentCulture;
+    protected override void OnInitialized()
+    {
+        // Subscribe to language changes to update UI
+        I18N.LanguageChanged += OnLanguageChangedFromService;
+    }
+
+    private void OnLanguageChangedFromService()
+    {
+        // Force re-render when language changes from other sources
+        InvokeAsync(StateHasChanged);
+    }
 
     /// <summary>
     /// Handle language change from dropdown
@@ -26,10 +35,10 @@
     private async Task OnLanguageChanged(ChangeEventArgs e)
     {
         var newLanguage = e.Value?.ToString();
-        if (!string.IsNullOrEmpty(newLanguage) && newLanguage != CurrentLanguage)
+        if (!string.IsNullOrEmpty(newLanguage) && newLanguage != I18N.CurrentCulture)
         {
-            // Update the I18N service
-            GanttI18N.SetCulture(newLanguage);
+            // Update the I18N service - this will notify all subscribers
+            I18N.SetCulture(newLanguage);
             
             // Update HTML lang attribute for CSS targeting
             try
@@ -41,12 +50,15 @@
                 // Silently ignore if JavaScript fails
             }
             
-            // Notify parent components
+            // Notify parent components (for legacy compatibility)
             await OnLanguageChange.InvokeAsync(newLanguage);
-            
-            // Force UI refresh
-            StateHasChanged();
         }
+    }
+
+    public void Dispose()
+    {
+        // Unsubscribe from language changes
+        I18N.LanguageChanged -= OnLanguageChangedFromService;
     }
 }
 

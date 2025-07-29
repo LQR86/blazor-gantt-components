@@ -5,15 +5,22 @@ namespace GanttComponents.Tests.Unit.Services
 {
     public class GanttI18NTests
     {
+        private readonly IGanttI18N _i18nService;
+
+        public GanttI18NTests()
+        {
+            _i18nService = new GanttI18N();
+        }
+
         [Fact]
         public void T_WithValidEnglishKey_ReturnsTranslation()
         {
             // Arrange
-            GanttI18N.SetCulture("en-US");
+            _i18nService.SetCulture("en-US");
             var key = "grid.wbs";
 
             // Act
-            var result = GanttI18N.T(key);
+            var result = _i18nService.T(key);
 
             // Assert
             Assert.Equal("WBS", result);
@@ -23,11 +30,11 @@ namespace GanttComponents.Tests.Unit.Services
         public void T_WithInvalidKey_ReturnsKey()
         {
             // Arrange
-            GanttI18N.SetCulture("en-US");
+            _i18nService.SetCulture("en-US");
             var key = "invalid.key";
 
             // Act
-            var result = GanttI18N.T(key);
+            var result = _i18nService.T(key);
 
             // Assert
             Assert.Equal("invalid.key", result);
@@ -37,10 +44,10 @@ namespace GanttComponents.Tests.Unit.Services
         public void T_WithNullKey_ReturnsEmptyString()
         {
             // Arrange
-            GanttI18N.SetCulture("en-US");
+            _i18nService.SetCulture("en-US");
 
             // Act
-            var result = GanttI18N.T(null!);
+            var result = _i18nService.T(null!);
 
             // Assert
             Assert.Equal(string.Empty, result);
@@ -50,10 +57,10 @@ namespace GanttComponents.Tests.Unit.Services
         public void T_WithEmptyKey_ReturnsEmptyString()
         {
             // Arrange
-            GanttI18N.SetCulture("en-US");
+            _i18nService.SetCulture("en-US");
 
             // Act
-            var result = GanttI18N.T("");
+            var result = _i18nService.T("");
 
             // Assert
             Assert.Equal("", result);
@@ -66,27 +73,27 @@ namespace GanttComponents.Tests.Unit.Services
             var expectedCulture = "en-US";
 
             // Act
-            GanttI18N.SetCulture(expectedCulture);
+            _i18nService.SetCulture(expectedCulture);
 
             // Assert
-            Assert.Equal(expectedCulture, GanttI18N.CurrentCulture);
+            Assert.Equal(expectedCulture, _i18nService.CurrentCulture);
         }
 
         [Fact]
         public void SetCulture_WithNullCulture_DefaultsToEnglish()
         {
             // Arrange & Act
-            GanttI18N.SetCulture(null!);
+            _i18nService.SetCulture(null!);
 
             // Assert
-            Assert.Equal("en-US", GanttI18N.CurrentCulture);
+            Assert.Equal("en-US", _i18nService.CurrentCulture);
         }
 
         [Fact]
         public void GetAvailableCultures_ReturnsExpectedCultures()
         {
             // Act
-            var cultures = GanttI18N.GetAvailableCultures();
+            var cultures = _i18nService.GetAvailableCultures();
 
             // Assert
             Assert.Contains("en-US", cultures);
@@ -99,7 +106,7 @@ namespace GanttComponents.Tests.Unit.Services
             var key = "grid.task-name";
 
             // Act
-            var result = GanttI18N.HasTranslation(key);
+            var result = _i18nService.HasTranslation(key);
 
             // Assert
             Assert.True(result);
@@ -112,7 +119,7 @@ namespace GanttComponents.Tests.Unit.Services
             var key = "invalid.key";
 
             // Act
-            var result = GanttI18N.HasTranslation(key);
+            var result = _i18nService.HasTranslation(key);
 
             // Assert
             Assert.False(result);
@@ -122,7 +129,7 @@ namespace GanttComponents.Tests.Unit.Services
         public void HasTranslation_WithNullKey_ReturnsFalse()
         {
             // Act
-            var result = GanttI18N.HasTranslation(null!);
+            var result = _i18nService.HasTranslation(null!);
 
             // Assert
             Assert.False(result);
@@ -139,10 +146,10 @@ namespace GanttComponents.Tests.Unit.Services
         public void T_AllTaskGridHeaders_ReturnCorrectTranslations(string key, string expected)
         {
             // Arrange
-            GanttI18N.SetCulture("en-US");
+            _i18nService.SetCulture("en-US");
 
             // Act
-            var result = GanttI18N.T(key);
+            var result = _i18nService.T(key);
 
             // Assert
             Assert.Equal(expected, result);
@@ -155,10 +162,10 @@ namespace GanttComponents.Tests.Unit.Services
         public void T_DateFormats_ReturnCorrectPatterns(string key, string expected)
         {
             // Arrange
-            GanttI18N.SetCulture("en-US");
+            _i18nService.SetCulture("en-US");
 
             // Act
-            var result = GanttI18N.T(key);
+            var result = _i18nService.T(key);
 
             // Assert
             Assert.Equal(expected, result);
@@ -170,10 +177,10 @@ namespace GanttComponents.Tests.Unit.Services
         public void T_DemoPageElements_ReturnCorrectTranslations(string key, string expected)
         {
             // Arrange
-            GanttI18N.SetCulture("en-US");
+            _i18nService.SetCulture("en-US");
 
             // Act
-            var result = GanttI18N.T(key);
+            var result = _i18nService.T(key);
 
             // Assert
             Assert.Equal(expected, result);
@@ -185,11 +192,11 @@ namespace GanttComponents.Tests.Unit.Services
         public void T_WithValidChineseKey_ReturnsChineseTranslation()
         {
             // Arrange
-            GanttI18N.SetCulture("zh-CN");
+            _i18nService.SetCulture("zh-CN");
             var key = "grid.wbs";
 
             // Act
-            var result = GanttI18N.T(key);
+            var result = _i18nService.T(key);
 
             // Assert
             Assert.Equal("工作分解", result);
@@ -206,10 +213,10 @@ namespace GanttComponents.Tests.Unit.Services
         public void T_AllTaskGridHeaders_ReturnCorrectChineseTranslations(string key, string expected)
         {
             // Arrange
-            GanttI18N.SetCulture("zh-CN");
+            _i18nService.SetCulture("zh-CN");
 
             // Act
-            var result = GanttI18N.T(key);
+            var result = _i18nService.T(key);
 
             // Assert
             Assert.Equal(expected, result);
@@ -222,10 +229,10 @@ namespace GanttComponents.Tests.Unit.Services
         public void T_ChineseDateFormats_ReturnCorrectPatterns(string key, string expected)
         {
             // Arrange
-            GanttI18N.SetCulture("zh-CN");
+            _i18nService.SetCulture("zh-CN");
 
             // Act
-            var result = GanttI18N.T(key);
+            var result = _i18nService.T(key);
 
             // Assert
             Assert.Equal(expected, result);
@@ -241,10 +248,10 @@ namespace GanttComponents.Tests.Unit.Services
         public void T_CommonUIElements_ReturnCorrectChineseTranslations(string key, string expected)
         {
             // Arrange
-            GanttI18N.SetCulture("zh-CN");
+            _i18nService.SetCulture("zh-CN");
 
             // Act
-            var result = GanttI18N.T(key);
+            var result = _i18nService.T(key);
 
             // Assert
             Assert.Equal(expected, result);
@@ -256,10 +263,10 @@ namespace GanttComponents.Tests.Unit.Services
         public void T_ChineseDemoPageElements_ReturnCorrectTranslations(string key, string expected)
         {
             // Arrange
-            GanttI18N.SetCulture("zh-CN");
+            _i18nService.SetCulture("zh-CN");
 
             // Act
-            var result = GanttI18N.T(key);
+            var result = _i18nService.T(key);
 
             // Assert
             Assert.Equal(expected, result);
@@ -269,7 +276,7 @@ namespace GanttComponents.Tests.Unit.Services
         public void GetAvailableCultures_IncludesChineseCulture()
         {
             // Act
-            var cultures = GanttI18N.GetAvailableCultures();
+            var cultures = _i18nService.GetAvailableCultures();
 
             // Assert
             Assert.Contains("zh-CN", cultures);
@@ -281,12 +288,12 @@ namespace GanttComponents.Tests.Unit.Services
         public void T_ChineseCultureWithMissingKey_FallsBackToEnglish()
         {
             // Arrange
-            GanttI18N.SetCulture("zh-CN");
+            _i18nService.SetCulture("zh-CN");
             // This key only exists in English (hypothetical scenario)
             var key = "test.english-only";
 
             // Act
-            var result = GanttI18N.T(key);
+            var result = _i18nService.T(key);
 
             // Assert
             // Should fallback to key since it doesn't exist in any culture
@@ -300,18 +307,18 @@ namespace GanttComponents.Tests.Unit.Services
             var key = "grid.task-name";
 
             // Act & Assert - English
-            GanttI18N.SetCulture("en-US");
-            var englishResult = GanttI18N.T(key);
+            _i18nService.SetCulture("en-US");
+            var englishResult = _i18nService.T(key);
             Assert.Equal("Task Name", englishResult);
 
             // Act & Assert - Chinese
-            GanttI18N.SetCulture("zh-CN");
-            var chineseResult = GanttI18N.T(key);
+            _i18nService.SetCulture("zh-CN");
+            var chineseResult = _i18nService.T(key);
             Assert.Equal("任务名称", chineseResult);
 
             // Act & Assert - Back to English
-            GanttI18N.SetCulture("en-US");
-            var englishAgainResult = GanttI18N.T(key);
+            _i18nService.SetCulture("en-US");
+            var englishAgainResult = _i18nService.T(key);
             Assert.Equal("Task Name", englishAgainResult);
         }
 
@@ -319,11 +326,11 @@ namespace GanttComponents.Tests.Unit.Services
         public void T_InvalidCultureWithFallbackChain_Works()
         {
             // Arrange
-            GanttI18N.SetCulture("fr-FR"); // Unsupported culture
+            _i18nService.SetCulture("fr-FR"); // Unsupported culture
             var key = "grid.wbs";
 
             // Act
-            var result = GanttI18N.T(key);
+            var result = _i18nService.T(key);
 
             // Assert
             // Should fallback to English since fr-FR doesn't exist

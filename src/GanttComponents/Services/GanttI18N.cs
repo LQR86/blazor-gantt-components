@@ -3,21 +3,37 @@ using System.Collections.Generic;
 namespace GanttComponents.Services
 {
     /// <summary>
+    /// Internationalization service
+    /// Enables dependency injection and removes cascading parameter coupling
+    /// </summary>
+    public interface IGanttI18N
+    {
+        string CurrentCulture { get; }
+        string T(string key);
+        void SetCulture(string culture);
+        IEnumerable<string> GetAvailableCultures();
+        bool HasTranslation(string key);
+        event Action? LanguageChanged;
+    }
+
+    /// <summary>
     /// Core internationalization service for Gantt Components.
     /// Provides simple translation functionality with English/Chinese support.
+    /// Uses singleton pattern with event notification to eliminate cascading parameter coupling.
     /// </summary>
-    public static class GanttI18N
+    public class GanttI18N : IGanttI18N
     {
-        private static string _currentCulture = "en-US";
+        private string _currentCulture = "en-US";
 
         /// <summary>
-        /// Gets or sets the current culture for translations.
+        /// Event fired when language changes - allows components to react independently
         /// </summary>
-        public static string CurrentCulture
-        {
-            get => _currentCulture;
-            set => _currentCulture = value ?? "en-US";
-        }
+        public event Action? LanguageChanged;
+
+        /// <summary>
+        /// Gets the current culture for translations.
+        /// </summary>
+        public string CurrentCulture => _currentCulture;
 
         /// <summary>
         /// Translation dictionaries for supported cultures.
@@ -90,12 +106,21 @@ namespace GanttComponents.Services
         };
 
         /// <summary>
-        /// Sets the current culture for translations.
+        /// Sets the current culture for translations and notifies subscribers.
         /// </summary>
         /// <param name="culture">Culture code (e.g., "en-US", "zh-CN")</param>
-        public static void SetCulture(string culture)
+        public void SetCulture(string culture)
         {
-            CurrentCulture = culture;
+            // Handle null culture by defaulting to English
+            culture = culture ?? "en-US";
+
+            if (Translations.ContainsKey(culture) && _currentCulture != culture)
+            {
+                _currentCulture = culture;
+
+                // Notify all components that language changed
+                LanguageChanged?.Invoke();
+            }
         }
 
         /// <summary>
@@ -104,20 +129,20 @@ namespace GanttComponents.Services
         /// </summary>
         /// <param name="key">Translation key</param>
         /// <returns>Translated text or key if not found</returns>
-        public static string T(string key)
+        public string T(string key)
         {
             if (string.IsNullOrEmpty(key))
                 return key ?? string.Empty;
 
             // Try current culture
-            if (Translations.TryGetValue(CurrentCulture, out var currentDict) &&
+            if (Translations.TryGetValue(_currentCulture, out var currentDict) &&
                 currentDict.TryGetValue(key, out var currentTranslation))
             {
                 return currentTranslation;
             }
 
             // Fallback to English
-            if (CurrentCulture != "en-US" &&
+            if (_currentCulture != "en-US" &&
                 Translations.TryGetValue("en-US", out var englishDict) &&
                 englishDict.TryGetValue(key, out var englishTranslation))
             {
@@ -132,7 +157,7 @@ namespace GanttComponents.Services
         /// Gets all available cultures.
         /// </summary>
         /// <returns>List of culture codes</returns>
-        public static IEnumerable<string> GetAvailableCultures()
+        public IEnumerable<string> GetAvailableCultures()
         {
             return Translations.Keys;
         }
@@ -142,7 +167,7 @@ namespace GanttComponents.Services
         /// </summary>
         /// <param name="key">Translation key to check</param>
         /// <returns>True if key exists</returns>
-        public static bool HasTranslation(string key)
+        public bool HasTranslation(string key)
         {
             if (string.IsNullOrEmpty(key))
                 return false;

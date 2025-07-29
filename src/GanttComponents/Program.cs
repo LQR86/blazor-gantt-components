@@ -28,6 +28,9 @@ builder.Services.AddScoped<IDatabaseSeedService, DatabaseSeedService>();
 builder.Services.AddScoped<IUniversalLogger, UniversalLogger>();
 builder.Services.AddScoped<IWbsCodeGenerationService, WbsCodeGenerationService>();
 
+// Add I18N service as singleton to maintain state across components
+builder.Services.AddSingleton<IGanttI18N, GanttI18N>();
+
 var app = builder.Build();
 
 // Initialize database

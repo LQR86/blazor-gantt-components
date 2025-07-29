@@ -14,31 +14,17 @@
                 <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
             </div>
             <div class="top-row-right">
-                <LanguageSelector OnLanguageChange="HandleLanguageChange" />
+                <LanguageSelector />
             </div>
         </div>
 
         <article class="content px-4">
-            <CascadingValue Value="currentLanguage">
-                @Body
-            </CascadingValue>
+            @Body
         </article>
     </main>
 </div>
 
 @code {
-    private string currentLanguage = GanttComponents.Services.GanttI18N.CurrentCulture;
-
-    /// <summary>
-    /// Handle language change from the global LanguageSelector
-    /// This will trigger a re-render of all child components
-    /// </summary>
-    private async Task HandleLanguageChange(string newLanguage)
-    {
-        // Update the cascading value which will trigger re-render of all child components
-        currentLanguage = newLanguage;
-        
-        // Force re-render of the entire page content
-        await InvokeAsync(StateHasChanged);
-    }
+    // No more cascading parameter management needed!
+    // Each component manages its own I18N subscription via dependency injection
 }

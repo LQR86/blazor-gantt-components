@@ -346,9 +346,19 @@ public class ZoomLevelConfiguration
 ### **📐 Fixed-Width Font Timeline Headers**
 
 ```css
-/* Fixed-width font for consistent I18N header rendering */
+/* Selective font strategy - only apply monospace where actually needed */
+
+/* TaskGrid headers - Use system fonts (CSS Grid handles layout) */
+.task-grid-header .header-cell {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* TimelineView headers - ONLY these need monospace for character alignment */
 .timeline-header {
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', 'Menlo', 'Consolas', monospace;
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 0px;
@@ -368,14 +378,123 @@ public class ZoomLevelConfiguration
     font-size: 10px;
 }
 
-/* Ensure consistent character width across languages */
+/* Language-specific adjustments for Chinese characters */
+[lang="zh-CN"] .task-grid-header .header-cell {
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+[lang="zh-CN"] .timeline-header {
+    font-size: 10px;
+    line-height: 1.1;
+}
+
+/* Fixed character width constants for timeline calculations */
 .timeline-header-constants {
-    --char-width: 7px;  /* Fixed character width for calculations */
+    --char-width: 7px;  /* Fixed character width for monospace calculations */
     --min-header-space: 21px; /* 3 chars minimum (like "Jan", "Q1", "一月") */
 }
 ```
 
-## 🔧 **Component Integration Examples**
+## 🎨 **Font Strategy Rules**
+
+### **📋 When to Use Each Font Strategy**
+
+| Component Type | Font Strategy | Reason | Example |
+|---------------|---------------|---------|---------|
+| **Fixed-Width Grids** | System Fonts | CSS Grid/Flexbox handles layout | TaskGrid headers, form labels |
+| **Character-Aligned Content** | Monospace | Precise character-level alignment needed | Timeline day numbers, code display |
+| **Regular UI Text** | System Fonts | Best readability and native feel | Buttons, descriptions, tooltips |
+| **Data Tables** | System Fonts | Column widths handled by CSS | Task lists, resource tables |
+| **Time/Date Headers** | Monospace | Day/month alignment in timeline | "Jan 1", "Feb 15", "三月" |
+
+### **🎯 Decision Framework**
+
+**Use Monospace Fonts When:**
+- ✅ Character position affects visual alignment (timeline day numbers)
+- ✅ Fixed character width needed for calculations (SVG positioning)
+- ✅ Multiple rows need vertical character alignment (calendar grids)
+
+**Use System Fonts When:**
+- ✅ CSS handles the layout (Grid, Flexbox, fixed widths)
+- ✅ Readability is more important than alignment
+- ✅ Native OS appearance is desired
+- ✅ Text length varies significantly
+
+### **🌍 Language-Specific Considerations**
+
+**English Text:**
+- System fonts: Excellent readability, native feel
+- Monospace fonts: Clean alignment for technical content
+
+**Chinese Text:**
+- System fonts: Optimal Chinese character rendering
+- Monospace fonts: May look awkward but necessary for alignment
+- Font size adjustments: Slightly smaller for better fit
+```
+
+### **🔧 Component Integration Examples**
+
+### **🏗️ Critical: Component Composition with I18N**
+
+**⚠️ IMPORTANT: Cascading Parameter Propagation**
+
+When composing components that use I18N (like TaskGrid inside GanttComposer), you **must** forward the cascading language parameter:
+
+```csharp
+// GanttComposer.razor - REQUIRED for I18N support
+@code {
+    [Parameter] public List<GanttTask>? Tasks { get; set; }
+    [Parameter] public EventCallback<int> OnTaskSelected { get; set; }
+    
+    // ✅ CRITICAL: Receive cascading language parameter
+    [CascadingParameter] public string CurrentLanguage { get; set; } = "en-US";
+    
+    // Other parameters...
+}
+```
+
+```html
+<!-- ✅ CRITICAL: Wrap child components with CascadingValue -->
+<div class="composer-grid">
+    <CascadingValue Value="CurrentLanguage">
+        <TaskGrid Tasks="@Tasks" 
+                 OnTaskSelected="HandleTaskSelection" 
+                 SelectedTaskId="@SelectedTaskId" />
+    </CascadingValue>
+</div>
+```
+
+**🚨 Common Issue**: Without proper cascading, TaskGrid headers become "resizable and detached from grid body" in composed contexts because language changes aren't propagated.
+
+### **🎨 CSS Override Strategy - Lessons Learned**
+
+**❌ WRONG: Aggressive !important overrides**
+```css
+/* This breaks TaskGrid layout in GanttComposer context */
+.task-grid-header {
+    display: flex !important;           /* ❌ Overrides natural layout */
+    height: var(--header-height) !important; /* ❌ Too rigid */
+    align-items: center !important;     /* ❌ Forces flexbox */
+}
+```
+
+**✅ CORRECT: Minimal, targeted overrides**
+```css
+/* This preserves TaskGrid's natural layout */
+.task-grid-header {
+    min-height: var(--header-height);   /* ✅ Ensures minimum height */
+    /* Don't override display property - let component decide */
+}
+
+.task-grid-header .header-cell {
+    font-family: system-fonts;          /* ✅ Typography only */
+    font-size: 13px;                    /* ✅ No layout changes */
+    text-align: center;                 /* ✅ Safe styling */
+}
+```
+
+**🎯 Key Principle**: I18N CSS should only affect **typography and language-specific rendering**, never **layout structure**.
 
 ### **📊 Timeline Zoom Controls with I18N**
 
@@ -407,9 +526,10 @@ public class ZoomLevelConfiguration
 </div>
 ```
 
-### **📋 Task Grid Headers with I18N**
+### **📋 Task Grid Headers with I18N (System Fonts)**
 
 ```html
+<!-- TaskGrid uses system fonts - CSS Grid handles layout -->
 <div class="task-grid-header">
     <div class="header-cell task-name">@GanttI18N.T("grid.task-name")</div>
     <div class="header-cell duration">@GanttI18N.T("grid.duration")</div>
@@ -417,6 +537,29 @@ public class ZoomLevelConfiguration
     <div class="header-cell end-date">@GanttI18N.T("grid.end-date")</div>
     <div class="header-cell progress">@GanttI18N.T("grid.progress")</div>
     <div class="header-cell resources">@GanttI18N.T("grid.resources")</div>
+</div>
+```
+
+### **📅 Timeline Headers with I18N (Monospace Fonts)**
+
+```html
+<!-- TimelineView headers use monospace - character alignment critical -->
+<div class="timeline-top-tier">
+    @foreach (var monthHeader in GetMonthHeaders())
+    {
+        <div class="timeline-header month-header" style="width: @(monthHeader.Width)px;">
+            @DateFormatHelper.FormatDate(monthHeader.Date, "date.month-year")
+        </div>
+    }
+</div>
+
+<div class="timeline-bottom-tier">
+    @foreach (var dayHeader in GetDayHeaders())
+    {
+        <div class="timeline-header day-header" style="width: @(DayWidth)px;">
+            @DateFormatHelper.FormatDate(dayHeader.Date, "date.day-number")
+        </div>
+    }
 </div>
 ```
 
@@ -570,6 +713,115 @@ public class I18NTests
 - [ ] Date formats follow cultural conventions
 - [ ] Duration units are properly localized
 - [ ] Language switching updates all UI elements immediately
+
+---
+
+## 🎨 **Font Strategy Summary**
+
+### **📝 Quick Reference Guide**
+
+| UI Element | Font Family | Size | Reason |
+|------------|-------------|------|---------|
+| **TaskGrid Headers** | System Fonts | 13px | CSS Grid handles layout, readability priority |
+| **Timeline Headers** | Monospace | 11px | Character alignment for day/month positioning |
+| **Button Text** | System Fonts | 14px | Native OS appearance, best readability |
+| **Tooltips** | System Fonts | 12px | Readability priority |
+| **Code Display** | Monospace | 12px | Character alignment needed |
+| **Form Labels** | System Fonts | 13px | CSS handles layout |
+
+### **🎯 Implementation Checklist**
+
+- ✅ **TaskGrid**: Use system fonts - CSS Grid provides layout stability
+- ✅ **TimelineView**: Use monospace fonts - SVG positioning requires character alignment  
+- ✅ **Chinese Support**: Slightly smaller font sizes for better character fit
+- ✅ **Modern Stack**: SF Mono, Roboto Mono instead of old Courier New
+- ✅ **Selective Application**: Right tool for the right job
+
+### **⚠️ Common Mistakes to Avoid**
+
+- ❌ Don't use monospace fonts for everything "to be safe"
+- ❌ Don't use system fonts for timeline day numbers (breaks alignment)
+- ❌ Don't forget language-specific font size adjustments
+- ❌ Don't mix font strategies within the same component
+
+---
+
+## 🔧 **Troubleshooting Guide**
+
+### **🚨 Common I18N Integration Issues**
+
+#### **Issue: TaskGrid headers "resizable and detached" in GanttComposer**
+
+**Symptoms:**
+- TaskGrid works fine standalone (`/gantt-demo`)
+- TaskGrid headers broken in composed view (`/gantt-composer-demo`)
+- Headers become resizable and detach from grid body
+- Language switching doesn't work in composed context
+
+**Root Cause:**
+1. **Missing Cascading Parameter**: Child TaskGrid not receiving language updates
+2. **CSS Override Conflicts**: I18N CSS overriding component's natural layout
+
+**Solution:**
+```csharp
+// 1. Add cascading parameter to parent component
+[CascadingParameter] public string CurrentLanguage { get; set; } = "en-US";
+```
+
+```html
+<!-- 2. Wrap child components with CascadingValue -->
+<CascadingValue Value="CurrentLanguage">
+    <TaskGrid Tasks="@Tasks" ... />
+</CascadingValue>
+```
+
+```css
+/* 3. Use minimal CSS overrides - avoid !important for layout */
+.task-grid-header {
+    min-height: var(--header-height);  /* ✅ Safe constraint */
+    /* Don't override display, flex properties */
+}
+```
+
+#### **Issue: Chinese characters break timeline alignment**
+
+**Symptoms:**
+- Timeline day numbers misaligned with Chinese text
+- Header widths inconsistent between languages
+
+**Solution:**
+- Use monospace fonts ONLY for timeline headers
+- Apply system fonts for TaskGrid headers (CSS Grid handles layout)
+
+#### **Issue: Language switching doesn't update all components**
+
+**Symptoms:**
+- Some components update, others don't
+- Partial translation updates
+
+**Solution:**
+- Ensure all parent components have `[CascadingParameter] CurrentLanguage`
+- Wrap component trees with `<CascadingValue Value="CurrentLanguage">`
+- Call `StateHasChanged()` after `GanttI18N.SetCulture()`
+
+### **🎯 I18N Integration Checklist**
+
+**For Component Authors:**
+- [ ] Add `[CascadingParameter] public string CurrentLanguage { get; set; } = "en-US";`
+- [ ] Use `GanttI18N.T()` for all translatable text
+- [ ] Test component both standalone and in composed contexts
+- [ ] Verify language switching triggers re-renders
+
+**For Composition Components (like GanttComposer):**
+- [ ] Receive cascading language parameter from parent
+- [ ] Forward parameter to child components via `<CascadingValue>`
+- [ ] Test language switching in composed context specifically
+
+**For CSS Authors:**
+- [ ] Use minimal overrides - avoid `!important` for layout properties
+- [ ] Apply monospace fonts only where character alignment is critical
+- [ ] Test font strategy in both standalone and composed contexts
+- [ ] Verify no layout breakage when switching languages
 
 ---
 

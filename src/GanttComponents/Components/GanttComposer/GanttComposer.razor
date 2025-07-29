@@ -10,14 +10,16 @@
     <!-- TaskGrid at fixed position and natural width -->
     <div id="composer-grid-@ComponentId" class="composer-grid" 
          style="position: absolute; left: 0; top: 0; width: @(GridWidth)px; height: 100%;">
-        <TaskGrid Tasks="@Tasks" 
-                 OnTaskSelected="HandleTaskSelection" 
-                 SelectedTaskId="@SelectedTaskId"
-                 OnTaskHovered="HandleTaskHover"
-                 HoveredTaskId="@HoveredTaskId"
-                 RowHeight="@RowHeight"
-                 HeaderHeight="@HeaderHeight"
-                 ShowVerticalScrollbar="false" />
+        <CascadingValue Value="CurrentLanguage">
+            <TaskGrid Tasks="@Tasks" 
+                     OnTaskSelected="HandleTaskSelection" 
+                     SelectedTaskId="@SelectedTaskId"
+                     OnTaskHovered="HandleTaskHover"
+                     HoveredTaskId="@HoveredTaskId"
+                     RowHeight="@RowHeight"
+                     HeaderHeight="@HeaderHeight"
+                     ShowVerticalScrollbar="false" />
+        </CascadingValue>
     </div>
     
     <!-- Draggable splitter at TaskGrid boundary -->
@@ -45,6 +47,8 @@
     [Parameter] public int RowHeight { get; set; } = 32; // Row height for alignment consistency
     [Parameter] public int HeaderHeight { get; set; } = 56; // Total header height (should match TimelineView total)
     [Parameter] public int ContainerHeight { get; set; } = 600; // Container height (configurable)
+    
+    [CascadingParameter] public string CurrentLanguage { get; set; } = "en-US"; // Receive current language from MainLayout
     
     private int? SelectedTaskId { get; set; }
     private int? HoveredTaskId { get; set; }

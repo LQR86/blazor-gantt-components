@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@using GanttComponents.Components.LanguageSelector
 
 <PageTitle>GanttComponents</PageTitle>
 
@@ -9,11 +10,35 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            <div class="top-row-left">
+                <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            </div>
+            <div class="top-row-right">
+                <LanguageSelector OnLanguageChange="HandleLanguageChange" />
+            </div>
         </div>
 
         <article class="content px-4">
-            @Body
+            <CascadingValue Value="currentLanguage">
+                @Body
+            </CascadingValue>
         </article>
     </main>
 </div>
+
+@code {
+    private string currentLanguage = GanttComponents.Services.GanttI18N.CurrentCulture;
+
+    /// <summary>
+    /// Handle language change from the global LanguageSelector
+    /// This will trigger a re-render of all child components
+    /// </summary>
+    private async Task HandleLanguageChange(string newLanguage)
+    {
+        // Update the cascading value which will trigger re-render of all child components
+        currentLanguage = newLanguage;
+        
+        // Force re-render of the entire page content
+        await InvokeAsync(StateHasChanged);
+    }
+}

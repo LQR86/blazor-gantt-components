@@ -48,6 +48,9 @@ namespace GanttComponents.Services
                 ["common.add"] = "Add",
                 ["common.close"] = "Close",
 
+                // Language Selector
+                ["language.selector-label"] = "Language",
+
                 // Demo Page Elements
                 ["demo.load-sample-data"] = "Load Sample Data",
                 ["demo.clear-selection"] = "Clear Selection"
@@ -76,6 +79,9 @@ namespace GanttComponents.Services
                 ["common.edit"] = "编辑",
                 ["common.add"] = "添加",
                 ["common.close"] = "关闭",
+
+                // Language Selector
+                ["language.selector-label"] = "语言",
 
                 // Demo Page Elements
                 ["demo.load-sample-data"] = "加载示例数据",

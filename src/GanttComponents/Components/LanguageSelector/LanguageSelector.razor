@@ -1,0 +1,101 @@
+@using GanttComponents.Services
+@inject IJSRuntime JSRuntime
+
+<div class="language-selector">
+    <label class="selector-label">@GanttI18N.T("language.selector-label"):</label>
+    <select class="selector-dropdown" value="@CurrentLanguage" @onchange="OnLanguageChanged">
+        <option value="en-US">English</option>
+        <option value="zh-CN">中文</option>
+    </select>
+</div>
+
+@code {
+    /// <summary>
+    /// Event callback fired when language is changed
+    /// </summary>
+    [Parameter] public EventCallback<string> OnLanguageChange { get; set; }
+
+    /// <summary>
+    /// Current selected language
+    /// </summary>
+    private string CurrentLanguage => GanttI18N.CurrentCulture;
+
+    /// <summary>
+    /// Handle language change from dropdown
+    /// </summary>
+    private async Task OnLanguageChanged(ChangeEventArgs e)
+    {
+        var newLanguage = e.Value?.ToString();
+        if (!string.IsNullOrEmpty(newLanguage) && newLanguage != CurrentLanguage)
+        {
+            // Update the I18N service
+            GanttI18N.SetCulture(newLanguage);
+            
+            // Update HTML lang attribute for CSS targeting
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("eval", $"document.documentElement.lang = '{newLanguage}';");
+            }
+            catch
+            {
+                // Silently ignore if JavaScript fails
+            }
+            
+            // Notify parent components
+            await OnLanguageChange.InvokeAsync(newLanguage);
+            
+            // Force UI refresh
+            StateHasChanged();
+        }
+    }
+}
+
+<style>
+    .language-selector {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+    }
+
+    .selector-label {
+        color: #495057;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .selector-dropdown {
+        border: 1px solid #ced4da;
+        border-radius: 3px;
+        padding: 4px 8px;
+        background: white;
+        color: #495057;
+        font-size: 14px;
+        min-width: 80px;
+        cursor: pointer;
+    }
+
+    .selector-dropdown:hover {
+        border-color: #2196F3;
+    }
+
+    .selector-dropdown:focus {
+        outline: none;
+        border-color: #2196F3;
+        box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+    }
+
+    /* Responsive design */
+    @@media (max-width: 768px) {
+        .language-selector {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+    }
+</style>

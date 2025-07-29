@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Globalization;
+using System.Resources;
 
 namespace GanttComponents.Services
 {
@@ -17,13 +19,15 @@ namespace GanttComponents.Services
     }
 
     /// <summary>
-    /// Core internationalization service for Gantt Components.
-    /// Provides simple translation functionality with English/Chinese support.
-    /// Uses singleton pattern with event notification to eliminate cascading parameter coupling.
+    /// Resource-based internationalization service for Gantt Components.
+    /// Provides scalable translation functionality using .resx files.
+    /// Supports English/Chinese with easy extensibility for additional languages.
     /// </summary>
     public class GanttI18N : IGanttI18N
     {
         private string _currentCulture = "en-US";
+        private readonly ResourceManager _resourceManager;
+        private readonly string[] _supportedCultures = { "en-US", "zh-CN" };
 
         /// <summary>
         /// Event fired when language changes - allows components to react independently
@@ -35,75 +39,12 @@ namespace GanttComponents.Services
         /// </summary>
         public string CurrentCulture => _currentCulture;
 
-        /// <summary>
-        /// Translation dictionaries for supported cultures.
-        /// </summary>
-        private static readonly Dictionary<string, Dictionary<string, string>> Translations = new()
+        public GanttI18N()
         {
-            ["en-US"] = new()
-            {
-                // TaskGrid Headers
-                ["grid.wbs"] = "WBS",
-                ["grid.task-name"] = "Task Name",
-                ["grid.start-date"] = "Start Date",
-                ["grid.end-date"] = "End Date",
-                ["grid.duration"] = "Duration",
-                ["grid.progress"] = "Progress",
-                ["grid.resources"] = "Resources",
-
-                // Date Formats
-                ["date.short-format"] = "MM/dd/yyyy",
-                ["date.month-year"] = "MMM yyyy",
-                ["date.day-number"] = "d",
-
-                // Common UI Elements
-                ["common.save"] = "Save",
-                ["common.cancel"] = "Cancel",
-                ["common.delete"] = "Delete",
-                ["common.edit"] = "Edit",
-                ["common.add"] = "Add",
-                ["common.close"] = "Close",
-
-                // Language Selector
-                ["language.selector-label"] = "Language",
-
-                // Demo Page Elements
-                ["demo.load-sample-data"] = "Load Sample Data",
-                ["demo.clear-selection"] = "Clear Selection"
-            },
-
-            ["zh-CN"] = new()
-            {
-                // TaskGrid Headers
-                ["grid.wbs"] = "工作分解",
-                ["grid.task-name"] = "任务名称",
-                ["grid.start-date"] = "开始日期",
-                ["grid.end-date"] = "结束日期",
-                ["grid.duration"] = "持续时间",
-                ["grid.progress"] = "进度",
-                ["grid.resources"] = "资源",
-
-                // Date Formats
-                ["date.short-format"] = "yyyy年MM月dd日",
-                ["date.month-year"] = "yyyy年MM月",
-                ["date.day-number"] = "d日",
-
-                // Common UI Elements
-                ["common.save"] = "保存",
-                ["common.cancel"] = "取消",
-                ["common.delete"] = "删除",
-                ["common.edit"] = "编辑",
-                ["common.add"] = "添加",
-                ["common.close"] = "关闭",
-
-                // Language Selector
-                ["language.selector-label"] = "语言",
-
-                // Demo Page Elements
-                ["demo.load-sample-data"] = "加载示例数据",
-                ["demo.clear-selection"] = "清除选择"
-            }
-        };
+            // Initialize ResourceManager pointing to the default resource file
+            _resourceManager = new ResourceManager("GanttComponents.Resources.GanttResources",
+                typeof(GanttI18N).Assembly);
+        }
 
         /// <summary>
         /// Sets the current culture for translations and notifies subscribers.
@@ -114,7 +55,7 @@ namespace GanttComponents.Services
             // Handle null culture by defaulting to English
             culture = culture ?? "en-US";
 
-            if (Translations.ContainsKey(culture) && _currentCulture != culture)
+            if (_supportedCultures.Contains(culture) && _currentCulture != culture)
             {
                 _currentCulture = culture;
 
@@ -124,7 +65,7 @@ namespace GanttComponents.Services
         }
 
         /// <summary>
-        /// Translates a key to the current culture.
+        /// Translates a key to the current culture using resource files.
         /// Implements fallback chain: Current Culture → English → Key
         /// </summary>
         /// <param name="key">Translation key</param>
@@ -134,23 +75,33 @@ namespace GanttComponents.Services
             if (string.IsNullOrEmpty(key))
                 return key ?? string.Empty;
 
-            // Try current culture
-            if (Translations.TryGetValue(_currentCulture, out var currentDict) &&
-                currentDict.TryGetValue(key, out var currentTranslation))
+            try
             {
-                return currentTranslation;
-            }
+                // Create CultureInfo for the current culture
+                var cultureInfo = new CultureInfo(_currentCulture);
 
-            // Fallback to English
-            if (_currentCulture != "en-US" &&
-                Translations.TryGetValue("en-US", out var englishDict) &&
-                englishDict.TryGetValue(key, out var englishTranslation))
+                // Try to get the resource for the current culture
+                var translation = _resourceManager.GetString(key, cultureInfo);
+
+                if (!string.IsNullOrEmpty(translation))
+                    return translation;
+
+                // Fallback to English if current culture is not English
+                if (_currentCulture != "en-US")
+                {
+                    var englishTranslation = _resourceManager.GetString(key, new CultureInfo("en-US"));
+                    if (!string.IsNullOrEmpty(englishTranslation))
+                        return englishTranslation;
+                }
+
+                // Fallback to key itself if no translation found
+                return key;
+            }
+            catch (Exception)
             {
-                return englishTranslation;
+                // If any error occurs, return the key as fallback
+                return key;
             }
-
-            // Fallback to key itself
-            return key;
         }
 
         /// <summary>
@@ -159,7 +110,7 @@ namespace GanttComponents.Services
         /// <returns>List of culture codes</returns>
         public IEnumerable<string> GetAvailableCultures()
         {
-            return Translations.Keys;
+            return _supportedCultures;
         }
 
         /// <summary>
@@ -172,13 +123,16 @@ namespace GanttComponents.Services
             if (string.IsNullOrEmpty(key))
                 return false;
 
-            foreach (var culture in Translations.Values)
+            try
             {
-                if (culture.ContainsKey(key))
-                    return true;
+                // Check if the key exists in the default (English) resource file
+                var translation = _resourceManager.GetString(key, new CultureInfo("en-US"));
+                return !string.IsNullOrEmpty(translation);
             }
-
-            return false;
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

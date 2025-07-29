@@ -3,15 +3,16 @@
 @using GanttComponents.Components.TimelineView
 @using GanttComponents.Services
 @inject IGanttTaskService TaskService
+@inject IGanttI18N I18N
 
-<PageTitle>TimelineView Demo</PageTitle>
+<PageTitle>@I18N.T("page.title.timeline-demo")</PageTitle>
 
-<h1>TimelineView Component - Standalone Demo</h1>
+<h1>@I18N.T("demo.timeline.title")</h1>
 
 <div class="demo-container">
     <div class="demo-section">
-        <h3>Independent TimelineView Component (Milestone 1.2)</h3>
-        <p>Testing TimelineView as a standalone component with its own API and data handling.</p>
+        <h3>@I18N.T("demo.timeline.section")</h3>
+        <p>@I18N.T("demo.timeline.description")</p>
         
         <div class="timeline-container">
             <TimelineView Tasks="@SampleTasks" 
@@ -23,14 +24,14 @@
     @if (SelectedTaskInfo != null)
     {
         <div class="demo-section">
-            <h4>Selected Task Information</h4>
+            <h4>@I18N.T("demo.selected-task")</h4>
             <div class="task-info">
-                <p><strong>WBS Code:</strong> @SelectedTaskInfo.WbsCode</p>
-                <p><strong>Name:</strong> @SelectedTaskInfo.Name</p>
-                <p><strong>Start Date:</strong> @SelectedTaskInfo.StartDate.ToString("MM/dd/yyyy")</p>
-                <p><strong>End Date:</strong> @SelectedTaskInfo.EndDate.ToString("MM/dd/yyyy")</p>
-                <p><strong>Duration:</strong> @SelectedTaskInfo.Duration</p>
-                <p><strong>Progress:</strong> @SelectedTaskInfo.Progress%</p>
+                <p><strong>@I18N.T("task.wbs-code"):</strong> @SelectedTaskInfo.WbsCode</p>
+                <p><strong>@I18N.T("task.name"):</strong> @SelectedTaskInfo.Name</p>
+                <p><strong>@I18N.T("task.start-date"):</strong> @SelectedTaskInfo.StartDate.ToString("MM/dd/yyyy")</p>
+                <p><strong>@I18N.T("task.end-date"):</strong> @SelectedTaskInfo.EndDate.ToString("MM/dd/yyyy")</p>
+                <p><strong>@I18N.T("task.duration"):</strong> @SelectedTaskInfo.Duration</p>
+                <p><strong>@I18N.T("task.progress"):</strong> @SelectedTaskInfo.Progress%</p>
             </div>
         </div>
     }

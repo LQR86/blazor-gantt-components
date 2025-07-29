@@ -42,7 +42,7 @@ namespace GanttComponents.Tests.Unit.Services
             var testDate = new DateTime(2025, 7, 29);
             var customKey = "date.month-year";
             var expectedPattern = "MMM yyyy";
-            
+
             _mockI18N.Setup(x => x.T(customKey)).Returns(expectedPattern);
 
             // Act - Use invariant culture to ensure consistent test results

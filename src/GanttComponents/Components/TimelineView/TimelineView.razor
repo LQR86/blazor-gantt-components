@@ -1,6 +1,9 @@
 @using GanttComponents.Models
 @using GanttComponents.Services
 @inject IUniversalLogger Logger
+@inject IGanttI18N I18N
+@inject DateFormatHelper DateFormatter
+@implements IDisposable
 
 <div class="timeline-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
     <div class="timeline-scroll-container" @onscroll="OnScroll">
@@ -10,7 +13,7 @@
                 {
                     var monthWidth = GetMonthWidth(month);
                     <div class="timeline-month" style="width: @(monthWidth)px;">
-                        @month.ToString("MMM yyyy")
+                        @DateFormatter.FormatTimelineMonth(month)
                     </div>
                 }
             </div>
@@ -99,6 +102,10 @@
     protected override void OnInitialized()
     {
         Logger.LogComponentLifecycle("TimelineView", "OnInitialized", new { TaskCount = Tasks?.Count ?? 0 });
+        
+        // Subscribe to language changes
+        I18N.LanguageChanged += OnLanguageChanged;
+        
         CalculateTimelineRange();
     }
 
@@ -174,6 +181,19 @@
             await OnScrollChanged.InvokeAsync(e);
         }
     }
+
+    private void OnLanguageChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        if (I18N != null)
+        {
+            I18N.LanguageChanged -= OnLanguageChanged;
+        }
+    }
 }
 
 <style>
@@ -211,6 +231,7 @@
         align-items: center;
         justify-content: center;
         font-weight: 500;
+        font-family: var(--gantt-monospace-font, 'Consolas', 'Monaco', 'Courier New', monospace);
         border-right: 1px solid var(--gantt-outline, #e0e0e0);
         background: var(--gantt-surface-variant, #f5f5f5);
         box-sizing: border-box;

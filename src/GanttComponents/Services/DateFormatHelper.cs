@@ -26,8 +26,9 @@ public class DateFormatHelper
         // Get the format pattern from I18N translations
         var pattern = _i18n.T(formatKey);
 
-        // Use the pattern to format the date with current culture
-        return date.ToString(pattern, CultureInfo.CurrentCulture);
+        // Use the correct culture matching the I18N setting instead of system culture
+        var culture = GetCultureInfo(_i18n.CurrentCulture);
+        return date.ToString(pattern, culture);
     }
 
     /// <summary>
@@ -71,5 +72,20 @@ public class DateFormatHelper
     public string FormatTimelineDay(DateTime date)
     {
         return FormatDate(date, "date.day-number");
+    }
+
+    /// <summary>
+    /// Get CultureInfo from I18N culture string.
+    /// </summary>
+    /// <param name="cultureString">Culture string from I18N service (e.g., "en-US", "zh-CN")</param>
+    /// <returns>Corresponding CultureInfo object</returns>
+    private CultureInfo GetCultureInfo(string cultureString)
+    {
+        return cultureString switch
+        {
+            "zh-CN" => new CultureInfo("zh-CN"),
+            "en-US" => new CultureInfo("en-US"),
+            _ => CultureInfo.InvariantCulture
+        };
     }
 }

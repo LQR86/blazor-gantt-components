@@ -3,6 +3,7 @@
 @inject GanttRowAlignmentService RowAlignmentService
 @inject IUniversalLogger Logger
 @inject IGanttI18N I18N
+@inject DateFormatHelper DateFormatter
 @implements IDisposable
 
 <div class="task-grid-container" style="--row-height: @(RowHeight)px; --header-height: @(HeaderHeight)px;">
@@ -56,11 +57,11 @@
                     </div>
                     
                     <div class="grid-cell" style="width: 120px;">
-                        @task.StartDate.ToString("MM/dd/yyyy")
+                        @DateFormatter.FormatDate(task.StartDate)
                     </div>
                     
                     <div class="grid-cell" style="width: 120px;">
-                        @task.EndDate.ToString("MM/dd/yyyy")
+                        @DateFormatter.FormatDate(task.EndDate)
                     </div>
                     
                     <div class="grid-cell" style="width: 100px;">

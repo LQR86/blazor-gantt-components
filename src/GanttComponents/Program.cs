@@ -31,6 +31,9 @@ builder.Services.AddScoped<IWbsCodeGenerationService, WbsCodeGenerationService>(
 // Add I18N service as singleton to maintain state across components
 builder.Services.AddSingleton<IGanttI18N, GanttI18N>();
 
+// Add DateFormatHelper as scoped service
+builder.Services.AddScoped<DateFormatHelper>();
+
 var app = builder.Build();
 
 // Initialize database

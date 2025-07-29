@@ -51,6 +51,35 @@ namespace GanttComponents.Services
                 // Demo Page Elements
                 ["demo.load-sample-data"] = "Load Sample Data",
                 ["demo.clear-selection"] = "Clear Selection"
+            },
+
+            ["zh-CN"] = new()
+            {
+                // TaskGrid Headers
+                ["grid.wbs"] = "工作分解",
+                ["grid.task-name"] = "任务名称",
+                ["grid.start-date"] = "开始日期",
+                ["grid.end-date"] = "结束日期",
+                ["grid.duration"] = "持续时间",
+                ["grid.progress"] = "进度",
+                ["grid.resources"] = "资源",
+
+                // Date Formats
+                ["date.short-format"] = "yyyy年MM月dd日",
+                ["date.month-year"] = "yyyy年MM月",
+                ["date.day-number"] = "d日",
+
+                // Common UI Elements
+                ["common.save"] = "保存",
+                ["common.cancel"] = "取消",
+                ["common.delete"] = "删除",
+                ["common.edit"] = "编辑",
+                ["common.add"] = "添加",
+                ["common.close"] = "关闭",
+
+                // Demo Page Elements
+                ["demo.load-sample-data"] = "加载示例数据",
+                ["demo.clear-selection"] = "清除选择"
             }
         };
 

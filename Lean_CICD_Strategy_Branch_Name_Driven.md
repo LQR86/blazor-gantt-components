@@ -1,8 +1,71 @@
-# Branch Name Driven CI/CD Strategy
+# Lean CI/CD Strategy - Branch Name Driven
+
+> **🎯 Core Philosophy: Continuous Integration with Small, Independent Features**
+> 
+> This strategy implements **Lean/Agile development principles**:
+> - ✅ **Small, Independent Features** - Each branch is a focused, testable unit
+> - ✅ **Frequent Integration** - Daily merges to main branch (no long-lived branches)
+> - ✅ **Fast Feedback** - Automated validation within minutes of push
+> - ✅ **Minimal Batch Size** - Single feature per branch, single commit per milestone
+> - ✅ **Risk Reduction** - Small changes = easier debugging, testing, and rollback
+> 
+> **Result**: Professional development velocity with enterprise-grade quality gates
 
 ## 🎯 Overview
 
 Our CI/CD system is built on a **Branch Name Driven** architecture where the branch name is the single source of truth that determines all automation behavior. This approach combines three key architectural features to create an efficient, convention-driven system.
+
+## 🔄 **Current DevOps Workflow**
+
+Our development process follows a **requirements-driven, design-first** approach with small, independent feature iterations:
+
+### **📋 Phase 1: Strategic Planning**
+```
+REQUIREMENTS.md → Features_Planning.md → Design Documentation
+     ↓                    ↓                      ↓
+[Immutable user needs] [Strategic roadmap] [Technical designs]
+```
+
+1. **REQUIREMENTS.md** - Immutable user value contract (never changes during development)
+2. **Features_Planning.md** - Strategic feature roadmap with requirements mapping
+3. **docs/** folder - Detailed technical designs and architecture decisions
+
+### **⚡ Phase 2: Tactical Implementation**
+```
+TEMP_FILES/temp-short-term-plan.md → feat/v{version}-{feature} → PR → Merge → Repeat
+           ↓                              ↓                    ↓     ↓
+    [Daily milestones]           [Small feature branch]    [Review] [Integration]
+```
+
+4. **TEMP_FILES/temp-short-term-plan.md** - Break features into small, independent daily tasks
+5. **Feature branch creation** - Single-day scope following branch naming conventions
+6. **PR creation and review** - Automated validation and manual review
+7. **Merge to main** - Automatic tagging/releases for version-tagged features
+8. **Next iteration** - Immediately start next small feature
+
+### **🎯 Key Workflow Principles**
+- ✅ **Requirements stability** - REQUIREMENTS.md never changes during development
+- ✅ **Strategic planning** - Features_Planning.md provides roadmap and requirements mapping
+- ✅ **Design-first** - Technical designs in docs/ before implementation
+- ✅ **Small iterations** - Daily features planned in temp-short-term-plan.md
+- ✅ **Fast feedback** - PR/merge cycles complete within hours, not days
+- ✅ **Continuous integration** - No long-lived feature branches
+
+### **📁 File Organization**
+```
+Root/
+├── REQUIREMENTS.md              # Immutable user needs (stakeholder contract)
+├── Features_Planning.md         # Strategic roadmap (requirements → features)
+├── docs/                        # Technical designs & architecture
+│   ├── architecture/
+│   ├── ci-cd/
+│   └── testing/
+├── TEMP_FILES/                  # Temporary workspace (not tracked by git)
+│   ├── temp-short-term-plan.md  # Daily milestone planning
+│   ├── *.json, *.csv           # Temporary data files
+│   └── *.py, *.md              # Scripts, notes, experiments
+└── src/                         # Source code implementation
+```
 
 ## 🏗️ Three Core Architectural Features
 
@@ -92,32 +155,83 @@ perf/{description}          # Performance optimizations
 
 ## 🚀 Developer Workflow
 
-### **Starting a Feature (Version-Tagged)**
-```bash
-# 1. Create branch with version and feature name
-git checkout -b feat/v0.5.0-task-centering
+### **Complete Development Cycle**
 
-# 2. Implement feature
+#### **📋 1. Strategic Planning Phase**
+```bash
+# Review strategic documents
+cat REQUIREMENTS.md              # Understand user needs
+cat Features_Planning.md         # Check feature roadmap
+ls docs/                         # Review technical designs
+```
+
+#### **⚡ 2. Daily Planning Phase**
+```bash
+# Plan small, independent features
+vim TEMP_FILES/temp-short-term-plan.md    # Break down next feature
+# - Define single-day scope
+# - Identify dependencies
+# - Set clear success criteria
+```
+
+#### **🔧 3. Implementation Phase**
+```bash
+# Create feature branch with proper naming
+git checkout -b feat/v0.5.0-i18n-foundation
+
+# Implement single feature (max 1 day scope)
 # ... write code ...
 
-# 3. Create PR with version tag in title (simplified format)
+# Validate locally before PR
+dotnet build && dotnet test
+dotnet format --verify-no-changes
+```
+
+#### **🔄 4. Integration Phase**
+```bash
+# Create PR with conventional commit format
+# Title: "feat: Add I18N foundation service (v0.5.0)"
+
+# PR gets automatic validation:
+# - Build and test
+# - Code formatting check
+# - Branch naming validation
+
+# After merge → Automatic tag and release (for versioned features)
+```
+
+### **Starting a Feature (Version-Tagged)**
+```bash
+# 1. Plan in temp-short-term-plan.md first
+echo "feat/v0.5.0-task-centering - Add horizontal task bar centering" >> TEMP_FILES/temp-short-term-plan.md
+
+# 2. Create branch with version and feature name
+git checkout -b feat/v0.5.0-task-centering
+
+# 3. Implement feature (single-day scope)
+# ... write code ...
+
+# 4. Create PR with version tag in title
 # Title: "feat: Add horizontal task bar centering (v0.5.0)"
 
-# 4. Merge → Automatic tag and release creation
+# 5. Merge → Automatic tag and release creation
 ```
 
 ### **Starting a Fix/Improvement (Non-Versioned)**
 ```bash
-# 1. Create branch following convention
+# 1. Plan in temp-short-term-plan.md if needed
+echo "fix/timeline-scrolling-bug - Fix timeline scroll synchronization" >> TEMP_FILES/temp-short-term-plan.md
+
+# 2. Create branch following convention
 git checkout -b fix/timeline-scrolling-bug
 
-# 2. Fix the issue
+# 3. Fix the issue
 # ... write fix ...
 
-# 3. Create PR with conventional title
+# 4. Create PR with conventional title
 # Title: "fix: resolve timeline scrolling issue"
 
-# 4. Merge → No version tag (included in next feature release)
+# 5. Merge → No version tag (included in next feature release)
 ```
 
 ### **Local Development Tasks**

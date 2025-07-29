@@ -59,6 +59,13 @@ BlazorGantt.sln                           # Main solution file
 ├── .vscode/                               # VS Code configuration
 │   ├── tasks.json                         # Build/run tasks
 │   └── launch.json                        # Debug configuration
+├── TEMP_FILES/                            # ⚠️ Temporary files (not tracked by git)
+│   ├── temp-short-term-plan.md            # Short-term milestone planning
+│   ├── *.json                             # Temporary JSON data files
+│   ├── *.csv                              # Temporary CSV exports/imports
+│   ├── *.py                               # Temporary scripts for data processing
+│   ├── *.md                               # Temporary documentation/notes
+│   └── [any temporary files]              # Working files, experiments, drafts
 └── Documentation files...                 # Requirements, workflow docs
 ```
 
@@ -85,6 +92,33 @@ BlazorGantt.sln                           # Main solution file
 - ✅ **`dotnet test`** - Runs all tests (currently 10 passing)
 - ✅ **`dotnet run --project src/GanttComponents/`** - Runs application
 - ✅ **Application runs** at https://localhost:7138
+- ✅ **TEMP_FILES/** - Organized temporary workspace
+
+### **⚠️ TEMP_FILES/ Folder Usage**
+The `TEMP_FILES/` folder serves as a **temporary workspace** for development:
+
+**Purpose**: 
+- ✅ **Temporary planning** - Short-term milestone documents, feature sketches
+- ✅ **Data experiments** - JSON/CSV files for testing, sample data
+- ✅ **Scripts & utilities** - Python scripts, data processing tools
+- ✅ **Working drafts** - Notes, experimental documentation
+- ✅ **Development artifacts** - Build outputs, temporary configs
+
+**Git Strategy**:
+- ⚠️ **Not tracked by git** - Files here are local-only working files
+- ⚠️ **Add to .gitignore** - Prevent accidental commits of temporary files
+- ⚠️ **Clean regularly** - Remove obsolete files to keep workspace organized
+
+**Examples of TEMP_FILES/ usage**:
+```
+TEMP_FILES/
+├── temp-short-term-plan.md     # Current sprint planning
+├── sample-tasks.json           # Test data for components
+├── fix_end_dates.py           # Data cleanup script
+├── feature-progress-notes.md   # Development notes
+├── exported-data.csv          # Data analysis exports
+└── experiment-results.md      # Technical experiment outcomes
+```
 
 ## 🚀 **Commands for Development**
 

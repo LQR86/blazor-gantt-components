@@ -1,7 +1,11 @@
 ﻿@page "/"
+@using GanttComponents.Services
+@inject IGanttI18N I18N
 
-<h1>Welcome to Custom Gantt Components!</h1>
+<PageTitle>@I18N.T("page.title.home")</PageTitle>
 
-<p>This is a custom Blazor Server application demonstrating our own Gantt chart components.</p>
+<h1>@I18N.T("home.welcome")</h1>
 
-<p><a href="/gantt-demo">Try the Gantt Demo</a></p>
+<p>@I18N.T("home.description")</p>
+
+<p><a href="/gantt-demo">@I18N.T("home.try-demo")</a></p>

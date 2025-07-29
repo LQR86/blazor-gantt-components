@@ -1,4 +1,8 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using GanttComponents.Services
+@inject IGanttI18N I18N
+@implements IDisposable
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">GanttComponents</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -11,42 +15,42 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+                <span class="oi oi-home" aria-hidden="true"></span> @I18N.T("nav.home")
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="gantt-demo">
-                <span class="oi oi-spreadsheet" aria-hidden="true"></span> Gantt Demo
+                <span class="oi oi-spreadsheet" aria-hidden="true"></span> @I18N.T("nav.gantt-demo")
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="timeline-demo">
-                <span class="oi oi-calendar" aria-hidden="true"></span> Timeline Demo
+                <span class="oi oi-calendar" aria-hidden="true"></span> @I18N.T("nav.timeline-demo")
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="gantt-composer-demo">
-                <span class="oi oi-resize-both" aria-hidden="true"></span> GanttComposer Demo
+                <span class="oi oi-resize-both" aria-hidden="true"></span> @I18N.T("nav.gantt-composer-demo")
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="wbs-demo">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> WBS Demo
+                <span class="oi oi-list-rich" aria-hidden="true"></span> @I18N.T("nav.wbs-demo")
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="logger-demo">
-                <span class="oi oi-terminal" aria-hidden="true"></span> Logger Demo
+                <span class="oi oi-terminal" aria-hidden="true"></span> @I18N.T("nav.logger-demo")
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+                <span class="oi oi-plus" aria-hidden="true"></span> @I18N.T("nav.counter")
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+                <span class="oi oi-list-rich" aria-hidden="true"></span> @I18N.T("nav.fetch-data")
             </NavLink>
         </div>
     </nav>
@@ -57,8 +61,27 @@
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
+    protected override void OnInitialized()
+    {
+        // Subscribe to language changes
+        I18N.LanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    public void Dispose()
+    {
+        if (I18N != null)
+        {
+            I18N.LanguageChanged -= OnLanguageChanged;
+        }
     }
 }

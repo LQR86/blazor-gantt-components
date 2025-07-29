@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <!-- TaskGrid Headers -->
+  <data name="grid.wbs" xml:space="preserve">
+    <value>工作分解</value>
+  </data>
+  <data name="grid.task-name" xml:space="preserve">
+    <value>任务名称</value>
+  </data>
+  <data name="grid.start-date" xml:space="preserve">
+    <value>开始日期</value>
+  </data>
+  <data name="grid.end-date" xml:space="preserve">
+    <value>结束日期</value>
+  </data>
+  <data name="grid.duration" xml:space="preserve">
+    <value>持续时间</value>
+  </data>
+  <data name="grid.progress" xml:space="preserve">
+    <value>进度</value>
+  </data>
+  <data name="grid.resources" xml:space="preserve">
+    <value>资源</value>
+  </data>
+
+  <!-- Date Formats -->
+  <data name="date.short-format" xml:space="preserve">
+    <value>yyyy年MM月dd日</value>
+  </data>
+  <data name="date.month-year" xml:space="preserve">
+    <value>yyyy年MM月</value>
+  </data>
+  <data name="date.day-number" xml:space="preserve">
+    <value>d日</value>
+  </data>
+
+  <!-- Common UI Elements -->
+  <data name="common.save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="common.cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="common.delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="common.edit" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="common.add" xml:space="preserve">
+    <value>添加</value>
+  </data>
+  <data name="common.close" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+
+  <!-- Language Selector -->
+  <data name="language.selector-label" xml:space="preserve">
+    <value>语言</value>
+  </data>
+
+  <!-- Demo Page Elements -->
+  <data name="demo.load-sample-data" xml:space="preserve">
+    <value>加载示例数据</value>
+  </data>
+  <data name="demo.clear-selection" xml:space="preserve">
+    <value>清除选择</value>
+  </data>
+  <data name="demo.show-alignment" xml:space="preserve">
+    <value>显示行对齐</value>
+  </data>
+  <data name="demo.hide-alignment" xml:space="preserve">
+    <value>隐藏行对齐</value>
+  </data>
+  <data name="demo.selected-task" xml:space="preserve">
+    <value>已选任务信息</value>
+  </data>
+  <data name="demo.no-tasks-loaded" xml:space="preserve">
+    <value>未加载任务。点击"加载示例数据"查看GanttComposer演示。</value>
+  </data>
+
+  <!-- Navigation Menu -->
+  <data name="nav.home" xml:space="preserve">
+    <value>首页</value>
+  </data>
+  <data name="nav.gantt-demo" xml:space="preserve">
+    <value>甘特图演示</value>
+  </data>
+  <data name="nav.timeline-demo" xml:space="preserve">
+    <value>时间线演示</value>
+  </data>
+  <data name="nav.gantt-composer-demo" xml:space="preserve">
+    <value>甘特图组合演示</value>
+  </data>
+  <data name="nav.wbs-demo" xml:space="preserve">
+    <value>工作分解结构演示</value>
+  </data>
+  <data name="nav.logger-demo" xml:space="preserve">
+    <value>日志演示</value>
+  </data>
+  <data name="nav.counter" xml:space="preserve">
+    <value>计数器</value>
+  </data>
+  <data name="nav.fetch-data" xml:space="preserve">
+    <value>获取数据</value>
+  </data>
+
+  <!-- Page Titles -->
+  <data name="page.title.home" xml:space="preserve">
+    <value>自定义甘特图组件</value>
+  </data>
+  <data name="page.title.gantt-demo" xml:space="preserve">
+    <value>甘特图演示</value>
+  </data>
+  <data name="page.title.timeline-demo" xml:space="preserve">
+    <value>时间线视图演示</value>
+  </data>
+  <data name="page.title.gantt-composer-demo" xml:space="preserve">
+    <value>甘特图组合演示</value>
+  </data>
+  <data name="page.title.wbs-demo" xml:space="preserve">
+    <value>工作分解结构生成演示</value>
+  </data>
+  <data name="page.title.logger-demo" xml:space="preserve">
+    <value>日志演示</value>
+  </data>
+
+  <!-- Home Page -->
+  <data name="home.welcome" xml:space="preserve">
+    <value>欢迎使用自定义甘特图组件！</value>
+  </data>
+  <data name="home.description" xml:space="preserve">
+    <value>这是一个自定义的Blazor服务器应用程序，演示我们自己的甘特图组件。</value>
+  </data>
+  <data name="home.try-demo" xml:space="preserve">
+    <value>尝试甘特图演示</value>
+  </data>
+
+  <!-- Demo Page Headers -->
+  <data name="demo.gantt.title" xml:space="preserve">
+    <value>自定义甘特图UI组件演示</value>
+  </data>
+  <data name="demo.gantt.taskgrid-section" xml:space="preserve">
+    <value>任务网格组件（第一阶段）</value>
+  </data>
+  <data name="demo.gantt.taskgrid-description" xml:space="preserve">
+    <value>具有分层树结构、展开/折叠和选择功能的独立任务网格。</value>
+  </data>
+  <data name="demo.timeline.title" xml:space="preserve">
+    <value>时间线视图组件 - 独立演示</value>
+  </data>
+  <data name="demo.timeline.section" xml:space="preserve">
+    <value>独立时间线视图组件（里程碑1.2）</value>
+  </data>
+  <data name="demo.timeline.description" xml:space="preserve">
+    <value>测试时间线视图作为具有自己API和数据处理功能的独立组件。</value>
+  </data>
+  <data name="demo.composer.title" xml:space="preserve">
+    <value>甘特图组合集成演示</value>
+  </data>
+  <data name="demo.composer.description" xml:space="preserve">
+    <value>此页面演示了集成任务网格和时间线视图的甘特图组合组件。</value>
+  </data>
+  <data name="demo.composer.integration-features" xml:space="preserve">
+    <value>集成功能：</value>
+  </data>
+
+  <!-- Task Information Labels -->
+  <data name="task.id" xml:space="preserve">
+    <value>编号</value>
+  </data>
+  <data name="task.wbs-code" xml:space="preserve">
+    <value>工作分解代码</value>
+  </data>
+  <data name="task.name" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="task.start-date" xml:space="preserve">
+    <value>开始日期</value>
+  </data>
+  <data name="task.end-date" xml:space="preserve">
+    <value>结束日期</value>
+  </data>
+  <data name="task.duration" xml:space="preserve">
+    <value>持续时间</value>
+  </data>
+  <data name="task.progress" xml:space="preserve">
+    <value>进度</value>
+  </data>
+</root>

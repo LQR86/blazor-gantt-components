@@ -2,16 +2,19 @@
 @using GanttComponents.Services
 @inject GanttRowAlignmentService RowAlignmentService
 @inject IUniversalLogger Logger
+@inject IGanttI18N I18N
+@inject DateFormatHelper DateFormatter
+@implements IDisposable
 
 <div class="task-grid-container" style="--row-height: @(RowHeight)px; --header-height: @(HeaderHeight)px;">
     <div class="task-grid-header">
-        <div class="header-cell" style="width: 80px;">WBS</div>
-        <div class="header-cell" style="width: 200px;">Task Name</div>
-        <div class="header-cell" style="width: 120px;">Start Date</div>
-        <div class="header-cell" style="width: 120px;">End Date</div>
-        <div class="header-cell" style="width: 100px;">Duration</div>
-        <div class="header-cell" style="width: 80px;">Progress</div>
-        <div class="header-cell" style="width: 150px;">Resources</div>
+        <div class="header-cell" style="width: 80px;">@I18N.T("grid.wbs")</div>
+        <div class="header-cell" style="width: 200px;">@I18N.T("grid.task-name")</div>
+        <div class="header-cell" style="width: 120px;">@I18N.T("grid.start-date")</div>
+        <div class="header-cell" style="width: 120px;">@I18N.T("grid.end-date")</div>
+        <div class="header-cell" style="width: 100px;">@I18N.T("grid.duration")</div>
+        <div class="header-cell" style="width: 80px;">@I18N.T("grid.progress")</div>
+        <div class="header-cell" style="width: 150px;">@I18N.T("grid.resources")</div>
     </div>
     
     <div class="task-grid-body @(!ShowVerticalScrollbar ? "hide-scrollbar" : "")" @onscroll="OnScroll">
@@ -54,11 +57,11 @@
                     </div>
                     
                     <div class="grid-cell" style="width: 120px;">
-                        @task.StartDate.ToString("MM/dd/yyyy")
+                        @DateFormatter.FormatDate(task.StartDate)
                     </div>
                     
                     <div class="grid-cell" style="width: 120px;">
-                        @task.EndDate.ToString("MM/dd/yyyy")
+                        @DateFormatter.FormatDate(task.EndDate)
                     </div>
                     
                     <div class="grid-cell" style="width: 100px;">
@@ -98,6 +101,9 @@
     {
         Logger.LogComponentLifecycle("TaskGrid", "OnInitialized", new { TaskCount = Tasks?.Count ?? 0 });
         
+        // Subscribe to language changes
+        I18N.LanguageChanged += OnLanguageChanged;
+        
         // Initialize expanded state for all parent tasks
         if (Tasks != null)
         {
@@ -111,6 +117,18 @@
                 AllExpanded = true 
             });
         }
+    }
+
+    private void OnLanguageChanged()
+    {
+        // Force re-render when language changes
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        // Unsubscribe from language changes
+        I18N.LanguageChanged -= OnLanguageChanged;
     }
 
     protected override void OnParametersSet()

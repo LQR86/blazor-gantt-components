@@ -9,6 +9,7 @@
 				"build"
 			],
 			"group": "build",
+			"dependsOn": "Format and Verify (CI Check)",
 			"problemMatcher": [
 				"$msCompile"
 			]
@@ -23,6 +24,7 @@
 				"src/GanttComponents/"
 			],
 			"group": "build",
+			"dependsOn": "Build",
 			"isBackground": true,
 			"problemMatcher": []
 		},
@@ -57,6 +59,7 @@
 				"diagnostic"
 			],
 			"group": "test",
+			"dependsOn": "Format Code (Pre-commit)",
 			"presentation": {
 				"echo": true,
 				"reveal": "always",

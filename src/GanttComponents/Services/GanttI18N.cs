@@ -9,7 +9,7 @@ namespace GanttComponents.Services
     public static class GanttI18N
     {
         private static string _currentCulture = "en-US";
-        
+
         /// <summary>
         /// Gets or sets the current culture for translations.
         /// </summary>
@@ -30,16 +30,16 @@ namespace GanttComponents.Services
                 ["grid.wbs"] = "WBS",
                 ["grid.task-name"] = "Task Name",
                 ["grid.start-date"] = "Start Date",
-                ["grid.end-date"] = "End Date", 
+                ["grid.end-date"] = "End Date",
                 ["grid.duration"] = "Duration",
                 ["grid.progress"] = "Progress",
                 ["grid.resources"] = "Resources",
-                
+
                 // Date Formats
                 ["date.short-format"] = "MM/dd/yyyy",
                 ["date.month-year"] = "MMM yyyy",
                 ["date.day-number"] = "d",
-                
+
                 // Common UI Elements
                 ["common.save"] = "Save",
                 ["common.cancel"] = "Cancel",
@@ -47,7 +47,7 @@ namespace GanttComponents.Services
                 ["common.edit"] = "Edit",
                 ["common.add"] = "Add",
                 ["common.close"] = "Close",
-                
+
                 // Demo Page Elements
                 ["demo.load-sample-data"] = "Load Sample Data",
                 ["demo.clear-selection"] = "Clear Selection"

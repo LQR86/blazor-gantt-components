@@ -1,0 +1,150 @@
+name: 🚀 Setup Stakeholder Demo
+
+on:
+  workflow_dispatch:
+    inputs:
+      demo_purpose:
+        description: 'Demo Purpose'
+        required: true
+        default: 'Timeline Zoom System Review'
+        type: string
+      stakeholder_group:
+        description: 'Stakeholder Group'
+        required: true
+        default: 'Product Team'
+        type: choice
+        options:
+        - Product Team
+        - Engineering Review
+        - Client Demo
+        - Executive Review
+      duration_hours:
+        description: 'Demo Duration (hours)'
+        required: true
+        default: '4'
+        type: string
+
+jobs:
+  setup-demo:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📊 Demo Setup Information
+      run: |
+        echo "🎯 Setting up BlazorGantt Demo"
+        echo "================================"
+        echo "Purpose: ${{ github.event.inputs.demo_purpose }}"
+        echo "Stakeholders: ${{ github.event.inputs.stakeholder_group }}"
+        echo "Duration: ${{ github.event.inputs.duration_hours }} hours"
+        echo "Repository: ${{ github.repository }}"
+        echo "Branch: ${{ github.ref_name }}"
+        echo ""
+        echo "📋 Current Implementation Status:"
+        echo "✅ Phase 1: Foundation (v0.7.0-v0.7.2) - Complete"
+        echo "✅ Phase 2.1: Zoom State Management (v0.8.0) - Complete"
+        echo "✅ Phase 2.2: Six Zoom Levels (v0.8.1) - Complete"
+        echo "✅ Phase 2.3: Timeline Header Adaptation - Complete"
+        echo "🚧 Phase 2.4: Basic Zoom UI Controls (v0.8.2) - In Progress"
+        echo ""
+        echo "🔗 Codespace Setup:"
+        echo "1. Go to: https://github.com/${{ github.repository }}"
+        echo "2. Click: Code → Codespaces → Create codespace on ${{ github.ref_name }}"
+        echo "3. Wait for automatic setup (2-3 minutes)"
+        echo "4. Run: ./start-demo.sh"
+        echo "5. Make port 5000 public in PORTS tab"
+        echo "6. Share the generated URL with stakeholders"
+        echo ""
+        echo "💡 Demo Features Available:"
+        echo "- Six strategic zoom levels with smooth transitions"
+        echo "- Timeline header adaptation for all zoom levels"
+        echo "- I18N support (English & Chinese)"
+        echo "- Row alignment preservation"
+        echo "- Zoom state management with event handling"
+
+    - name: 📝 Create Demo Summary Issue
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const issueBody = `## 🎯 Demo Session Information
+          
+          **Purpose:** ${{ github.event.inputs.demo_purpose }}
+          **Stakeholder Group:** ${{ github.event.inputs.stakeholder_group }}
+          **Scheduled Duration:** ${{ github.event.inputs.duration_hours }} hours
+          **Branch:** \`${{ github.ref_name }}\`
+          **Requested by:** @${{ github.actor }}
+          
+          ## 📊 Implementation Status
+          
+          - ✅ **Phase 1 Complete:** Foundation (v0.7.0-v0.7.2)
+          - ✅ **Phase 2.1:** Zoom State Management (v0.8.0)
+          - ✅ **Phase 2.2:** Six Zoom Levels Implementation (v0.8.1) 
+          - ✅ **Phase 2.3:** Timeline Header Adaptation
+          - 🚧 **Phase 2.4:** Basic Zoom UI Controls (v0.8.2) - Current
+          - ⏳ **Phase 2.5:** GanttComposer Integration Validation
+          
+          ## 🚀 Quick Start for Demo
+          
+          ### 1. Launch Codespace
+          Go to: https://github.com/${{ github.repository }}
+          Click: Code → Codespaces → Create codespace on ${{ github.ref_name }}
+          
+          ### 2. Start Demo
+          Run: ./start-demo.sh
+          
+          ### 3. Share Public URL
+          - Go to **PORTS** tab in VS Code
+          - Click globe icon next to port 5000 to make **public**  
+          - Copy and share the generated URL
+          
+          ## 🎨 Demo Features
+          
+          - **Six Zoom Levels** ✅ Ready: WeekDay (60px) → YearQuarter (3px)
+          - **Header Adaptation** ✅ Ready: Dynamic headers per zoom level
+          - **I18N Support** ✅ Ready: English & Chinese localization
+          - **Row Alignment** ✅ Ready: Pixel-perfect across all levels
+          - **Zoom Controls** 🚧 In Progress: Basic UI controls (v0.8.2)
+          - **Smart Zoom** ⏳ Planned: Fit Viewport/Tasks (v0.8.6)
+          
+          ## 💬 Feedback Collection
+          
+          Please use this issue to collect stakeholder feedback:
+          
+          - **Zoom Level Performance:** How smooth are zoom transitions?
+          - **Header Clarity:** Are timeline headers clear at all zoom levels?
+          - **Language Support:** Does I18N work correctly for your use case?
+          - **Navigation Experience:** How intuitive is zoom navigation?
+          - **Visual Polish:** Any UI/UX improvements needed?
+          
+          ## 📋 Demo Checklist
+          
+          - [ ] Codespace launched successfully
+          - [ ] Demo URL shared with stakeholders  
+          - [ ] Zoom level switching tested
+          - [ ] Timeline header adaptation verified
+          - [ ] I18N language toggle tested
+          - [ ] Row alignment validated across levels
+          - [ ] Stakeholder feedback collected
+          - [ ] Next iteration priorities identified
+          
+          **Demo URL:** _Will be added when Codespace is ready_
+          **Status:** 🟡 Setup in Progress`;
+          
+          const { data: issue } = await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `🚀 Stakeholder Demo: ${{ github.event.inputs.demo_purpose }}`,
+            body: issueBody,
+            labels: ['demo', 'stakeholder-review', 'timeline-zoom']
+          });
+          
+          console.log(`Created demo tracking issue: #${issue.number}`);
+
+    - name: ✅ Demo Setup Complete
+      run: |
+        echo "🎉 Stakeholder demo setup complete!"
+        echo ""
+        echo "📋 Next Steps:"
+        echo "1. Launch Codespace from repository"
+        echo "2. Run ./start-demo.sh"
+        echo "3. Make port 5000 public"
+        echo "4. Share URL with stakeholders"
+        echo "5. Collect feedback in the created GitHub issue"

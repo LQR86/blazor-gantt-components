@@ -75,6 +75,83 @@ public class DateFormatHelper
     }
 
     /// <summary>
+    /// Format a date for zoom-aware timeline headers using specified I18N key.
+    /// Supports all timeline header units: quarter, year, decade, etc.
+    /// </summary>
+    /// <param name="date">The date to format</param>
+    /// <param name="formatKey">I18N key for the specific format</param>
+    /// <returns>Formatted date string for zoom-appropriate headers</returns>
+    public string FormatTimelineHeader(DateTime date, string formatKey)
+    {
+        return FormatDate(date, formatKey);
+    }
+
+    /// <summary>
+    /// Format a date for quarter display (e.g., "Q1 2025").
+    /// </summary>
+    /// <param name="date">The date to format</param>
+    /// <returns>Formatted quarter string</returns>
+    public string FormatQuarter(DateTime date)
+    {
+        return FormatDate(date, "date.quarter-year");
+    }
+
+    /// <summary>
+    /// Format a date for short quarter display (e.g., "Q1").
+    /// </summary>
+    /// <param name="date">The date to format</param>
+    /// <returns>Formatted short quarter string</returns>
+    public string FormatQuarterShort(DateTime date)
+    {
+        return FormatDate(date, "date.quarter-short");
+    }
+
+    /// <summary>
+    /// Format a date for year display.
+    /// </summary>
+    /// <param name="date">The date to format</param>
+    /// <returns>Formatted year string</returns>
+    public string FormatYear(DateTime date)
+    {
+        return FormatDate(date, "date.year");
+    }
+
+    /// <summary>
+    /// Format a date for decade display (e.g., "2020-2029").
+    /// </summary>
+    /// <param name="date">The date to format</param>
+    /// <returns>Formatted decade string</returns>
+    public string FormatDecade(DateTime date)
+    {
+        // Calculate decade start and end years
+        var decadeStart = (date.Year / 10) * 10;
+        var decadeEnd = decadeStart + 9;
+
+        // Get the format pattern and culture
+        var pattern = _i18n.T("date.decade");
+        var culture = GetCultureInfo(_i18n.CurrentCulture);
+
+        // For decade format, we need to substitute the start and end years
+        // Pattern is expected to be like "yyyy'-'yyyy" 
+        // Use regex to replace the first and second occurrence properly
+        var regex = new System.Text.RegularExpressions.Regex("yyyy");
+        var firstReplacement = regex.Replace(pattern, decadeStart.ToString("0000"), 1);
+        var finalResult = regex.Replace(firstReplacement, decadeEnd.ToString("0000"), 1);
+
+        return finalResult;
+    }
+
+    /// <summary>
+    /// Format a date for short month display (e.g., "Jan").
+    /// </summary>
+    /// <param name="date">The date to format</param>
+    /// <returns>Formatted short month string</returns>
+    public string FormatMonthShort(DateTime date)
+    {
+        return FormatDate(date, "date.month-short");
+    }
+
+    /// <summary>
     /// Get CultureInfo from I18N culture string.
     /// </summary>
     /// <param name="cultureString">Culture string from I18N service (e.g., "en-US", "zh-CN")</param>

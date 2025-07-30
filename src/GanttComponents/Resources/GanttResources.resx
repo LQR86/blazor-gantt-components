@@ -87,8 +87,23 @@
   <data name="date.month-year" xml:space="preserve">
     <value>MMM yyyy</value>
   </data>
+  <data name="date.month-short" xml:space="preserve">
+    <value>MMM</value>
+  </data>
   <data name="date.day-number" xml:space="preserve">
-    <value>d</value>
+    <value>%d</value>
+  </data>
+  <data name="date.quarter-year" xml:space="preserve">
+    <value>'Q'q yyyy</value>
+  </data>
+  <data name="date.quarter-short" xml:space="preserve">
+    <value>'Q'q</value>
+  </data>
+  <data name="date.year" xml:space="preserve">
+    <value>yyyy</value>
+  </data>
+  <data name="date.decade" xml:space="preserve">
+    <value>yyyy'-'yyyy</value>
   </data>
 
   <!-- Common UI Elements -->

@@ -87,8 +87,23 @@
   <data name="date.month-year" xml:space="preserve">
     <value>yyyy年MM月</value>
   </data>
+  <data name="date.month-short" xml:space="preserve">
+    <value>MM月</value>
+  </data>
   <data name="date.day-number" xml:space="preserve">
-    <value>d日</value>
+    <value>%d日</value>
+  </data>
+  <data name="date.quarter-year" xml:space="preserve">
+    <value>yyyy年'第'q'季度'</value>
+  </data>
+  <data name="date.quarter-short" xml:space="preserve">
+    <value>'Q'q</value>
+  </data>
+  <data name="date.year" xml:space="preserve">
+    <value>yyyy年</value>
+  </data>
+  <data name="date.decade" xml:space="preserve">
+    <value>yyyy年'-'yyyy年</value>
   </data>
 
   <!-- Common UI Elements -->

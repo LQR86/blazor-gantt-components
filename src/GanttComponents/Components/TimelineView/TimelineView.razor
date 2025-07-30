@@ -8,21 +8,78 @@
 <div class="timeline-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
     <div class="timeline-scroll-container" @onscroll="OnScroll">
         <div class="timeline-header">
-            <div class="timeline-header-months">
-                @for (var month = StartDate; month <= EndDate; month = month.AddMonths(1))
-                {
-                    var monthWidth = GetMonthWidth(month);
-                    <div class="timeline-month" style="width: @(monthWidth)px;">
-                        @DateFormatter.FormatTimelineMonth(month)
-                    </div>
+            @{
+                var headerConfig = TimelineHeaderAdapter.GetHeaderConfiguration(ZoomLevel, EffectiveDayWidth);
+                var timeSpanDays = (EndDate - StartDate).Days + 1;
+                var shouldCollapse = TimelineHeaderAdapter.ShouldCollapseHeaders(headerConfig, EffectiveDayWidth, timeSpanDays);
+            }
+            
+            @if (headerConfig.ShowPrimary && !shouldCollapse)
+            {
+                <div class="timeline-header-primary">
+                    @{
+                        var primaryStart = TimelineHeaderAdapter.GetPeriodStart(StartDate, headerConfig.PrimaryUnit);
+                        var increment = TimelineHeaderAdapter.GetDateIncrement(headerConfig.PrimaryUnit);
+                        var current = primaryStart;
+                    }
+                    
+                    @while (current <= EndDate)
+                    {
+                        var periodWidth = TimelineHeaderAdapter.GetPeriodWidth(current, headerConfig.PrimaryUnit, EffectiveDayWidth);
+                        var nextPeriod = increment(current);
+                        
+                        // Adjust width if period extends beyond timeline
+                        if (nextPeriod > EndDate.AddDays(1))
+                        {
+                            var visibleDays = (EndDate.AddDays(1) - current).Days;
+                            periodWidth = visibleDays * EffectiveDayWidth;
+                        }
+                        
+                        // Skip if period starts after timeline end
+                        if (current > EndDate)
+                        {
+                            break;
+                        }
+                        
+                        <div class="timeline-primary-unit" style="width: @(periodWidth)px;">
+                            @DateFormatter.FormatTimelineHeader(current, headerConfig.PrimaryFormat)
+                        </div>
+                        
+                        current = nextPeriod;
+                    }
+                </div>
+            }
+            
+            <div class="timeline-header-secondary">
+                @{
+                    var secondaryStart = TimelineHeaderAdapter.GetPeriodStart(StartDate, headerConfig.SecondaryUnit);
+                    var secondaryIncrement = TimelineHeaderAdapter.GetDateIncrement(headerConfig.SecondaryUnit);
+                    var secondaryCurrent = secondaryStart;
                 }
-            </div>
-            <div class="timeline-header-days">
-                @for (var day = StartDate; day <= EndDate; day = day.AddDays(1))
+                
+                @while (secondaryCurrent <= EndDate)
                 {
-                    <div class="timeline-day" style="width: @(EffectiveDayWidth)px;">
-                        @day.Day
+                    var secondaryWidth = TimelineHeaderAdapter.GetPeriodWidth(secondaryCurrent, headerConfig.SecondaryUnit, EffectiveDayWidth);
+                    var nextSecondary = secondaryIncrement(secondaryCurrent);
+                    
+                    // Adjust width if period extends beyond timeline
+                    if (nextSecondary > EndDate.AddDays(1))
+                    {
+                        var visibleDays = (EndDate.AddDays(1) - secondaryCurrent).Days;
+                        secondaryWidth = visibleDays * EffectiveDayWidth;
+                    }
+                    
+                    // Skip if period starts after timeline end
+                    if (secondaryCurrent > EndDate)
+                    {
+                        break;
+                    }
+                    
+                    <div class="timeline-secondary-unit" style="width: @(secondaryWidth)px;">
+                        @DateFormatter.FormatTimelineHeader(secondaryCurrent, headerConfig.SecondaryFormat)
                     </div>
+                    
+                    secondaryCurrent = nextSecondary;
                 }
             </div>
         </div>
@@ -299,6 +356,56 @@
         min-width: fit-content;
     }
 
+    /* Zoom-adaptive primary header row (quarters, years, decades) */
+    .timeline-header-primary {
+        display: flex;
+        height: var(--header-month-height);
+        border-bottom: 1px solid var(--gantt-outline, #e0e0e0);
+    }
+
+    .timeline-primary-unit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        font-family: var(--gantt-monospace-font, 'Consolas', 'Monaco', 'Courier New', monospace);
+        border-right: 1px solid var(--gantt-outline, #e0e0e0);
+        background: var(--gantt-surface-variant, #f5f5f5);
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        flex-shrink: 0;
+        min-width: 0; /* Allow text overflow handling */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Zoom-adaptive secondary header row (months, quarters, years) */
+    .timeline-header-secondary {
+        display: flex;
+        height: var(--header-day-height);
+    }
+
+    .timeline-secondary-unit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-family: var(--gantt-monospace-font, 'Consolas', 'Monaco', 'Courier New', monospace);
+        border-right: 1px solid var(--gantt-outline, #e0e0e0);
+        background: var(--gantt-surface, #ffffff);
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        flex-shrink: 0;
+        min-width: 0; /* Allow text overflow handling */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Legacy classes for backward compatibility - deprecated */
     .timeline-header-months {
         display: flex;
         height: var(--header-month-height);

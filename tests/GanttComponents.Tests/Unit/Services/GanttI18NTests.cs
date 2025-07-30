@@ -159,7 +159,7 @@ namespace GanttComponents.Tests.Unit.Services
         [Theory]
         [InlineData("date.short-format", "MM/dd/yyyy")]
         [InlineData("date.month-year", "MMM yyyy")]
-        [InlineData("date.day-number", "d")]
+        [InlineData("date.day-number", "%d")]
         public void T_DateFormats_ReturnCorrectPatterns(string key, string expected)
         {
             // Arrange
@@ -226,7 +226,7 @@ namespace GanttComponents.Tests.Unit.Services
         [Theory]
         [InlineData("date.short-format", "yyyy年MM月dd日")]
         [InlineData("date.month-year", "yyyy年MM月")]
-        [InlineData("date.day-number", "d日")]
+        [InlineData("date.day-number", "%d日")]
         public void T_ChineseDateFormats_ReturnCorrectPatterns(string key, string expected)
         {
             // Arrange

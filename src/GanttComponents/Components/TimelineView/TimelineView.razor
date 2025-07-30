@@ -89,6 +89,10 @@
     [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthDay;
     [Parameter] public double ZoomFactor { get; set; } = 1.6; // 25px * 1.6 = 40px (maintains current behavior)
     
+    // Zoom state change events
+    [Parameter] public EventCallback<TimelineZoomLevel> OnZoomLevelChanged { get; set; }
+    [Parameter] public EventCallback<double> OnZoomFactorChanged { get; set; }
+    
     // Timeline configuration
     // Legacy constant maintained for reference - replaced by EffectiveDayWidth property
     private const int LegacyDayWidth = 40; // Was: 40px per day (fixed scale)
@@ -201,6 +205,66 @@
     {
         InvokeAsync(StateHasChanged);
     }
+
+    // Zoom control methods
+    public async Task SetZoomLevelAsync(TimelineZoomLevel newZoomLevel)
+    {
+        if (ZoomLevel != newZoomLevel)
+        {
+            ZoomLevel = newZoomLevel;
+            CalculateTimelineRange(); // Recalculate dimensions
+            Logger.LogUserAction("TimelineView_ZoomLevelChanged", new { OldLevel = ZoomLevel, NewLevel = newZoomLevel });
+            
+            if (OnZoomLevelChanged.HasDelegate)
+            {
+                await OnZoomLevelChanged.InvokeAsync(newZoomLevel);
+            }
+            
+            StateHasChanged();
+        }
+    }
+
+    public async Task SetZoomFactorAsync(double newZoomFactor)
+    {
+        // Clamp zoom factor to reasonable bounds (0.5x to 3.0x)
+        var clampedFactor = Math.Max(0.5, Math.Min(3.0, newZoomFactor));
+        
+        if (Math.Abs(ZoomFactor - clampedFactor) > 0.01) // Avoid tiny changes
+        {
+            var oldFactor = ZoomFactor;
+            ZoomFactor = clampedFactor;
+            CalculateTimelineRange(); // Recalculate dimensions
+            Logger.LogUserAction("TimelineView_ZoomFactorChanged", new { OldFactor = oldFactor, NewFactor = clampedFactor });
+            
+            if (OnZoomFactorChanged.HasDelegate)
+            {
+                await OnZoomFactorChanged.InvokeAsync(clampedFactor);
+            }
+            
+            StateHasChanged();
+        }
+    }
+
+    public async Task ZoomInAsync()
+    {
+        var newFactor = ZoomFactor * 1.2; // 20% increase
+        await SetZoomFactorAsync(newFactor);
+    }
+
+    public async Task ZoomOutAsync()
+    {
+        var newFactor = ZoomFactor / 1.2; // 20% decrease
+        await SetZoomFactorAsync(newFactor);
+    }
+
+    public async Task ResetZoomAsync()
+    {
+        await SetZoomFactorAsync(1.0); // Reset to base factor
+    }
+
+    // Read-only properties for current zoom state
+    public double CurrentEffectiveDayWidth => EffectiveDayWidth;
+    public string CurrentZoomDescription => $"{ZoomLevel} @ {ZoomFactor:F1}x";
 
     public void Dispose()
     {

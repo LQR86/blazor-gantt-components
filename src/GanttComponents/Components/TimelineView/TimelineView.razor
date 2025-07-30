@@ -20,7 +20,7 @@
             <div class="timeline-header-days">
                 @for (var day = StartDate; day <= EndDate; day = day.AddDays(1))
                 {
-                    <div class="timeline-day" style="width: @(DayWidth)px;">
+                    <div class="timeline-day" style="width: @(EffectiveDayWidth)px;">
                         @day.Day
                     </div>
                 }
@@ -85,10 +85,25 @@
     [Parameter] public EventCallback<int?> OnTaskHovered { get; set; }
     [Parameter] public int? HoveredTaskId { get; set; }
     
+    // Zoom parameters - maintain backward compatibility with current 40px day width
+    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthDay;
+    [Parameter] public double ZoomFactor { get; set; } = 1.6; // 25px * 1.6 = 40px (maintains current behavior)
+    
     // Timeline configuration
-    private const int DayWidth = 40; // 40px per day (fixed scale)
+    // Legacy constant maintained for reference - replaced by EffectiveDayWidth property
+    private const int LegacyDayWidth = 40; // Was: 40px per day (fixed scale)
     private const int TaskBarHeight = 20;
     private const int TaskBarMargin = 6; // Center task bar in row
+    
+    // Dynamic day width based on zoom level and factor
+    private double EffectiveDayWidth
+    {
+        get
+        {
+            var config = TimelineZoomService.GetConfiguration(ZoomLevel);
+            return config.GetEffectiveDayWidth(ZoomFactor);
+        }
+    }
     
     // Calculated total header height
     private int TotalHeaderHeight => HeaderMonthHeight + HeaderDayHeight;
@@ -130,26 +145,26 @@
         }
         
         var totalDays = (EndDate - StartDate).Days + 1;
-        TotalWidth = totalDays * DayWidth;
+        TotalWidth = (int)(totalDays * EffectiveDayWidth);
         TotalHeight = (Tasks?.Count ?? 0) * RowHeight;
     }
 
     private double DayToPixel(DateTime date)
     {
         var days = (date.Date - StartDate).TotalDays;
-        return days * DayWidth;
+        return days * EffectiveDayWidth;
     }
 
     private double CalculateTaskWidth(GanttTask task)
     {
         var duration = (task.EndDate.Date - task.StartDate.Date).TotalDays + 1;
-        return duration * DayWidth;
+        return duration * EffectiveDayWidth;
     }
 
     private int GetMonthWidth(DateTime month)
     {
         var daysInMonth = DateTime.DaysInMonth(month.Year, month.Month);
-        return daysInMonth * DayWidth;
+        return (int)(daysInMonth * EffectiveDayWidth);
     }
 
     private async Task SelectTask(int taskId)

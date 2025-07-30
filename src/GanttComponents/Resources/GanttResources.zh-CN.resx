@@ -244,4 +244,67 @@
   <data name="task.progress" xml:space="preserve">
     <value>进度</value>
   </data>
+
+  <!-- Timeline Zoom Levels -->
+  <data name="zoom.level.week-day" xml:space="preserve">
+    <value>周-日</value>
+  </data>
+  <data name="zoom.level.month-day" xml:space="preserve">
+    <value>月-日</value>
+  </data>
+  <data name="zoom.level.month-week" xml:space="preserve">
+    <value>月-周</value>
+  </data>
+  <data name="zoom.level.quarter-week" xml:space="preserve">
+    <value>季-周</value>
+  </data>
+  <data name="zoom.level.quarter-month" xml:space="preserve">
+    <value>季-月</value>
+  </data>
+  <data name="zoom.level.year-quarter" xml:space="preserve">
+    <value>年-季</value>
+  </data>
+
+  <!-- Timeline Zoom Level Descriptions -->
+  <data name="zoom.description.week-day" xml:space="preserve">
+    <value>冲刺规划，日常管理 (2-8周)</value>
+  </data>
+  <data name="zoom.description.month-day" xml:space="preserve">
+    <value>项目里程碑，阶段跟踪 (3-12个月)</value>
+  </data>
+  <data name="zoom.description.month-week" xml:space="preserve">
+    <value>季度规划，资源调度 (6-18个月)</value>
+  </data>
+  <data name="zoom.description.quarter-week" xml:space="preserve">
+    <value>年度规划，战略路线图 (6-24个月)</value>
+  </data>
+  <data name="zoom.description.quarter-month" xml:space="preserve">
+    <value>多年项目，组合规划 (1-5年)</value>
+  </data>
+  <data name="zoom.description.year-quarter" xml:space="preserve">
+    <value>企业组合，战略规划 (2-10年)</value>
+  </data>
+
+  <!-- Timeline Zoom UI Controls -->
+  <data name="zoom.controls.zoom-in" xml:space="preserve">
+    <value>放大</value>
+  </data>
+  <data name="zoom.controls.zoom-out" xml:space="preserve">
+    <value>缩小</value>
+  </data>
+  <data name="zoom.controls.fit-viewport" xml:space="preserve">
+    <value>适应视口</value>
+  </data>
+  <data name="zoom.controls.fit-tasks" xml:space="preserve">
+    <value>适应任务</value>
+  </data>
+  <data name="zoom.controls.zoom-level" xml:space="preserve">
+    <value>缩放级别</value>
+  </data>
+  <data name="zoom.controls.zoom-factor" xml:space="preserve">
+    <value>缩放系数</value>
+  </data>
+  <data name="zoom.overflow.hidden-tasks" xml:space="preserve">
+    <value>隐藏任务</value>
+  </data>
 </root>

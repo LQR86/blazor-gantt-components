@@ -244,4 +244,67 @@
   <data name="task.progress" xml:space="preserve">
     <value>Progress</value>
   </data>
+
+  <!-- Timeline Zoom Levels -->
+  <data name="zoom.level.week-day" xml:space="preserve">
+    <value>Week-Day</value>
+  </data>
+  <data name="zoom.level.month-day" xml:space="preserve">
+    <value>Month-Day</value>
+  </data>
+  <data name="zoom.level.month-week" xml:space="preserve">
+    <value>Month-Week</value>
+  </data>
+  <data name="zoom.level.quarter-week" xml:space="preserve">
+    <value>Quarter-Week</value>
+  </data>
+  <data name="zoom.level.quarter-month" xml:space="preserve">
+    <value>Quarter-Month</value>
+  </data>
+  <data name="zoom.level.year-quarter" xml:space="preserve">
+    <value>Year-Quarter</value>
+  </data>
+
+  <!-- Timeline Zoom Level Descriptions -->
+  <data name="zoom.description.week-day" xml:space="preserve">
+    <value>Sprint planning, daily management (2-8 weeks)</value>
+  </data>
+  <data name="zoom.description.month-day" xml:space="preserve">
+    <value>Project milestones, phase tracking (3-12 months)</value>
+  </data>
+  <data name="zoom.description.month-week" xml:space="preserve">
+    <value>Quarterly planning, resource scheduling (6-18 months)</value>
+  </data>
+  <data name="zoom.description.quarter-week" xml:space="preserve">
+    <value>Annual planning, strategic roadmaps (6-24 months)</value>
+  </data>
+  <data name="zoom.description.quarter-month" xml:space="preserve">
+    <value>Multi-year programs, portfolio planning (1-5 years)</value>
+  </data>
+  <data name="zoom.description.year-quarter" xml:space="preserve">
+    <value>Enterprise portfolio, strategic planning (2-10 years)</value>
+  </data>
+
+  <!-- Timeline Zoom UI Controls -->
+  <data name="zoom.controls.zoom-in" xml:space="preserve">
+    <value>Zoom In</value>
+  </data>
+  <data name="zoom.controls.zoom-out" xml:space="preserve">
+    <value>Zoom Out</value>
+  </data>
+  <data name="zoom.controls.fit-viewport" xml:space="preserve">
+    <value>Fit Viewport</value>
+  </data>
+  <data name="zoom.controls.fit-tasks" xml:space="preserve">
+    <value>Fit Tasks</value>
+  </data>
+  <data name="zoom.controls.zoom-level" xml:space="preserve">
+    <value>Zoom Level</value>
+  </data>
+  <data name="zoom.controls.zoom-factor" xml:space="preserve">
+    <value>Zoom Factor</value>
+  </data>
+  <data name="zoom.overflow.hidden-tasks" xml:space="preserve">
+    <value>Hidden Tasks</value>
+  </data>
 </root>

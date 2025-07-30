@@ -126,3 +126,30 @@ You can also use the GitHub Actions workflow:
 3. Click **"Run workflow"**
 4. Fill in demo details (purpose, stakeholder group, duration)
 5. This creates a tracking issue for organized feedback collection
+
+### **⚠️ Important: Codespace Billing & Timing**
+
+**How Billing Works:**
+- You're charged for **Codespace runtime** (when VS Code is active)
+- Public URLs don't add extra costs - they're tied to runtime
+- **Auto-sleep**: Codespaces sleep after 30 minutes of inactivity
+- **Manual control**: Stop Codespace immediately after demos
+
+**Free Tier Limits:**
+- 120 core hours/month (2-core machine)
+- 60 core hours/month (4-core machine)
+
+**Best Practices:**
+- ✅ **Just-in-Time**: Start Codespace right before demo
+- ✅ **Manual Stop**: Stop immediately after demo session  
+- ✅ **Time Windows**: "Available for next 2 hours"
+- ✅ **Multiple Sessions**: Start/stop for different stakeholder groups
+
+**Example Demo Schedule:**
+```
+Monday 2PM: Start Codespace → Demo with PM team → Stop Codespace
+Tuesday 10AM: Start Codespace → Demo with stakeholders → Stop Codespace  
+Wednesday 3PM: Start Codespace → Demo with executives → Stop Codespace
+```
+
+This approach keeps you well within free tier limits while providing professional demo experiences.

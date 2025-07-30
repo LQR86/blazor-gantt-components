@@ -1,0 +1,52 @@
+{
+  "name": "BlazorGantt Timeline Zoom Demo",
+  "image": "mcr.microsoft.com/dotnet/sdk:8.0",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "forwardPorts": [5000, 5001],
+  
+  "portsAttributes": {
+    "5000": {
+      "label": "BlazorGantt HTTP Demo",
+      "onAutoForward": "notify",
+      "visibility": "public",
+      "protocol": "http"
+    },
+    "5001": {
+      "label": "BlazorGantt HTTPS Demo", 
+      "onAutoForward": "notify",
+      "visibility": "public",
+      "protocol": "https"
+    }
+  },
+
+  "postCreateCommand": "bash .devcontainer/setup-demo.sh",
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.blazorwasm-companion",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "dotnet.defaultSolution": "BlazorGantt.sln",
+        "files.exclude": {
+          "**/bin": true,
+          "**/obj": true
+        }
+      }
+    }
+  },
+
+  "remoteUser": "vscode"
+}

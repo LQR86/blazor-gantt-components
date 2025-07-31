@@ -68,4 +68,12 @@ echo "🛑 Press Ctrl+C to stop the demo"
 echo ""
 
 cd src/GanttComponents
-dotnet run
+
+# Use Codespace-specific profile for external access
+if [ -n "$CODESPACE_NAME" ]; then
+    echo "🌐 Using Codespace profile (binds to 0.0.0.0 for external access)"
+    dotnet run --launch-profile GanttComponents-Codespace
+else
+    echo "💻 Using local profile (binds to localhost)"
+    dotnet run --launch-profile GanttComponents
+fi

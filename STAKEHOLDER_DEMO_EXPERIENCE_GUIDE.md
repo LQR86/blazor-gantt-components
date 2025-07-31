@@ -20,6 +20,29 @@ Once the Codespace loads:
 ./start-demo.sh
 ```
 
+**If you get "dotnet: command not found":**
+```bash
+# Install .NET SDK manually:
+wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+chmod +x ./dotnet-install.sh
+./dotnet-install.sh --version latest
+export PATH="$PATH:$HOME/.dotnet"
+export DOTNET_ROOT="$HOME/.dotnet"
+
+# Then run the demo:
+./start-demo.sh
+```
+
+**If you get "ICU package" error:**
+```bash
+# For Alpine Linux (install ICU libraries for globalization support):
+sudo apk update
+sudo apk add icu-libs icu-dev
+
+# Then run the demo:
+./start-demo.sh
+```
+
 You'll see output like:
 ```
 🎯 BlazorGantt Stakeholder Demo Launcher
@@ -50,9 +73,30 @@ You'll see output like:
 
 #### 3. **Make Ports Public for Stakeholders**
 1. In VS Code, go to **PORTS** tab (bottom panel)
-2. Find port **5000** (BlazorGantt HTTP Demo)
+2. Find the running port (usually **5234** for HTTP or **7138** for HTTPS)
 3. **Right-click** → **Port Visibility** → **Public**
 4. **Copy the generated URL** (e.g., `https://scaling-waddle-xxx.github.dev`)
+
+**Important Navigation:**
+- Base URL shows "Not Found" - this is normal
+- **Use HTTP URLs**: Add `/timeline-demo` to the HTTP URL
+- **Correct format**: `https://your-codespace-url.github.dev/timeline-demo`
+- Available demo pages:
+  - `/timeline-demo` - Timeline zoom features (MAIN DEMO)
+  - `/gantt-composer-demo` - Full Gantt experience
+  - `/wbs-demo` - Work breakdown structure
+
+**Troubleshooting:**
+- If you see 307 redirects, the app is redirecting HTTP to HTTPS
+- If URL redirects to `github.dev/pf-signin`, restart demo (it will auto-detect Codespace)
+- **Auto-detection**: Demo script automatically uses Codespace profile for external access
+- Use the public HTTPS URL from the PORTS tab
+- Clear browser cache if pages don't load
+
+**Common Issues:**
+- **Authentication redirect**: Restart `./start-demo.sh` - it auto-detects Codespace environment
+- **Port not public**: Right-click port in PORTS tab → Port Visibility → Public
+- **Wrong URL**: Use `https://your-url/timeline-demo` not just base URL
 
 ### **As a Stakeholder (External User):**
 
@@ -65,6 +109,8 @@ You'll get a message like:
 
 #### 2. **Access the Demo** 
 - **No GitHub account required** - just click the URL
+- **Navigate to demo pages**: Add `/timeline-demo` to the URL
+- **Full URL example**: `https://scaling-waddle-xxx.github.dev/timeline-demo`
 - Works on any device (desktop, tablet, mobile)
 - Full Blazor Server functionality
 

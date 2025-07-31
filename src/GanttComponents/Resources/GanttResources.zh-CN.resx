@@ -322,4 +322,19 @@
   <data name="zoom.overflow.hidden-tasks" xml:space="preserve">
     <value>隐藏任务</value>
   </data>
+  <data name="ZoomControls.ZoomLevel" xml:space="preserve">
+    <value>级别</value>
+  </data>
+  <data name="ZoomControls.Current" xml:space="preserve">
+    <value>当前</value>
+  </data>
+  <data name="ZoomControls.QuickActions" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="ZoomControls.ZoomIn" xml:space="preserve">
+    <value>放大</value>
+  </data>
+  <data name="ZoomControls.ZoomOut" xml:space="preserve">
+    <value>缩小</value>
+  </data>
 </root>

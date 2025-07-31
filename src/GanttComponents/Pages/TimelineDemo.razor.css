@@ -1,0 +1,100 @@
+/* Timeline Demo Page - Zoom Controls Showcase */
+.zoom-controls-demo {
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.zoom-demo-variant {
+    margin: 16px 0;
+    padding: 16px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+}
+
+.zoom-demo-variant h5 {
+    margin: 0 0 12px 0;
+    color: #1976d2;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.timeline-controls {
+    margin: 16px 0;
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 8px;
+}
+
+.zoom-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: #e3f2fd;
+    border-radius: 4px;
+    border: 1px solid #2196f3;
+}
+
+.status-label {
+    font-weight: 600;
+    color: #1976d2;
+    font-size: 11px;
+}
+
+.status-value {
+    font-family: 'Roboto Mono', monospace;
+    color: #0d47a1;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* Demo container improvements */
+.demo-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.demo-section {
+    margin: 24px 0;
+}
+
+.demo-section h3 {
+    color: #1976d2;
+    border-bottom: 2px solid #e3f2fd;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+}
+
+.demo-section h4 {
+    color: #424242;
+    margin: 16px 0 8px 0;
+}
+
+/* Timeline container */
+.timeline-container {
+    margin: 16px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    background: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .zoom-controls-demo {
+        padding: 12px;
+    }
+    
+    .zoom-demo-variant {
+        padding: 12px;
+    }
+    
+    .demo-container {
+        padding: 12px;
+    }
+}

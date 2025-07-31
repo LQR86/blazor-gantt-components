@@ -1,0 +1,212 @@
+@using GanttComponents.Models
+@using GanttComponents.Services
+@inject IGanttI18N I18N
+@inject IUniversalLogger Logger
+
+<div class="timeline-zoom-controls @CssClass" style="@Style">
+    @if (ShowLevelPresets)
+    {
+        <div class="zoom-level-presets">
+            @if (ShowLabels)
+            {
+                <span class="zoom-controls-label">@I18N.T("ZoomControls.ZoomLevel")</span>
+            }
+            
+            @foreach (var level in GetVisibleZoomLevels())
+            {
+                var config = TimelineZoomService.GetConfiguration(level);
+                var isActive = level == CurrentZoomLevel;
+                var buttonClass = $"zoom-preset-button {(isActive ? "active" : "")}";
+                
+                <button type="button" 
+                        class="@buttonClass" 
+                        disabled="@(isActive || Disabled)"
+                        title="@I18N.T(config.DescriptionKey)"
+                        @onclick="() => OnZoomLevelSelected(level)">
+                    @I18N.T(config.DisplayNameKey)
+                </button>
+            }
+        </div>
+    }
+    
+    @if (ShowCurrentState && !HideCurrentState)
+    {
+        <div class="zoom-current-state">
+            @if (ShowLabels)
+            {
+                <span class="zoom-controls-label">@I18N.T("ZoomControls.Current")</span>
+            }
+            
+            <div class="zoom-current-display">
+                <span class="zoom-level-name">@I18N.T(TimelineZoomService.GetConfiguration(CurrentZoomLevel).DisplayNameKey)</span>
+                @if (ShowZoomFactor)
+                {
+                    <span class="zoom-factor-display">@($"{CurrentZoomFactor:P0}")</span>
+                }
+                @if (ShowDayWidth)
+                {
+                    <span class="zoom-day-width">@($"{CurrentDayWidth:F0}px")</span>
+                }
+            </div>
+        </div>
+    }
+    
+    @if (ShowQuickActions)
+    {
+        <div class="zoom-quick-actions">
+            @if (ShowLabels)
+            {
+                <span class="zoom-controls-label">@I18N.T("ZoomControls.QuickActions")</span>
+            }
+            
+            <div class="zoom-action-buttons">
+                <button type="button" 
+                        class="zoom-action-button zoom-in" 
+                        disabled="@(Disabled || IsAtMaxZoom())"
+                        title="@I18N.T("ZoomControls.ZoomIn")"
+                        @onclick="OnZoomIn">
+                    <span class="zoom-icon">+</span>
+                    @if (ShowActionLabels)
+                    {
+                        <span class="zoom-action-text">@I18N.T("ZoomControls.ZoomIn")</span>
+                    }
+                </button>
+                
+                <button type="button" 
+                        class="zoom-action-button zoom-out" 
+                        disabled="@(Disabled || IsAtMinZoom())"
+                        title="@I18N.T("ZoomControls.ZoomOut")"
+                        @onclick="OnZoomOut">
+                    <span class="zoom-icon">−</span>
+                    @if (ShowActionLabels)
+                    {
+                        <span class="zoom-action-text">@I18N.T("ZoomControls.ZoomOut")</span>
+                    }
+                </button>
+            </div>
+        </div>
+    }
+    
+    @if (AdditionalContent != null)
+    {
+        <div class="zoom-additional-content">
+            @AdditionalContent
+        </div>
+    }
+</div>
+
+@code {
+    // Core zoom state - REQUIRED
+    [Parameter, EditorRequired] public TimelineZoomLevel CurrentZoomLevel { get; set; }
+    [Parameter, EditorRequired] public double CurrentZoomFactor { get; set; } = 1.0;
+    [Parameter, EditorRequired] public EventCallback<TimelineZoomLevel> OnZoomLevelChanged { get; set; }
+    [Parameter, EditorRequired] public EventCallback<double> OnZoomFactorChanged { get; set; }
+    
+    // Composability and customization
+    [Parameter] public RenderFragment? AdditionalContent { get; set; }
+    [Parameter] public string CssClass { get; set; } = "";
+    [Parameter] public string Style { get; set; } = "";
+    [Parameter] public bool Disabled { get; set; } = false;
+    
+    // UI configuration - all optional with sensible defaults
+    [Parameter] public bool ShowLevelPresets { get; set; } = true;
+    [Parameter] public bool ShowCurrentState { get; set; } = true;
+    [Parameter] public bool ShowQuickActions { get; set; } = true;
+    [Parameter] public bool ShowLabels { get; set; } = true;
+    [Parameter] public bool ShowActionLabels { get; set; } = false; // Icons only by default
+    [Parameter] public bool ShowZoomFactor { get; set; } = true;
+    [Parameter] public bool ShowDayWidth { get; set; } = false; // Developer feature
+    [Parameter] public bool HideCurrentState { get; set; } = false;
+    
+    // Zoom level filtering - for different use cases
+    [Parameter] public IReadOnlyList<TimelineZoomLevel>? VisibleZoomLevels { get; set; }
+    [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.WeekDay;
+    [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.YearQuarter;
+    
+    // Calculated properties
+    private double CurrentDayWidth => TimelineZoomService.GetConfiguration(CurrentZoomLevel).GetEffectiveDayWidth(CurrentZoomFactor);
+    
+    // Get visible zoom levels based on configuration
+    private IEnumerable<TimelineZoomLevel> GetVisibleZoomLevels()
+    {
+        if (VisibleZoomLevels != null && VisibleZoomLevels.Count > 0)
+        {
+            return VisibleZoomLevels;
+        }
+        
+        // Use min/max range - NOTE: WeekDay=0 (detailed) to YearQuarter=5 (overview)
+        var allLevels = Enum.GetValues<TimelineZoomLevel>().OrderBy(x => (int)x);
+        var filteredLevels = allLevels.Where(level => level >= MinZoomLevel && level <= MaxZoomLevel).ToList();
+        
+        return filteredLevels;
+    }
+    
+    // Event handlers
+    private async Task OnZoomLevelSelected(TimelineZoomLevel level)
+    {
+        Logger.LogOperation("ZOOM_CONTROLS", $"ZoomLevelSelected: {level} (current: {CurrentZoomLevel})");
+        
+        if (level != CurrentZoomLevel && OnZoomLevelChanged.HasDelegate)
+        {
+            Logger.LogOperation("ZOOM_CONTROLS", $"Invoking OnZoomLevelChanged: {CurrentZoomLevel} -> {level}");
+            await OnZoomLevelChanged.InvokeAsync(level);
+        }
+        else
+        {
+            Logger.LogWarning("ZoomLevelSelected ignored", new { level, CurrentZoomLevel, HasDelegate = OnZoomLevelChanged.HasDelegate });
+        }
+    }
+    
+    private async Task OnZoomIn()
+    {
+        Logger.LogOperation("ZOOM_CONTROLS", "ZoomIn button clicked");
+        
+        var levels = GetVisibleZoomLevels().OrderBy(x => (int)x).ToList();
+        var currentIndex = levels.IndexOf(CurrentZoomLevel);
+        
+        if (currentIndex > 0) // Can zoom in (higher detail = lower index)
+        {
+            var newLevel = levels[currentIndex - 1];
+            Logger.LogOperation("ZOOM_CONTROLS", $"ZoomIn: {CurrentZoomLevel} -> {newLevel}");
+            await OnZoomLevelSelected(newLevel);
+        }
+        else
+        {
+            Logger.LogWarning("Cannot zoom in - already at maximum zoom", new { CurrentZoomLevel, currentIndex });
+        }
+    }
+    
+    private async Task OnZoomOut()
+    {
+        Logger.LogOperation("ZOOM_CONTROLS", "ZoomOut button clicked");
+        
+        var levels = GetVisibleZoomLevels().OrderBy(x => (int)x).ToList();
+        var currentIndex = levels.IndexOf(CurrentZoomLevel);
+        
+        if (currentIndex < levels.Count - 1) // Can zoom out (lower detail = higher index)
+        {
+            var newLevel = levels[currentIndex + 1];
+            Logger.LogOperation("ZOOM_CONTROLS", $"ZoomOut: {CurrentZoomLevel} -> {newLevel}");
+            await OnZoomLevelSelected(newLevel);
+        }
+        else
+        {
+            Logger.LogWarning("Cannot zoom out - already at minimum zoom", new { CurrentZoomLevel, currentIndex });
+        }
+    }
+    
+    // State checks
+    private bool IsAtMaxZoom()
+    {
+        var levels = GetVisibleZoomLevels().OrderBy(x => (int)x).ToList();
+        var result = levels.Count > 0 && CurrentZoomLevel == levels.First();
+        return result;
+    }
+    
+    private bool IsAtMinZoom()
+    {
+        var levels = GetVisibleZoomLevels().OrderBy(x => (int)x).ToList();
+        var result = levels.Count > 0 && CurrentZoomLevel == levels.Last();
+        return result;
+    }
+}

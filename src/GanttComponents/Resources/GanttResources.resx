@@ -322,4 +322,19 @@
   <data name="zoom.overflow.hidden-tasks" xml:space="preserve">
     <value>Hidden Tasks</value>
   </data>
+  <data name="ZoomControls.ZoomLevel" xml:space="preserve">
+    <value>Level</value>
+  </data>
+  <data name="ZoomControls.Current" xml:space="preserve">
+    <value>Current</value>
+  </data>
+  <data name="ZoomControls.QuickActions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ZoomControls.ZoomIn" xml:space="preserve">
+    <value>Zoom In</value>
+  </data>
+  <data name="ZoomControls.ZoomOut" xml:space="preserve">
+    <value>Zoom Out</value>
+  </data>
 </root>

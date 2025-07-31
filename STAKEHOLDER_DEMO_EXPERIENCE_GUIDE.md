@@ -73,13 +73,15 @@ You'll see output like:
 
 #### 3. **Make Ports Public for Stakeholders**
 1. In VS Code, go to **PORTS** tab (bottom panel)
-2. Find the running port (usually **5234** for HTTP or **7138** for HTTPS)
+2. Find the running ports:
+   - **Port 5234** (HTTP) - Recommended for stakeholder demos
+   - **Port 7138** (HTTPS) - Secure option
 3. **Right-click** → **Port Visibility** → **Public**
-4. **Copy the generated URL** (e.g., `https://scaling-waddle-xxx.github.dev`)
+4. **Copy the generated URL** (e.g., `https://organic-carnival-xxx.github.dev`)
 
 **Important Navigation:**
 - Base URL shows "Not Found" - this is normal
-- **Use HTTP URLs**: Add `/timeline-demo` to the HTTP URL
+- **Add demo path**: Add `/timeline-demo` to the URL
 - **Correct format**: `https://your-codespace-url.github.dev/timeline-demo`
 - Available demo pages:
   - `/timeline-demo` - Timeline zoom features (MAIN DEMO)
@@ -87,16 +89,13 @@ You'll see output like:
   - `/wbs-demo` - Work breakdown structure
 
 **Troubleshooting:**
-- If you see 307 redirects, the app is redirecting HTTP to HTTPS
-- If URL redirects to `github.dev/pf-signin`, restart demo (it will auto-detect Codespace)
-- **Auto-detection**: Demo script automatically uses Codespace profile for external access
-- Use the public HTTPS URL from the PORTS tab
-- Clear browser cache if pages don't load
-
-**Common Issues:**
-- **Authentication redirect**: Restart `./start-demo.sh` - it auto-detects Codespace environment
+- **Authentication redirect** (github.dev/pf-signin): 
+  - Stop the current demo (Ctrl+C)
+  - Restart `./start-demo.sh` - it will auto-detect Codespace
+  - Ensure you're using ports 5234/7138, not 5000/5001
 - **Port not public**: Right-click port in PORTS tab → Port Visibility → Public
 - **Wrong URL**: Use `https://your-url/timeline-demo` not just base URL
+- **Still getting 404**: Check that the application started successfully in terminal
 
 ### **As a Stakeholder (External User):**
 

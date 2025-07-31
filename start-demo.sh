@@ -25,8 +25,12 @@ fi
 
 # Set demo environment
 export ASPNETCORE_ENVIRONMENT=Demo
-export ASPNETCORE_URLS="http://0.0.0.0:5000;https://0.0.0.0:5001"
-export ASPNETCORE_HTTPS_PORT=5001
+
+# Only set URLs for local development - let Codespace profile handle its own URLs
+if [ -z "$CODESPACE_NAME" ]; then
+    export ASPNETCORE_URLS="http://localhost:5000;https://localhost:5001"
+    export ASPNETCORE_HTTPS_PORT=5001
+fi
 
 # Display demo features
 echo "🎨 Available Demo Features:"
@@ -49,15 +53,16 @@ echo "🔗 Demo Access Information:"
 if [ -n "$CODESPACES" ]; then
     echo "  📱 For Stakeholder Access:"
     echo "    1. Go to VS Code PORTS tab"
-    echo "    2. Click globe icon next to port 5000"
-    echo "    3. Copy the public URL"
-    echo "    4. Share with stakeholders"
+    echo "    2. Find ports 5234 (HTTP) or 7138 (HTTPS)"
+    echo "    3. Right-click → Port Visibility → Public"
+    echo "    4. Copy the public URL and add /timeline-demo"
+    echo "    5. Example: https://your-codespace-url.github.dev/timeline-demo"
     echo ""
     echo "  🔒 Security: Public URLs allow external access without GitHub login"
 else
     echo "  🏠 Local Access:"
-    echo "    • HTTP:  http://localhost:5000"
-    echo "    • HTTPS: https://localhost:5001"
+    echo "    • HTTP:  http://localhost:5000/timeline-demo"
+    echo "    • HTTPS: https://localhost:5001/timeline-demo"
 fi
 echo ""
 

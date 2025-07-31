@@ -1,6 +1,7 @@
 @using GanttComponents.Components.TaskGrid
 @using GanttComponents.Components.TimelineView
 @using GanttComponents.Models
+@using GanttComponents.Services
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
 
@@ -165,13 +166,15 @@
         {
             // Calculate timeline start date (same logic as TimelineView.CalculateTimelineRange)
             var startDate = Tasks.Min(t => t.StartDate).Date.AddDays(-7);
-            const int dayWidth = 40; // Same as TimelineView.DayWidth constant
+            
+            // Use dynamic day width based on current zoom level and factor
+            var effectiveDayWidth = TimelineZoomService.CalculateEffectiveDayWidth(ZoomLevel, ZoomFactor);
             
             await JSRuntime.InvokeVoidAsync("ganttComposer.scrollTaskBarToCenter",
                 $"composer-timeline-{ComponentId}",
                 selectedTask.StartDate.ToString("yyyy-MM-dd"),
                 startDate.ToString("yyyy-MM-dd"),
-                dayWidth);
+                effectiveDayWidth);
         }
         catch (Exception)
         {

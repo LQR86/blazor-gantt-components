@@ -1,0 +1,274 @@
+/* Timeline Zoom Controls - Material Design Based */
+.timeline-zoom-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--md-sys-color-surface);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: 8px;
+    font-family: var(--md-sys-typescale-body-small-font-family-name, 'Roboto', sans-serif);
+    font-size: var(--md-sys-typescale-body-small-font-size, 12px);
+    line-height: var(--md-sys-typescale-body-small-line-height, 16px);
+}
+
+/* Section containers */
+.zoom-level-presets,
+.zoom-current-state,
+.zoom-quick-actions,
+.zoom-additional-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Labels */
+.zoom-controls-label {
+    color: var(--md-sys-color-on-surface-variant);
+    font-weight: var(--md-sys-typescale-label-small-font-weight, 500);
+    font-size: var(--md-sys-typescale-label-small-font-size, 11px);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 4px;
+    white-space: nowrap;
+}
+
+/* Preset level buttons */
+.zoom-preset-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 64px;
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--md-sys-color-outline);
+    border-radius: 16px;
+    background: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+    font-family: inherit;
+    font-size: var(--md-sys-typescale-label-medium-font-size, 12px);
+    font-weight: var(--md-sys-typescale-label-medium-font-weight, 500);
+    cursor: pointer;
+    transition: all 150ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    user-select: none;
+    white-space: nowrap;
+}
+
+.zoom-preset-button:hover:not(:disabled) {
+    background: var(--md-sys-color-surface-variant);
+    border-color: var(--md-sys-color-outline-variant);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.zoom-preset-button:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.zoom-preset-button.active {
+    background: var(--md-sys-color-primary);
+    border-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.zoom-preset-button:disabled {
+    background: var(--md-sys-color-surface);
+    border-color: var(--md-sys-color-outline-variant);
+    color: var(--md-sys-color-on-surface-variant);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Current state display */
+.zoom-current-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: var(--md-sys-color-surface-variant);
+    border-radius: 4px;
+    min-height: 24px;
+}
+
+.zoom-level-name {
+    color: var(--md-sys-color-on-surface);
+    font-weight: var(--md-sys-typescale-label-medium-font-weight, 500);
+}
+
+.zoom-factor-display,
+.zoom-day-width {
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: var(--md-sys-typescale-body-small-font-size, 11px);
+    font-family: var(--md-sys-typescale-body-small-font-family-name, 'Roboto Mono', monospace);
+}
+
+.zoom-factor-display::before {
+    content: '(';
+}
+
+.zoom-factor-display::after {
+    content: ')';
+}
+
+/* Quick action buttons */
+.zoom-action-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.zoom-action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 32px;
+    width: auto;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid var(--md-sys-color-outline);
+    border-radius: 16px;
+    background: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+    cursor: pointer;
+    transition: all 150ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* When no text labels, keep circular */
+.zoom-action-button:not(:has(.zoom-action-text)) {
+    width: 32px;
+    padding: 0;
+    border-radius: 50%;
+}
+
+.zoom-action-button:hover:not(:disabled) {
+    background: var(--md-sys-color-surface-variant);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.zoom-action-button:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.zoom-action-button:disabled {
+    background: var(--md-sys-color-surface);
+    border-color: var(--md-sys-color-outline-variant);
+    color: var(--md-sys-color-on-surface-variant);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.zoom-icon {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.zoom-action-text {
+    margin-left: 4px;
+    font-size: var(--md-sys-typescale-label-small-font-size, 11px);
+    font-weight: var(--md-sys-typescale-label-small-font-weight, 500);
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+    .timeline-zoom-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .zoom-level-presets,
+    .zoom-current-state,
+    .zoom-quick-actions {
+        justify-content: center;
+    }
+    
+    .zoom-controls-label {
+        display: none; /* Hide labels on mobile for space */
+    }
+    
+    .zoom-preset-button {
+        min-width: 48px;
+        flex: 1;
+    }
+}
+
+/* Compact variant */
+.timeline-zoom-controls.compact {
+    gap: 8px;
+    padding: 4px 8px;
+}
+
+.timeline-zoom-controls.compact .zoom-action-buttons {
+    gap: 8px;
+}
+
+.timeline-zoom-controls.compact .zoom-preset-button {
+    min-width: 48px;
+    height: 24px;
+    padding: 0 8px;
+    font-size: 10px;
+}
+
+.timeline-zoom-controls.compact .zoom-action-button {
+    min-width: 24px;
+    height: 24px;
+    padding: 0 6px;
+    border-radius: 12px;
+}
+
+.timeline-zoom-controls.compact .zoom-action-buttons {
+    gap: 6px;
+}
+
+.timeline-zoom-controls.compact .zoom-action-button:not(:has(.zoom-action-text)) {
+    width: 24px;
+    padding: 0;
+    border-radius: 50%;
+}
+
+.timeline-zoom-controls.compact .zoom-icon {
+    font-size: 12px;
+}
+
+.timeline-zoom-controls.compact .zoom-action-text {
+    font-size: 10px;
+    margin-left: 2px;
+}
+
+/* Minimal variant - just buttons, no labels */
+.timeline-zoom-controls.minimal {
+    padding: 4px;
+    border: none;
+    background: transparent;
+}
+
+.timeline-zoom-controls.minimal .zoom-controls-label {
+    display: none;
+}
+
+.timeline-zoom-controls.minimal .zoom-current-state {
+    display: none;
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+    .timeline-zoom-controls {
+        background: var(--md-sys-color-surface-dark, #121212);
+        border-color: var(--md-sys-color-outline-variant-dark, #444);
+    }
+    
+    .zoom-preset-button {
+        background: var(--md-sys-color-surface-dark, #1e1e1e);
+        border-color: var(--md-sys-color-outline-dark, #666);
+        color: var(--md-sys-color-on-surface-dark, #e0e0e0);
+    }
+    
+    .zoom-preset-button.active {
+        background: var(--md-sys-color-primary-dark, #bb86fc);
+        color: var(--md-sys-color-on-primary-dark, #000);
+    }
+}

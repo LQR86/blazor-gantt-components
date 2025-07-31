@@ -1,9 +1,11 @@
 @page "/timeline-demo"
 @using GanttComponents.Models
 @using GanttComponents.Components.TimelineView
+@using GanttComponents.Components.TimelineZoomControls
 @using GanttComponents.Services
 @inject IGanttTaskService TaskService
 @inject IGanttI18N I18N
+@inject IUniversalLogger Logger
 
 <PageTitle>@I18N.T("page.title.timeline-demo")</PageTitle>
 
@@ -11,11 +13,86 @@
 
 <div class="demo-container">
     <div class="demo-section">
+        <h3>✨ Timeline Zoom Controls (v0.8.2) - NEW!</h3>
+        <p>Interactive zoom level controls with real-time timeline updates.</p>
+        
+        <!-- Zoom Controls Demo Section -->
+        <div class="zoom-controls-demo">
+            <h4>Zoom Controls Component</h4>
+            
+            <!-- Default Configuration -->
+            <div class="zoom-demo-variant">
+                <h5>Default Configuration</h5>
+                <TimelineZoomControls CurrentZoomLevel="@CurrentZoomLevel"
+                                     CurrentZoomFactor="@CurrentZoomFactor"
+                                     OnZoomLevelChanged="HandleZoomLevelChanged"
+                                     OnZoomFactorChanged="HandleZoomFactorChanged" />
+            </div>
+            
+            <!-- Compact Configuration -->
+            <div class="zoom-demo-variant">
+                <h5>Compact Variant</h5>
+                <TimelineZoomControls CurrentZoomLevel="@CurrentZoomLevel"
+                                     CurrentZoomFactor="@CurrentZoomFactor"
+                                     OnZoomLevelChanged="HandleZoomLevelChanged"
+                                     OnZoomFactorChanged="HandleZoomFactorChanged"
+                                     CssClass="compact"
+                                     ShowActionLabels="true" />
+            </div>
+            
+            <!-- Minimal Configuration -->
+            <div class="zoom-demo-variant">
+                <h5>Minimal Variant (Presets Only)</h5>
+                <TimelineZoomControls CurrentZoomLevel="@CurrentZoomLevel"
+                                     CurrentZoomFactor="@CurrentZoomFactor"
+                                     OnZoomLevelChanged="HandleZoomLevelChanged"
+                                     OnZoomFactorChanged="HandleZoomFactorChanged"
+                                     CssClass="minimal"
+                                     ShowCurrentState="false"
+                                     ShowQuickActions="false"
+                                     ShowLabels="false" />
+            </div>
+            
+            <!-- Custom Range Configuration -->
+            <div class="zoom-demo-variant">
+                <h5>Custom Range (WeekDay to MonthWeek)</h5>
+                <TimelineZoomControls CurrentZoomLevel="@CurrentZoomLevel"
+                                     CurrentZoomFactor="@CurrentZoomFactor"
+                                     OnZoomLevelChanged="HandleZoomLevelChanged"
+                                     OnZoomFactorChanged="HandleZoomFactorChanged"
+                                     MinZoomLevel="@TimelineZoomLevel.WeekDay"
+                                     MaxZoomLevel="@TimelineZoomLevel.MonthWeek"
+                                     ShowDayWidth="true" />
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
         <h3>@I18N.T("demo.timeline.section")</h3>
         <p>@I18N.T("demo.timeline.description")</p>
         
+        <!-- Main zoom controls for timeline -->
+        <div class="timeline-controls">
+            <TimelineZoomControls CurrentZoomLevel="@CurrentZoomLevel"
+                                 CurrentZoomFactor="@CurrentZoomFactor"
+                                 OnZoomLevelChanged="HandleZoomLevelChanged"
+                                 OnZoomFactorChanged="HandleZoomFactorChanged"
+                                 ShowDayWidth="true">
+                <AdditionalContent>
+                    <div class="zoom-status">
+                        <span class="status-label">Live Demo Status:</span>
+                        <span class="status-value">@($"Effective Day Width: {EffectiveDayWidth:F0}px")</span>
+                    </div>
+                </AdditionalContent>
+            </TimelineZoomControls>
+        </div>
+        
         <div class="timeline-container">
             <TimelineView Tasks="@SampleTasks" 
+                         ZoomLevel="@CurrentZoomLevel"
+                         ZoomFactor="@CurrentZoomFactor"
+                         OnZoomLevelChanged="HandleZoomLevelChanged"
+                         OnZoomFactorChanged="HandleZoomFactorChanged"
                          OnTaskSelected="HandleTaskSelected" 
                          OnScrollChanged="HandleScrollChanged" />
         </div>
@@ -71,10 +148,54 @@
 @code {
     private List<GanttTask> SampleTasks { get; set; } = new();
     private GanttTask? SelectedTaskInfo { get; set; }
+    
+    // Zoom state properties
+    private TimelineZoomLevel CurrentZoomLevel { get; set; } = TimelineZoomLevel.MonthDay;
+    private double CurrentZoomFactor { get; set; } = 1.6; // Maintain current 40px day width
+    
+    // Calculated properties
+    private double EffectiveDayWidth => TimelineZoomService.GetConfiguration(CurrentZoomLevel).GetEffectiveDayWidth(CurrentZoomFactor);
 
     protected override async Task OnInitializedAsync()
     {
         await LoadSampleData();
+    }
+    
+    // Zoom event handlers
+    private async Task HandleZoomLevelChanged(TimelineZoomLevel newLevel)
+    {
+        Logger.LogOperation("TIMELINE_DEMO", $"HandleZoomLevelChanged: {CurrentZoomLevel} -> {newLevel}");
+        
+        var oldLevel = CurrentZoomLevel;
+        CurrentZoomLevel = newLevel;
+        
+        Logger.LogStateChange("TimelineDemo", "CurrentZoomLevel", oldLevel, newLevel);
+        Logger.LogDebugInfo("Zoom state after change", new { 
+            CurrentZoomLevel = newLevel, 
+            CurrentZoomFactor, 
+            EffectiveDayWidth 
+        });
+        
+        await InvokeAsync(StateHasChanged);
+        Logger.LogOperation("TIMELINE_DEMO", "StateHasChanged invoked after zoom level change");
+    }
+    
+    private async Task HandleZoomFactorChanged(double newFactor)
+    {
+        Logger.LogOperation("TIMELINE_DEMO", $"HandleZoomFactorChanged: {CurrentZoomFactor} -> {newFactor}");
+        
+        var oldFactor = CurrentZoomFactor;
+        CurrentZoomFactor = newFactor;
+        
+        Logger.LogStateChange("TimelineDemo", "CurrentZoomFactor", oldFactor, newFactor);
+        Logger.LogDebugInfo("Zoom factor after change", new { 
+            CurrentZoomLevel, 
+            CurrentZoomFactor = newFactor, 
+            EffectiveDayWidth 
+        });
+        
+        await InvokeAsync(StateHasChanged);
+        Logger.LogOperation("TIMELINE_DEMO", "StateHasChanged invoked after zoom factor change");
     }
 
     private async Task LoadSampleData()
@@ -205,6 +326,54 @@
         border: 1px solid var(--gantt-outline, #e0e0e0);
         border-radius: 4px;
         overflow: hidden;
+    }
+    
+    .zoom-controls-demo {
+        border: 1px solid var(--gantt-outline-variant, #d0d0d0);
+        border-radius: 8px;
+        padding: 16px;
+        background: var(--gantt-surface-variant, #fafafa);
+    }
+    
+    .zoom-demo-variant {
+        margin-bottom: 20px;
+        padding: 12px;
+        border: 1px solid var(--gantt-outline, #e0e0e0);
+        border-radius: 6px;
+        background: var(--gantt-surface, #ffffff);
+    }
+    
+    .zoom-demo-variant h5 {
+        margin: 0 0 8px 0;
+        color: var(--gantt-primary, #1976d2);
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    .timeline-controls {
+        margin-bottom: 16px;
+        padding: 12px;
+        background: var(--gantt-surface-variant, #f8f9fa);
+        border-radius: 6px;
+        border: 1px solid var(--gantt-outline-variant, #e1e5e9);
+    }
+    
+    .zoom-status {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 12px;
+    }
+    
+    .status-label {
+        color: var(--gantt-on-surface-variant, #666);
+        font-weight: 500;
+    }
+    
+    .status-value {
+        color: var(--gantt-primary, #1976d2);
+        font-weight: 600;
+        font-family: monospace;
     }
 
     .task-info {

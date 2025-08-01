@@ -1,18 +1,14 @@
 @page "/manual-zoom-validation"
-@using GanttComponents.Models
-@using GanttComponents.Services
-@using GanttComponents.Components.TimelineZoomControls
-@using Microsoft.AspNetCore.Components
 @inject IGanttI18N I18N
 @inject IUniversalLogger Logger
 
-<PageTitle>Manual Zoom Controls Validation - Iteration 3.1</PageTitle>
+<PageTitle>Manual Zoom Controls Integration Validation - Iteration 3.1</PageTitle>
 
 <div class="validation-container">
     <header class="validation-header">
-        <h1>🎛️ Manual Zoom Controls Validation</h1>
+        <h1>🎛️ Manual Zoom Controls Integration Validation</h1>
         <p class="validation-subtitle">
-            <strong>Iteration 3.1</strong> - Testing manual zoom slider, increment controls, and live preview functionality
+            <strong>Iteration 3.1</strong> - Testing manual zoom controls with TimelineView standalone and GanttComposer integration
         </p>
     </header>
 
@@ -34,15 +30,13 @@
                     <span class="state-value">@($"{EffectiveDayWidth:F1}px")</span>
                 </div>
                 <div class="state-item">
-                    <label>Range Valid:</label>
-                    <span class="state-value @(IsValidRange ? "valid" : "invalid")">
-                        @(IsValidRange ? "✅ Valid" : "❌ Invalid")
-                    </span>
+                    <label>Timeline Width:</label>
+                    <span class="state-value">@($"{TimelineWidth:F0}px")</span>
                 </div>
             </div>
         </div>
 
-        <!-- Manual Zoom Controls Test -->
+        <!-- Manual Zoom Controls -->
         <div class="controls-test">
             <h2>🎛️ Manual Zoom Controls</h2>
             <div class="controls-container">
@@ -64,91 +58,105 @@
             </div>
         </div>
 
-        <!-- Manual Controls Only Test -->
-        <div class="controls-test">
-            <h2>🎚️ Manual Controls Only</h2>
-            <div class="controls-container">
-                <TimelineZoomControls 
-                    CurrentZoomLevel="@CurrentZoomLevel"
-                    CurrentZoomFactor="@CurrentZoomFactor"
-                    OnZoomLevelChanged="@OnZoomLevelChanged"
-                    OnZoomFactorChanged="@OnZoomFactorChanged"
-                    ShowLevelPresets="false"
-                    ShowCurrentState="false"
-                    ShowQuickActions="false"
-                    ShowManualControls="true"
-                    ShowLivePreview="true"
-                    ShowLabels="true"
-                    CssClass="validation-zoom-controls-minimal" />
-            </div>
+        <!-- TimelineView Standalone Integration -->
+        <div class="timeline-test">
+            <h2>📅 TimelineView Standalone Integration</h2>
+            <p class="test-description">
+                Manual zoom controls should affect the timeline rendering below. 
+                Watch the day width, header spacing, and taskbar positioning change as you adjust the zoom.
+            </p>
+            <TimelineView 
+                Tasks="@SampleTasks"
+                ZoomLevel="@CurrentZoomLevel"
+                ZoomFactor="@CurrentZoomFactor"
+                OnZoomLevelChanged="@OnZoomLevelChanged"
+                OnZoomFactorChanged="@OnZoomFactorChanged"
+                RowHeight="32"
+                HeaderMonthHeight="24"
+                HeaderDayHeight="24" />
         </div>
 
-        <!-- Integration Test with Different Ranges -->
-        <div class="controls-test">
-            <h2>🎯 Custom Range Test (0.25x - 5.0x)</h2>
-            <div class="controls-container">
-                <TimelineZoomControls 
-                    CurrentZoomLevel="@CurrentZoomLevel"
-                    CurrentZoomFactor="@CurrentZoomFactor"
-                    OnZoomLevelChanged="@OnZoomLevelChanged"
-                    OnZoomFactorChanged="@OnZoomFactorChanged"
-                    ShowLevelPresets="false"
-                    ShowCurrentState="true"
-                    ShowQuickActions="false"
-                    ShowManualControls="true"
-                    ShowLivePreview="true"
-                    ShowLabels="true"
-                    MinZoomFactor="0.25"
-                    MaxZoomFactor="5.0"
-                    ZoomFactorStep="0.25"
-                    CssClass="validation-zoom-controls-extended" />
-            </div>
+        <!-- GanttComposer Full Integration -->
+        <div class="composer-test">
+            <h2>🗂️ GanttComposer Full Integration</h2>
+            <p class="test-description">
+                Complete integration test with TaskGrid + TimelineView. 
+                Manual zoom should affect only the timeline while maintaining grid alignment.
+            </p>
+            <GanttComposer 
+                Tasks="@SampleTasks"
+                OnTaskSelected="@HandleTaskSelection"
+                ShowDebugAlignment="@ShowDebugAlignment"
+                ZoomLevel="@CurrentZoomLevel"
+                ZoomFactor="@CurrentZoomFactor"
+                OnZoomLevelChanged="@OnZoomLevelChanged"
+                OnZoomFactorChanged="@OnZoomFactorChanged"
+                ContainerHeight="400"
+                RowHeight="32" />
         </div>
 
-        <!-- Manual Testing Instructions -->
+        @if (SelectedTaskId.HasValue)
+        {
+            var selectedTask = SampleTasks.FirstOrDefault(t => t.Id == SelectedTaskId.Value);
+            if (selectedTask != null)
+            {
+                <div class="selected-task-info alert alert-success mt-3">
+                    <strong>Selected Task:</strong> @selectedTask.Name
+                    <br />
+                    <small>
+                        Duration: @selectedTask.Duration | 
+                        Start: @selectedTask.StartDate.ToString("yyyy-MM-dd") | 
+                        End: @selectedTask.EndDate.ToString("yyyy-MM-dd")
+                    </small>
+                </div>
+            }
+        }
+
+        <!-- Integration Testing Checklist -->
         <div class="testing-instructions">
-            <h2>🧪 Manual Testing Checklist</h2>
+            <h2>🧪 Integration Testing Checklist</h2>
             <div class="checklist">
                 <div class="checklist-section">
-                    <h3>✅ Slider Functionality</h3>
+                    <h3>✅ TimelineView Standalone</h3>
                     <ul>
-                        <li>✅ Slider moves smoothly across the range (0.5x - 3.0x)</li>
-                        <li>✅ Live preview shows zoom factor changes during dragging</li>
-                        <li>✅ Final value applies when slider is released</li>
-                        <li>✅ Slider respects min/max boundaries</li>
-                        <li>✅ Step size works correctly (0.1x increments)</li>
+                        <li>✅ Manual zoom controls affect timeline day width</li>
+                        <li>✅ Timeline headers adjust to new day width</li>
+                        <li>✅ Task bars stretch/compress with zoom changes</li>
+                        <li>✅ Timeline scrolling adapts to new width</li>
+                        <li>✅ Visual feedback is immediate and smooth</li>
                     </ul>
                 </div>
                 
                 <div class="checklist-section">
-                    <h3>✅ Increment/Decrement Buttons</h3>
+                    <h3>✅ GanttComposer Integration</h3>
                     <ul>
-                        <li>✅ + button increases zoom factor by 0.1x</li>
-                        <li>✅ - button decreases zoom factor by 0.1x</li>
-                        <li>✅ Buttons disable at min/max boundaries</li>
-                        <li>✅ Buttons work with keyboard navigation</li>
-                        <li>✅ Visual feedback on hover/click</li>
+                        <li>✅ Task grid remains fixed width during zoom</li>
+                        <li>✅ Timeline adapts to zoom changes</li>
+                        <li>✅ Row alignment maintained between grid and timeline</li>
+                        <li>✅ Splitter position remains stable</li>
+                        <li>✅ Combined scrolling works correctly</li>
                     </ul>
                 </div>
                 
                 <div class="checklist-section">
-                    <h3>✅ Live Preview</h3>
+                    <h3>✅ Manual Controls Behavior</h3>
                     <ul>
-                        <li>✅ Preview value appears during slider interaction</li>
-                        <li>✅ Preview has visual distinction (color, animation)</li>
-                        <li>✅ Preview disappears when interaction ends</li>
-                        <li>✅ No preview during button clicks (immediate change)</li>
-                    </ul>
-                </div>
-                
-                <div class="checklist-section">
-                    <h3>✅ Integration</h3>
-                    <ul>
-                        <li>✅ Manual controls work with preset level buttons</li>
-                        <li>✅ Quick action buttons (zoom in/out) still work</li>
+                        <li>✅ Slider changes immediately affect timeline</li>
+                        <li>✅ Increment/decrement buttons work smoothly</li>
+                        <li>✅ Live preview shows during slider drag</li>
+                        <li>✅ Boundary limits prevent invalid zoom levels</li>
                         <li>✅ State synchronization across all controls</li>
-                        <li>✅ Custom range configurations work correctly</li>
-                        <li>✅ I18N labels display correctly</li>
+                    </ul>
+                </div>
+                
+                <div class="checklist-section">
+                    <h3>✅ Visual Validation</h3>
+                    <ul>
+                        <li>✅ Day widths match calculated effective values</li>
+                        <li>✅ Task positioning is accurate across zoom levels</li>
+                        <li>✅ No visual glitches during zoom transitions</li>
+                        <li>✅ Performance remains smooth during interactions</li>
+                        <li>✅ Timeline width updates correctly</li>
                     </ul>
                 </div>
             </div>
@@ -181,10 +189,16 @@
     // State
     private TimelineZoomLevel CurrentZoomLevel { get; set; } = TimelineZoomLevel.MonthDay;
     private double CurrentZoomFactor { get; set; } = 1.0;
+    private bool ShowDebugAlignment { get; set; } = false;
+    private int? SelectedTaskId { get; set; }
     
     // Validation properties
     private double EffectiveDayWidth => TimelineZoomService.GetConfiguration(CurrentZoomLevel).GetEffectiveDayWidth(CurrentZoomFactor);
-    private bool IsValidRange => CurrentZoomFactor >= 0.5 && CurrentZoomFactor <= 3.0;
+    private double TimelineWidth => SampleTasks.Any() ? 
+        (SampleTasks.Max(t => t.EndDate) - SampleTasks.Min(t => t.StartDate)).Days * EffectiveDayWidth : 0;
+    
+    // Sample data for testing
+    private List<GanttTask> SampleTasks { get; set; } = new();
     
     // Event tracking
     private List<LogEntry> EventLog { get; set; } = new();
@@ -197,13 +211,69 @@
     
     protected override void OnInitialized()
     {
-        AddLogEntry("Manual Zoom Validation page initialized");
-        Logger.LogOperation("MANUAL_ZOOM_VALIDATION", "Page initialized with default state", new
+        GenerateSampleTasks();
+        AddLogEntry("Manual Zoom Integration Validation page initialized");
+        Logger.LogOperation("MANUAL_ZOOM_INTEGRATION_VALIDATION", "Page initialized with sample tasks", new
         {
             CurrentZoomLevel,
             CurrentZoomFactor,
-            EffectiveDayWidth
+            EffectiveDayWidth,
+            TimelineWidth,
+            SampleTaskCount = SampleTasks.Count
         });
+    }
+    
+    private void GenerateSampleTasks()
+    {
+        var startDate = DateTime.Today.AddDays(-30);
+        SampleTasks = new List<GanttTask>
+        {
+            new GanttTask
+            {
+                Id = 1,
+                Name = "Project Planning",
+                StartDate = startDate,
+                EndDate = startDate.AddDays(7),
+                Duration = "7d",
+                Progress = 100
+            },
+            new GanttTask
+            {
+                Id = 2,
+                Name = "Design Phase",
+                StartDate = startDate.AddDays(8),
+                EndDate = startDate.AddDays(21),
+                Duration = "14d",
+                Progress = 75
+            },
+            new GanttTask
+            {
+                Id = 3,
+                Name = "Development",
+                StartDate = startDate.AddDays(15),
+                EndDate = startDate.AddDays(45),
+                Duration = "30d",
+                Progress = 45
+            },
+            new GanttTask
+            {
+                Id = 4,
+                Name = "Testing",
+                StartDate = startDate.AddDays(40),
+                EndDate = startDate.AddDays(55),
+                Duration = "15d",
+                Progress = 0
+            },
+            new GanttTask
+            {
+                Id = 5,
+                Name = "Deployment",
+                StartDate = startDate.AddDays(55),
+                EndDate = startDate.AddDays(60),
+                Duration = "5d",
+                Progress = 0
+            }
+        };
     }
     
     private Task OnZoomLevelChanged(TimelineZoomLevel newLevel)
@@ -211,13 +281,14 @@
         var oldLevel = CurrentZoomLevel;
         CurrentZoomLevel = newLevel;
         
-        AddLogEntry($"Zoom Level: {oldLevel} → {newLevel}");
-        Logger.LogOperation("MANUAL_ZOOM_VALIDATION", "Zoom level changed", new
+        AddLogEntry($"Zoom Level: {oldLevel} → {newLevel} (Timeline Width: {TimelineWidth:F0}px)");
+        Logger.LogOperation("MANUAL_ZOOM_INTEGRATION_VALIDATION", "Zoom level changed", new
         {
             OldLevel = oldLevel,
             NewLevel = newLevel,
             CurrentZoomFactor,
-            NewEffectiveDayWidth = EffectiveDayWidth
+            NewEffectiveDayWidth = EffectiveDayWidth,
+            NewTimelineWidth = TimelineWidth
         });
         
         StateHasChanged();
@@ -229,17 +300,26 @@
         var oldFactor = CurrentZoomFactor;
         CurrentZoomFactor = newFactor;
         
-        AddLogEntry($"Zoom Factor: {oldFactor:F2}x → {newFactor:F2}x (Day Width: {EffectiveDayWidth:F1}px)");
-        Logger.LogOperation("MANUAL_ZOOM_VALIDATION", "Zoom factor changed", new
+        AddLogEntry($"Zoom Factor: {oldFactor:F2}x → {newFactor:F2}x (Day Width: {EffectiveDayWidth:F1}px, Timeline: {TimelineWidth:F0}px)");
+        Logger.LogOperation("MANUAL_ZOOM_INTEGRATION_VALIDATION", "Zoom factor changed", new
         {
             OldFactor = oldFactor,
             NewFactor = newFactor,
             CurrentZoomLevel,
-            NewEffectiveDayWidth = EffectiveDayWidth
+            NewEffectiveDayWidth = EffectiveDayWidth,
+            NewTimelineWidth = TimelineWidth
         });
         
         StateHasChanged();
         return Task.CompletedTask;
+    }
+    
+    private void HandleTaskSelection(int taskId)
+    {
+        SelectedTaskId = taskId;
+        AddLogEntry($"Task Selected: ID {taskId}");
+        Logger.LogOperation("MANUAL_ZOOM_INTEGRATION_VALIDATION", "Task selected", new { TaskId = taskId });
+        StateHasChanged();
     }
     
     private void AddLogEntry(string message)
@@ -347,6 +427,31 @@
         background: #f8f9fa;
         border-radius: 6px;
         border: 1px dashed #ccc;
+    }
+
+    .test-description {
+        color: #666;
+        font-style: italic;
+        margin-bottom: 12px;
+        padding: 8px 12px;
+        background: #e8f4fd;
+        border-left: 3px solid #2196f3;
+        border-radius: 4px;
+    }
+
+    .timeline-test, .composer-test {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .timeline-test h2, .composer-test h2 {
+        margin: 0 0 12px 0;
+        color: #333;
+        font-size: 1.3rem;
+        font-weight: 600;
     }
     
     .validation-zoom-controls,

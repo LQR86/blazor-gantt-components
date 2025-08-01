@@ -20,19 +20,19 @@ public class GanttComposerZoomIntegrationTests : IDisposable
     public GanttComposerZoomIntegrationTests()
     {
         var services = new ServiceCollection();
-        
+
         _mockLogger = new Mock<IUniversalLogger>();
         _mockI18N = new Mock<IGanttI18N>();
-        
+
         // Setup I18N mock
         _mockI18N.Setup(x => x.T(It.IsAny<string>())).Returns((string key) => key);
-        
+
         // Register services
         services.AddSingleton(_mockLogger.Object);
         services.AddSingleton(_mockI18N.Object);
         services.AddScoped<TimelineZoomService>();
         services.AddScoped<GanttRowAlignmentService>();
-        
+
         _serviceProvider = services.BuildServiceProvider();
     }
 
@@ -111,19 +111,19 @@ public class GanttComposerZoomIntegrationTests : IDisposable
     {
         // Arrange
         var dayWidth = TimelineZoomService.CalculateEffectiveDayWidth(level, factor);
-        
+
         // Act
         var taskWidth = dayWidth * durationDays;
-        
+
         // Assert - Task width should be calculable
         Assert.True(taskWidth > 0, "Task width must be positive");
-        
+
         // Log visibility status for validation
         var isVisible = taskWidth >= 12.0; // 12px minimum visibility threshold
         _mockLogger.Verify(x => x.LogDebugInfo(
-            It.Is<string>(s => s.Contains("Task visibility")), 
+            It.Is<string>(s => s.Contains("Task visibility")),
             It.IsAny<object>()), Times.Never); // Just checking the test setup
-        
+
         // The test validates that calculations work - actual visibility handling is in components
         Assert.True(true, $"Task with {durationDays} days at {level} ({factor}x) = {taskWidth}px (visible: {isVisible})");
     }
@@ -140,12 +140,12 @@ public class GanttComposerZoomIntegrationTests : IDisposable
         {
             // The alignment service should be usable at any zoom level
             Assert.NotNull(alignmentService);
-            
+
             // Simulate row height calculation (alignment service responsibility)
             var rowHeight = 32; // Standard row height
             var taskCount = testTasks.Count;
             var totalHeight = rowHeight * taskCount;
-            
+
             Assert.True(totalHeight > 0, $"Total height calculation should work at {level}");
             Assert.Equal(160, totalHeight); // 5 tasks * 32px = 160px total height
         }
@@ -167,7 +167,7 @@ public class GanttComposerZoomIntegrationTests : IDisposable
         // Assert - Parameter flow validation
         Assert.Equal(60.0, initialDayWidth); // WeekDay @ 1.0x = 60px
         Assert.Equal(22.5, targetDayWidth);  // MonthWeek @ 1.5x = 15 * 1.5 = 22.5px
-        
+
         // Verify the integration maintains different day widths for different settings
         Assert.NotEqual(initialDayWidth, targetDayWidth);
     }
@@ -178,26 +178,26 @@ public class GanttComposerZoomIntegrationTests : IDisposable
         // Arrange
         var largeTasks = CreateTestTasks(500); // Simulate large dataset
         var zoomLevels = Enum.GetValues<TimelineZoomLevel>();
-        
+
         // Act & Assert - Performance validation
         foreach (TimelineZoomLevel level in zoomLevels)
         {
             var startTime = DateTime.UtcNow;
-            
+
             // Simulate zoom calculation for all tasks
             foreach (var task in largeTasks)
             {
                 var dayWidth = TimelineZoomService.CalculateEffectiveDayWidth(level, 1.0);
                 var taskWidth = dayWidth * ParseDurationDays(task.Duration);
-                
+
                 // Just ensure calculation completes
                 Assert.True(taskWidth >= 0);
             }
-            
+
             var duration = DateTime.UtcNow - startTime;
-            
+
             // Assert - Performance threshold
-            Assert.True(duration.TotalMilliseconds < 100, 
+            Assert.True(duration.TotalMilliseconds < 100,
                 $"Zoom calculations for 500 tasks at {level} should complete in <100ms, took {duration.TotalMilliseconds}ms");
         }
     }
@@ -206,7 +206,7 @@ public class GanttComposerZoomIntegrationTests : IDisposable
     {
         var tasks = new List<GanttTask>();
         var startDate = DateTime.Today;
-        
+
         for (int i = 0; i < count; i++)
         {
             tasks.Add(new GanttTask
@@ -219,7 +219,7 @@ public class GanttComposerZoomIntegrationTests : IDisposable
                 ParentId = i > 0 && i % 5 == 0 ? i - 4 : null // Some hierarchy
             });
         }
-        
+
         return tasks;
     }
 

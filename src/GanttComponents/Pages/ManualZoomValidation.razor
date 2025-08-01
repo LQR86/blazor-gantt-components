@@ -1,0 +1,412 @@
+@page "/manual-zoom-validation"
+@using GanttComponents.Models
+@using GanttComponents.Services
+@using GanttComponents.Components.TimelineZoomControls
+@using Microsoft.AspNetCore.Components
+@inject IGanttI18N I18N
+@inject IUniversalLogger Logger
+
+<PageTitle>Manual Zoom Controls Validation - Iteration 3.1</PageTitle>
+
+<div class="validation-container">
+    <header class="validation-header">
+        <h1>🎛️ Manual Zoom Controls Validation</h1>
+        <p class="validation-subtitle">
+            <strong>Iteration 3.1</strong> - Testing manual zoom slider, increment controls, and live preview functionality
+        </p>
+    </header>
+
+    <div class="validation-content">
+        <!-- Current State Display -->
+        <div class="state-display">
+            <h2>📊 Current Zoom State</h2>
+            <div class="state-grid">
+                <div class="state-item">
+                    <label>Zoom Level:</label>
+                    <span class="state-value">@CurrentZoomLevel</span>
+                </div>
+                <div class="state-item">
+                    <label>Zoom Factor:</label>
+                    <span class="state-value">@($"{CurrentZoomFactor:F2}x ({CurrentZoomFactor:P0})")</span>
+                </div>
+                <div class="state-item">
+                    <label>Effective Day Width:</label>
+                    <span class="state-value">@($"{EffectiveDayWidth:F1}px")</span>
+                </div>
+                <div class="state-item">
+                    <label>Range Valid:</label>
+                    <span class="state-value @(IsValidRange ? "valid" : "invalid")">
+                        @(IsValidRange ? "✅ Valid" : "❌ Invalid")
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Zoom Controls Test -->
+        <div class="controls-test">
+            <h2>🎛️ Manual Zoom Controls</h2>
+            <div class="controls-container">
+                <TimelineZoomControls 
+                    CurrentZoomLevel="@CurrentZoomLevel"
+                    CurrentZoomFactor="@CurrentZoomFactor"
+                    OnZoomLevelChanged="@OnZoomLevelChanged"
+                    OnZoomFactorChanged="@OnZoomFactorChanged"
+                    ShowLevelPresets="true"
+                    ShowCurrentState="true"
+                    ShowQuickActions="true"
+                    ShowManualControls="true"
+                    ShowLivePreview="true"
+                    ShowLabels="true"
+                    MinZoomFactor="0.5"
+                    MaxZoomFactor="3.0"
+                    ZoomFactorStep="0.1"
+                    CssClass="validation-zoom-controls" />
+            </div>
+        </div>
+
+        <!-- Manual Controls Only Test -->
+        <div class="controls-test">
+            <h2>🎚️ Manual Controls Only</h2>
+            <div class="controls-container">
+                <TimelineZoomControls 
+                    CurrentZoomLevel="@CurrentZoomLevel"
+                    CurrentZoomFactor="@CurrentZoomFactor"
+                    OnZoomLevelChanged="@OnZoomLevelChanged"
+                    OnZoomFactorChanged="@OnZoomFactorChanged"
+                    ShowLevelPresets="false"
+                    ShowCurrentState="false"
+                    ShowQuickActions="false"
+                    ShowManualControls="true"
+                    ShowLivePreview="true"
+                    ShowLabels="true"
+                    CssClass="validation-zoom-controls-minimal" />
+            </div>
+        </div>
+
+        <!-- Integration Test with Different Ranges -->
+        <div class="controls-test">
+            <h2>🎯 Custom Range Test (0.25x - 5.0x)</h2>
+            <div class="controls-container">
+                <TimelineZoomControls 
+                    CurrentZoomLevel="@CurrentZoomLevel"
+                    CurrentZoomFactor="@CurrentZoomFactor"
+                    OnZoomLevelChanged="@OnZoomLevelChanged"
+                    OnZoomFactorChanged="@OnZoomFactorChanged"
+                    ShowLevelPresets="false"
+                    ShowCurrentState="true"
+                    ShowQuickActions="false"
+                    ShowManualControls="true"
+                    ShowLivePreview="true"
+                    ShowLabels="true"
+                    MinZoomFactor="0.25"
+                    MaxZoomFactor="5.0"
+                    ZoomFactorStep="0.25"
+                    CssClass="validation-zoom-controls-extended" />
+            </div>
+        </div>
+
+        <!-- Manual Testing Instructions -->
+        <div class="testing-instructions">
+            <h2>🧪 Manual Testing Checklist</h2>
+            <div class="checklist">
+                <div class="checklist-section">
+                    <h3>✅ Slider Functionality</h3>
+                    <ul>
+                        <li>✅ Slider moves smoothly across the range (0.5x - 3.0x)</li>
+                        <li>✅ Live preview shows zoom factor changes during dragging</li>
+                        <li>✅ Final value applies when slider is released</li>
+                        <li>✅ Slider respects min/max boundaries</li>
+                        <li>✅ Step size works correctly (0.1x increments)</li>
+                    </ul>
+                </div>
+                
+                <div class="checklist-section">
+                    <h3>✅ Increment/Decrement Buttons</h3>
+                    <ul>
+                        <li>✅ + button increases zoom factor by 0.1x</li>
+                        <li>✅ - button decreases zoom factor by 0.1x</li>
+                        <li>✅ Buttons disable at min/max boundaries</li>
+                        <li>✅ Buttons work with keyboard navigation</li>
+                        <li>✅ Visual feedback on hover/click</li>
+                    </ul>
+                </div>
+                
+                <div class="checklist-section">
+                    <h3>✅ Live Preview</h3>
+                    <ul>
+                        <li>✅ Preview value appears during slider interaction</li>
+                        <li>✅ Preview has visual distinction (color, animation)</li>
+                        <li>✅ Preview disappears when interaction ends</li>
+                        <li>✅ No preview during button clicks (immediate change)</li>
+                    </ul>
+                </div>
+                
+                <div class="checklist-section">
+                    <h3>✅ Integration</h3>
+                    <ul>
+                        <li>✅ Manual controls work with preset level buttons</li>
+                        <li>✅ Quick action buttons (zoom in/out) still work</li>
+                        <li>✅ State synchronization across all controls</li>
+                        <li>✅ Custom range configurations work correctly</li>
+                        <li>✅ I18N labels display correctly</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Log -->
+        <div class="event-log">
+            <h2>📝 Event Log</h2>
+            <div class="log-container">
+                @if (EventLog.Any())
+                {
+                    @foreach (var logEntry in EventLog.TakeLast(10))
+                    {
+                        <div class="log-entry">
+                            <span class="log-timestamp">@logEntry.Timestamp.ToString("HH:mm:ss.fff")</span>
+                            <span class="log-message">@logEntry.Message</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="log-empty">No events yet. Interact with the zoom controls to see events.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    // State
+    private TimelineZoomLevel CurrentZoomLevel { get; set; } = TimelineZoomLevel.MonthDay;
+    private double CurrentZoomFactor { get; set; } = 1.0;
+    
+    // Validation properties
+    private double EffectiveDayWidth => TimelineZoomService.GetConfiguration(CurrentZoomLevel).GetEffectiveDayWidth(CurrentZoomFactor);
+    private bool IsValidRange => CurrentZoomFactor >= 0.5 && CurrentZoomFactor <= 3.0;
+    
+    // Event tracking
+    private List<LogEntry> EventLog { get; set; } = new();
+    
+    private class LogEntry
+    {
+        public DateTime Timestamp { get; set; }
+        public string Message { get; set; } = "";
+    }
+    
+    protected override void OnInitialized()
+    {
+        AddLogEntry("Manual Zoom Validation page initialized");
+        Logger.LogOperation("MANUAL_ZOOM_VALIDATION", "Page initialized with default state", new
+        {
+            CurrentZoomLevel,
+            CurrentZoomFactor,
+            EffectiveDayWidth
+        });
+    }
+    
+    private Task OnZoomLevelChanged(TimelineZoomLevel newLevel)
+    {
+        var oldLevel = CurrentZoomLevel;
+        CurrentZoomLevel = newLevel;
+        
+        AddLogEntry($"Zoom Level: {oldLevel} → {newLevel}");
+        Logger.LogOperation("MANUAL_ZOOM_VALIDATION", "Zoom level changed", new
+        {
+            OldLevel = oldLevel,
+            NewLevel = newLevel,
+            CurrentZoomFactor,
+            NewEffectiveDayWidth = EffectiveDayWidth
+        });
+        
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+    
+    private Task OnZoomFactorChanged(double newFactor)
+    {
+        var oldFactor = CurrentZoomFactor;
+        CurrentZoomFactor = newFactor;
+        
+        AddLogEntry($"Zoom Factor: {oldFactor:F2}x → {newFactor:F2}x (Day Width: {EffectiveDayWidth:F1}px)");
+        Logger.LogOperation("MANUAL_ZOOM_VALIDATION", "Zoom factor changed", new
+        {
+            OldFactor = oldFactor,
+            NewFactor = newFactor,
+            CurrentZoomLevel,
+            NewEffectiveDayWidth = EffectiveDayWidth
+        });
+        
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+    
+    private void AddLogEntry(string message)
+    {
+        EventLog.Add(new LogEntry
+        {
+            Timestamp = DateTime.Now,
+            Message = message
+        });
+        
+        // Keep only recent entries
+        if (EventLog.Count > 50)
+        {
+            EventLog.RemoveRange(0, EventLog.Count - 50);
+        }
+    }
+}
+
+<style>
+    .validation-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .validation-header {
+        text-align: center;
+        margin-bottom: 32px;
+        padding: 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+    }
+    
+    .validation-header h1 {
+        margin: 0 0 8px 0;
+        font-size: 2.5rem;
+        font-weight: 600;
+    }
+    
+    .validation-subtitle {
+        margin: 0;
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .validation-content {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+    
+    .state-display, .controls-test, .testing-instructions, .event-log {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .state-display h2, .controls-test h2, .testing-instructions h2, .event-log h2 {
+        margin: 0 0 16px 0;
+        color: #333;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+    
+    .state-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+    }
+    
+    .state-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border-left: 3px solid #667eea;
+    }
+    
+    .state-item label {
+        font-weight: 500;
+        color: #555;
+    }
+    
+    .state-value {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .state-value.valid {
+        color: #28a745;
+    }
+    
+    .state-value.invalid {
+        color: #dc3545;
+    }
+    
+    .controls-container {
+        padding: 16px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border: 1px dashed #ccc;
+    }
+    
+    .validation-zoom-controls,
+    .validation-zoom-controls-minimal,
+    .validation-zoom-controls-extended {
+        margin: 0;
+    }
+    
+    .checklist {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 16px;
+    }
+    
+    .checklist-section h3 {
+        margin: 0 0 12px 0;
+        color: #667eea;
+        font-size: 1.1rem;
+    }
+    
+    .checklist-section ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    
+    .checklist-section li {
+        margin-bottom: 6px;
+        line-height: 1.4;
+    }
+    
+    .log-container {
+        max-height: 300px;
+        overflow-y: auto;
+        background: #f8f9fa;
+        border-radius: 6px;
+        padding: 12px;
+    }
+    
+    .log-entry {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 6px;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 0.9rem;
+    }
+    
+    .log-timestamp {
+        color: #666;
+        font-weight: 500;
+        min-width: 80px;
+    }
+    
+    .log-message {
+        color: #333;
+    }
+    
+    .log-empty {
+        color: #999;
+        font-style: italic;
+        text-align: center;
+        padding: 20px;
+    }
+</style>

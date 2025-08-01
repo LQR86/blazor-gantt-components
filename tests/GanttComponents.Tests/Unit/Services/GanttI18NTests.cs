@@ -521,13 +521,25 @@ namespace GanttComponents.Tests.Unit.Services
             // Act
             var result = _i18nService.GetAllZoomLevelInfo();
 
-            // Assert
-            Assert.Equal(6, result.Count);
+            // Assert - Preset-only system now supports 13 fine-grained levels
+            Assert.Equal(13, result.Count);
+            
+            // Original 6 levels still exist
             Assert.True(result.ContainsKey(TimelineZoomLevel.WeekDay));
             Assert.True(result.ContainsKey(TimelineZoomLevel.MonthDay));
             Assert.True(result.ContainsKey(TimelineZoomLevel.MonthWeek));
             Assert.True(result.ContainsKey(TimelineZoomLevel.QuarterWeek));
             Assert.True(result.ContainsKey(TimelineZoomLevel.QuarterMonth));
+            Assert.True(result.ContainsKey(TimelineZoomLevel.YearQuarter));
+            
+            // New intermediate levels added for finer granularity
+            Assert.True(result.ContainsKey(TimelineZoomLevel.WeekDayMedium));
+            Assert.True(result.ContainsKey(TimelineZoomLevel.WeekDayLow));
+            Assert.True(result.ContainsKey(TimelineZoomLevel.MonthDayMedium));
+            Assert.True(result.ContainsKey(TimelineZoomLevel.MonthWeekMedium));
+            Assert.True(result.ContainsKey(TimelineZoomLevel.MonthWeekLow));
+            Assert.True(result.ContainsKey(TimelineZoomLevel.QuarterWeekMedium));
+            Assert.True(result.ContainsKey(TimelineZoomLevel.QuarterMonthMedium));
             Assert.True(result.ContainsKey(TimelineZoomLevel.YearQuarter));
 
             // Verify content for a few levels

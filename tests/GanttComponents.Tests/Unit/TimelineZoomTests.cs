@@ -11,12 +11,12 @@ namespace GanttComponents.Tests.Unit;
 public class TimelineZoomTests
 {
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 60.0)]
-    [InlineData(TimelineZoomLevel.MonthDay, 25.0)]
-    [InlineData(TimelineZoomLevel.MonthWeek, 15.0)]
-    [InlineData(TimelineZoomLevel.QuarterWeek, 8.0)]
-    [InlineData(TimelineZoomLevel.QuarterMonth, 5.0)]
-    [InlineData(TimelineZoomLevel.YearQuarter, 3.0)]
+    [InlineData(TimelineZoomLevel.WeekDay, 96.0)]    // Preset-only: 60 * 1.6 for backward compatibility
+    [InlineData(TimelineZoomLevel.MonthDay, 40.0)]   // Preset-only: 25 * 1.6 for backward compatibility
+    [InlineData(TimelineZoomLevel.MonthWeek, 24.0)]  // Preset-only: 15 * 1.6 for backward compatibility
+    [InlineData(TimelineZoomLevel.QuarterWeek, 12.8)] // Preset-only: 8 * 1.6 for backward compatibility
+    [InlineData(TimelineZoomLevel.QuarterMonth, 8.0)] // Preset-only: 5 * 1.6 for backward compatibility
+    [InlineData(TimelineZoomLevel.YearQuarter, 3.0)]  // Minimum day width constraint maintained
     public void ZoomLevelConfiguration_HasCorrectBaseDayWidth(TimelineZoomLevel level, double expectedDayWidth)
     {
         // Arrange & Act
@@ -28,58 +28,69 @@ public class TimelineZoomTests
     }
 
     [Theory]
-    [InlineData(1.0, 25.0)] // 1.0x factor = base width
-    [InlineData(1.6, 40.0)] // Default factor for backward compatibility
-    [InlineData(0.5, 12.5)] // Minimum factor
-    [InlineData(3.0, 75.0)] // Maximum factor
-    [InlineData(2.0, 50.0)] // 2x factor
+    [InlineData(1.0, 40.0)] // Preset-only: factor always 1.0, base width is 40.0 for MonthDay
+    [InlineData(1.6, 40.0)] // Preset-only: factor clamped to 1.0, base width is 40.0
+    [InlineData(0.5, 40.0)] // Preset-only: factor clamped to 1.0, base width is 40.0
+    [InlineData(3.0, 40.0)] // Preset-only: factor clamped to 1.0, base width is 40.0
+    [InlineData(2.0, 40.0)] // Preset-only: factor clamped to 1.0, base width is 40.0
     public void ZoomLevelConfiguration_CalculatesEffectiveDayWidth(double zoomFactor, double expectedWidth)
     {
         // Arrange
         var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay);
 
-        // Act
+        // Act - In preset-only system, all factors are clamped to 1.0
         var effectiveWidth = config.GetEffectiveDayWidth(zoomFactor);
 
-        // Assert
+        // Assert - Effective width always equals base day width in preset-only system
         Assert.Equal(expectedWidth, effectiveWidth, precision: 1);
     }
 
     [Theory]
-    [InlineData(-0.5, 0.5)] // Below minimum gets clamped
-    [InlineData(0.3, 0.5)]  // Below minimum gets clamped
-    [InlineData(0.5, 0.5)]  // Minimum value
-    [InlineData(1.0, 1.0)]  // Normal value
-    [InlineData(3.0, 3.0)]  // Maximum value
-    [InlineData(3.5, 3.0)]  // Above maximum gets clamped
-    [InlineData(10.0, 3.0)] // Way above maximum gets clamped
+    [InlineData(-0.5, 1.0)] // Preset-only: all inputs clamped to 1.0
+    [InlineData(0.3, 1.0)]  // Preset-only: all inputs clamped to 1.0
+    [InlineData(0.5, 1.0)]  // Preset-only: all inputs clamped to 1.0
+    [InlineData(1.0, 1.0)]  // Preset-only: all inputs clamped to 1.0
+    [InlineData(3.0, 1.0)]  // Preset-only: all inputs clamped to 1.0
+    [InlineData(3.5, 1.0)]  // Preset-only: all inputs clamped to 1.0
+    [InlineData(10.0, 1.0)] // Preset-only: all inputs clamped to 1.0
     public void ZoomLevelConfiguration_ClampsZoomFactorToValidRange(double input, double expected)
     {
         // Arrange
         var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay);
 
-        // Act
+        // Act - In preset-only system, all factors are clamped to 1.0
         var clampedWidth = config.GetEffectiveDayWidth(input);
-        var expectedWidth = config.BaseDayWidth * expected;
+        var expectedWidth = config.BaseDayWidth * expected; // Always 40.0 * 1.0 = 40.0
 
-        // Assert
+        // Assert - Effective day width is always the base day width in preset-only system
         Assert.Equal(expectedWidth, clampedWidth, precision: 1);
     }
 
     [Fact]
-    public void TimelineZoomService_ReturnsAllSixZoomLevels()
+    public void TimelineZoomService_ReturnsAllThirteenZoomLevels()
     {
         // Arrange & Act
         var configurations = TimelineZoomService.GetAllConfigurations();
 
-        // Assert
-        Assert.Equal(6, configurations.Count);
+        // Assert - Preset-only system now supports 13 fine-grained levels
+        Assert.Equal(13, configurations.Count);
+        
+        // Original 6 levels still exist
         Assert.Contains(TimelineZoomLevel.WeekDay, configurations.Keys);
         Assert.Contains(TimelineZoomLevel.MonthDay, configurations.Keys);
         Assert.Contains(TimelineZoomLevel.MonthWeek, configurations.Keys);
         Assert.Contains(TimelineZoomLevel.QuarterWeek, configurations.Keys);
         Assert.Contains(TimelineZoomLevel.QuarterMonth, configurations.Keys);
         Assert.Contains(TimelineZoomLevel.YearQuarter, configurations.Keys);
+        
+        // New intermediate levels added for finer granularity
+        Assert.Contains(TimelineZoomLevel.WeekDayMedium, configurations.Keys);
+        Assert.Contains(TimelineZoomLevel.WeekDayLow, configurations.Keys);
+        Assert.Contains(TimelineZoomLevel.MonthDayMedium, configurations.Keys);
+        Assert.Contains(TimelineZoomLevel.MonthWeekMedium, configurations.Keys);
+        Assert.Contains(TimelineZoomLevel.MonthWeekLow, configurations.Keys);
+        Assert.Contains(TimelineZoomLevel.QuarterWeekMedium, configurations.Keys);
+        Assert.Contains(TimelineZoomLevel.QuarterMonthMedium, configurations.Keys);
     }
 
     [Fact]
@@ -89,10 +100,10 @@ public class TimelineZoomTests
         var (level, factor) = TimelineZoomService.GetDefaultZoomSettings();
         var dayWidth = TimelineZoomService.CalculateEffectiveDayWidth(level, factor);
 
-        // Assert
+        // Assert - In preset-only system, factor is always 1.0, but effective day width remains 40px
         Assert.Equal(TimelineZoomLevel.MonthDay, level);
-        Assert.Equal(1.6, factor);
-        Assert.Equal(40.0, dayWidth, precision: 1); // Current 40px day width preserved
+        Assert.Equal(1.0, factor); // Preset-only: factors are always 1.0
+        Assert.Equal(40.0, dayWidth, precision: 1); // Day width preserved at 40px through base day width adjustment
     }
 
     [Theory]
@@ -150,13 +161,13 @@ public class TimelineZoomTests
         // Arrange
         var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay);
 
-        // Act & Assert
-        Assert.True(config.IsValidZoomFactor(0.5));  // Min valid
-        Assert.True(config.IsValidZoomFactor(1.0));  // Normal
-        Assert.True(config.IsValidZoomFactor(3.0));  // Max valid
-        Assert.False(config.IsValidZoomFactor(0.4)); // Below min
-        Assert.False(config.IsValidZoomFactor(3.1)); // Above max
-        Assert.False(config.IsValidZoomFactor(-1.0)); // Negative
+        // Act & Assert - In preset-only system, only factor 1.0 is valid
+        Assert.True(config.IsValidZoomFactor(1.0));   // Only valid factor in preset-only system
+        Assert.False(config.IsValidZoomFactor(0.5));  // Invalid in preset-only system
+        Assert.False(config.IsValidZoomFactor(3.0));  // Invalid in preset-only system
+        Assert.False(config.IsValidZoomFactor(0.4));  // Invalid in preset-only system
+        Assert.False(config.IsValidZoomFactor(3.1));  // Invalid in preset-only system
+        Assert.False(config.IsValidZoomFactor(-1.0)); // Invalid in preset-only system
     }
 
     [Fact]
@@ -168,25 +179,26 @@ public class TimelineZoomTests
         // Act
         var config = TimelineZoomService.GetConfiguration(invalidLevel);
 
-        // Assert - Should return default configuration
+        // Assert - Should return default configuration with preset-only base width
         Assert.Equal(TaskDisplayConstants.DEFAULT_ZOOM_LEVEL, config.Level);
-        Assert.Equal(25.0, config.BaseDayWidth); // MonthDay base width
+        Assert.Equal(40.0, config.BaseDayWidth); // MonthDay preset-only base width (25 * 1.6)
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 0.1, 0.5)]    // Clamp to minimum
-    [InlineData(TimelineZoomLevel.MonthDay, 1.6, 1.6)]   // Valid factor unchanged
-    [InlineData(TimelineZoomLevel.YearQuarter, 5.0, 3.0)] // Clamp to maximum
-    [InlineData(TimelineZoomLevel.QuarterWeek, -1.0, 0.5)] // Negative clamped to minimum
-    public void TimelineZoomService_ClampsZoomFactorCorrectly(
+    [InlineData(TimelineZoomLevel.WeekDay, 96.0)]   // Preset-only always returns base day width
+    [InlineData(TimelineZoomLevel.MonthDay, 40.0)]  // Maintains backward compatibility
+    [InlineData(TimelineZoomLevel.YearQuarter, 3.0)] // Minimum day width constraint
+    [InlineData(TimelineZoomLevel.QuarterWeek, 12.8)] // New intermediate level
+    public void TimelineZoomService_PresetOnlyFactorsAlwaysOne(
         TimelineZoomLevel level,
-        double input,
-        double expected)
+        double expectedDayWidth)
     {
-        // Arrange & Act
-        var clamped = TimelineZoomService.ClampZoomFactor(level, input);
+        // Arrange & Act - In preset-only system, factor is always 1.0
+        var clamped = TimelineZoomService.ClampZoomFactor(level, 999.0); // Any input
+        var dayWidth = TimelineZoomService.CalculateEffectiveDayWidth(level, clamped);
 
-        // Assert
-        Assert.Equal(expected, clamped);
+        // Assert - Factor always clamped to 1.0, day width comes from base configuration
+        Assert.Equal(1.0, clamped);
+        Assert.Equal(expectedDayWidth, dayWidth, precision: 1);
     }
 }

@@ -4,12 +4,39 @@ namespace GanttComponents.Services;
 
 /// <summary>
 /// Provides zoom-level-appropriate header configurations for timeline views.
-/// Optimizes header display based on effective day width and zoom level.
+/// Now supports both legacy configurations and new preset templates.
 /// </summary>
 public static class TimelineHeaderAdapter
 {
     /// <summary>
+    /// Gets the optimal header configuration using preset templates (recommended approach).
+    /// Uses predefined templates for predictable, testable behavior.
+    /// </summary>
+    /// <param name="zoomLevel">Current zoom level</param>
+    /// <returns>Header configuration based on preset template</returns>
+    public static TimelineHeaderConfiguration GetHeaderConfigurationFromTemplate(TimelineZoomLevel zoomLevel)
+    {
+        // Get preset template for this zoom level
+        var template = TimelineHeaderTemplateService.GetTemplate(zoomLevel);
+
+        // Convert template to configuration structure
+        return new TimelineHeaderConfiguration
+        {
+            PrimaryUnit = template.PrimaryUnit,
+            PrimaryFormat = template.PrimaryFormat,
+            SecondaryUnit = template.SecondaryUnit,
+            SecondaryFormat = template.SecondaryFormat,
+            ShowPrimary = template.ShowPrimary,
+            ShowSecondary = template.ShowSecondary,
+            // Set reasonable minimum widths based on zoom level characteristics
+            MinPrimaryWidth = GetMinimumPrimaryWidth(zoomLevel),
+            MinSecondaryWidth = GetMinimumSecondaryWidth(zoomLevel)
+        };
+    }
+
+    /// <summary>
     /// Gets the optimal header configuration for a given zoom level and day width.
+    /// Legacy method - kept for backward compatibility. Consider using GetHeaderConfigurationFromTemplate instead.
     /// </summary>
     /// <param name="zoomLevel">Current zoom level</param>
     /// <param name="effectiveDayWidth">Current effective day width in pixels</param>
@@ -264,6 +291,74 @@ public static class TimelineHeaderAdapter
             TimelineHeaderUnit.Year => timeSpanDays / 365.0,
             TimelineHeaderUnit.Decade => timeSpanDays / 3650.0,
             _ => timeSpanDays
+        };
+    }
+
+    /// <summary>
+    /// Gets the minimum primary header width for a zoom level.
+    /// Based on typical text content for each level.
+    /// </summary>
+    private static double GetMinimumPrimaryWidth(TimelineZoomLevel zoomLevel)
+    {
+        return zoomLevel switch
+        {
+            // Ultra-wide levels need space for verbose formats
+            TimelineZoomLevel.WeekDay => 120,           // "January 2025"
+            TimelineZoomLevel.WeekDayMedium => 100,     // "Jan 2025"
+            TimelineZoomLevel.WeekDayLow => 60,         // "Jan"
+
+            // Wide levels use standard formats
+            TimelineZoomLevel.MonthDay => 60,           // "Jan"
+            TimelineZoomLevel.MonthDayMedium => 40,     // "Q1"
+
+            // Medium levels use quarterly/yearly formats
+            TimelineZoomLevel.MonthWeek => 80,          // "Q1 2025"
+            TimelineZoomLevel.MonthWeekMedium => 40,    // "Q1"
+            TimelineZoomLevel.MonthWeekLow => 60,       // "2025"
+
+            // Narrow levels use yearly/decade formats
+            TimelineZoomLevel.QuarterWeek => 60,        // "2025"
+            TimelineZoomLevel.QuarterWeekMedium => 100, // "2020-2029"
+            TimelineZoomLevel.QuarterMonth => 60,       // "20s"
+            TimelineZoomLevel.QuarterMonthMedium => 60, // "20s"
+
+            // Ultra-narrow level
+            TimelineZoomLevel.YearQuarter => 40,        // "20", "30" (minimal)
+
+            _ => 60 // Default fallback
+        };
+    }
+
+    /// <summary>
+    /// Gets the minimum secondary header width for a zoom level.
+    /// Based on typical text content for each level.
+    /// </summary>
+    private static double GetMinimumSecondaryWidth(TimelineZoomLevel zoomLevel)
+    {
+        return zoomLevel switch
+        {
+            // Day-level secondary headers
+            TimelineZoomLevel.WeekDay => 20,            // "1", "2", "3"
+            TimelineZoomLevel.WeekDayMedium => 20,      // "1", "2", "3"
+            TimelineZoomLevel.WeekDayLow => 20,         // "1", "2", "3"
+            TimelineZoomLevel.MonthDay => 20,           // "1", "2", "3"
+            TimelineZoomLevel.MonthDayMedium => 25,     // "M", "T", "W" (day abbrev)
+
+            // Month-level secondary headers
+            TimelineZoomLevel.MonthWeek => 25,          // "J", "F", "M"
+            TimelineZoomLevel.MonthWeekMedium => 25,    // "J", "F", "M"
+            TimelineZoomLevel.MonthWeekLow => 15,       // "1", "2", "3", "4"
+
+            // Quarter/year-level secondary headers
+            TimelineZoomLevel.QuarterWeek => 15,        // "1", "2", "3", "4"
+            TimelineZoomLevel.QuarterWeekMedium => 25,  // "25", "26", "27"
+            TimelineZoomLevel.QuarterMonth => 25,       // "25", "26", "27"
+            TimelineZoomLevel.QuarterMonthMedium => 15, // "5", "6", "7"
+
+            // Minimal secondary headers
+            TimelineZoomLevel.YearQuarter => 15,        // "5", "6", "7"
+
+            _ => 20 // Default fallback
         };
     }
 }

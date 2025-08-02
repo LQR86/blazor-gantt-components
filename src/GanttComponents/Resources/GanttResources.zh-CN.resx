@@ -106,6 +106,32 @@
     <value>yyyy年'-'yyyy年</value>
   </data>
 
+  <!-- Extended date formats for header templates -->
+  <data name="date.month-year-verbose" xml:space="preserve">
+    <value>yyyy年MMMM</value>
+  </data>
+  <data name="date.day-abbrev" xml:space="preserve">
+    <value>ddd</value>
+  </data>
+  <data name="date.month-abbrev" xml:space="preserve">
+    <value>M月</value>
+  </data>
+  <data name="date.quarter-minimal" xml:space="preserve">
+    <value>q</value>
+  </data>
+  <data name="date.year-short" xml:space="preserve">
+    <value>yy年</value>
+  </data>
+  <data name="date.year-minimal" xml:space="preserve">
+    <value>y</value>
+  </data>
+  <data name="date.decade-short" xml:space="preserve">
+    <value>yy年代</value>
+  </data>
+  <data name="date.decade-minimal" xml:space="preserve">
+    <value>yy</value>
+  </data>
+
   <!-- Common UI Elements -->
   <data name="common.save" xml:space="preserve">
     <value>保存</value>

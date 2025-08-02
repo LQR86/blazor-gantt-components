@@ -9,7 +9,8 @@
     <div class="timeline-scroll-container" @onscroll="OnScroll">
         <div class="timeline-header">
             @{
-                var headerConfig = TimelineHeaderAdapter.GetHeaderConfiguration(ZoomLevel, EffectiveDayWidth);
+                // Use the new preset template system for predictable, testable header behavior
+                var headerConfig = TimelineHeaderAdapter.GetHeaderConfigurationFromTemplate(ZoomLevel, Logger);
                 var timeSpanDays = (EndDate - StartDate).Days + 1;
                 var shouldCollapse = TimelineHeaderAdapter.ShouldCollapseHeaders(headerConfig, EffectiveDayWidth, timeSpanDays);
             }
@@ -18,15 +19,21 @@
             {
                 <div class="timeline-header-primary">
                     @{
-                        var primaryStart = TimelineHeaderAdapter.GetPeriodStart(StartDate, headerConfig.PrimaryUnit);
+                        var primaryStart = TimelineHeaderAdapter.GetPeriodStart(StartDate, headerConfig.PrimaryUnit, Logger);
                         var increment = TimelineHeaderAdapter.GetDateIncrement(headerConfig.PrimaryUnit);
                         var current = primaryStart;
+                        
+                        // Debug logging for header generation
+                        Logger?.LogDebugInfo($"HEADER DEBUG: StartDate: {StartDate:yyyy-MM-dd (ddd)}, PrimaryUnit: {headerConfig.PrimaryUnit}, PrimaryStart: {primaryStart:yyyy-MM-dd (ddd)}");
                     }
                     
                     @while (current <= EndDate)
                     {
                         var periodWidth = TimelineHeaderAdapter.GetPeriodWidth(current, headerConfig.PrimaryUnit, EffectiveDayWidth);
                         var nextPeriod = increment(current);
+                        
+                        // Debug logging for each header cell
+                        Logger?.LogDebugInfo($"HEADER CELL DEBUG: Current: {current:yyyy-MM-dd (ddd)}, Format: {headerConfig.PrimaryFormat}, Width: {periodWidth}px");
                         
                         // Adjust width if period extends beyond timeline
                         if (nextPeriod > EndDate.AddDays(1))
@@ -52,7 +59,7 @@
             
             <div class="timeline-header-secondary">
                 @{
-                    var secondaryStart = TimelineHeaderAdapter.GetPeriodStart(StartDate, headerConfig.SecondaryUnit);
+                    var secondaryStart = TimelineHeaderAdapter.GetPeriodStart(StartDate, headerConfig.SecondaryUnit, Logger);
                     var secondaryIncrement = TimelineHeaderAdapter.GetDateIncrement(headerConfig.SecondaryUnit);
                     var secondaryCurrent = secondaryStart;
                 }
@@ -120,7 +127,9 @@
                           data-task-id="@task.Id"
                           @onclick="() => SelectTask(task.Id)"
                           @onmouseenter="() => HoverTask(task.Id)"
-                          @onmouseleave="() => HoverTask(null)" />
+                          @onmouseleave="() => HoverTask(null)">
+                        <title>@GetTaskTooltip(task)</title>
+                    </rect>
                     
                     <!-- Task label (WBS Code) - TODO: Add text labels -->
                     @* <svg:text x="@(x + 4)" y="@(y + RowHeight/2 + 4)" class="timeline-task-label">@task.WbsCode</svg:text> *@
@@ -193,16 +202,41 @@
 
     private void CalculateTimelineRange()
     {
+        DateTime taskStartDate, taskEndDate;
+        
         if (Tasks == null || !Tasks.Any())
         {
             // Default range if no tasks
-            StartDate = DateTime.UtcNow.Date.AddDays(-30);
-            EndDate = DateTime.UtcNow.Date.AddDays(90);
+            taskStartDate = DateTime.UtcNow.Date.AddDays(-30);
+            taskEndDate = DateTime.UtcNow.Date.AddDays(90);
         }
         else
         {
-            StartDate = Tasks.Min(t => t.StartDate).Date.AddDays(-7);
-            EndDate = Tasks.Max(t => t.EndDate).Date.AddDays(7);
+            taskStartDate = Tasks.Min(t => t.StartDate).Date.AddDays(-7);
+            taskEndDate = Tasks.Max(t => t.EndDate).Date.AddDays(7);
+        }
+        
+        // Get header configuration to align timeline boundaries with header periods
+        var headerConfig = TimelineHeaderAdapter.GetHeaderConfigurationFromTemplate(ZoomLevel, Logger);
+        
+        // Align StartDate with primary period boundary (e.g., week start for WeekDay modes)
+        StartDate = TimelineHeaderAdapter.GetPeriodStart(taskStartDate, headerConfig.PrimaryUnit, Logger);
+        
+        // Align EndDate with primary period boundary
+        var endPeriodStart = TimelineHeaderAdapter.GetPeriodStart(taskEndDate, headerConfig.PrimaryUnit, Logger);
+        var increment = TimelineHeaderAdapter.GetDateIncrement(headerConfig.PrimaryUnit);
+        EndDate = increment(endPeriodStart).AddDays(-1); // End of the period
+        
+        // Debug logging for timeline range calculation
+        Logger?.LogDebugInfo($"TIMELINE RANGE DEBUG: Original TaskStart: {taskStartDate:yyyy-MM-dd (ddd)}, TaskEnd: {taskEndDate:yyyy-MM-dd (ddd)}");
+        Logger?.LogDebugInfo($"TIMELINE RANGE DEBUG: Aligned StartDate: {StartDate:yyyy-MM-dd (ddd)}, EndDate: {EndDate:yyyy-MM-dd (ddd)}");
+        Logger?.LogDebugInfo($"TIMELINE RANGE DEBUG: PrimaryUnit: {headerConfig.PrimaryUnit}, Alignment ensures header boundaries match timeline coordinates");
+        
+        if (Tasks != null && Tasks.Any())
+        {
+            var minTaskStart = Tasks.Min(t => t.StartDate);
+            var maxTaskEnd = Tasks.Max(t => t.EndDate);
+            Logger?.LogDebugInfo($"TASK RANGE DEBUG: Min StartDate: {minTaskStart:yyyy-MM-dd (ddd)}, Max EndDate: {maxTaskEnd:yyyy-MM-dd (ddd)}");
         }
         
         var totalDays = (EndDate - StartDate).Days + 1;
@@ -260,7 +294,18 @@
 
     private void OnLanguageChanged()
     {
-        InvokeAsync(StateHasChanged);
+        try
+        {
+            InvokeAsync(StateHasChanged);
+        }
+        catch (ObjectDisposedException)
+        {
+            // Component has been disposed, ignore language change
+        }
+        catch (InvalidOperationException)
+        {
+            // Component is not in a valid state for updates, ignore
+        }
     }
 
     // Zoom control methods
@@ -325,9 +370,34 @@
 
     public void Dispose()
     {
-        if (I18N != null)
+        try
         {
-            I18N.LanguageChanged -= OnLanguageChanged;
+            if (I18N != null)
+            {
+                I18N.LanguageChanged -= OnLanguageChanged;
+            }
+        }
+        catch (ObjectDisposedException)
+        {
+            // Ignore disposal exceptions during cleanup
+        }
+    }
+
+    private string GetTaskTooltip(GanttTask task)
+    {
+        if (task == null) return string.Empty;
+        
+        try
+        {
+            // Debug logging for task tooltip dates
+            Logger?.LogDebugInfo($"TOOLTIP DEBUG: Task '{task.Name}' StartDate: {task.StartDate:yyyy-MM-dd (ddd)}, EndDate: {task.EndDate:yyyy-MM-dd (ddd)}");
+            
+            return $"{task.Name} ({task.StartDate:MM/dd/yyyy} - {task.EndDate:MM/dd/yyyy})";
+        }
+        catch
+        {
+            // Fallback if formatting fails
+            return task.Name ?? "Task";
         }
     }
 }

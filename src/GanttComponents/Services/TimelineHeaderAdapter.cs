@@ -1,4 +1,7 @@
 using GanttComponents.Models;
+using GanttComponents.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace GanttComponents.Services;
 
@@ -13,11 +16,16 @@ public static class TimelineHeaderAdapter
     /// Uses predefined templates for predictable, testable behavior.
     /// </summary>
     /// <param name="zoomLevel">Current zoom level</param>
+    /// <param name="logger">Optional logger for debugging (can be null)</param>
     /// <returns>Header configuration based on preset template</returns>
-    public static TimelineHeaderConfiguration GetHeaderConfigurationFromTemplate(TimelineZoomLevel zoomLevel)
+    public static TimelineHeaderConfiguration GetHeaderConfigurationFromTemplate(TimelineZoomLevel zoomLevel, IUniversalLogger? logger = null)
     {
         // Get preset template for this zoom level
         var template = TimelineHeaderTemplateService.GetTemplate(zoomLevel);
+
+        // Debug logging
+        logger?.LogDebugInfo($"TEMPLATE DEBUG: ZoomLevel: {zoomLevel}, PrimaryUnit: {template.PrimaryUnit}, SecondaryUnit: {template.SecondaryUnit}");
+        logger?.LogDebugInfo($"TEMPLATE FORMATS: Primary: {template.PrimaryFormat}, Secondary: {template.SecondaryFormat}");
 
         // Convert template to configuration structure
         return new TimelineHeaderConfiguration
@@ -247,19 +255,28 @@ public static class TimelineHeaderAdapter
     /// </summary>
     /// <param name="date">Input date</param>
     /// <param name="unit">Timeline unit</param>
+    /// <param name="logger">Optional logger for debugging (can be null)</param>
     /// <returns>Start of the period containing the date</returns>
-    public static DateTime GetPeriodStart(DateTime date, TimelineHeaderUnit unit)
+    public static DateTime GetPeriodStart(DateTime date, TimelineHeaderUnit unit, IUniversalLogger? logger = null)
     {
-        return unit switch
+        var result = unit switch
         {
             TimelineHeaderUnit.Day => date.Date,
-            TimelineHeaderUnit.Week => date.Date.AddDays(-(int)date.DayOfWeek), // Start of week (Sunday)
+            TimelineHeaderUnit.Week => GetMondayWeekStart(date, logger), // Start of week (Monday)
             TimelineHeaderUnit.Month => new DateTime(date.Year, date.Month, 1),
             TimelineHeaderUnit.Quarter => GetQuarterStart(date),
             TimelineHeaderUnit.Year => new DateTime(date.Year, 1, 1),
             TimelineHeaderUnit.Decade => new DateTime((date.Year / 10) * 10, 1, 1),
             _ => throw new ArgumentOutOfRangeException(nameof(unit))
         };
+
+        // Debug logging for week calculations
+        if (unit == TimelineHeaderUnit.Week)
+        {
+            logger?.LogDebugInfo($"GetPeriodStart DEBUG: Input date: {date:yyyy-MM-dd (ddd)}, Week start: {result:yyyy-MM-dd (ddd)}");
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -282,10 +299,22 @@ public static class TimelineHeaderAdapter
         return new DateTime(date.Year, quarterStartMonth, 1);
     }
 
+    private static DateTime GetMondayWeekStart(DateTime date, IUniversalLogger? logger = null)
+    {
+        // Calculate days to subtract to get to Monday
+        // DayOfWeek: Sunday=0, Monday=1, Tuesday=2, ..., Saturday=6
+        int daysFromMonday = ((int)date.DayOfWeek + 6) % 7; // Convert to Monday-based week
+        var result = date.Date.AddDays(-daysFromMonday);
+
+        logger?.LogDebugInfo($"GetMondayWeekStart DEBUG: Input: {date:yyyy-MM-dd (ddd)}, DaysFromMonday: {daysFromMonday}, Result: {result:yyyy-MM-dd (ddd)}");
+
+        return result;
+    }
     private static double GetEstimatedPrimaryUnits(TimelineHeaderUnit unit, int timeSpanDays)
     {
         return unit switch
         {
+            TimelineHeaderUnit.Week => timeSpanDays / 7.0,
             TimelineHeaderUnit.Month => timeSpanDays / 30.0,
             TimelineHeaderUnit.Quarter => timeSpanDays / 90.0,
             TimelineHeaderUnit.Year => timeSpanDays / 365.0,
@@ -380,9 +409,11 @@ public class TimelineHeaderConfiguration
 
 /// <summary>
 /// Timeline header units for different zoom levels.
+/// Now includes Hour unit for ultra-wide zoom levels following Syncfusion patterns.
 /// </summary>
 public enum TimelineHeaderUnit
 {
+    Hour,
     Day,
     Week,
     Month,

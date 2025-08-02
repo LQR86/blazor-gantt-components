@@ -148,6 +148,12 @@
   <data name="date.day-month-year" xml:space="preserve">
     <value>%d MMM yyyy</value>
   </data>
+  <data name="date.quarter-month-year" xml:space="preserve">
+    <value>MMM yyyy</value>
+  </data>
+  <data name="date.month-start-day" xml:space="preserve">
+    <value>%d MMM</value>
+  </data>
   <data name="date.hour-24" xml:space="preserve">
     <value>H</value>
   </data>
@@ -309,45 +315,97 @@
     <value>Progress</value>
   </data>
 
-  <!-- Timeline Zoom Levels -->
-  <data name="zoom.level.week-day" xml:space="preserve">
-    <value>Week-Day</value>
+  <!-- Timeline Zoom Levels - Syncfusion Aligned (13 levels) -->
+  
+  <!-- WeekDay Pattern Levels (Week → Day) -->
+  <data name="ZoomLevel.WeekDay" xml:space="preserve">
+    <value>Week-Day View</value>
   </data>
-  <data name="zoom.level.month-day" xml:space="preserve">
-    <value>Month-Day</value>
+  <data name="ZoomLevel.WeekDay.Description" xml:space="preserve">
+    <value>Daily sprint planning with weekly context (60px/day)</value>
   </data>
-  <data name="zoom.level.month-week" xml:space="preserve">
-    <value>Month-Week</value>
+  <data name="ZoomLevel.WeekDayMedium" xml:space="preserve">
+    <value>Week-Day Medium</value>
   </data>
-  <data name="zoom.level.quarter-week" xml:space="preserve">
-    <value>Quarter-Week</value>
+  <data name="ZoomLevel.WeekDayMedium.Description" xml:space="preserve">
+    <value>Medium weekly view with daily granularity (45px/day)</value>
   </data>
-  <data name="zoom.level.quarter-month" xml:space="preserve">
-    <value>Quarter-Month</value>
+  <data name="ZoomLevel.WeekDayLow" xml:space="preserve">
+    <value>Week-Day Compact</value>
   </data>
-  <data name="zoom.level.year-quarter" xml:space="preserve">
-    <value>Year-Quarter</value>
+  <data name="ZoomLevel.WeekDayLow.Description" xml:space="preserve">
+    <value>Compact weekly view with daily tracking (35px/day)</value>
+  </data>
+  
+  <!-- MonthWeek Pattern Levels (Month → Week) -->
+  <data name="ZoomLevel.MonthWeek" xml:space="preserve">
+    <value>Month-Week View</value>
+  </data>
+  <data name="ZoomLevel.MonthWeek.Description" xml:space="preserve">
+    <value>Monthly overview with weekly breakdown (25px/day)</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekMedium" xml:space="preserve">
+    <value>Month-Week Medium</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekMedium.Description" xml:space="preserve">
+    <value>Medium monthly view with weekly periods (20px/day)</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekLow" xml:space="preserve">
+    <value>Month-Week Compact</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekLow.Description" xml:space="preserve">
+    <value>Compact monthly view with weekly periods (18px/day)</value>
   </data>
 
-  <!-- Timeline Zoom Level Descriptions -->
-  <data name="zoom.description.week-day" xml:space="preserve">
-    <value>Sprint planning, daily management (2-8 weeks)</value>
+  <!-- QuarterMonth Pattern Levels (Quarter → Month) -->
+  <data name="ZoomLevel.QuarterMonth" xml:space="preserve">
+    <value>Quarter-Month View</value>
   </data>
-  <data name="zoom.description.month-day" xml:space="preserve">
-    <value>Project milestones, phase tracking (3-12 months)</value>
+  <data name="ZoomLevel.QuarterMonth.Description" xml:space="preserve">
+    <value>Quarterly overview with monthly breakdown (15px/day)</value>
   </data>
-  <data name="zoom.description.month-week" xml:space="preserve">
-    <value>Quarterly planning, resource scheduling (6-18 months)</value>
+  <data name="ZoomLevel.QuarterMonthMedium" xml:space="preserve">
+    <value>Quarter-Month Medium</value>
   </data>
-  <data name="zoom.description.quarter-week" xml:space="preserve">
-    <value>Annual planning, strategic roadmaps (6-24 months)</value>
+  <data name="ZoomLevel.QuarterMonthMedium.Description" xml:space="preserve">
+    <value>Medium quarterly view with monthly periods (12px/day)</value>
   </data>
-  <data name="zoom.description.quarter-month" xml:space="preserve">
-    <value>Multi-year programs, portfolio planning (1-5 years)</value>
+  <data name="ZoomLevel.QuarterMonthLow" xml:space="preserve">
+    <value>Quarter-Month Compact</value>
   </data>
-  <data name="zoom.description.year-quarter" xml:space="preserve">
-    <value>Enterprise portfolio, strategic planning (2-10 years)</value>
+  <data name="ZoomLevel.QuarterMonthLow.Description" xml:space="preserve">
+    <value>Compact quarterly view with monthly markers (10px/day)</value>
   </data>
+  
+  <!-- YearQuarter Pattern Levels (Year → Quarter) -->
+  <data name="ZoomLevel.YearQuarter" xml:space="preserve">
+    <value>Year-Quarter View</value>
+  </data>
+  <data name="ZoomLevel.YearQuarter.Description" xml:space="preserve">
+    <value>Annual overview with quarterly breakdown (8px/day)</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterMedium" xml:space="preserve">
+    <value>Year-Quarter Medium</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterMedium.Description" xml:space="preserve">
+    <value>Medium annual view with quarterly periods (6.5px/day)</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterLow" xml:space="preserve">
+    <value>Year-Quarter Compact</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterLow.Description" xml:space="preserve">
+    <value>Extended multi-year planning with quarterly markers (5px/day)</value>
+  </data>
+  
+  <!-- YearQuarter Minimal Pattern Level (Minimum day width) -->
+  <data name="ZoomLevel.YearQuarterMin" xml:space="preserve">
+    <value>Year-Quarter Minimal</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterMin.Description" xml:space="preserve">
+    <value>Long-term strategic view with minimum day width (3px/day)</value>
+  </data>
+
+
 
   <!-- Timeline Zoom UI Controls -->
   <data name="zoom.controls.zoom-in" xml:space="preserve">

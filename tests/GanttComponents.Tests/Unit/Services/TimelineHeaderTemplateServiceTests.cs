@@ -39,8 +39,8 @@ public class TimelineHeaderTemplateServiceTests
 
     [Theory]
     [InlineData(TimelineZoomLevel.WeekDay, "date.week-range", "date.day-name-short")]
-    [InlineData(TimelineZoomLevel.MonthDay, "date.month-year", "date.week-start-day")]
-    [InlineData(TimelineZoomLevel.YearQuarter, "date.decade-minimal", "date.year-minimal")]
+    [InlineData(TimelineZoomLevel.MonthWeek, "date.month-year", "date.week-start-day")]
+    [InlineData(TimelineZoomLevel.YearQuarter, "date.year", "date.quarter-short")]
     public void GetTemplate_ReturnsCorrectFormats(TimelineZoomLevel zoomLevel, string expectedPrimaryFormat, string expectedSecondaryFormat)
     {
         // Act
@@ -68,14 +68,14 @@ public class TimelineHeaderTemplateServiceTests
     }
 
     [Fact]
-    public void YearQuarter_HasPrimaryHidden()
+    public void YearQuarter_HasBothHeadersVisible()
     {
         // Act
         var template = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.YearQuarter);
 
-        // Assert
-        Assert.False(template.ShowPrimary); // Too cramped at 3px day width
-        Assert.True(template.ShowSecondary);
+        // Assert - Year-Quarter pattern uses Year → Quarter, both visible at 8px day width
+        Assert.True(template.ShowPrimary); // Year headers are visible
+        Assert.True(template.ShowSecondary); // Quarter headers are visible
     }
 
     [Fact]

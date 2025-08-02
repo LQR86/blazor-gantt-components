@@ -341,12 +341,19 @@ namespace GanttComponents.Tests.Unit.Services
         #region Zoom I18N Tests
 
         [Theory]
-        [InlineData("zoom.level.week-day", "Week-Day")]
-        [InlineData("zoom.level.month-day", "Month-Day")]
-        [InlineData("zoom.level.month-week", "Month-Week")]
-        [InlineData("zoom.level.quarter-week", "Quarter-Week")]
-        [InlineData("zoom.level.quarter-month", "Quarter-Month")]
-        [InlineData("zoom.level.year-quarter", "Year-Quarter")]
+        [InlineData("ZoomLevel.WeekDay", "Week-Day View")]
+        [InlineData("ZoomLevel.WeekDayMedium", "Week-Day Medium")]
+        [InlineData("ZoomLevel.WeekDayLow", "Week-Day Compact")]
+        [InlineData("ZoomLevel.MonthWeek", "Month-Week View")]
+        [InlineData("ZoomLevel.MonthWeekMedium", "Month-Week Medium")]
+        [InlineData("ZoomLevel.MonthWeekLow", "Month-Week Compact")]
+        [InlineData("ZoomLevel.QuarterMonth", "Quarter-Month View")]
+        [InlineData("ZoomLevel.QuarterMonthMedium", "Quarter-Month Medium")]
+        [InlineData("ZoomLevel.QuarterMonthLow", "Quarter-Month Compact")]
+        [InlineData("ZoomLevel.YearQuarter", "Year-Quarter View")]
+        [InlineData("ZoomLevel.YearQuarterMedium", "Year-Quarter Medium")]
+        [InlineData("ZoomLevel.YearQuarterLow", "Year-Quarter Compact")]
+        [InlineData("ZoomLevel.YearQuarterMin", "Year-Quarter Minimal")]
         public void T_ZoomLevelNames_English_ReturnsCorrectTranslation(string key, string expected)
         {
             // Arrange
@@ -360,12 +367,19 @@ namespace GanttComponents.Tests.Unit.Services
         }
 
         [Theory]
-        [InlineData("zoom.level.week-day", "周-日")]
-        [InlineData("zoom.level.month-day", "月-日")]
-        [InlineData("zoom.level.month-week", "月-周")]
-        [InlineData("zoom.level.quarter-week", "季-周")]
-        [InlineData("zoom.level.quarter-month", "季-月")]
-        [InlineData("zoom.level.year-quarter", "年-季")]
+        [InlineData("ZoomLevel.WeekDay", "周-日视图")]
+        [InlineData("ZoomLevel.WeekDayMedium", "周-日中等")]
+        [InlineData("ZoomLevel.WeekDayLow", "周-日紧凑")]
+        [InlineData("ZoomLevel.MonthWeek", "月-周视图")]
+        [InlineData("ZoomLevel.MonthWeekMedium", "月-周中等")]
+        [InlineData("ZoomLevel.MonthWeekLow", "月-周紧凑")]
+        [InlineData("ZoomLevel.QuarterMonth", "季-月视图")]
+        [InlineData("ZoomLevel.QuarterMonthMedium", "季-月中等")]
+        [InlineData("ZoomLevel.QuarterMonthLow", "季-月紧凑")]
+        [InlineData("ZoomLevel.YearQuarter", "年-季视图")]
+        [InlineData("ZoomLevel.YearQuarterMedium", "年-季中等")]
+        [InlineData("ZoomLevel.YearQuarterLow", "年-季紧凑")]
+        [InlineData("ZoomLevel.YearQuarterMin", "年-季最小")]
         public void T_ZoomLevelNames_Chinese_ReturnsCorrectTranslation(string key, string expected)
         {
             // Arrange
@@ -379,12 +393,19 @@ namespace GanttComponents.Tests.Unit.Services
         }
 
         [Theory]
-        [InlineData("zoom.description.week-day", "Sprint planning, daily management (2-8 weeks)")]
-        [InlineData("zoom.description.month-day", "Project milestones, phase tracking (3-12 months)")]
-        [InlineData("zoom.description.month-week", "Quarterly planning, resource scheduling (6-18 months)")]
-        [InlineData("zoom.description.quarter-week", "Annual planning, strategic roadmaps (6-24 months)")]
-        [InlineData("zoom.description.quarter-month", "Multi-year programs, portfolio planning (1-5 years)")]
-        [InlineData("zoom.description.year-quarter", "Enterprise portfolio, strategic planning (2-10 years)")]
+        [InlineData("ZoomLevel.WeekDay.Description", "Daily sprint planning with weekly context (60px/day)")]
+        [InlineData("ZoomLevel.WeekDayMedium.Description", "Medium weekly view with daily granularity (45px/day)")]
+        [InlineData("ZoomLevel.WeekDayLow.Description", "Compact weekly view with daily tracking (35px/day)")]
+        [InlineData("ZoomLevel.MonthWeek.Description", "Monthly overview with weekly breakdown (25px/day)")]
+        [InlineData("ZoomLevel.MonthWeekMedium.Description", "Medium monthly view with weekly periods (20px/day)")]
+        [InlineData("ZoomLevel.MonthWeekLow.Description", "Compact monthly view with weekly periods (18px/day)")]
+        [InlineData("ZoomLevel.QuarterMonth.Description", "Quarterly overview with monthly breakdown (15px/day)")]
+        [InlineData("ZoomLevel.QuarterMonthMedium.Description", "Medium quarterly view with monthly periods (12px/day)")]
+        [InlineData("ZoomLevel.QuarterMonthLow.Description", "Compact quarterly view with monthly markers (10px/day)")]
+        [InlineData("ZoomLevel.YearQuarter.Description", "Annual overview with quarterly breakdown (8px/day)")]
+        [InlineData("ZoomLevel.YearQuarterMedium.Description", "Medium annual view with quarterly periods (6.5px/day)")]
+        [InlineData("ZoomLevel.YearQuarterLow.Description", "Extended multi-year planning with quarterly markers (5px/day)")]
+        [InlineData("ZoomLevel.YearQuarterMin.Description", "Long-term strategic view with minimum day width (3px/day)")]
         public void T_ZoomDescriptions_English_ReturnsCorrectTranslation(string key, string expected)
         {
             // Arrange
@@ -398,12 +419,19 @@ namespace GanttComponents.Tests.Unit.Services
         }
 
         [Theory]
-        [InlineData("zoom.description.week-day", "冲刺规划，日常管理 (2-8周)")]
-        [InlineData("zoom.description.month-day", "项目里程碑，阶段跟踪 (3-12个月)")]
-        [InlineData("zoom.description.month-week", "季度规划，资源调度 (6-18个月)")]
-        [InlineData("zoom.description.quarter-week", "年度规划，战略路线图 (6-24个月)")]
-        [InlineData("zoom.description.quarter-month", "多年项目，组合规划 (1-5年)")]
-        [InlineData("zoom.description.year-quarter", "企业组合，战略规划 (2-10年)")]
+        [InlineData("ZoomLevel.WeekDay.Description", "带周上下文的每日冲刺规划 (60px/天)")]
+        [InlineData("ZoomLevel.WeekDayMedium.Description", "具有每日粒度的中等周视图 (45px/天)")]
+        [InlineData("ZoomLevel.WeekDayLow.Description", "带每日跟踪的紧凑周视图 (35px/天)")]
+        [InlineData("ZoomLevel.MonthWeek.Description", "带周分解的月度概览 (25px/天)")]
+        [InlineData("ZoomLevel.MonthWeekMedium.Description", "具有周期的中等月度视图 (20px/天)")]
+        [InlineData("ZoomLevel.MonthWeekLow.Description", "具有周期的紧凑月度视图 (18px/天)")]
+        [InlineData("ZoomLevel.QuarterMonth.Description", "带月分解的季度概览 (15px/天)")]
+        [InlineData("ZoomLevel.QuarterMonthMedium.Description", "具有月周期的中等季度视图 (12px/天)")]
+        [InlineData("ZoomLevel.QuarterMonthLow.Description", "带月标记的紧凑季度视图 (10px/天)")]
+        [InlineData("ZoomLevel.YearQuarter.Description", "带季度分解的年度概览 (8px/天)")]
+        [InlineData("ZoomLevel.YearQuarterMedium.Description", "具有季度周期的中等年度视图 (6.5px/天)")]
+        [InlineData("ZoomLevel.YearQuarterLow.Description", "带季度标记的扩展多年规划 (5px/天)")]
+        [InlineData("ZoomLevel.YearQuarterMin.Description", "具有最小日宽度的长期战略视图 (3px/天)")]
         public void T_ZoomDescriptions_Chinese_ReturnsCorrectTranslation(string key, string expected)
         {
             // Arrange
@@ -462,13 +490,20 @@ namespace GanttComponents.Tests.Unit.Services
             // Arrange
             _i18nService.SetCulture("en-US");
 
-            // Act & Assert
-            Assert.Equal("Week-Day", _i18nService.GetZoomLevelName(TimelineZoomLevel.WeekDay));
-            Assert.Equal("Month-Day", _i18nService.GetZoomLevelName(TimelineZoomLevel.MonthDay));
-            Assert.Equal("Month-Week", _i18nService.GetZoomLevelName(TimelineZoomLevel.MonthWeek));
-            Assert.Equal("Quarter-Week", _i18nService.GetZoomLevelName(TimelineZoomLevel.QuarterWeek));
-            Assert.Equal("Quarter-Month", _i18nService.GetZoomLevelName(TimelineZoomLevel.QuarterMonth));
-            Assert.Equal("Year-Quarter", _i18nService.GetZoomLevelName(TimelineZoomLevel.YearQuarter));
+            // Act & Assert - Testing our new 13-level system
+            Assert.Equal("Week-Day View", _i18nService.GetZoomLevelName(TimelineZoomLevel.WeekDay));
+            Assert.Equal("Week-Day Medium", _i18nService.GetZoomLevelName(TimelineZoomLevel.WeekDayMedium));
+            Assert.Equal("Week-Day Compact", _i18nService.GetZoomLevelName(TimelineZoomLevel.WeekDayLow));
+            Assert.Equal("Month-Week View", _i18nService.GetZoomLevelName(TimelineZoomLevel.MonthWeek));
+            Assert.Equal("Month-Week Medium", _i18nService.GetZoomLevelName(TimelineZoomLevel.MonthWeekMedium));
+            Assert.Equal("Month-Week Compact", _i18nService.GetZoomLevelName(TimelineZoomLevel.MonthWeekLow));
+            Assert.Equal("Quarter-Month View", _i18nService.GetZoomLevelName(TimelineZoomLevel.QuarterMonth));
+            Assert.Equal("Quarter-Month Medium", _i18nService.GetZoomLevelName(TimelineZoomLevel.QuarterMonthMedium));
+            Assert.Equal("Quarter-Month Compact", _i18nService.GetZoomLevelName(TimelineZoomLevel.QuarterMonthLow));
+            Assert.Equal("Year-Quarter View", _i18nService.GetZoomLevelName(TimelineZoomLevel.YearQuarter));
+            Assert.Equal("Year-Quarter Medium", _i18nService.GetZoomLevelName(TimelineZoomLevel.YearQuarterMedium));
+            Assert.Equal("Year-Quarter Compact", _i18nService.GetZoomLevelName(TimelineZoomLevel.YearQuarterLow));
+            Assert.Equal("Year-Quarter Minimal", _i18nService.GetZoomLevelName(TimelineZoomLevel.YearQuarterMin));
         }
 
         [Fact]
@@ -477,19 +512,33 @@ namespace GanttComponents.Tests.Unit.Services
             // Arrange
             _i18nService.SetCulture("en-US");
 
-            // Act & Assert
-            Assert.Equal("Sprint planning, daily management (2-8 weeks)",
+            // Act & Assert - Testing our new 13-level system descriptions
+            Assert.Equal("Daily sprint planning with weekly context (60px/day)",
                 _i18nService.GetZoomLevelDescription(TimelineZoomLevel.WeekDay));
-            Assert.Equal("Project milestones, phase tracking (3-12 months)",
-                _i18nService.GetZoomLevelDescription(TimelineZoomLevel.MonthDay));
-            Assert.Equal("Quarterly planning, resource scheduling (6-18 months)",
+            Assert.Equal("Medium weekly view with daily granularity (45px/day)",
+                _i18nService.GetZoomLevelDescription(TimelineZoomLevel.WeekDayMedium));
+            Assert.Equal("Compact weekly view with daily tracking (35px/day)",
+                _i18nService.GetZoomLevelDescription(TimelineZoomLevel.WeekDayLow));
+            Assert.Equal("Monthly overview with weekly breakdown (25px/day)",
                 _i18nService.GetZoomLevelDescription(TimelineZoomLevel.MonthWeek));
-            Assert.Equal("Annual planning, strategic roadmaps (6-24 months)",
-                _i18nService.GetZoomLevelDescription(TimelineZoomLevel.QuarterWeek));
-            Assert.Equal("Multi-year programs, portfolio planning (1-5 years)",
+            Assert.Equal("Medium monthly view with weekly periods (20px/day)",
+                _i18nService.GetZoomLevelDescription(TimelineZoomLevel.MonthWeekMedium));
+            Assert.Equal("Compact monthly view with weekly periods (18px/day)",
+                _i18nService.GetZoomLevelDescription(TimelineZoomLevel.MonthWeekLow));
+            Assert.Equal("Quarterly overview with monthly breakdown (15px/day)",
                 _i18nService.GetZoomLevelDescription(TimelineZoomLevel.QuarterMonth));
-            Assert.Equal("Enterprise portfolio, strategic planning (2-10 years)",
+            Assert.Equal("Medium quarterly view with monthly periods (12px/day)",
+                _i18nService.GetZoomLevelDescription(TimelineZoomLevel.QuarterMonthMedium));
+            Assert.Equal("Compact quarterly view with monthly markers (10px/day)",
+                _i18nService.GetZoomLevelDescription(TimelineZoomLevel.QuarterMonthLow));
+            Assert.Equal("Annual overview with quarterly breakdown (8px/day)",
                 _i18nService.GetZoomLevelDescription(TimelineZoomLevel.YearQuarter));
+            Assert.Equal("Medium annual view with quarterly periods (6.5px/day)",
+                _i18nService.GetZoomLevelDescription(TimelineZoomLevel.YearQuarterMedium));
+            Assert.Equal("Extended multi-year planning with quarterly markers (5px/day)",
+                _i18nService.GetZoomLevelDescription(TimelineZoomLevel.YearQuarterLow));
+            Assert.Equal("Long-term strategic view with minimum day width (3px/day)",
+                _i18nService.GetZoomLevelDescription(TimelineZoomLevel.YearQuarterMin));
         }
 
         [Theory]
@@ -521,52 +570,55 @@ namespace GanttComponents.Tests.Unit.Services
             // Act
             var result = _i18nService.GetAllZoomLevelInfo();
 
-            // Assert - Preset-only system now supports 13 fine-grained levels
+            // Assert - Our new 13-level system 
             Assert.Equal(13, result.Count);
 
-            // Original 6 levels still exist
+            // WeekDay pattern (3 levels)
             Assert.True(result.ContainsKey(TimelineZoomLevel.WeekDay));
-            Assert.True(result.ContainsKey(TimelineZoomLevel.MonthDay));
-            Assert.True(result.ContainsKey(TimelineZoomLevel.MonthWeek));
-            Assert.True(result.ContainsKey(TimelineZoomLevel.QuarterWeek));
-            Assert.True(result.ContainsKey(TimelineZoomLevel.QuarterMonth));
-            Assert.True(result.ContainsKey(TimelineZoomLevel.YearQuarter));
-
-            // New intermediate levels added for finer granularity
             Assert.True(result.ContainsKey(TimelineZoomLevel.WeekDayMedium));
             Assert.True(result.ContainsKey(TimelineZoomLevel.WeekDayLow));
-            Assert.True(result.ContainsKey(TimelineZoomLevel.MonthDayMedium));
+
+            // MonthWeek pattern (3 levels) 
+            Assert.True(result.ContainsKey(TimelineZoomLevel.MonthWeek));
             Assert.True(result.ContainsKey(TimelineZoomLevel.MonthWeekMedium));
             Assert.True(result.ContainsKey(TimelineZoomLevel.MonthWeekLow));
-            Assert.True(result.ContainsKey(TimelineZoomLevel.QuarterWeekMedium));
-            Assert.True(result.ContainsKey(TimelineZoomLevel.QuarterMonthMedium));
-            Assert.True(result.ContainsKey(TimelineZoomLevel.YearQuarter));
 
-            // Verify content for a few levels
-            Assert.Equal("Week-Day", result[TimelineZoomLevel.WeekDay].Name);
-            Assert.Equal("Sprint planning, daily management (2-8 weeks)", result[TimelineZoomLevel.WeekDay].Description);
-            Assert.Equal("Month-Day", result[TimelineZoomLevel.MonthDay].Name);
-            Assert.Equal("Project milestones, phase tracking (3-12 months)", result[TimelineZoomLevel.MonthDay].Description);
+            // QuarterMonth pattern (3 levels)
+            Assert.True(result.ContainsKey(TimelineZoomLevel.QuarterMonth));
+            Assert.True(result.ContainsKey(TimelineZoomLevel.QuarterMonthMedium));
+            Assert.True(result.ContainsKey(TimelineZoomLevel.QuarterMonthLow));
+
+            // YearQuarter pattern (4 levels)
+            Assert.True(result.ContainsKey(TimelineZoomLevel.YearQuarter));
+            Assert.True(result.ContainsKey(TimelineZoomLevel.YearQuarterMedium));
+            Assert.True(result.ContainsKey(TimelineZoomLevel.YearQuarterLow));
+            Assert.True(result.ContainsKey(TimelineZoomLevel.YearQuarterMin));
+
+            // Verify content for representative levels
+            Assert.Equal("Week-Day View", result[TimelineZoomLevel.WeekDay].Name);
+            Assert.Equal("Daily sprint planning with weekly context (60px/day)", result[TimelineZoomLevel.WeekDay].Description);
+            Assert.Equal("Month-Week View", result[TimelineZoomLevel.MonthWeek].Name);
+            Assert.Equal("Monthly overview with weekly breakdown (25px/day)", result[TimelineZoomLevel.MonthWeek].Description);
         }
 
         [Fact]
         public void ZoomI18N_LanguageSwitching_UpdatesZoomTranslations()
         {
-            // Test language switching for zoom functionality
+            // Test language switching for zoom functionality with new 13-level system
 
             // English first
             _i18nService.SetCulture("en-US");
-            Assert.Equal("Week-Day", _i18nService.GetZoomLevelName(TimelineZoomLevel.WeekDay));
+            Assert.Equal("Week-Day View", _i18nService.GetZoomLevelName(TimelineZoomLevel.WeekDay));
             Assert.Equal("Zoom In", _i18nService.GetZoomControlText("zoom-in"));
 
             // Switch to Chinese
             _i18nService.SetCulture("zh-CN");
-            Assert.Equal("周-日", _i18nService.GetZoomLevelName(TimelineZoomLevel.WeekDay));
+            Assert.Equal("周-日视图", _i18nService.GetZoomLevelName(TimelineZoomLevel.WeekDay));
             Assert.Equal("放大", _i18nService.GetZoomControlText("zoom-in"));
 
             // Back to English
             _i18nService.SetCulture("en-US");
-            Assert.Equal("Week-Day", _i18nService.GetZoomLevelName(TimelineZoomLevel.WeekDay));
+            Assert.Equal("Week-Day View", _i18nService.GetZoomLevelName(TimelineZoomLevel.WeekDay));
             Assert.Equal("Zoom In", _i18nService.GetZoomControlText("zoom-in"));
         }
 

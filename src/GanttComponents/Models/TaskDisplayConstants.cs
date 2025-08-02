@@ -42,9 +42,9 @@ public static class TaskDisplayConstants
 
     /// <summary>
     /// Default zoom level for preset-only zoom approach.
-    /// MonthDay level at 25px provides good balance for most use cases.
+    /// MonthWeek level at ~24px provides good balance for most use cases.
     /// </summary>
-    public const TimelineZoomLevel DEFAULT_ZOOM_LEVEL = TimelineZoomLevel.MonthDay;
+    public const TimelineZoomLevel DEFAULT_ZOOM_LEVEL = TimelineZoomLevel.MonthWeek;
 
     /// <summary>
     /// Minimum effective day width in pixels to maintain task visibility.

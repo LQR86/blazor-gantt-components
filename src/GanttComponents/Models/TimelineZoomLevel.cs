@@ -2,100 +2,100 @@ namespace GanttComponents.Models;
 
 /// <summary>
 /// Defines the strategic zoom levels for timeline visualization.
-/// Each level optimizes display for different project planning needs.
-/// Expanded to 13 preset-only levels for smooth zoom transitions.
+/// 13-level system with 4 pattern groups: WeekDay → MonthWeek → QuarterMonth → YearQuarter
+/// Each pattern provides multiple granularity options for smooth transitions.
 /// </summary>
 public enum TimelineZoomLevel
 {
     /// <summary>
     /// Week-Day level: 60px per day
-    /// Best for: Short-term detailed scheduling (1-4 weeks)
-    /// Typical use: Sprint planning, daily task management
+    /// Best for: Daily sprint planning with weekly context
+    /// Pattern: Week → Day
     /// </summary>
     WeekDay = 0,
 
     /// <summary>
     /// Week-Day Medium level: 45px per day
-    /// Best for: Short-term planning with slightly wider view (2-6 weeks)
-    /// Typical use: Sprint planning, detailed project phases
+    /// Best for: Medium weekly view with daily granularity
+    /// Pattern: Week → Day
     /// </summary>
     WeekDayMedium = 1,
 
     /// <summary>
     /// Week-Day Low level: 35px per day
-    /// Best for: Short to medium-term planning (1-8 weeks)
-    /// Typical use: Multi-sprint planning, feature cycles
+    /// Best for: Compact weekly view with daily tracking
+    /// Pattern: Week → Day
     /// </summary>
     WeekDayLow = 2,
 
     /// <summary>
-    /// Month-Day level: 25px per day
-    /// Best for: Monthly project planning (1-6 months)
-    /// Typical use: Feature development cycles, milestone tracking
+    /// Month-Week level: 24px per day (adjusted from 25px in planning)
+    /// Best for: Monthly overview with weekly breakdown
+    /// Pattern: Quarter → Month (showing Month → Week)
     /// </summary>
-    MonthDay = 3,
+    MonthWeek = 3,
 
     /// <summary>
-    /// Month-Day Medium level: 20px per day
-    /// Best for: Medium-term project planning (2-8 months)
-    /// Typical use: Release planning, phase management
+    /// Month-Week Medium level: 19.2px per day (adjusted from 20px in planning)
+    /// Best for: Medium monthly view with weekly periods
+    /// Pattern: Quarter → Month (showing Month → Week)
     /// </summary>
-    MonthDayMedium = 4,
+    MonthWeekMedium = 4,
 
     /// <summary>
-    /// Month-Week level: 15px per day
-    /// Best for: Quarterly planning (3-12 months)
-    /// Typical use: Release planning, resource allocation
+    /// Month-Week Low level: 16px per day (adjusted from 18px in planning)
+    /// Best for: Compact monthly view with weekly periods
+    /// Pattern: Quarter → Month (showing Month → Week)
     /// </summary>
-    MonthWeek = 5,
+    MonthWeekLow = 5,
 
     /// <summary>
-    /// Month-Week Medium level: 12px per day
-    /// Best for: Extended quarterly planning (4-15 months)
-    /// Typical use: Product roadmap, resource planning
+    /// Quarter-Month level: 15px per day
+    /// Best for: Quarterly overview with monthly breakdown
+    /// Pattern: Quarter → Month
     /// </summary>
-    MonthWeekMedium = 6,
+    QuarterMonth = 6,
 
     /// <summary>
-    /// Month-Week Low level: 10px per day
-    /// Best for: Long-term quarterly planning (6-18 months)
-    /// Typical use: Strategic roadmaps, portfolio planning
+    /// Quarter-Month Medium level: 12px per day
+    /// Best for: Medium quarterly view with monthly periods
+    /// Pattern: Quarter → Month
     /// </summary>
-    MonthWeekLow = 7,
+    QuarterMonthMedium = 7,
 
     /// <summary>
-    /// Quarter-Week level: 8px per day
-    /// Best for: Annual planning (6-24 months)
-    /// Typical use: Strategic roadmaps, long-term projects
+    /// Quarter-Month Low level: 10px per day
+    /// Best for: Compact quarterly view with monthly markers
+    /// Pattern: Quarter → Month
     /// </summary>
-    QuarterWeek = 8,
+    QuarterMonthLow = 8,
 
     /// <summary>
-    /// Quarter-Week Medium level: 6.5px per day
-    /// Best for: Extended annual planning (12-30 months)
-    /// Typical use: Multi-year project timelines, portfolio management
+    /// Year-Quarter level: 8px per day
+    /// Best for: Annual overview with quarterly breakdown
+    /// Pattern: Year → Quarter
     /// </summary>
-    QuarterWeekMedium = 9,
+    YearQuarter = 9,
 
     /// <summary>
-    /// Quarter-Month level: 5px per day
-    /// Best for: Multi-year overview (1-5 years)
-    /// Typical use: Program management, portfolio planning
+    /// Year-Quarter Medium level: 6.5px per day
+    /// Best for: Medium annual view with quarterly periods
+    /// Pattern: Year → Quarter
     /// </summary>
-    QuarterMonth = 10,
+    YearQuarterMedium = 10,
 
     /// <summary>
-    /// Quarter-Month Medium level: 4px per day
-    /// Best for: Extended multi-year planning (2-6 years)
-    /// Typical use: Strategic initiatives, enterprise planning
+    /// Year-Quarter Low level: 5px per day
+    /// Best for: Extended multi-year planning with quarterly markers
+    /// Pattern: Year → Quarter
     /// </summary>
-    QuarterMonthMedium = 11,
+    YearQuarterLow = 11,
 
     /// <summary>
-    /// Year-Quarter level: 3px per day (minimum boundary)
-    /// Best for: Long-term strategic view (2-10 years)
-    /// Typical use: Strategic planning, enterprise roadmaps
+    /// Year-Quarter Minimal level: 3px per day (minimum boundary)
+    /// Best for: Long-term strategic view with minimum day width
+    /// Pattern: Year → Quarter
     /// Enforces 3px minimum day width to maintain task visibility
     /// </summary>
-    YearQuarter = 12
+    YearQuarterMin = 12
 }

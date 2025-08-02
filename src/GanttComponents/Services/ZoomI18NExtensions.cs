@@ -18,12 +18,27 @@ namespace GanttComponents.Services
         {
             return zoomLevel switch
             {
-                TimelineZoomLevel.WeekDay => i18n.T("zoom.level.week-day"),
-                TimelineZoomLevel.MonthDay => i18n.T("zoom.level.month-day"),
-                TimelineZoomLevel.MonthWeek => i18n.T("zoom.level.month-week"),
-                TimelineZoomLevel.QuarterWeek => i18n.T("zoom.level.quarter-week"),
-                TimelineZoomLevel.QuarterMonth => i18n.T("zoom.level.quarter-month"),
-                TimelineZoomLevel.YearQuarter => i18n.T("zoom.level.year-quarter"),
+                // WeekDay pattern levels
+                TimelineZoomLevel.WeekDay => i18n.T("ZoomLevel.WeekDay"),
+                TimelineZoomLevel.WeekDayMedium => i18n.T("ZoomLevel.WeekDayMedium"),
+                TimelineZoomLevel.WeekDayLow => i18n.T("ZoomLevel.WeekDayLow"),
+
+                // MonthWeek pattern levels
+                TimelineZoomLevel.MonthWeek => i18n.T("ZoomLevel.MonthWeek"),
+                TimelineZoomLevel.MonthWeekMedium => i18n.T("ZoomLevel.MonthWeekMedium"),
+                TimelineZoomLevel.MonthWeekLow => i18n.T("ZoomLevel.MonthWeekLow"),
+
+                // QuarterMonth pattern levels
+                TimelineZoomLevel.QuarterMonth => i18n.T("ZoomLevel.QuarterMonth"),
+                TimelineZoomLevel.QuarterMonthMedium => i18n.T("ZoomLevel.QuarterMonthMedium"),
+                TimelineZoomLevel.QuarterMonthLow => i18n.T("ZoomLevel.QuarterMonthLow"),
+
+                // YearQuarter pattern levels
+                TimelineZoomLevel.YearQuarter => i18n.T("ZoomLevel.YearQuarter"),
+                TimelineZoomLevel.YearQuarterMedium => i18n.T("ZoomLevel.YearQuarterMedium"),
+                TimelineZoomLevel.YearQuarterLow => i18n.T("ZoomLevel.YearQuarterLow"),
+                TimelineZoomLevel.YearQuarterMin => i18n.T("ZoomLevel.YearQuarterMin"),
+
                 _ => zoomLevel.ToString()
             };
         }
@@ -38,12 +53,27 @@ namespace GanttComponents.Services
         {
             return zoomLevel switch
             {
-                TimelineZoomLevel.WeekDay => i18n.T("zoom.description.week-day"),
-                TimelineZoomLevel.MonthDay => i18n.T("zoom.description.month-day"),
-                TimelineZoomLevel.MonthWeek => i18n.T("zoom.description.month-week"),
-                TimelineZoomLevel.QuarterWeek => i18n.T("zoom.description.quarter-week"),
-                TimelineZoomLevel.QuarterMonth => i18n.T("zoom.description.quarter-month"),
-                TimelineZoomLevel.YearQuarter => i18n.T("zoom.description.year-quarter"),
+                // WeekDay pattern levels
+                TimelineZoomLevel.WeekDay => i18n.T("ZoomLevel.WeekDay.Description"),
+                TimelineZoomLevel.WeekDayMedium => i18n.T("ZoomLevel.WeekDayMedium.Description"),
+                TimelineZoomLevel.WeekDayLow => i18n.T("ZoomLevel.WeekDayLow.Description"),
+
+                // MonthWeek pattern levels
+                TimelineZoomLevel.MonthWeek => i18n.T("ZoomLevel.MonthWeek.Description"),
+                TimelineZoomLevel.MonthWeekMedium => i18n.T("ZoomLevel.MonthWeekMedium.Description"),
+                TimelineZoomLevel.MonthWeekLow => i18n.T("ZoomLevel.MonthWeekLow.Description"),
+
+                // QuarterMonth pattern levels
+                TimelineZoomLevel.QuarterMonth => i18n.T("ZoomLevel.QuarterMonth.Description"),
+                TimelineZoomLevel.QuarterMonthMedium => i18n.T("ZoomLevel.QuarterMonthMedium.Description"),
+                TimelineZoomLevel.QuarterMonthLow => i18n.T("ZoomLevel.QuarterMonthLow.Description"),
+
+                // YearQuarter pattern levels
+                TimelineZoomLevel.YearQuarter => i18n.T("ZoomLevel.YearQuarter.Description"),
+                TimelineZoomLevel.YearQuarterMedium => i18n.T("ZoomLevel.YearQuarterMedium.Description"),
+                TimelineZoomLevel.YearQuarterLow => i18n.T("ZoomLevel.YearQuarterLow.Description"),
+                TimelineZoomLevel.YearQuarterMin => i18n.T("ZoomLevel.YearQuarterMin.Description"),
+
                 _ => string.Empty
             };
         }

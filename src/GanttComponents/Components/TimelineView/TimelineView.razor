@@ -152,7 +152,7 @@
     [Parameter] public int? HoveredTaskId { get; set; }
     
     // Zoom parameters - maintain backward compatibility with current 40px day width
-    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthDay;
+    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeek;
     [Parameter] public double ZoomFactor { get; set; } = 1.6; // 25px * 1.6 = 40px (maintains current behavior)
     
     // Zoom state change events

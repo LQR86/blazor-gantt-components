@@ -14,7 +14,7 @@ public class TimelineViewZoomTests
     public void DefaultZoomParameters_ShouldMaintainBackwardCompatibility()
     {
         // Arrange
-        var defaultZoomLevel = TimelineZoomLevel.MonthDay;
+        var defaultZoomLevel = TimelineZoomLevel.MonthWeek;
         var defaultZoomFactor = 1.6;
         var expectedDayWidth = 40.0; // Current legacy behavior
 
@@ -30,7 +30,7 @@ public class TimelineViewZoomTests
     public void MonthDayZoomLevel_WithDifferentFactors_ShouldCalculateCorrectly()
     {
         // Arrange
-        var zoomLevel = TimelineZoomLevel.MonthDay;
+        var zoomLevel = TimelineZoomLevel.MonthWeek;
 
         var testCases = new[]
         {
@@ -73,11 +73,9 @@ public class TimelineViewZoomTests
 
     [Theory]
     [InlineData(TimelineZoomLevel.WeekDay, 1.0, 96.0)]        // 60 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.MonthDay, 1.0, 40.0)]       // 25 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.MonthWeek, 1.0, 24.0)]      // 15 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.QuarterWeek, 1.0, 12.8)]    // 8 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.QuarterMonth, 1.0, 8.0)]    // 5 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.YearQuarter, 1.0, 3.0)]     // Maintains 3px minimum constraint
+    [InlineData(TimelineZoomLevel.MonthWeek, 1.0, 40.0)]       // 25 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.QuarterMonth, 1.0, 24.0)]    // 15 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.YearQuarter, 1.0, 12.8)]     // 8 * 1.6 backward compatibility
     public void ZoomLevel_WithBaseFactor_ShouldReturnExpectedDayWidth(
         TimelineZoomLevel level,
         double factor,
@@ -97,7 +95,7 @@ public class TimelineViewZoomTests
     public void ZoomFactorValidation_ShouldClampToValidRange()
     {
         // Arrange
-        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay);
+        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthWeek);
         var baseDayWidth = 40.0; // Updated for preset-only: 25 * 1.6 = 40px
 
         var testCases = new[]

@@ -32,10 +32,9 @@ public class PresetOnlyZoomValidationTests
 
     [Theory]
     [InlineData(TimelineZoomLevel.WeekDay, 96.0)]        // 60 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.MonthDay, 40.0)]       // 25 * 1.6 backward compatibility  
-    [InlineData(TimelineZoomLevel.MonthWeek, 24.0)]      // 15 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.QuarterMonth, 8.0)]    // 5 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.YearQuarter, 3.0)]     // 3px minimum constraint
+    [InlineData(TimelineZoomLevel.MonthWeek, 40.0)]       // 25 * 1.6 backward compatibility  
+    [InlineData(TimelineZoomLevel.QuarterMonth, 24.0)]    // 15 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.YearQuarter, 12.8)]     // 8 * 1.6 backward compatibility
     public void PresetOnlySystem_AllLevels_ConsistentDayWidthRegardlessOfFactor(TimelineZoomLevel level, double expectedDayWidth)
     {
         // Arrange - Test various zoom factors that should all produce same result

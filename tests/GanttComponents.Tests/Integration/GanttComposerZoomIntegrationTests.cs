@@ -45,9 +45,9 @@ public class GanttComposerZoomIntegrationTests : IDisposable
         {
             // Preset-only system: factors ignored, backward-compatible day widths (original * 1.6)
             (TimelineZoomLevel.WeekDay, 1.0, 96.0),     // 60 * 1.6 for backward compatibility
-            (TimelineZoomLevel.MonthWeek, 1.0, 24.0),   // 15 * 1.6 for backward compatibility
-            (TimelineZoomLevel.QuarterMonth, 1.0, 8.0), // 5 * 1.6 for backward compatibility
-            (TimelineZoomLevel.YearQuarter, 1.0, 3.0),  // 3px minimum constraint
+            (TimelineZoomLevel.MonthWeek, 1.0, 40.0),   // 25 * 1.6 for backward compatibility
+            (TimelineZoomLevel.QuarterMonth, 1.0, 24.0), // 15 * 1.6 for backward compatibility
+            (TimelineZoomLevel.YearQuarter, 1.0, 12.8),  // 8 * 1.6 for backward compatibility
             // In preset-only system, factors are clamped to 1.0 (same result regardless of input factor)
             (TimelineZoomLevel.WeekDay, 0.5, 96.0),     // Factor ignored, same as 1.0
             (TimelineZoomLevel.WeekDay, 2.0, 96.0),     // Factor ignored, same as 1.0
@@ -168,7 +168,7 @@ public class GanttComposerZoomIntegrationTests : IDisposable
 
         // Assert - Parameter flow validation for preset-only system
         Assert.Equal(96.0, initialDayWidth); // WeekDay in preset-only: 96px (60 * 1.6)
-        Assert.Equal(24.0, targetDayWidth);  // MonthWeek in preset-only: 24px (15 * 1.6, factor ignored)
+        Assert.Equal(40.0, targetDayWidth);  // MonthWeek in preset-only: 40px (25 * 1.6, factor ignored)
 
         // Verify the integration maintains different day widths for different settings
         Assert.NotEqual(initialDayWidth, targetDayWidth);

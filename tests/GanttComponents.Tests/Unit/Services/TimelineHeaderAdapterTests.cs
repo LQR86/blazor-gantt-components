@@ -28,7 +28,7 @@ public class TimelineHeaderAdapterTests
     public void GetHeaderConfiguration_MonthDayLevel_ReturnsCorrectConfiguration()
     {
         // Arrange
-        var zoomLevel = TimelineZoomLevel.MonthDay;
+        var zoomLevel = TimelineZoomLevel.WeekDay;
         var effectiveDayWidth = 25.0;
 
         // Act
@@ -54,10 +54,10 @@ public class TimelineHeaderAdapterTests
         var config = TimelineHeaderAdapter.GetHeaderConfiguration(zoomLevel, effectiveDayWidth);
 
         // Assert
-        Assert.Equal(TimelineHeaderUnit.Quarter, config.PrimaryUnit);
-        Assert.Equal("date.quarter-year", config.PrimaryFormat);
-        Assert.Equal(TimelineHeaderUnit.Month, config.SecondaryUnit);
-        Assert.Equal("date.month-short", config.SecondaryFormat);
+        Assert.Equal(TimelineHeaderUnit.Month, config.PrimaryUnit);
+        Assert.Equal("date.month-year", config.PrimaryFormat);
+        Assert.Equal(TimelineHeaderUnit.Week, config.SecondaryUnit);
+        Assert.Equal("date.week-start-day", config.SecondaryFormat);
     }
 
     [Fact]

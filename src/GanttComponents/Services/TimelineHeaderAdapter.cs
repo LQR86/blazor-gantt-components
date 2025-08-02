@@ -89,19 +89,19 @@ public static class TimelineHeaderAdapter
                 MinSecondaryWidth = 20
             },
 
-            TimelineZoomLevel.MonthDay => new TimelineHeaderConfiguration
+            TimelineZoomLevel.MonthWeek => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Month,
                 PrimaryFormat = "date.month-year",
-                SecondaryUnit = TimelineHeaderUnit.Day,
-                SecondaryFormat = "date.day-number",
+                SecondaryUnit = TimelineHeaderUnit.Week,
+                SecondaryFormat = "date.week-start-day",
                 ShowPrimary = true,
                 ShowSecondary = true,
                 MinPrimaryWidth = 100,
                 MinSecondaryWidth = 15
             },
 
-            TimelineZoomLevel.MonthDayMedium => new TimelineHeaderConfiguration
+            TimelineZoomLevel.MonthWeekMedium => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Month,
                 PrimaryFormat = "date.month-year",
@@ -111,30 +111,6 @@ public static class TimelineHeaderAdapter
                 ShowSecondary = true,
                 MinPrimaryWidth = 100, // Same as MonthDay
                 MinSecondaryWidth = 15
-            },
-
-            TimelineZoomLevel.MonthWeek => new TimelineHeaderConfiguration
-            {
-                PrimaryUnit = TimelineHeaderUnit.Quarter,
-                PrimaryFormat = "date.quarter-year",
-                SecondaryUnit = TimelineHeaderUnit.Month,
-                SecondaryFormat = "date.month-short",
-                ShowPrimary = true,
-                ShowSecondary = true,
-                MinPrimaryWidth = 180, // Quarters need space for "Q1 2025"
-                MinSecondaryWidth = 45  // Abbreviated months "Jan"
-            },
-
-            TimelineZoomLevel.MonthWeekMedium => new TimelineHeaderConfiguration
-            {
-                PrimaryUnit = TimelineHeaderUnit.Quarter,
-                PrimaryFormat = "date.quarter-year",
-                SecondaryUnit = TimelineHeaderUnit.Month,
-                SecondaryFormat = "date.month-short",
-                ShowPrimary = true,
-                ShowSecondary = true,
-                MinPrimaryWidth = 180, // Same as MonthWeek
-                MinSecondaryWidth = 45
             },
 
             TimelineZoomLevel.MonthWeekLow => new TimelineHeaderConfiguration
@@ -149,7 +125,7 @@ public static class TimelineHeaderAdapter
                 MinSecondaryWidth = 45
             },
 
-            TimelineZoomLevel.QuarterWeek => new TimelineHeaderConfiguration
+            TimelineZoomLevel.YearQuarter => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Year,
                 PrimaryFormat = "date.year",
@@ -161,7 +137,7 @@ public static class TimelineHeaderAdapter
                 MinSecondaryWidth = 30  // "Q1", "Q2", etc.
             },
 
-            TimelineZoomLevel.QuarterWeekMedium => new TimelineHeaderConfiguration
+            TimelineZoomLevel.YearQuarterMedium => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Year,
                 PrimaryFormat = "date.year",
@@ -197,7 +173,7 @@ public static class TimelineHeaderAdapter
                 MinSecondaryWidth = 25
             },
 
-            TimelineZoomLevel.YearQuarter => new TimelineHeaderConfiguration
+            TimelineZoomLevel.YearQuarterLow => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Decade,
                 PrimaryFormat = "date.decade",
@@ -207,6 +183,18 @@ public static class TimelineHeaderAdapter
                 ShowSecondary = true,
                 MinPrimaryWidth = 300, // "2020-2029"
                 MinSecondaryWidth = 40   // "2025"
+            },
+
+            TimelineZoomLevel.YearQuarterMin => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Decade,
+                PrimaryFormat = "date.decade-short",
+                SecondaryUnit = TimelineHeaderUnit.Year,
+                SecondaryFormat = "date.year-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 200, // "20s"
+                MinSecondaryWidth = 30   // "25"
             },
 
             _ => throw new ArgumentOutOfRangeException(nameof(zoomLevel))
@@ -337,22 +325,19 @@ public static class TimelineHeaderAdapter
             TimelineZoomLevel.WeekDayLow => 60,         // "Jan"
 
             // Wide levels use standard formats
-            TimelineZoomLevel.MonthDay => 60,           // "Jan"
-            TimelineZoomLevel.MonthDayMedium => 40,     // "Q1"
+            TimelineZoomLevel.MonthWeek => 60,           // "Jan"
+            TimelineZoomLevel.MonthWeekMedium => 40,     // "Q1"
 
             // Medium levels use quarterly/yearly formats
-            TimelineZoomLevel.MonthWeek => 80,          // "Q1 2025"
-            TimelineZoomLevel.MonthWeekMedium => 40,    // "Q1"
-            TimelineZoomLevel.MonthWeekLow => 60,       // "2025"
+            TimelineZoomLevel.QuarterMonth => 80,          // "Q1 2025"
+            TimelineZoomLevel.QuarterMonthMedium => 40,    // "Q1"
+            TimelineZoomLevel.QuarterMonthLow => 60,       // "2025"
 
             // Narrow levels use yearly/decade formats
-            TimelineZoomLevel.QuarterWeek => 60,        // "2025"
-            TimelineZoomLevel.QuarterWeekMedium => 100, // "2020-2029"
-            TimelineZoomLevel.QuarterMonth => 60,       // "20s"
-            TimelineZoomLevel.QuarterMonthMedium => 60, // "20s"
-
-            // Ultra-narrow level
-            TimelineZoomLevel.YearQuarter => 40,        // "20", "30" (minimal)
+            TimelineZoomLevel.YearQuarter => 60,        // "2025"
+            TimelineZoomLevel.YearQuarterMedium => 100, // "2020-2029"
+            TimelineZoomLevel.YearQuarterLow => 60,       // "20s"
+            TimelineZoomLevel.YearQuarterMin => 40,        // "20", "30" (minimal)
 
             _ => 60 // Default fallback
         };
@@ -370,22 +355,22 @@ public static class TimelineHeaderAdapter
             TimelineZoomLevel.WeekDay => 20,            // "1", "2", "3"
             TimelineZoomLevel.WeekDayMedium => 20,      // "1", "2", "3"
             TimelineZoomLevel.WeekDayLow => 20,         // "1", "2", "3"
-            TimelineZoomLevel.MonthDay => 20,           // "1", "2", "3"
-            TimelineZoomLevel.MonthDayMedium => 25,     // "M", "T", "W" (day abbrev)
+            TimelineZoomLevel.MonthWeek => 20,           // "1", "2", "3"
+            TimelineZoomLevel.MonthWeekMedium => 25,     // "M", "T", "W" (day abbrev)
 
             // Month-level secondary headers
-            TimelineZoomLevel.MonthWeek => 25,          // "J", "F", "M"
-            TimelineZoomLevel.MonthWeekMedium => 25,    // "J", "F", "M"
-            TimelineZoomLevel.MonthWeekLow => 15,       // "1", "2", "3", "4"
+            TimelineZoomLevel.MonthWeekLow => 25,          // "J", "F", "M"
+            TimelineZoomLevel.QuarterMonth => 25,    // "J", "F", "M"
+            TimelineZoomLevel.QuarterMonthMedium => 15,       // "1", "2", "3", "4"
 
             // Quarter/year-level secondary headers
-            TimelineZoomLevel.QuarterWeek => 15,        // "1", "2", "3", "4"
-            TimelineZoomLevel.QuarterWeekMedium => 25,  // "25", "26", "27"
-            TimelineZoomLevel.QuarterMonth => 25,       // "25", "26", "27"
-            TimelineZoomLevel.QuarterMonthMedium => 15, // "5", "6", "7"
+            TimelineZoomLevel.QuarterMonthLow => 15,        // "1", "2", "3", "4"
+            TimelineZoomLevel.YearQuarter => 25,  // "25", "26", "27"
+            TimelineZoomLevel.YearQuarterMedium => 25,       // "25", "26", "27"
+            TimelineZoomLevel.YearQuarterLow => 15, // "5", "6", "7"
 
             // Minimal secondary headers
-            TimelineZoomLevel.YearQuarter => 15,        // "5", "6", "7"
+            TimelineZoomLevel.YearQuarterMin => 15,        // "5", "6", "7"
 
             _ => 20 // Default fallback
         };

@@ -148,6 +148,12 @@
   <data name="date.day-month-year" xml:space="preserve">
     <value>yyyy年MM月%d日</value>
   </data>
+  <data name="date.quarter-month-year" xml:space="preserve">
+    <value>yyyy年MM月</value>
+  </data>
+  <data name="date.month-start-day" xml:space="preserve">
+    <value>MM月%d日</value>
+  </data>
   <data name="date.hour-24" xml:space="preserve">
     <value>H时</value>
   </data>
@@ -309,44 +315,96 @@
     <value>进度</value>
   </data>
 
-  <!-- Timeline Zoom Levels -->
-  <data name="zoom.level.week-day" xml:space="preserve">
-    <value>周-日</value>
+  <!-- Timeline Zoom Levels - Syncfusion Aligned (13 levels) -->
+  
+  <!-- Timeline Zoom Levels - Syncfusion Aligned (13 levels) -->
+  
+  <!-- WeekDay Pattern Levels (Week → Day) -->
+  <data name="ZoomLevel.WeekDay" xml:space="preserve">
+    <value>周-日视图</value>
   </data>
-  <data name="zoom.level.month-day" xml:space="preserve">
-    <value>月-日</value>
+  <data name="ZoomLevel.WeekDay.Description" xml:space="preserve">
+    <value>带周上下文的每日冲刺规划 (60px/天)</value>
   </data>
-  <data name="zoom.level.month-week" xml:space="preserve">
-    <value>月-周</value>
+  <data name="ZoomLevel.WeekDayMedium" xml:space="preserve">
+    <value>周-日中等</value>
   </data>
-  <data name="zoom.level.quarter-week" xml:space="preserve">
-    <value>季-周</value>
+  <data name="ZoomLevel.WeekDayMedium.Description" xml:space="preserve">
+    <value>具有每日粒度的中等周视图 (45px/天)</value>
   </data>
-  <data name="zoom.level.quarter-month" xml:space="preserve">
-    <value>季-月</value>
+  <data name="ZoomLevel.WeekDayLow" xml:space="preserve">
+    <value>周-日紧凑</value>
   </data>
-  <data name="zoom.level.year-quarter" xml:space="preserve">
-    <value>年-季</value>
+  <data name="ZoomLevel.WeekDayLow.Description" xml:space="preserve">
+    <value>带每日跟踪的紧凑周视图 (35px/天)</value>
+  </data>
+  
+  <!-- MonthWeek Pattern Levels (Month → Week) -->
+  <data name="ZoomLevel.MonthWeek" xml:space="preserve">
+    <value>月-周视图</value>
+  </data>
+  <data name="ZoomLevel.MonthWeek.Description" xml:space="preserve">
+    <value>带周分解的月度概览 (25px/天)</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekMedium" xml:space="preserve">
+    <value>月-周中等</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekMedium.Description" xml:space="preserve">
+    <value>具有周期的中等月度视图 (20px/天)</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekLow" xml:space="preserve">
+    <value>月-周紧凑</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekLow.Description" xml:space="preserve">
+    <value>具有周期的紧凑月度视图 (18px/天)</value>
   </data>
 
-  <!-- Timeline Zoom Level Descriptions -->
-  <data name="zoom.description.week-day" xml:space="preserve">
-    <value>冲刺规划，日常管理 (2-8周)</value>
+  <!-- QuarterMonth Pattern Levels (Quarter → Month) -->
+  <data name="ZoomLevel.QuarterMonth" xml:space="preserve">
+    <value>季-月视图</value>
   </data>
-  <data name="zoom.description.month-day" xml:space="preserve">
-    <value>项目里程碑，阶段跟踪 (3-12个月)</value>
+  <data name="ZoomLevel.QuarterMonth.Description" xml:space="preserve">
+    <value>带月分解的季度概览 (15px/天)</value>
   </data>
-  <data name="zoom.description.month-week" xml:space="preserve">
-    <value>季度规划，资源调度 (6-18个月)</value>
+  <data name="ZoomLevel.QuarterMonthMedium" xml:space="preserve">
+    <value>季-月中等</value>
   </data>
-  <data name="zoom.description.quarter-week" xml:space="preserve">
-    <value>年度规划，战略路线图 (6-24个月)</value>
+  <data name="ZoomLevel.QuarterMonthMedium.Description" xml:space="preserve">
+    <value>具有月周期的中等季度视图 (12px/天)</value>
   </data>
-  <data name="zoom.description.quarter-month" xml:space="preserve">
-    <value>多年项目，组合规划 (1-5年)</value>
+  <data name="ZoomLevel.QuarterMonthLow" xml:space="preserve">
+    <value>季-月紧凑</value>
   </data>
-  <data name="zoom.description.year-quarter" xml:space="preserve">
-    <value>企业组合，战略规划 (2-10年)</value>
+  <data name="ZoomLevel.QuarterMonthLow.Description" xml:space="preserve">
+    <value>带月标记的紧凑季度视图 (10px/天)</value>
+  </data>
+  
+  <!-- YearQuarter Pattern Levels (Year → Quarter) -->
+  <data name="ZoomLevel.YearQuarter" xml:space="preserve">
+    <value>年-季视图</value>
+  </data>
+  <data name="ZoomLevel.YearQuarter.Description" xml:space="preserve">
+    <value>带季度分解的年度概览 (8px/天)</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterMedium" xml:space="preserve">
+    <value>年-季中等</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterMedium.Description" xml:space="preserve">
+    <value>具有季度周期的中等年度视图 (6.5px/天)</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterLow" xml:space="preserve">
+    <value>年-季紧凑</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterLow.Description" xml:space="preserve">
+    <value>带季度标记的扩展多年规划 (5px/天)</value>
+  </data>
+  
+  <!-- YearQuarter Minimal Pattern Level (Minimum day width) -->
+  <data name="ZoomLevel.YearQuarterMin" xml:space="preserve">
+    <value>年-季最小</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterMin.Description" xml:space="preserve">
+    <value>具有最小日宽度的长期战略视图 (3px/天)</value>
   </data>
 
   <!-- Timeline Zoom UI Controls -->

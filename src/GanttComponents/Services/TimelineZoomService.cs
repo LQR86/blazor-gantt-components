@@ -29,65 +29,65 @@ public class TimelineZoomService
                 "ZoomLevel.WeekDayLow",
                 "ZoomLevel.WeekDayLow.Description"
             ),
-            [TimelineZoomLevel.MonthDay] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.MonthDay,
-                40.0, // 25 * 1.6 for backward compatibility (maintains 40px default)
-                "ZoomLevel.MonthDay",
-                "ZoomLevel.MonthDay.Description"
-            ),
-            [TimelineZoomLevel.MonthDayMedium] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.MonthDayMedium,
-                32.0, // 20 * 1.6 for backward compatibility
-                "ZoomLevel.MonthDayMedium",
-                "ZoomLevel.MonthDayMedium.Description"
-            ),
             [TimelineZoomLevel.MonthWeek] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.MonthWeek,
-                24.0, // 15 * 1.6 for backward compatibility
+                40.0, // 25 * 1.6 for backward compatibility - matches GanttResources.resx
                 "ZoomLevel.MonthWeek",
                 "ZoomLevel.MonthWeek.Description"
             ),
             [TimelineZoomLevel.MonthWeekMedium] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.MonthWeekMedium,
-                19.2, // 12 * 1.6 for backward compatibility
+                32.0, // 20 * 1.6 for backward compatibility - matches GanttResources.resx
                 "ZoomLevel.MonthWeekMedium",
                 "ZoomLevel.MonthWeekMedium.Description"
             ),
             [TimelineZoomLevel.MonthWeekLow] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.MonthWeekLow,
-                16.0, // 10 * 1.6 for backward compatibility
+                28.8, // 18 * 1.6 for backward compatibility - matches GanttResources.resx
                 "ZoomLevel.MonthWeekLow",
                 "ZoomLevel.MonthWeekLow.Description"
             ),
-            [TimelineZoomLevel.QuarterWeek] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.QuarterWeek,
-                12.8, // 8 * 1.6 for backward compatibility
-                "ZoomLevel.QuarterWeek",
-                "ZoomLevel.QuarterWeek.Description"
-            ),
-            [TimelineZoomLevel.QuarterWeekMedium] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.QuarterWeekMedium,
-                10.4, // 6.5 * 1.6 for backward compatibility
-                "ZoomLevel.QuarterWeekMedium",
-                "ZoomLevel.QuarterWeekMedium.Description"
-            ),
             [TimelineZoomLevel.QuarterMonth] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.QuarterMonth,
-                8.0, // 5 * 1.6 for backward compatibility
+                24.0, // 15 * 1.6 for backward compatibility (15px/day from GanttResources.resx)
                 "ZoomLevel.QuarterMonth",
                 "ZoomLevel.QuarterMonth.Description"
             ),
             [TimelineZoomLevel.QuarterMonthMedium] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.QuarterMonthMedium,
-                6.4, // 4 * 1.6 for backward compatibility
+                19.2, // 12 * 1.6 for backward compatibility (12px/day from GanttResources.resx)
                 "ZoomLevel.QuarterMonthMedium",
                 "ZoomLevel.QuarterMonthMedium.Description"
             ),
+            [TimelineZoomLevel.QuarterMonthLow] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.QuarterMonthLow,
+                16.0, // 10 * 1.6 for backward compatibility (10px/day from GanttResources.resx)
+                "ZoomLevel.QuarterMonthLow",
+                "ZoomLevel.QuarterMonthLow.Description"
+            ),
             [TimelineZoomLevel.YearQuarter] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.YearQuarter,
-                3.0, // Maintain 3px minimum day width constraint
+                12.8, // 8 * 1.6 for backward compatibility (8px/day from GanttResources.resx)
                 "ZoomLevel.YearQuarter",
                 "ZoomLevel.YearQuarter.Description"
+            ),
+            [TimelineZoomLevel.YearQuarterMedium] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.YearQuarterMedium,
+                10.4, // 6.5 * 1.6 for backward compatibility (6.5px/day from GanttResources.resx)
+                "ZoomLevel.YearQuarterMedium",
+                "ZoomLevel.YearQuarterMedium.Description"
+            ),
+            [TimelineZoomLevel.YearQuarterLow] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.YearQuarterLow,
+                8.0, // 5 * 1.6 for backward compatibility (5px/day from GanttResources.resx)
+                "ZoomLevel.YearQuarterLow",
+                "ZoomLevel.YearQuarterLow.Description"
+            ),
+            [TimelineZoomLevel.YearQuarterMin] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.YearQuarterMin,
+                3.0, // Minimum day width constraint (3px/day from GanttResources.resx)
+                "ZoomLevel.YearQuarterMin",
+                "ZoomLevel.YearQuarterMin.Description"
             )
         };
 

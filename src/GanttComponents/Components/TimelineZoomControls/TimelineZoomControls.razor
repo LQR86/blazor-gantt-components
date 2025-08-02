@@ -4,47 +4,71 @@
 @inject IGanttI18N I18N
 @inject IUniversalLogger Logger
 
-<div class="timeline-zoom-controls @CssClass" style="@Style">
-    @if (ShowLevelPresets)
+<div class="timeline-zoom-controls @GetEffectiveCssClass()" style="@Style">
+    @if (EffectiveConfig.ShowLevelPresets)
     {
-        <div class="zoom-level-presets">
-            @if (ShowLabels)
-            {
-                <span class="zoom-controls-label">@I18N.T("ZoomControls.ZoomLevel")</span>
-            }
-            
-            @foreach (var level in GetVisibleZoomLevels())
-            {
-                var config = TimelineZoomService.GetConfiguration(level);
-                var isActive = level == CurrentZoomLevel;
-                var buttonClass = $"zoom-preset-button {(isActive ? "active" : "")}";
+        @if (EffectiveConfig.UseDropdownForPresets)
+        {
+            <div class="zoom-level-dropdown">
+                @if (EffectiveConfig.ShowLabels)
+                {
+                    <span class="zoom-controls-label">@I18N.T("ZoomControls.ZoomLevel")</span>
+                }
+                <select class="zoom-preset-dropdown" 
+                        value="@CurrentZoomLevel" 
+                        disabled="@Disabled"
+                        @onchange="OnDropdownLevelSelected">
+                    @foreach (var level in GetVisibleZoomLevels())
+                    {
+                        var config = TimelineZoomService.GetConfiguration(level);
+                        <option value="@level" title="@I18N.T(config.DescriptionKey)">
+                            @I18N.T(config.DisplayNameKey)
+                        </option>
+                    }
+                </select>
+            </div>
+        }
+        else
+        {
+            <div class="zoom-level-presets">
+                @if (EffectiveConfig.ShowLabels)
+                {
+                    <span class="zoom-controls-label">@I18N.T("ZoomControls.ZoomLevel")</span>
+                }
                 
-                <button type="button" 
-                        class="@buttonClass" 
-                        disabled="@(isActive || Disabled)"
-                        title="@I18N.T(config.DescriptionKey)"
-                        @onclick="() => OnZoomLevelSelected(level)">
-                    @I18N.T(config.DisplayNameKey)
-                </button>
-            }
-        </div>
+                @foreach (var level in GetVisibleZoomLevels())
+                {
+                    var config = TimelineZoomService.GetConfiguration(level);
+                    var isActive = level == CurrentZoomLevel;
+                    var buttonClass = $"zoom-preset-button {(isActive ? "active" : "")}";
+                    
+                    <button type="button" 
+                            class="@buttonClass" 
+                            disabled="@(isActive || Disabled)"
+                            title="@I18N.T(config.DescriptionKey)"
+                            @onclick="() => OnZoomLevelSelected(level)">
+                        @I18N.T(config.DisplayNameKey)
+                    </button>
+                }
+            </div>
+        }
     }
     
-    @if (ShowCurrentState && !HideCurrentState)
+    @if (EffectiveConfig.ShowCurrentState && !EffectiveConfig.HideCurrentState)
     {
         <div class="zoom-current-state">
-            @if (ShowLabels)
+            @if (EffectiveConfig.ShowLabels)
             {
                 <span class="zoom-controls-label">@I18N.T("ZoomControls.Current")</span>
             }
             
             <div class="zoom-current-display">
                 <span class="zoom-level-name">@I18N.T(TimelineZoomService.GetConfiguration(CurrentZoomLevel).DisplayNameKey)</span>
-                @if (ShowZoomFactor)
+                @if (EffectiveConfig.ShowZoomFactor)
                 {
                     <span class="zoom-factor-display">@($"{CurrentZoomFactor:P0}")</span>
                 }
-                @if (ShowDayWidth)
+                @if (EffectiveConfig.ShowDayWidth)
                 {
                     <span class="zoom-day-width">@($"{CurrentDayWidth:F0}px")</span>
                 }
@@ -52,10 +76,10 @@
         </div>
     }
     
-    @if (ShowQuickActions)
+    @if (EffectiveConfig.ShowQuickActions)
     {
         <div class="zoom-quick-actions">
-            @if (ShowLabels)
+            @if (EffectiveConfig.ShowLabels)
             {
                 <span class="zoom-controls-label">@I18N.T("ZoomControls.QuickActions")</span>
             }
@@ -67,7 +91,7 @@
                         title="@I18N.T("ZoomControls.ZoomIn")"
                         @onclick="OnZoomIn">
                     <span class="zoom-icon">+</span>
-                    @if (ShowActionLabels)
+                    @if (EffectiveConfig.ShowActionLabels)
                     {
                         <span class="zoom-action-text">@I18N.T("ZoomControls.ZoomIn")</span>
                     }
@@ -79,7 +103,7 @@
                         title="@I18N.T("ZoomControls.ZoomOut")"
                         @onclick="OnZoomOut">
                     <span class="zoom-icon">−</span>
-                    @if (ShowActionLabels)
+                    @if (EffectiveConfig.ShowActionLabels)
                     {
                         <span class="zoom-action-text">@I18N.T("ZoomControls.ZoomOut")</span>
                     }
@@ -103,13 +127,16 @@
     [Parameter, EditorRequired] public EventCallback<TimelineZoomLevel> OnZoomLevelChanged { get; set; }
     [Parameter, EditorRequired] public EventCallback<double> OnZoomFactorChanged { get; set; }
     
+    // NEW: Preset configuration system - choose a preset or use Custom for individual control
+    [Parameter] public TimelineZoomControlPreset Preset { get; set; } = TimelineZoomControlPreset.Default;
+    
     // Composability and customization
     [Parameter] public RenderFragment? AdditionalContent { get; set; }
     [Parameter] public string CssClass { get; set; } = "";
     [Parameter] public string Style { get; set; } = "";
     [Parameter] public bool Disabled { get; set; } = false;
     
-    // UI configuration - all optional with sensible defaults
+    // UI configuration - used when Preset = Custom, otherwise ignored
     [Parameter] public bool ShowLevelPresets { get; set; } = true;
     [Parameter] public bool ShowCurrentState { get; set; } = true;
     [Parameter] public bool ShowQuickActions { get; set; } = true;
@@ -127,8 +154,50 @@
     // Preset-only approach: Manual zoom controls removed for v0.8.5
     // All zoom control is handled via preset level selection only
     
+    // Effective configuration based on preset or custom parameters
+    private TimelineZoomControlConfiguration EffectiveConfig
+    {
+        get
+        {
+            if (Preset == TimelineZoomControlPreset.Custom)
+            {
+                // Use individual parameters when Custom preset is selected
+                return new TimelineZoomControlConfiguration
+                {
+                    ShowLevelPresets = ShowLevelPresets,
+                    ShowCurrentState = ShowCurrentState,
+                    ShowQuickActions = ShowQuickActions,
+                    ShowLabels = ShowLabels,
+                    ShowActionLabels = ShowActionLabels,
+                    ShowZoomFactor = ShowZoomFactor,
+                    ShowDayWidth = ShowDayWidth,
+                    HideCurrentState = HideCurrentState,
+                    CssClass = CssClass,
+                    UseDropdownForPresets = false, // Can be added as parameter if needed
+                    MaxVisiblePresets = 13
+                };
+            }
+            else
+            {
+                // Use predefined preset configuration
+                return TimelineZoomControlConfiguration.GetPresetConfiguration(Preset);
+            }
+        }
+    }
+    
     // Calculated properties
     private double CurrentDayWidth => TimelineZoomService.GetConfiguration(CurrentZoomLevel).GetEffectiveDayWidth(CurrentZoomFactor);
+    
+    // Get effective CSS class combining preset and custom classes
+    private string GetEffectiveCssClass()
+    {
+        var effectiveClass = EffectiveConfig.CssClass;
+        if (!string.IsNullOrWhiteSpace(CssClass))
+        {
+            effectiveClass = string.IsNullOrWhiteSpace(effectiveClass) ? CssClass : $"{effectiveClass} {CssClass}";
+        }
+        return effectiveClass;
+    }
     
     // Get visible zoom levels based on configuration
     private IEnumerable<TimelineZoomLevel> GetVisibleZoomLevels()
@@ -138,9 +207,26 @@
             return VisibleZoomLevels;
         }
         
-        // Use min/max range - NOTE: WeekDay=0 (detailed) to YearQuarter=5 (overview)
+        // Use min/max range - NOTE: WeekDay=0 (detailed) to YearQuarter=12 (overview)
         var allLevels = Enum.GetValues<TimelineZoomLevel>().OrderBy(x => (int)x);
         var filteredLevels = allLevels.Where(level => level >= MinZoomLevel && level <= MaxZoomLevel).ToList();
+        
+        // Apply preset limit for visible presets
+        if (EffectiveConfig.MaxVisiblePresets > 0 && filteredLevels.Count > EffectiveConfig.MaxVisiblePresets)
+        {
+            // Take evenly distributed levels across the range
+            var step = (double)filteredLevels.Count / EffectiveConfig.MaxVisiblePresets;
+            var selectedLevels = new List<TimelineZoomLevel>();
+            for (int i = 0; i < EffectiveConfig.MaxVisiblePresets; i++)
+            {
+                var index = (int)(i * step);
+                if (index < filteredLevels.Count)
+                {
+                    selectedLevels.Add(filteredLevels[index]);
+                }
+            }
+            return selectedLevels;
+        }
         
         return filteredLevels;
     }
@@ -158,6 +244,15 @@
         else
         {
             Logger.LogWarning("ZoomLevelSelected ignored", new { level, CurrentZoomLevel, HasDelegate = OnZoomLevelChanged.HasDelegate });
+        }
+    }
+    
+    private async Task OnDropdownLevelSelected(ChangeEventArgs e)
+    {
+        if (e.Value != null && Enum.TryParse<TimelineZoomLevel>(e.Value.ToString(), out var level))
+        {
+            Logger.LogOperation("ZOOM_CONTROLS", $"DropdownZoomLevelSelected: {level}");
+            await OnZoomLevelSelected(level);
         }
     }
     

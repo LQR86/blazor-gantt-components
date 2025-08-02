@@ -13,56 +13,184 @@
 
 <div class="demo-container">
     <div class="demo-section">
-        <h3>✨ Timeline Zoom Controls (v0.8.2) - NEW!</h3>
-        <p>Interactive zoom level controls with real-time timeline updates.</p>
+        <h3>✨ Timeline Zoom Control Presets (v0.8.5) - NEW!</h3>
+        <p>Comprehensive showcase of all preset configurations for different UI scenarios.</p>
         
-        <!-- Zoom Controls Demo Section -->
+        <!-- Zoom Controls Presets Demo Section -->
         <div class="zoom-controls-demo">
-            <h4>Zoom Controls Component</h4>
+            <h4>All Preset Configurations</h4>
             
-            <!-- Default Configuration -->
+            <!-- 1. Default Configuration -->
             <div class="zoom-demo-variant">
-                <h5>Default Configuration</h5>
-                <TimelineZoomControls CurrentZoomLevel="@CurrentZoomLevel"
+                <h5>1. Default - Full Featured</h5>
+                <p class="preset-description">@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.Default)</p>
+                <TimelineZoomControls Preset="TimelineZoomControlPreset.Default"
+                                     CurrentZoomLevel="@CurrentZoomLevel"
                                      CurrentZoomFactor="@CurrentZoomFactor"
                                      OnZoomLevelChanged="HandleZoomLevelChanged"
                                      OnZoomFactorChanged="HandleZoomFactorChanged" />
             </div>
             
-            <!-- Compact Configuration -->
+            <!-- 2. Extremely Compact -->
             <div class="zoom-demo-variant">
-                <h5>Compact Variant</h5>
-                <TimelineZoomControls CurrentZoomLevel="@CurrentZoomLevel"
-                                     CurrentZoomFactor="@CurrentZoomFactor"
-                                     OnZoomLevelChanged="HandleZoomLevelChanged"
-                                     OnZoomFactorChanged="HandleZoomFactorChanged"
-                                     CssClass="compact"
-                                     ShowActionLabels="true" />
+                <h5>2. Extremely Compact - Minimal Toolbar</h5>
+                <p class="preset-description">@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.ExtremelyCompact)</p>
+                <div class="demo-toolbar">
+                    <span class="toolbar-item">File</span>
+                    <span class="toolbar-item">Edit</span>
+                    <TimelineZoomControls Preset="TimelineZoomControlPreset.ExtremelyCompact"
+                                         CurrentZoomLevel="@CurrentZoomLevel"
+                                         CurrentZoomFactor="@CurrentZoomFactor"
+                                         OnZoomLevelChanged="HandleZoomLevelChanged"
+                                         OnZoomFactorChanged="HandleZoomFactorChanged" />
+                    <span class="toolbar-item">View</span>
+                    <span class="toolbar-item">Help</span>
+                </div>
             </div>
             
-            <!-- Minimal Configuration -->
+            <!-- 3. Compact Labeled -->
             <div class="zoom-demo-variant">
-                <h5>Minimal Variant (Presets Only)</h5>
-                <TimelineZoomControls CurrentZoomLevel="@CurrentZoomLevel"
-                                     CurrentZoomFactor="@CurrentZoomFactor"
-                                     OnZoomLevelChanged="HandleZoomLevelChanged"
-                                     OnZoomFactorChanged="HandleZoomFactorChanged"
-                                     CssClass="minimal"
-                                     ShowCurrentState="false"
-                                     ShowQuickActions="false"
-                                     ShowLabels="false" />
+                <h5>3. Compact Labeled - Spacious Toolbar</h5>
+                <p class="preset-description">@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.CompactLabeled)</p>
+                <div class="demo-toolbar spacious">
+                    <span class="toolbar-item">Project</span>
+                    <span class="toolbar-item">Timeline</span>
+                    <TimelineZoomControls Preset="TimelineZoomControlPreset.CompactLabeled"
+                                         CurrentZoomLevel="@CurrentZoomLevel"
+                                         CurrentZoomFactor="@CurrentZoomFactor"
+                                         OnZoomLevelChanged="HandleZoomLevelChanged"
+                                         OnZoomFactorChanged="HandleZoomFactorChanged" />
+                    <span class="toolbar-item">Settings</span>
+                </div>
             </div>
             
-            <!-- Custom Range Configuration -->
+            <!-- 4. Compact Dropdown -->
             <div class="zoom-demo-variant">
-                <h5>Custom Range (WeekDay to MonthWeek)</h5>
-                <TimelineZoomControls CurrentZoomLevel="@CurrentZoomLevel"
-                                     CurrentZoomFactor="@CurrentZoomFactor"
-                                     OnZoomLevelChanged="HandleZoomLevelChanged"
-                                     OnZoomFactorChanged="HandleZoomFactorChanged"
-                                     MinZoomLevel="@TimelineZoomLevel.WeekDay"
-                                     MaxZoomLevel="@TimelineZoomLevel.MonthWeek"
-                                     ShowDayWidth="true" />
+                <h5>4. Compact Dropdown - Control Panel</h5>
+                <p class="preset-description">@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.CompactDropdown)</p>
+                <div class="demo-control-panel">
+                    <div class="panel-section">
+                        <label>Display Options:</label>
+                        <TimelineZoomControls Preset="TimelineZoomControlPreset.CompactDropdown"
+                                             CurrentZoomLevel="@CurrentZoomLevel"
+                                             CurrentZoomFactor="@CurrentZoomFactor"
+                                             OnZoomLevelChanged="HandleZoomLevelChanged"
+                                             OnZoomFactorChanged="HandleZoomFactorChanged" />
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 5. Preset Only -->
+            <div class="zoom-demo-variant">
+                <h5>5. Preset Only - Clean Level Selection</h5>
+                <p class="preset-description">@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.PresetOnly)</p>
+                <div class="clean-section">
+                    <TimelineZoomControls Preset="TimelineZoomControlPreset.PresetOnly"
+                                         CurrentZoomLevel="@CurrentZoomLevel"
+                                         CurrentZoomFactor="@CurrentZoomFactor"
+                                         OnZoomLevelChanged="HandleZoomLevelChanged"
+                                         OnZoomFactorChanged="HandleZoomFactorChanged" />
+                </div>
+            </div>
+            
+            <!-- 6. Status Only -->
+            <div class="zoom-demo-variant">
+                <h5>6. Status Only - Read-Only Display</h5>
+                <p class="preset-description">@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.StatusOnly)</p>
+                <div class="demo-status-bar">
+                    <span class="status-item">Ready</span>
+                    <span class="status-item">|</span>
+                    <TimelineZoomControls Preset="TimelineZoomControlPreset.StatusOnly"
+                                         CurrentZoomLevel="@CurrentZoomLevel"
+                                         CurrentZoomFactor="@CurrentZoomFactor"
+                                         OnZoomLevelChanged="HandleZoomLevelChanged"
+                                         OnZoomFactorChanged="HandleZoomFactorChanged" />
+                    <span class="status-item">|</span>
+                    <span class="status-item">1,234 tasks loaded</span>
+                </div>
+            </div>
+            
+            <!-- 7. Debug Configuration -->
+            <div class="zoom-demo-variant">
+                <h5>7. Debug - All Features Visible</h5>
+                <p class="preset-description">@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.Debug)</p>
+                <div class="debug-section">
+                    <TimelineZoomControls Preset="TimelineZoomControlPreset.Debug"
+                                         CurrentZoomLevel="@CurrentZoomLevel"
+                                         CurrentZoomFactor="@CurrentZoomFactor"
+                                         OnZoomLevelChanged="HandleZoomLevelChanged"
+                                         OnZoomFactorChanged="HandleZoomFactorChanged" />
+                </div>
+            </div>
+            
+            <!-- 8. Minimal Presets -->
+            <div class="zoom-demo-variant">
+                <h5>8. Minimal Presets - Clean Button Strip</h5>
+                <p class="preset-description">@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.MinimalPresets)</p>
+                <div class="minimal-section">
+                    <TimelineZoomControls Preset="TimelineZoomControlPreset.MinimalPresets"
+                                         CurrentZoomLevel="@CurrentZoomLevel"
+                                         CurrentZoomFactor="@CurrentZoomFactor"
+                                         OnZoomLevelChanged="HandleZoomLevelChanged"
+                                         OnZoomFactorChanged="HandleZoomFactorChanged" />
+                </div>
+            </div>
+            
+            <!-- 9. Action Focused -->
+            <div class="zoom-demo-variant">
+                <h5>9. Action Focused - Prominent Zoom Controls</h5>
+                <p class="preset-description">@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.ActionFocused)</p>
+                <div class="action-section">
+                    <TimelineZoomControls Preset="TimelineZoomControlPreset.ActionFocused"
+                                         CurrentZoomLevel="@CurrentZoomLevel"
+                                         CurrentZoomFactor="@CurrentZoomFactor"
+                                         OnZoomLevelChanged="HandleZoomLevelChanged"
+                                         OnZoomFactorChanged="HandleZoomFactorChanged" />
+                </div>
+            </div>
+            
+            <!-- 10. Custom Configuration -->
+            <div class="zoom-demo-variant">
+                <h5>10. Custom - Individual Parameter Control</h5>
+                <p class="preset-description">@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.Custom)</p>
+                <div class="custom-section">
+                    <TimelineZoomControls Preset="TimelineZoomControlPreset.Custom"
+                                         ShowLevelPresets="true"
+                                         ShowCurrentState="true"
+                                         ShowQuickActions="false"
+                                         ShowLabels="false"
+                                         ShowZoomFactor="true"
+                                         ShowDayWidth="true"
+                                         CurrentZoomLevel="@CurrentZoomLevel"
+                                         CurrentZoomFactor="@CurrentZoomFactor"
+                                         OnZoomLevelChanged="HandleZoomLevelChanged"
+                                         OnZoomFactorChanged="HandleZoomFactorChanged" />
+                    <small class="custom-note">Custom example: Presets + Status, No Actions, No Labels, Show Technical Info</small>
+                </div>
+            </div>
+            
+            <!-- Responsive Testing Section -->
+            <div class="zoom-demo-variant responsive-test">
+                <h5>📱 Responsive Testing</h5>
+                <p class="preset-description">All presets automatically adapt to container size. Resize your browser to see responsive behavior.</p>
+                <div class="responsive-demo">
+                    <div class="narrow-container">
+                        <h6>Narrow Container (300px):</h6>
+                        <TimelineZoomControls Preset="TimelineZoomControlPreset.Default"
+                                             CurrentZoomLevel="@CurrentZoomLevel"
+                                             CurrentZoomFactor="@CurrentZoomFactor"
+                                             OnZoomLevelChanged="HandleZoomLevelChanged"
+                                             OnZoomFactorChanged="HandleZoomFactorChanged" />
+                    </div>
+                    <div class="medium-container">
+                        <h6>Medium Container (600px):</h6>
+                        <TimelineZoomControls Preset="TimelineZoomControlPreset.CompactDropdown"
+                                             CurrentZoomLevel="@CurrentZoomLevel"
+                                             CurrentZoomFactor="@CurrentZoomFactor"
+                                             OnZoomLevelChanged="HandleZoomLevelChanged"
+                                             OnZoomFactorChanged="HandleZoomFactorChanged" />
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -337,7 +465,7 @@
     
     .zoom-demo-variant {
         margin-bottom: 20px;
-        padding: 12px;
+        padding: 16px;
         border: 1px solid var(--gantt-outline, #e0e0e0);
         border-radius: 6px;
         background: var(--gantt-surface, #ffffff);
@@ -346,8 +474,159 @@
     .zoom-demo-variant h5 {
         margin: 0 0 8px 0;
         color: var(--gantt-primary, #1976d2);
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 600;
+    }
+    
+    .preset-description {
+        font-size: 13px;
+        color: var(--gantt-on-surface-variant, #666);
+        margin: 4px 0 12px 0;
+        font-style: italic;
+    }
+    
+    /* Demo Context Styles */
+    .demo-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: var(--gantt-surface-variant, #f5f5f5);
+        border: 1px solid var(--gantt-outline-variant, #d0d0d0);
+        border-radius: 4px;
+        font-size: 13px;
+    }
+    
+    .demo-toolbar.spacious {
+        gap: 16px;
+        padding: 10px 16px;
+    }
+    
+    .toolbar-item {
+        padding: 4px 8px;
+        color: var(--gantt-on-surface, #333);
+        cursor: pointer;
+        border-radius: 3px;
+    }
+    
+    .toolbar-item:hover {
+        background: var(--gantt-state-hover, rgba(0, 0, 0, 0.04));
+    }
+    
+    .demo-control-panel {
+        background: var(--gantt-surface-variant, #f8f9fa);
+        border: 1px solid var(--gantt-outline-variant, #e1e5e9);
+        border-radius: 6px;
+        padding: 12px;
+    }
+    
+    .panel-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .panel-section label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--gantt-on-surface, #333);
+        min-width: 100px;
+    }
+    
+    .clean-section {
+        padding: 16px;
+        background: var(--gantt-surface, #ffffff);
+        border: 1px solid var(--gantt-outline-variant, #e8e8e8);
+        border-radius: 6px;
+        text-align: center;
+    }
+    
+    .demo-status-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        background: var(--gantt-surface-variant, #f0f0f0);
+        border-top: 1px solid var(--gantt-outline-variant, #d0d0d0);
+        font-size: 12px;
+        color: var(--gantt-on-surface-variant, #666);
+        border-radius: 0 0 4px 4px;
+    }
+    
+    .status-item {
+        white-space: nowrap;
+    }
+    
+    .debug-section {
+        background: var(--gantt-surface-variant, #f9f9f9);
+        border: 2px dashed var(--gantt-outline-variant, #ccc);
+        border-radius: 6px;
+        padding: 16px;
+    }
+    
+    .minimal-section {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 8px;
+    }
+    
+    .action-section {
+        background: var(--gantt-surface, #ffffff);
+        border: 2px solid var(--gantt-primary, #1976d2);
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+    }
+    
+    .custom-section {
+        background: var(--gantt-surface-variant, #fff8e1);
+        border: 1px solid var(--gantt-primary, #ff9800);
+        border-radius: 6px;
+        padding: 16px;
+    }
+    
+    .custom-note {
+        display: block;
+        font-size: 11px;
+        color: var(--gantt-on-surface-variant, #666);
+        margin-top: 8px;
+        font-style: italic;
+    }
+    
+    /* Responsive Testing Styles */
+    .responsive-test {
+        background: linear-gradient(45deg, #f0f8ff 0%, #e6f3ff 100%);
+        border: 2px solid var(--gantt-primary, #1976d2);
+    }
+    
+    .responsive-demo {
+        display: flex;
+        gap: 20px;
+        margin-top: 12px;
+    }
+    
+    .narrow-container {
+        width: 300px;
+        padding: 12px;
+        background: var(--gantt-surface, #ffffff);
+        border: 1px solid var(--gantt-outline, #e0e0e0);
+        border-radius: 4px;
+    }
+    
+    .medium-container {
+        width: 600px;
+        padding: 12px;
+        background: var(--gantt-surface, #ffffff);
+        border: 1px solid var(--gantt-outline, #e0e0e0);
+        border-radius: 4px;
+    }
+    
+    .narrow-container h6,
+    .medium-container h6 {
+        margin: 0 0 8px 0;
+        font-size: 12px;
+        color: var(--gantt-on-surface-variant, #666);
     }
     
     .timeline-controls {

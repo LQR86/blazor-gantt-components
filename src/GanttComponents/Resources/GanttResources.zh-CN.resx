@@ -337,16 +337,4 @@
   <data name="ZoomControls.ZoomOut" xml:space="preserve">
     <value>缩小</value>
   </data>
-  <data name="ZoomControls.ManualZoom" xml:space="preserve">
-    <value>手动缩放</value>
-  </data>
-  <data name="ZoomControls.ZoomFactorSlider" xml:space="preserve">
-    <value>调整缩放比例</value>
-  </data>
-  <data name="ZoomControls.ZoomFactorIncrease" xml:space="preserve">
-    <value>增加缩放比例</value>
-  </data>
-  <data name="ZoomControls.ZoomFactorDecrease" xml:space="preserve">
-    <value>减少缩放比例</value>
-  </data>
 </root>

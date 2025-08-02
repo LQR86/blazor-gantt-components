@@ -4,47 +4,71 @@
 @inject IGanttI18N I18N
 @inject IUniversalLogger Logger
 
-<div class="timeline-zoom-controls @CssClass" style="@Style">
-    @if (ShowLevelPresets)
+<div class="timeline-zoom-controls @GetEffectiveCssClass()" style="@Style">
+    @if (EffectiveConfig.ShowLevelPresets)
     {
-        <div class="zoom-level-presets">
-            @if (ShowLabels)
-            {
-                <span class="zoom-controls-label">@I18N.T("ZoomControls.ZoomLevel")</span>
-            }
-            
-            @foreach (var level in GetVisibleZoomLevels())
-            {
-                var config = TimelineZoomService.GetConfiguration(level);
-                var isActive = level == CurrentZoomLevel;
-                var buttonClass = $"zoom-preset-button {(isActive ? "active" : "")}";
+        @if (EffectiveConfig.UseDropdownForPresets)
+        {
+            <div class="zoom-level-dropdown">
+                @if (EffectiveConfig.ShowLabels)
+                {
+                    <span class="zoom-controls-label">@I18N.T("ZoomControls.ZoomLevel")</span>
+                }
+                <select class="zoom-preset-dropdown" 
+                        value="@CurrentZoomLevel" 
+                        disabled="@Disabled"
+                        @onchange="OnDropdownLevelSelected">
+                    @foreach (var level in GetVisibleZoomLevels())
+                    {
+                        var config = TimelineZoomService.GetConfiguration(level);
+                        <option value="@level" title="@I18N.T(config.DescriptionKey)">
+                            @I18N.T(config.DisplayNameKey)
+                        </option>
+                    }
+                </select>
+            </div>
+        }
+        else
+        {
+            <div class="zoom-level-presets">
+                @if (EffectiveConfig.ShowLabels)
+                {
+                    <span class="zoom-controls-label">@I18N.T("ZoomControls.ZoomLevel")</span>
+                }
                 
-                <button type="button" 
-                        class="@buttonClass" 
-                        disabled="@(isActive || Disabled)"
-                        title="@I18N.T(config.DescriptionKey)"
-                        @onclick="() => OnZoomLevelSelected(level)">
-                    @I18N.T(config.DisplayNameKey)
-                </button>
-            }
-        </div>
+                @foreach (var level in GetVisibleZoomLevels())
+                {
+                    var config = TimelineZoomService.GetConfiguration(level);
+                    var isActive = level == CurrentZoomLevel;
+                    var buttonClass = $"zoom-preset-button {(isActive ? "active" : "")}";
+                    
+                    <button type="button" 
+                            class="@buttonClass" 
+                            disabled="@(isActive || Disabled)"
+                            title="@I18N.T(config.DescriptionKey)"
+                            @onclick="() => OnZoomLevelSelected(level)">
+                        @I18N.T(config.DisplayNameKey)
+                    </button>
+                }
+            </div>
+        }
     }
     
-    @if (ShowCurrentState && !HideCurrentState)
+    @if (EffectiveConfig.ShowCurrentState && !EffectiveConfig.HideCurrentState)
     {
         <div class="zoom-current-state">
-            @if (ShowLabels)
+            @if (EffectiveConfig.ShowLabels)
             {
                 <span class="zoom-controls-label">@I18N.T("ZoomControls.Current")</span>
             }
             
             <div class="zoom-current-display">
                 <span class="zoom-level-name">@I18N.T(TimelineZoomService.GetConfiguration(CurrentZoomLevel).DisplayNameKey)</span>
-                @if (ShowZoomFactor)
+                @if (EffectiveConfig.ShowZoomFactor)
                 {
                     <span class="zoom-factor-display">@($"{CurrentZoomFactor:P0}")</span>
                 }
-                @if (ShowDayWidth)
+                @if (EffectiveConfig.ShowDayWidth)
                 {
                     <span class="zoom-day-width">@($"{CurrentDayWidth:F0}px")</span>
                 }
@@ -52,10 +76,10 @@
         </div>
     }
     
-    @if (ShowQuickActions)
+    @if (EffectiveConfig.ShowQuickActions)
     {
         <div class="zoom-quick-actions">
-            @if (ShowLabels)
+            @if (EffectiveConfig.ShowLabels)
             {
                 <span class="zoom-controls-label">@I18N.T("ZoomControls.QuickActions")</span>
             }
@@ -67,7 +91,7 @@
                         title="@I18N.T("ZoomControls.ZoomIn")"
                         @onclick="OnZoomIn">
                     <span class="zoom-icon">+</span>
-                    @if (ShowActionLabels)
+                    @if (EffectiveConfig.ShowActionLabels)
                     {
                         <span class="zoom-action-text">@I18N.T("ZoomControls.ZoomIn")</span>
                     }
@@ -79,60 +103,11 @@
                         title="@I18N.T("ZoomControls.ZoomOut")"
                         @onclick="OnZoomOut">
                     <span class="zoom-icon">−</span>
-                    @if (ShowActionLabels)
+                    @if (EffectiveConfig.ShowActionLabels)
                     {
                         <span class="zoom-action-text">@I18N.T("ZoomControls.ZoomOut")</span>
                     }
                 </button>
-            </div>
-        </div>
-    }
-    
-    @if (ShowManualControls)
-    {
-        <div class="zoom-manual-controls">
-            @if (ShowLabels)
-            {
-                <span class="zoom-controls-label">@I18N.T("ZoomControls.ManualZoom")</span>
-            }
-            
-            <div class="zoom-manual-section">
-                <div class="zoom-slider-container">
-                    <button type="button" 
-                            class="zoom-increment-button zoom-decrement" 
-                            disabled="@(Disabled || IsAtMinZoomFactor())"
-                            title="@I18N.T("ZoomControls.ZoomFactorDecrease")"
-                            @onclick="OnZoomFactorDecrement">
-                        <span class="zoom-icon">−</span>
-                    </button>
-                    
-                    <input type="range" 
-                           class="zoom-factor-slider" 
-                           min="@MinZoomFactor" 
-                           max="@MaxZoomFactor" 
-                           step="@ZoomFactorStep"
-                           value="@CurrentZoomFactor" 
-                           disabled="@Disabled"
-                           title="@I18N.T("ZoomControls.ZoomFactorSlider")"
-                           @oninput="OnZoomFactorSliderChange"
-                           @onchange="OnZoomFactorSliderComplete" />
-                    
-                    <button type="button" 
-                            class="zoom-increment-button zoom-increment" 
-                            disabled="@(Disabled || IsAtMaxZoomFactor())"
-                            title="@I18N.T("ZoomControls.ZoomFactorIncrease")"
-                            @onclick="OnZoomFactorIncrement">
-                        <span class="zoom-icon">+</span>
-                    </button>
-                </div>
-                
-                <div class="zoom-factor-display-detailed">
-                    <span class="zoom-factor-value">@($"{CurrentZoomFactor:P0}")</span>
-                    @if (ShowLivePreview && _isSliderActive)
-                    {
-                        <span class="zoom-factor-preview">@($"→ {_previewZoomFactor:P0}")</span>
-                    }
-                </div>
             </div>
         </div>
     }
@@ -152,13 +127,16 @@
     [Parameter, EditorRequired] public EventCallback<TimelineZoomLevel> OnZoomLevelChanged { get; set; }
     [Parameter, EditorRequired] public EventCallback<double> OnZoomFactorChanged { get; set; }
     
+    // NEW: Preset configuration system - choose a preset or use Custom for individual control
+    [Parameter] public TimelineZoomControlPreset Preset { get; set; } = TimelineZoomControlPreset.Default;
+    
     // Composability and customization
     [Parameter] public RenderFragment? AdditionalContent { get; set; }
     [Parameter] public string CssClass { get; set; } = "";
     [Parameter] public string Style { get; set; } = "";
     [Parameter] public bool Disabled { get; set; } = false;
     
-    // UI configuration - all optional with sensible defaults
+    // UI configuration - used when Preset = Custom, otherwise ignored
     [Parameter] public bool ShowLevelPresets { get; set; } = true;
     [Parameter] public bool ShowCurrentState { get; set; } = true;
     [Parameter] public bool ShowQuickActions { get; set; } = true;
@@ -173,19 +151,53 @@
     [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.WeekDay;
     [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.YearQuarter;
     
-    // Manual zoom controls - NEW for Iteration 3.1
-    [Parameter] public bool ShowManualControls { get; set; } = true;
-    [Parameter] public bool ShowLivePreview { get; set; } = true;
-    [Parameter] public double MinZoomFactor { get; set; } = 0.5;
-    [Parameter] public double MaxZoomFactor { get; set; } = 3.0;
-    [Parameter] public double ZoomFactorStep { get; set; } = 0.1;
+    // Preset-only approach: Manual zoom controls removed for v0.8.5
+    // All zoom control is handled via preset level selection only
     
-    // Internal state for live preview
-    private bool _isSliderActive = false;
-    private double _previewZoomFactor = 1.0;
+    // Effective configuration based on preset or custom parameters
+    private TimelineZoomControlConfiguration EffectiveConfig
+    {
+        get
+        {
+            if (Preset == TimelineZoomControlPreset.Custom)
+            {
+                // Use individual parameters when Custom preset is selected
+                return new TimelineZoomControlConfiguration
+                {
+                    ShowLevelPresets = ShowLevelPresets,
+                    ShowCurrentState = ShowCurrentState,
+                    ShowQuickActions = ShowQuickActions,
+                    ShowLabels = ShowLabels,
+                    ShowActionLabels = ShowActionLabels,
+                    ShowZoomFactor = ShowZoomFactor,
+                    ShowDayWidth = ShowDayWidth,
+                    HideCurrentState = HideCurrentState,
+                    CssClass = CssClass,
+                    UseDropdownForPresets = false, // Can be added as parameter if needed
+                    MaxVisiblePresets = 13
+                };
+            }
+            else
+            {
+                // Use predefined preset configuration
+                return TimelineZoomControlConfiguration.GetPresetConfiguration(Preset);
+            }
+        }
+    }
     
     // Calculated properties
     private double CurrentDayWidth => TimelineZoomService.GetConfiguration(CurrentZoomLevel).GetEffectiveDayWidth(CurrentZoomFactor);
+    
+    // Get effective CSS class combining preset and custom classes
+    private string GetEffectiveCssClass()
+    {
+        var effectiveClass = EffectiveConfig.CssClass;
+        if (!string.IsNullOrWhiteSpace(CssClass))
+        {
+            effectiveClass = string.IsNullOrWhiteSpace(effectiveClass) ? CssClass : $"{effectiveClass} {CssClass}";
+        }
+        return effectiveClass;
+    }
     
     // Get visible zoom levels based on configuration
     private IEnumerable<TimelineZoomLevel> GetVisibleZoomLevels()
@@ -195,9 +207,26 @@
             return VisibleZoomLevels;
         }
         
-        // Use min/max range - NOTE: WeekDay=0 (detailed) to YearQuarter=5 (overview)
+        // Use min/max range - NOTE: WeekDay=0 (detailed) to YearQuarter=12 (overview)
         var allLevels = Enum.GetValues<TimelineZoomLevel>().OrderBy(x => (int)x);
         var filteredLevels = allLevels.Where(level => level >= MinZoomLevel && level <= MaxZoomLevel).ToList();
+        
+        // Apply preset limit for visible presets
+        if (EffectiveConfig.MaxVisiblePresets > 0 && filteredLevels.Count > EffectiveConfig.MaxVisiblePresets)
+        {
+            // Take evenly distributed levels across the range
+            var step = (double)filteredLevels.Count / EffectiveConfig.MaxVisiblePresets;
+            var selectedLevels = new List<TimelineZoomLevel>();
+            for (int i = 0; i < EffectiveConfig.MaxVisiblePresets; i++)
+            {
+                var index = (int)(i * step);
+                if (index < filteredLevels.Count)
+                {
+                    selectedLevels.Add(filteredLevels[index]);
+                }
+            }
+            return selectedLevels;
+        }
         
         return filteredLevels;
     }
@@ -215,6 +244,15 @@
         else
         {
             Logger.LogWarning("ZoomLevelSelected ignored", new { level, CurrentZoomLevel, HasDelegate = OnZoomLevelChanged.HasDelegate });
+        }
+    }
+    
+    private async Task OnDropdownLevelSelected(ChangeEventArgs e)
+    {
+        if (e.Value != null && Enum.TryParse<TimelineZoomLevel>(e.Value.ToString(), out var level))
+        {
+            Logger.LogOperation("ZOOM_CONTROLS", $"DropdownZoomLevelSelected: {level}");
+            await OnZoomLevelSelected(level);
         }
     }
     
@@ -269,81 +307,5 @@
         var levels = GetVisibleZoomLevels().OrderBy(x => (int)x).ToList();
         var result = levels.Count > 0 && CurrentZoomLevel == levels.Last();
         return result;
-    }
-    
-    // Manual zoom factor methods - NEW for Iteration 3.1
-    private bool IsAtMinZoomFactor()
-    {
-        return CurrentZoomFactor <= MinZoomFactor;
-    }
-    
-    private bool IsAtMaxZoomFactor()
-    {
-        return CurrentZoomFactor >= MaxZoomFactor;
-    }
-    
-    private async Task OnZoomFactorIncrement()
-    {
-        Logger.LogOperation("ZOOM_CONTROLS", "ZoomFactorIncrement button clicked");
-        
-        var newFactor = Math.Min(MaxZoomFactor, CurrentZoomFactor + ZoomFactorStep);
-        if (Math.Abs(newFactor - CurrentZoomFactor) > 0.001) // Avoid floating point precision issues
-        {
-            Logger.LogOperation("ZOOM_CONTROLS", $"ZoomFactorIncrement: {CurrentZoomFactor:F2} -> {newFactor:F2}");
-            await OnZoomFactorChanged.InvokeAsync(newFactor);
-        }
-        else
-        {
-            Logger.LogWarning("Cannot increment zoom factor - already at maximum", new { CurrentZoomFactor, MaxZoomFactor });
-        }
-    }
-    
-    private async Task OnZoomFactorDecrement()
-    {
-        Logger.LogOperation("ZOOM_CONTROLS", "ZoomFactorDecrement button clicked");
-        
-        var newFactor = Math.Max(MinZoomFactor, CurrentZoomFactor - ZoomFactorStep);
-        if (Math.Abs(newFactor - CurrentZoomFactor) > 0.001) // Avoid floating point precision issues
-        {
-            Logger.LogOperation("ZOOM_CONTROLS", $"ZoomFactorDecrement: {CurrentZoomFactor:F2} -> {newFactor:F2}");
-            await OnZoomFactorChanged.InvokeAsync(newFactor);
-        }
-        else
-        {
-            Logger.LogWarning("Cannot decrement zoom factor - already at minimum", new { CurrentZoomFactor, MinZoomFactor });
-        }
-    }
-    
-    private void OnZoomFactorSliderChange(ChangeEventArgs e)
-    {
-        if (double.TryParse(e.Value?.ToString(), out var newFactor))
-        {
-            // Live preview during slider movement
-            _isSliderActive = true;
-            _previewZoomFactor = Math.Max(MinZoomFactor, Math.Min(MaxZoomFactor, newFactor));
-            
-            Logger.LogOperation("ZOOM_CONTROLS", $"ZoomFactorSlider preview: {CurrentZoomFactor:F2} -> {_previewZoomFactor:F2}");
-            StateHasChanged(); // Update UI for live preview
-        }
-    }
-    
-    private async Task OnZoomFactorSliderComplete(ChangeEventArgs e)
-    {
-        if (double.TryParse(e.Value?.ToString(), out var newFactor))
-        {
-            _isSliderActive = false;
-            var clampedFactor = Math.Max(MinZoomFactor, Math.Min(MaxZoomFactor, newFactor));
-            
-            if (Math.Abs(clampedFactor - CurrentZoomFactor) > 0.001) // Avoid floating point precision issues
-            {
-                Logger.LogOperation("ZOOM_CONTROLS", $"ZoomFactorSlider complete: {CurrentZoomFactor:F2} -> {clampedFactor:F2}");
-                await OnZoomFactorChanged.InvokeAsync(clampedFactor);
-            }
-            else
-            {
-                Logger.LogOperation("ZOOM_CONTROLS", "ZoomFactorSlider complete: no change needed");
-                StateHasChanged(); // Clear preview state
-            }
-        }
     }
 }

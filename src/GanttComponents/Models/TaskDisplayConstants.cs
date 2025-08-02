@@ -35,16 +35,24 @@ public static class TaskDisplayConstants
     public const double TASK_SPACING = 1.0;
 
     /// <summary>
-    /// Default zoom factor for backward compatibility.
-    /// Current 40px day width = MonthDay (25px) * 1.6x factor.
+    /// Default zoom factor for preset-only zoom approach.
+    /// All zoom control is handled via level switching, factor is always 1.0x.
     /// </summary>
-    public const double DEFAULT_ZOOM_FACTOR = 1.6;
+    public const double DEFAULT_ZOOM_FACTOR = 1.0;
 
     /// <summary>
-    /// Default zoom level for backward compatibility.
-    /// MonthDay level maintains existing visual appearance with zoom factor.
+    /// Default zoom level for preset-only zoom approach.
+    /// MonthDay level at 25px provides good balance for most use cases.
     /// </summary>
     public const TimelineZoomLevel DEFAULT_ZOOM_LEVEL = TimelineZoomLevel.MonthDay;
+
+    /// <summary>
+    /// Minimum effective day width in pixels to maintain task visibility.
+    /// Prevents zoom-out beyond YearQuarter base level (3.0px/day).
+    /// This avoids the need for taskbar hiding strategies while maintaining
+    /// reasonable strategic planning capability at decade-level views.
+    /// </summary>
+    public const double MIN_EFFECTIVE_DAY_WIDTH = 3.0;
 
     /// <summary>
     /// Check if a task width meets the minimum display requirement.

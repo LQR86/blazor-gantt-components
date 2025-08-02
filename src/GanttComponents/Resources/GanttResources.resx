@@ -337,16 +337,4 @@
   <data name="ZoomControls.ZoomOut" xml:space="preserve">
     <value>Zoom Out</value>
   </data>
-  <data name="ZoomControls.ManualZoom" xml:space="preserve">
-    <value>Manual Zoom</value>
-  </data>
-  <data name="ZoomControls.ZoomFactorSlider" xml:space="preserve">
-    <value>Adjust zoom factor</value>
-  </data>
-  <data name="ZoomControls.ZoomFactorIncrease" xml:space="preserve">
-    <value>Increase zoom factor</value>
-  </data>
-  <data name="ZoomControls.ZoomFactorDecrease" xml:space="preserve">
-    <value>Decrease zoom factor</value>
-  </data>
 </root>

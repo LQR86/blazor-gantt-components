@@ -1,0 +1,196 @@
+@page "/zoom-presets-demo"
+@using GanttComponents.Models
+@using GanttComponents.Services
+@using GanttComponents.Components.TimelineZoomControls
+@inject IGanttI18N I18N
+
+<PageTitle>Timeline Zoom Control Presets Demo</PageTitle>
+
+<div class="presets-demo-container">
+    <div class="demo-header">
+        <h1>Timeline Zoom Control Presets</h1>
+        <p>Demonstration of different preset configurations for the TimelineZoomControls component.</p>
+        <p><strong>Current Zoom Level:</strong> @I18N.T(TimelineZoomService.GetConfiguration(currentZoomLevel).DisplayNameKey) (@currentZoomLevel)</p>
+    </div>
+
+    <div class="demo-sections">
+        <!-- Default Configuration -->
+        <div class="demo-section">
+            <h2>1. Default - Full Featured</h2>
+            <p><em>@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.Default)</em></p>
+            <div class="demo-control">
+                <TimelineZoomControls 
+                    Preset="TimelineZoomControlPreset.Default"
+                    CurrentZoomLevel="@currentZoomLevel"
+                    CurrentZoomFactor="@currentZoomFactor"
+                    OnZoomLevelChanged="@OnZoomLevelChanged"
+                    OnZoomFactorChanged="@OnZoomFactorChanged" />
+            </div>
+        </div>
+
+        <!-- Extremely Compact -->
+        <div class="demo-section">
+            <h2>2. Extremely Compact - Toolbar Minimal</h2>
+            <p><em>@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.ExtremelyCompact)</em></p>
+            <div class="demo-control toolbar-like">
+                <span>Other toolbar items...</span>
+                <TimelineZoomControls 
+                    Preset="TimelineZoomControlPreset.ExtremelyCompact"
+                    CurrentZoomLevel="@currentZoomLevel"
+                    CurrentZoomFactor="@currentZoomFactor"
+                    OnZoomLevelChanged="@OnZoomLevelChanged"
+                    OnZoomFactorChanged="@OnZoomFactorChanged" />
+                <span>...more items</span>
+            </div>
+        </div>
+
+        <!-- Compact Labeled -->
+        <div class="demo-section">
+            <h2>3. Compact Labeled - Toolbar with Space</h2>
+            <p><em>@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.CompactLabeled)</em></p>
+            <div class="demo-control toolbar-like">
+                <span>File</span>
+                <span>Edit</span>
+                <TimelineZoomControls 
+                    Preset="TimelineZoomControlPreset.CompactLabeled"
+                    CurrentZoomLevel="@currentZoomLevel"
+                    CurrentZoomFactor="@currentZoomFactor"
+                    OnZoomLevelChanged="@OnZoomLevelChanged"
+                    OnZoomFactorChanged="@OnZoomFactorChanged" />
+                <span>Help</span>
+            </div>
+        </div>
+
+        <!-- Compact Dropdown -->
+        <div class="demo-section">
+            <h2>4. Compact Dropdown - Control Panel</h2>
+            <p><em>@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.CompactDropdown)</em></p>
+            <div class="demo-control panel-like">
+                <TimelineZoomControls 
+                    Preset="TimelineZoomControlPreset.CompactDropdown"
+                    CurrentZoomLevel="@currentZoomLevel"
+                    CurrentZoomFactor="@currentZoomFactor"
+                    OnZoomLevelChanged="@OnZoomLevelChanged"
+                    OnZoomFactorChanged="@OnZoomFactorChanged" />
+            </div>
+        </div>
+
+        <!-- Preset Only -->
+        <div class="demo-section">
+            <h2>5. Preset Only - Clean Level Selection</h2>
+            <p><em>@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.PresetOnly)</em></p>
+            <div class="demo-control">
+                <TimelineZoomControls 
+                    Preset="TimelineZoomControlPreset.PresetOnly"
+                    CurrentZoomLevel="@currentZoomLevel"
+                    CurrentZoomFactor="@currentZoomFactor"
+                    OnZoomLevelChanged="@OnZoomLevelChanged"
+                    OnZoomFactorChanged="@OnZoomFactorChanged" />
+            </div>
+        </div>
+
+        <!-- Status Only -->
+        <div class="demo-section">
+            <h2>6. Status Only - Read-Only Display</h2>
+            <p><em>@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.StatusOnly)</em></p>
+            <div class="demo-control status-bar-like">
+                <span>Ready</span>
+                <TimelineZoomControls 
+                    Preset="TimelineZoomControlPreset.StatusOnly"
+                    CurrentZoomLevel="@currentZoomLevel"
+                    CurrentZoomFactor="@currentZoomFactor"
+                    OnZoomLevelChanged="@OnZoomLevelChanged"
+                    OnZoomFactorChanged="@OnZoomFactorChanged" />
+                <span>100% | 1,234 tasks</span>
+            </div>
+        </div>
+
+        <!-- Debug Configuration -->
+        <div class="demo-section">
+            <h2>7. Debug - All Features Visible</h2>
+            <p><em>@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.Debug)</em></p>
+            <div class="demo-control">
+                <TimelineZoomControls 
+                    Preset="TimelineZoomControlPreset.Debug"
+                    CurrentZoomLevel="@currentZoomLevel"
+                    CurrentZoomFactor="@currentZoomFactor"
+                    OnZoomLevelChanged="@OnZoomLevelChanged"
+                    OnZoomFactorChanged="@OnZoomFactorChanged" />
+            </div>
+        </div>
+
+        <!-- Minimal Presets -->
+        <div class="demo-section">
+            <h2>8. Minimal Presets - Clean Button Strip</h2>
+            <p><em>@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.MinimalPresets)</em></p>
+            <div class="demo-control">
+                <TimelineZoomControls 
+                    Preset="TimelineZoomControlPreset.MinimalPresets"
+                    CurrentZoomLevel="@currentZoomLevel"
+                    CurrentZoomFactor="@currentZoomFactor"
+                    OnZoomLevelChanged="@OnZoomLevelChanged"
+                    OnZoomFactorChanged="@OnZoomFactorChanged" />
+            </div>
+        </div>
+
+        <!-- Action Focused -->
+        <div class="demo-section">
+            <h2>9. Action Focused - Prominent Zoom Controls</h2>
+            <p><em>@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.ActionFocused)</em></p>
+            <div class="demo-control">
+                <TimelineZoomControls 
+                    Preset="TimelineZoomControlPreset.ActionFocused"
+                    CurrentZoomLevel="@currentZoomLevel"
+                    CurrentZoomFactor="@currentZoomFactor"
+                    OnZoomLevelChanged="@OnZoomLevelChanged"
+                    OnZoomFactorChanged="@OnZoomFactorChanged" />
+            </div>
+        </div>
+
+        <!-- Custom Configuration -->
+        <div class="demo-section">
+            <h2>10. Custom - Individual Parameter Control</h2>
+            <p><em>@TimelineZoomControlConfiguration.GetPresetDescription(TimelineZoomControlPreset.Custom)</em></p>
+            <div class="demo-control">
+                <TimelineZoomControls 
+                    Preset="TimelineZoomControlPreset.Custom"
+                    ShowLevelPresets="true"
+                    ShowCurrentState="true"
+                    ShowQuickActions="false"
+                    ShowLabels="false"
+                    ShowZoomFactor="true"
+                    ShowDayWidth="true"
+                    CurrentZoomLevel="@currentZoomLevel"
+                    CurrentZoomFactor="@currentZoomFactor"
+                    OnZoomLevelChanged="@OnZoomLevelChanged"
+                    OnZoomFactorChanged="@OnZoomFactorChanged" />
+            </div>
+            <p><small>Custom example: Presets + Status, No Actions, No Labels, Show Technical Info</small></p>
+        </div>
+    </div>
+
+    <div class="demo-footer">
+        <h3>Responsive Testing</h3>
+        <p>Resize your browser window to see how each preset adapts to different container sizes.</p>
+        <p>Each preset includes appropriate responsive behavior and container-awareness.</p>
+    </div>
+</div>
+
+@code {
+    private TimelineZoomLevel currentZoomLevel = TimelineZoomLevel.MonthDay;
+    private double currentZoomFactor = 1.0;
+
+    private Task OnZoomLevelChanged(TimelineZoomLevel newLevel)
+    {
+        currentZoomLevel = newLevel;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task OnZoomFactorChanged(double newFactor)
+    {
+        currentZoomFactor = newFactor;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

@@ -59,6 +59,7 @@ public class ZoomLevelConfiguration
 
     /// <summary>
     /// Create the standard configuration for a zoom level.
+    /// For preset-only zoom approach: min and max factors are both 1.0.
     /// </summary>
     /// <param name="level">The zoom level</param>
     /// <param name="baseDayWidth">Base day width in pixels</param>
@@ -77,8 +78,8 @@ public class ZoomLevelConfiguration
             BaseDayWidth = baseDayWidth,
             DisplayNameKey = displayNameKey,
             DescriptionKey = descriptionKey,
-            MinZoomFactor = 0.5,
-            MaxZoomFactor = 3.0
+            MinZoomFactor = 1.0,  // Preset-only: no manual zoom factors
+            MaxZoomFactor = 1.0   // Preset-only: no manual zoom factors
         };
     }
 }

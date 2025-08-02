@@ -43,12 +43,14 @@ public class GanttComposerZoomIntegrationTests : IDisposable
         var zoomService = _serviceProvider.GetRequiredService<TimelineZoomService>();
         var testCases = new[]
         {
-            (TimelineZoomLevel.WeekDay, 1.0, 60.0),
-            (TimelineZoomLevel.MonthWeek, 1.0, 15.0),  // Fixed: 15px not 30px
-            (TimelineZoomLevel.QuarterMonth, 1.0, 5.0), // Fixed: 5px not 15px
-            (TimelineZoomLevel.YearQuarter, 1.0, 3.0),
-            (TimelineZoomLevel.WeekDay, 0.5, 30.0),
-            (TimelineZoomLevel.WeekDay, 2.0, 120.0),
+            // Preset-only system: factors ignored, backward-compatible day widths (original * 1.6)
+            (TimelineZoomLevel.WeekDay, 1.0, 96.0),     // 60 * 1.6 for backward compatibility
+            (TimelineZoomLevel.MonthWeek, 1.0, 24.0),   // 15 * 1.6 for backward compatibility
+            (TimelineZoomLevel.QuarterMonth, 1.0, 8.0), // 5 * 1.6 for backward compatibility
+            (TimelineZoomLevel.YearQuarter, 1.0, 3.0),  // 3px minimum constraint
+            // In preset-only system, factors are clamped to 1.0 (same result regardless of input factor)
+            (TimelineZoomLevel.WeekDay, 0.5, 96.0),     // Factor ignored, same as 1.0
+            (TimelineZoomLevel.WeekDay, 2.0, 96.0),     // Factor ignored, same as 1.0
         };
 
         foreach (var (level, factor, expected) in testCases)
@@ -84,17 +86,17 @@ public class GanttComposerZoomIntegrationTests : IDisposable
     [Fact]
     public void ZoomFactorRange_AllFactors_ProducesValidDayWidths()
     {
-        // Arrange
+        // Arrange - In preset-only system, factors are always clamped to 1.0
         var testFactors = new[] { 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5, 3.0 };
-        var testLevel = TimelineZoomLevel.WeekDay; // 60px base
+        var testLevel = TimelineZoomLevel.WeekDay; // 96px base (60 * 1.6)
 
         foreach (var factor in testFactors)
         {
-            // Act
+            // Act - In preset-only system, all factors result in same day width
             var dayWidth = TimelineZoomService.CalculateEffectiveDayWidth(testLevel, factor);
-            var expectedWidth = 60.0 * factor;
+            var expectedWidth = 96.0; // Always 96px regardless of factor (preset-only)
 
-            // Assert
+            // Assert - All factors should produce same day width in preset-only system
             Assert.Equal(expectedWidth, dayWidth, 0.1);
             Assert.True(dayWidth >= 30.0, $"Factor {factor} should produce day width >= 30px");
             Assert.True(dayWidth <= 180.0, $"Factor {factor} should produce day width <= 180px");
@@ -164,9 +166,9 @@ public class GanttComposerZoomIntegrationTests : IDisposable
         var initialDayWidth = TimelineZoomService.CalculateEffectiveDayWidth(initialLevel, initialFactor);
         var targetDayWidth = TimelineZoomService.CalculateEffectiveDayWidth(targetLevel, targetFactor);
 
-        // Assert - Parameter flow validation
-        Assert.Equal(60.0, initialDayWidth); // WeekDay @ 1.0x = 60px
-        Assert.Equal(22.5, targetDayWidth);  // MonthWeek @ 1.5x = 15 * 1.5 = 22.5px
+        // Assert - Parameter flow validation for preset-only system
+        Assert.Equal(96.0, initialDayWidth); // WeekDay in preset-only: 96px (60 * 1.6)
+        Assert.Equal(24.0, targetDayWidth);  // MonthWeek in preset-only: 24px (15 * 1.6, factor ignored)
 
         // Verify the integration maintains different day widths for different settings
         Assert.NotEqual(initialDayWidth, targetDayWidth);

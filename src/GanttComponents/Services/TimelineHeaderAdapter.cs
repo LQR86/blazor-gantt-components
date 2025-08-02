@@ -30,6 +30,30 @@ public static class TimelineHeaderAdapter
                 MinSecondaryWidth = 20  // Days just show numbers
             },
 
+            TimelineZoomLevel.WeekDayMedium => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Month,
+                PrimaryFormat = "date.month-year",
+                SecondaryUnit = TimelineHeaderUnit.Day,
+                SecondaryFormat = "date.day-number",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 120, // Same as WeekDay
+                MinSecondaryWidth = 20
+            },
+
+            TimelineZoomLevel.WeekDayLow => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Month,
+                PrimaryFormat = "date.month-year",
+                SecondaryUnit = TimelineHeaderUnit.Day,
+                SecondaryFormat = "date.day-number",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 120, // Same as WeekDay
+                MinSecondaryWidth = 20
+            },
+
             TimelineZoomLevel.MonthDay => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Month,
@@ -39,6 +63,18 @@ public static class TimelineHeaderAdapter
                 ShowPrimary = true,
                 ShowSecondary = true,
                 MinPrimaryWidth = 100,
+                MinSecondaryWidth = 15
+            },
+
+            TimelineZoomLevel.MonthDayMedium => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Month,
+                PrimaryFormat = "date.month-year",
+                SecondaryUnit = TimelineHeaderUnit.Day,
+                SecondaryFormat = "date.day-number",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 100, // Same as MonthDay
                 MinSecondaryWidth = 15
             },
 
@@ -54,6 +90,30 @@ public static class TimelineHeaderAdapter
                 MinSecondaryWidth = 45  // Abbreviated months "Jan"
             },
 
+            TimelineZoomLevel.MonthWeekMedium => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Quarter,
+                PrimaryFormat = "date.quarter-year",
+                SecondaryUnit = TimelineHeaderUnit.Month,
+                SecondaryFormat = "date.month-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 180, // Same as MonthWeek
+                MinSecondaryWidth = 45
+            },
+
+            TimelineZoomLevel.MonthWeekLow => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Quarter,
+                PrimaryFormat = "date.quarter-year",
+                SecondaryUnit = TimelineHeaderUnit.Month,
+                SecondaryFormat = "date.month-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 180, // Same as MonthWeek
+                MinSecondaryWidth = 45
+            },
+
             TimelineZoomLevel.QuarterWeek => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Year,
@@ -66,6 +126,18 @@ public static class TimelineHeaderAdapter
                 MinSecondaryWidth = 30  // "Q1", "Q2", etc.
             },
 
+            TimelineZoomLevel.QuarterWeekMedium => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Year,
+                PrimaryFormat = "date.year",
+                SecondaryUnit = TimelineHeaderUnit.Quarter,
+                SecondaryFormat = "date.quarter-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 200, // Same as QuarterWeek
+                MinSecondaryWidth = 30
+            },
+
             TimelineZoomLevel.QuarterMonth => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Year,
@@ -75,6 +147,18 @@ public static class TimelineHeaderAdapter
                 ShowPrimary = true,
                 ShowSecondary = true,
                 MinPrimaryWidth = 150,
+                MinSecondaryWidth = 25
+            },
+
+            TimelineZoomLevel.QuarterMonthMedium => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Year,
+                PrimaryFormat = "date.year",
+                SecondaryUnit = TimelineHeaderUnit.Quarter,
+                SecondaryFormat = "date.quarter-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 150, // Same as QuarterMonth
                 MinSecondaryWidth = 25
             },
 

@@ -34,10 +34,10 @@ public class TimelineViewZoomTests
 
         var testCases = new[]
         {
-            (factor: 1.0, expected: 25.0),
-            (factor: 1.6, expected: 40.0), // Backward compatibility case
-            (factor: 2.0, expected: 50.0),
-            (factor: 0.5, expected: 12.5)
+            (factor: 1.0, expected: 40.0),  // Preset-only: base day width is 40px (25 * 1.6)
+            (factor: 1.6, expected: 40.0), // Preset-only: factor clamped to 1.0, so 40 * 1.0 = 40
+            (factor: 2.0, expected: 40.0), // Preset-only: factor clamped to 1.0, so 40 * 1.0 = 40
+            (factor: 0.5, expected: 40.0)  // Preset-only: factor clamped to 1.0, so 40 * 1.0 = 40
         };
 
         var config = TimelineZoomService.GetConfiguration(zoomLevel);
@@ -72,12 +72,12 @@ public class TimelineViewZoomTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 1.0, 60.0)]
-    [InlineData(TimelineZoomLevel.MonthDay, 1.0, 25.0)]
-    [InlineData(TimelineZoomLevel.MonthWeek, 1.0, 15.0)]
-    [InlineData(TimelineZoomLevel.QuarterWeek, 1.0, 8.0)]
-    [InlineData(TimelineZoomLevel.QuarterMonth, 1.0, 5.0)]
-    [InlineData(TimelineZoomLevel.YearQuarter, 1.0, 3.0)]
+    [InlineData(TimelineZoomLevel.WeekDay, 1.0, 96.0)]        // 60 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.MonthDay, 1.0, 40.0)]       // 25 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.MonthWeek, 1.0, 24.0)]      // 15 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.QuarterWeek, 1.0, 12.8)]    // 8 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.QuarterMonth, 1.0, 8.0)]    // 5 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.YearQuarter, 1.0, 3.0)]     // Maintains 3px minimum constraint
     public void ZoomLevel_WithBaseFactor_ShouldReturnExpectedDayWidth(
         TimelineZoomLevel level,
         double factor,
@@ -98,13 +98,13 @@ public class TimelineViewZoomTests
     {
         // Arrange
         var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay);
-        var baseDayWidth = 25.0;
+        var baseDayWidth = 40.0; // Updated for preset-only: 25 * 1.6 = 40px
 
         var testCases = new[]
         {
-            (inputFactor: 0.1, expectedClamped: 0.5), // Below minimum
-            (inputFactor: 5.0, expectedClamped: 3.0), // Above maximum
-            (inputFactor: 1.5, expectedClamped: 1.5)  // Within range
+            (inputFactor: 0.1, expectedClamped: 1.0), // Preset-only: all factors clamped to 1.0
+            (inputFactor: 5.0, expectedClamped: 1.0), // Preset-only: all factors clamped to 1.0
+            (inputFactor: 1.5, expectedClamped: 1.0)  // Preset-only: all factors clamped to 1.0
         };
 
         // Act & Assert
@@ -112,7 +112,7 @@ public class TimelineViewZoomTests
         {
             var clampedFactor = Math.Max(config.MinZoomFactor, Math.Min(config.MaxZoomFactor, inputFactor));
             var actualDayWidth = config.GetEffectiveDayWidth(clampedFactor);
-            var expectedDayWidth = baseDayWidth * expectedClamped;
+            var expectedDayWidth = baseDayWidth * expectedClamped; // Always 40 * 1.0 = 40
 
             Assert.Equal(expectedDayWidth, actualDayWidth, precision: 1);
         }

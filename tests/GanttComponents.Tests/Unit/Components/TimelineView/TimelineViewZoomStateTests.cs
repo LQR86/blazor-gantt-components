@@ -115,12 +115,12 @@ public class TimelineViewZoomStateTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 1.0, 60.0)]
-    [InlineData(TimelineZoomLevel.MonthDay, 1.0, 25.0)]
-    [InlineData(TimelineZoomLevel.MonthWeek, 1.0, 15.0)]
-    [InlineData(TimelineZoomLevel.QuarterWeek, 1.0, 8.0)]
-    [InlineData(TimelineZoomLevel.QuarterMonth, 1.0, 5.0)]
-    [InlineData(TimelineZoomLevel.YearQuarter, 1.0, 3.0)]
+    [InlineData(TimelineZoomLevel.WeekDay, 1.0, 96.0)]        // 60 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.MonthDay, 1.0, 40.0)]       // 25 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.MonthWeek, 1.0, 24.0)]      // 15 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.QuarterWeek, 1.0, 12.8)]    // 8 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.QuarterMonth, 1.0, 8.0)]    // 5 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.YearQuarter, 1.0, 3.0)]     // Maintains 3px minimum constraint
     public void EffectiveDayWidth_WithDifferentZoomLevels_ShouldCalculateCorrectly(
         TimelineZoomLevel level, double factor, double expectedWidth)
     {
@@ -140,11 +140,11 @@ public class TimelineViewZoomStateTests
         // Arrange
         var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay);
 
-        // Act - MonthDay (25px) with 2.0x factor
-        var actualWidth = config.GetEffectiveDayWidth(2.0);
+        // Act - MonthDay (40px base) with preset-only factor (always 1.0)
+        var actualWidth = config.GetEffectiveDayWidth(2.0); // Factor clamped to 1.0
 
         // Assert
-        Assert.Equal(50.0, actualWidth, 1); // 25 * 2.0 = 50
+        Assert.Equal(40.0, actualWidth, 1); // Preset-only: 40 * 1.0 = 40 (factor clamped)
     }
 
     [Fact]

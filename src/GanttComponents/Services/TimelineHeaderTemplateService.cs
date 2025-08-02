@@ -42,7 +42,7 @@ public static class TimelineHeaderTemplateService
 
             [TimelineZoomLevel.WeekDayLow] = TimelineHeaderTemplate.Create(
                 TimelineHeaderUnit.Week,
-                "date.week-start-day",      // "15 Feb" - top tier: week start day with month
+                "date.week-range",          // "Dec 30, 2024" - top tier: week start with month-year (same as WeekDayMedium)
                 TimelineHeaderUnit.Day,
                 "date.day-number",          // "1", "2", "3" - bottom tier: day numbers (wider)
                 "Compact weekly view with daily tracking"

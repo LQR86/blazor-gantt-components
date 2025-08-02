@@ -132,6 +132,29 @@
     <value>yy</value>
   </data>
 
+  <!-- Syncfusion-aligned date formats for timeline headers -->
+  <data name="date.week-start" xml:space="preserve">
+    <value>%d</value>
+  </data>
+  <data name="date.week-start-day" xml:space="preserve">
+    <value>%d MMM</value>
+  </data>
+  <data name="date.week-range" xml:space="preserve">
+    <value>MMM %d, yyyy</value>
+  </data>
+  <data name="date.day-name-short" xml:space="preserve">
+    <value>ddd</value>
+  </data>
+  <data name="date.day-month-year" xml:space="preserve">
+    <value>%d MMM yyyy</value>
+  </data>
+  <data name="date.hour-24" xml:space="preserve">
+    <value>H</value>
+  </data>
+  <data name="date.hour-12" xml:space="preserve">
+    <value>h tt</value>
+  </data>
+
   <!-- Common UI Elements -->
   <data name="common.save" xml:space="preserve">
     <value>Save</value>

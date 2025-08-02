@@ -38,8 +38,8 @@ public class TimelineHeaderTemplateServiceTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, "date.month-year-verbose", "date.day-number")]
-    [InlineData(TimelineZoomLevel.MonthDay, "date.month-short", "date.day-number")]
+    [InlineData(TimelineZoomLevel.WeekDay, "date.week-range", "date.day-name-short")]
+    [InlineData(TimelineZoomLevel.MonthDay, "date.month-year", "date.week-start-day")]
     [InlineData(TimelineZoomLevel.YearQuarter, "date.decade-minimal", "date.year-minimal")]
     public void GetTemplate_ReturnsCorrectFormats(TimelineZoomLevel zoomLevel, string expectedPrimaryFormat, string expectedSecondaryFormat)
     {

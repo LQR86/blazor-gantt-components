@@ -26,6 +26,19 @@ public class DateFormatHelper
         // Get the format pattern from I18N translations
         var pattern = _i18n.T(formatKey);
 
+        // Handle special quarter formatting since .NET doesn't have a 'q' format specifier
+        if (pattern.Contains("q"))
+        {
+            return FormatDateWithQuarter(date, pattern);
+        }
+
+        // Handle %d pattern (day without leading zero)
+        if (pattern.Contains("%d"))
+        {
+            pattern = pattern.Replace("%d", "%d");  // Keep %d as is, we'll handle it specially
+            return HandleCustomDayFormat(date, pattern);
+        }
+
         // Use the correct culture matching the I18N setting instead of system culture
         var culture = GetCultureInfo(_i18n.CurrentCulture);
         return date.ToString(pattern, culture);
@@ -149,6 +162,92 @@ public class DateFormatHelper
     public string FormatMonthShort(DateTime date)
     {
         return FormatDate(date, "date.month-short");
+    }
+
+    /// <summary>
+    /// Format a date with quarter support by replacing 'q' with calculated quarter number.
+    /// </summary>
+    /// <param name="date">The date to format</param>
+    /// <param name="pattern">Format pattern containing 'q' for quarter</param>
+    /// <returns>Formatted date string with quarter number</returns>
+    private string FormatDateWithQuarter(DateTime date, string pattern)
+    {
+        // Calculate quarter (1-4)
+        var quarter = ((date.Month - 1) / 3) + 1;
+
+        // Replace 'q' with the quarter number
+        var quarterPattern = pattern.Replace("q", quarter.ToString());
+
+        // Use the correct culture matching the I18N setting
+        var culture = GetCultureInfo(_i18n.CurrentCulture);
+
+        try
+        {
+            return date.ToString(quarterPattern, culture);
+        }
+        catch (FormatException)
+        {
+            // If the pattern is still invalid, fall back to a simple replacement approach
+            // This handles cases where the pattern might have other invalid elements
+            return ReplaceQuarterInText(pattern, quarter, date, culture);
+        }
+    }
+
+    /// <summary>
+    /// Fallback method to replace quarter in text without using DateTime.ToString formatting.
+    /// </summary>
+    private string ReplaceQuarterInText(string pattern, int quarter, DateTime date, CultureInfo culture)
+    {
+        var result = pattern.Replace("q", quarter.ToString());
+
+        // Handle common patterns manually
+        if (result.Contains("yyyy"))
+        {
+            result = result.Replace("yyyy", date.Year.ToString());
+        }
+        if (result.Contains("MM"))
+        {
+            result = result.Replace("MM", date.Month.ToString("D2"));
+        }
+        if (result.Contains("dd"))
+        {
+            result = result.Replace("dd", date.Day.ToString("D2"));
+        }
+
+        // Remove single quotes used for literal text in patterns
+        result = result.Replace("'", "");
+
+        return result;
+    }    /// <summary>
+         /// Handle custom day format %d by extracting just the day number.
+         /// </summary>
+         /// <param name="date">The date to format</param>
+         /// <param name="pattern">Format pattern containing '%d'</param>
+         /// <returns>Formatted date string with day number</returns>
+    private string HandleCustomDayFormat(DateTime date, string pattern)
+    {
+        // For %d pattern, we want just the day number without leading zero
+        var dayNumber = date.Day.ToString();
+
+        // Replace %d with the day number in the pattern
+        var result = pattern.Replace("%d", dayNumber);
+
+        // If there are other format elements, process them normally
+        if (result != dayNumber && result != pattern)
+        {
+            var culture = GetCultureInfo(_i18n.CurrentCulture);
+            try
+            {
+                return date.ToString(result, culture);
+            }
+            catch (FormatException)
+            {
+                // If format fails, return just the result with substitutions
+                return result;
+            }
+        }
+
+        return result;
     }
 
     /// <summary>

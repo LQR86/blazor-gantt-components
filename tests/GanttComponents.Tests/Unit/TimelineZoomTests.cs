@@ -74,7 +74,7 @@ public class TimelineZoomTests
 
         // Assert - Preset-only system now supports 13 fine-grained levels
         Assert.Equal(13, configurations.Count);
-        
+
         // Original 6 levels still exist
         Assert.Contains(TimelineZoomLevel.WeekDay, configurations.Keys);
         Assert.Contains(TimelineZoomLevel.MonthDay, configurations.Keys);
@@ -82,7 +82,7 @@ public class TimelineZoomTests
         Assert.Contains(TimelineZoomLevel.QuarterWeek, configurations.Keys);
         Assert.Contains(TimelineZoomLevel.QuarterMonth, configurations.Keys);
         Assert.Contains(TimelineZoomLevel.YearQuarter, configurations.Keys);
-        
+
         // New intermediate levels added for finer granularity
         Assert.Contains(TimelineZoomLevel.WeekDayMedium, configurations.Keys);
         Assert.Contains(TimelineZoomLevel.WeekDayLow, configurations.Keys);

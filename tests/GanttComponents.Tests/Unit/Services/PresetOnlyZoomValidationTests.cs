@@ -91,7 +91,7 @@ public class PresetOnlyZoomValidationTests
             var dayWidth = TimelineZoomService.CalculateEffectiveDayWidth(level, 1.0);
 
             // Assert - All levels should have day width >= 3px minimum
-            Assert.True(dayWidth >= TaskDisplayConstants.MIN_EFFECTIVE_DAY_WIDTH, 
+            Assert.True(dayWidth >= TaskDisplayConstants.MIN_EFFECTIVE_DAY_WIDTH,
                 $"Level {level} has day width {dayWidth}px, should be >= {TaskDisplayConstants.MIN_EFFECTIVE_DAY_WIDTH}px");
         }
     }

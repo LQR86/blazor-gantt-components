@@ -523,7 +523,7 @@ namespace GanttComponents.Tests.Unit.Services
 
             // Assert - Preset-only system now supports 13 fine-grained levels
             Assert.Equal(13, result.Count);
-            
+
             // Original 6 levels still exist
             Assert.True(result.ContainsKey(TimelineZoomLevel.WeekDay));
             Assert.True(result.ContainsKey(TimelineZoomLevel.MonthDay));
@@ -531,7 +531,7 @@ namespace GanttComponents.Tests.Unit.Services
             Assert.True(result.ContainsKey(TimelineZoomLevel.QuarterWeek));
             Assert.True(result.ContainsKey(TimelineZoomLevel.QuarterMonth));
             Assert.True(result.ContainsKey(TimelineZoomLevel.YearQuarter));
-            
+
             // New intermediate levels added for finer granularity
             Assert.True(result.ContainsKey(TimelineZoomLevel.WeekDayMedium));
             Assert.True(result.ContainsKey(TimelineZoomLevel.WeekDayLow));

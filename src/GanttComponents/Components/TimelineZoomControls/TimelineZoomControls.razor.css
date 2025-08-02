@@ -3,7 +3,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
-    align-items: center;
+    align-items: flex-start; /* Changed from center to flex-start for wrapping sections */
     padding: 8px 12px;
     background: var(--md-sys-color-surface);
     border: 1px solid var(--md-sys-color-outline-variant);
@@ -11,6 +11,8 @@
     font-family: var(--md-sys-typescale-body-small-font-family-name, 'Roboto', sans-serif);
     font-size: var(--md-sys-typescale-body-small-font-size, 12px);
     line-height: var(--md-sys-typescale-body-small-line-height, 16px);
+    max-width: 100%; /* Ensure it respects container width */
+    box-sizing: border-box;
 }
 
 /* Section containers */
@@ -21,6 +23,13 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap; /* Allow content to wrap within sections */
+    min-width: 0; /* Allow flex items to shrink below their content size */
+}
+
+/* Zoom level presets specific wrapping */
+.zoom-level-presets {
+    max-width: 100%; /* Ensure preset buttons respect container width */
 }
 
 /* Labels */
@@ -51,8 +60,10 @@
     font-weight: var(--md-sys-typescale-label-medium-font-weight, 500);
     cursor: pointer;
     transition: all 150ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    -webkit-user-select: none;
     user-select: none;
     white-space: nowrap;
+    flex-shrink: 0; /* Prevent buttons from shrinking too much */
 }
 
 .zoom-preset-button:hover:not(:disabled) {
@@ -173,6 +184,25 @@
 }
 
 /* Responsive behavior */
+/* Medium container - when preset buttons start to wrap */
+@media (max-width: 1200px) {
+    .timeline-zoom-controls {
+        gap: 12px;
+    }
+    
+    .zoom-level-presets {
+        /* Allow preset section to take full width when needed */
+        flex-basis: 100%;
+        justify-content: flex-start;
+    }
+    
+    .zoom-preset-button {
+        min-width: 56px; /* Slightly smaller for medium screens */
+        flex-shrink: 1;
+    }
+}
+
+/* Small container - mobile behavior */
 @media (max-width: 768px) {
     .timeline-zoom-controls {
         flex-direction: column;
@@ -200,6 +230,10 @@
 .timeline-zoom-controls.compact {
     gap: 8px;
     padding: 4px 8px;
+}
+
+.timeline-zoom-controls.compact .zoom-level-presets {
+    gap: 4px; /* Tighter spacing for compact mode */
 }
 
 .timeline-zoom-controls.compact .zoom-action-buttons {
@@ -413,6 +447,43 @@
 @keyframes preview-pulse {
     0% { opacity: 0; transform: translateX(-4px); }
     100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Auto-wrap utility - for containers that need to adapt to varying widths */
+.timeline-zoom-controls.auto-wrap {
+    /* Force preset buttons to wrap more aggressively */
+    gap: 8px;
+}
+
+.timeline-zoom-controls.auto-wrap .zoom-level-presets {
+    /* Allow preset section to wrap more readily */
+    flex-basis: auto;
+    max-width: none;
+}
+
+.timeline-zoom-controls.auto-wrap .zoom-preset-button {
+    /* More flexible button sizing */
+    min-width: 52px;
+    flex-shrink: 1;
+}
+
+/* Container-query-like behavior using CSS classes */
+.timeline-zoom-controls.constrained {
+    /* For use in narrow containers like sidebars */
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+}
+
+.timeline-zoom-controls.constrained .zoom-level-presets,
+.timeline-zoom-controls.constrained .zoom-current-state,
+.timeline-zoom-controls.constrained .zoom-quick-actions {
+    justify-content: center;
+}
+
+.timeline-zoom-controls.constrained .zoom-preset-button {
+    flex: 1;
+    min-width: 40px;
 }
 
 /* Dark mode support for manual controls */

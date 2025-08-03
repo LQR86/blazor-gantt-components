@@ -18,26 +18,26 @@ namespace GanttComponents.Services
         {
             return zoomLevel switch
             {
-                // WeekDay pattern levels
-                TimelineZoomLevel.WeekDay => i18n.T("ZoomLevel.WeekDay"),
-                TimelineZoomLevel.WeekDayMedium => i18n.T("ZoomLevel.WeekDayMedium"),
-                TimelineZoomLevel.WeekDayLow => i18n.T("ZoomLevel.WeekDayLow"),
+                // Week→Day pattern levels (97px, 68px)
+                TimelineZoomLevel.WeekDay97px => i18n.T("ZoomLevel.WeekDay97px"),
+                TimelineZoomLevel.WeekDay68px => i18n.T("ZoomLevel.WeekDay68px"),
 
-                // MonthWeek pattern levels
-                TimelineZoomLevel.MonthWeek => i18n.T("ZoomLevel.MonthWeek"),
-                TimelineZoomLevel.MonthWeekMedium => i18n.T("ZoomLevel.MonthWeekMedium"),
-                TimelineZoomLevel.MonthWeekLow => i18n.T("ZoomLevel.MonthWeekLow"),
+                // Month→Day pattern levels (48px, 34px)
+                TimelineZoomLevel.MonthDay48px => i18n.T("ZoomLevel.MonthDay48px"),
+                TimelineZoomLevel.MonthDay34px => i18n.T("ZoomLevel.MonthDay34px"),
 
-                // QuarterMonth pattern levels
-                TimelineZoomLevel.QuarterMonth => i18n.T("ZoomLevel.QuarterMonth"),
-                TimelineZoomLevel.QuarterMonthMedium => i18n.T("ZoomLevel.QuarterMonthMedium"),
-                TimelineZoomLevel.QuarterMonthLow => i18n.T("ZoomLevel.QuarterMonthLow"),
+                // Quarter→Month pattern levels (24px, 17px)
+                TimelineZoomLevel.QuarterMonth24px => i18n.T("ZoomLevel.QuarterMonth24px"),
+                TimelineZoomLevel.QuarterMonth17px => i18n.T("ZoomLevel.QuarterMonth17px"),
 
-                // YearQuarter pattern levels
-                TimelineZoomLevel.YearQuarter => i18n.T("ZoomLevel.YearQuarter"),
-                TimelineZoomLevel.YearQuarterMedium => i18n.T("ZoomLevel.YearQuarterMedium"),
-                TimelineZoomLevel.YearQuarterLow => i18n.T("ZoomLevel.YearQuarterLow"),
-                TimelineZoomLevel.YearQuarterMin => i18n.T("ZoomLevel.YearQuarterMin"),
+                // Month-only pattern levels (12px, 8px)
+                TimelineZoomLevel.Month12px => i18n.T("ZoomLevel.Month12px"),
+                TimelineZoomLevel.Month8px => i18n.T("ZoomLevel.Month8px"),
+
+                // Year→Quarter pattern levels (6px, 4px, 3px)
+                TimelineZoomLevel.YearQuarter6px => i18n.T("ZoomLevel.YearQuarter6px"),
+                TimelineZoomLevel.YearQuarter4px => i18n.T("ZoomLevel.YearQuarter4px"),
+                TimelineZoomLevel.YearQuarter3px => i18n.T("ZoomLevel.YearQuarter3px"),
 
                 _ => zoomLevel.ToString()
             };
@@ -53,26 +53,26 @@ namespace GanttComponents.Services
         {
             return zoomLevel switch
             {
-                // WeekDay pattern levels
-                TimelineZoomLevel.WeekDay => i18n.T("ZoomLevel.WeekDay.Description"),
-                TimelineZoomLevel.WeekDayMedium => i18n.T("ZoomLevel.WeekDayMedium.Description"),
-                TimelineZoomLevel.WeekDayLow => i18n.T("ZoomLevel.WeekDayLow.Description"),
+                // Week→Day pattern levels (97px, 68px)
+                TimelineZoomLevel.WeekDay97px => i18n.T("ZoomLevel.WeekDay97px.Description"),
+                TimelineZoomLevel.WeekDay68px => i18n.T("ZoomLevel.WeekDay68px.Description"),
 
-                // MonthWeek pattern levels
-                TimelineZoomLevel.MonthWeek => i18n.T("ZoomLevel.MonthWeek.Description"),
-                TimelineZoomLevel.MonthWeekMedium => i18n.T("ZoomLevel.MonthWeekMedium.Description"),
-                TimelineZoomLevel.MonthWeekLow => i18n.T("ZoomLevel.MonthWeekLow.Description"),
+                // Month→Day pattern levels (48px, 34px)
+                TimelineZoomLevel.MonthDay48px => i18n.T("ZoomLevel.MonthDay48px.Description"),
+                TimelineZoomLevel.MonthDay34px => i18n.T("ZoomLevel.MonthDay34px.Description"),
 
-                // QuarterMonth pattern levels
-                TimelineZoomLevel.QuarterMonth => i18n.T("ZoomLevel.QuarterMonth.Description"),
-                TimelineZoomLevel.QuarterMonthMedium => i18n.T("ZoomLevel.QuarterMonthMedium.Description"),
-                TimelineZoomLevel.QuarterMonthLow => i18n.T("ZoomLevel.QuarterMonthLow.Description"),
+                // Quarter→Month pattern levels (24px, 17px)
+                TimelineZoomLevel.QuarterMonth24px => i18n.T("ZoomLevel.QuarterMonth24px.Description"),
+                TimelineZoomLevel.QuarterMonth17px => i18n.T("ZoomLevel.QuarterMonth17px.Description"),
 
-                // YearQuarter pattern levels
-                TimelineZoomLevel.YearQuarter => i18n.T("ZoomLevel.YearQuarter.Description"),
-                TimelineZoomLevel.YearQuarterMedium => i18n.T("ZoomLevel.YearQuarterMedium.Description"),
-                TimelineZoomLevel.YearQuarterLow => i18n.T("ZoomLevel.YearQuarterLow.Description"),
-                TimelineZoomLevel.YearQuarterMin => i18n.T("ZoomLevel.YearQuarterMin.Description"),
+                // Month-only pattern levels (12px, 8px)
+                TimelineZoomLevel.Month12px => i18n.T("ZoomLevel.Month12px.Description"),
+                TimelineZoomLevel.Month8px => i18n.T("ZoomLevel.Month8px.Description"),
+
+                // Year→Quarter pattern levels (6px, 4px, 3px)
+                TimelineZoomLevel.YearQuarter6px => i18n.T("ZoomLevel.YearQuarter6px.Description"),
+                TimelineZoomLevel.YearQuarter4px => i18n.T("ZoomLevel.YearQuarter4px.Description"),
+                TimelineZoomLevel.YearQuarter3px => i18n.T("ZoomLevel.YearQuarter3px.Description"),
 
                 _ => string.Empty
             };

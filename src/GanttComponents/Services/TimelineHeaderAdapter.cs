@@ -53,7 +53,8 @@ public static class TimelineHeaderAdapter
     {
         return zoomLevel switch
         {
-            TimelineZoomLevel.WeekDay => new TimelineHeaderConfiguration
+            // Week→Day patterns (levels 10-11: 68px, 97px)
+            TimelineZoomLevel.WeekDay68px => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Month,
                 PrimaryFormat = "date.month-year",
@@ -65,7 +66,7 @@ public static class TimelineHeaderAdapter
                 MinSecondaryWidth = 20  // Days just show numbers
             },
 
-            TimelineZoomLevel.WeekDayMedium => new TimelineHeaderConfiguration
+            TimelineZoomLevel.WeekDay97px => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Month,
                 PrimaryFormat = "date.month-year",
@@ -73,35 +74,24 @@ public static class TimelineHeaderAdapter
                 SecondaryFormat = "date.day-number",
                 ShowPrimary = true,
                 ShowSecondary = true,
-                MinPrimaryWidth = 120, // Same as WeekDay
+                MinPrimaryWidth = 120, // Same as WeekDay68px
                 MinSecondaryWidth = 20
             },
 
-            TimelineZoomLevel.WeekDayLow => new TimelineHeaderConfiguration
+            // Month→Day patterns (levels 8-9: 34px, 48px)
+            TimelineZoomLevel.MonthDay34px => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Month,
                 PrimaryFormat = "date.month-year",
                 SecondaryUnit = TimelineHeaderUnit.Day,
                 SecondaryFormat = "date.day-number",
-                ShowPrimary = true,
-                ShowSecondary = true,
-                MinPrimaryWidth = 120, // Same as WeekDay
-                MinSecondaryWidth = 20
-            },
-
-            TimelineZoomLevel.MonthWeek => new TimelineHeaderConfiguration
-            {
-                PrimaryUnit = TimelineHeaderUnit.Month,
-                PrimaryFormat = "date.month-year",
-                SecondaryUnit = TimelineHeaderUnit.Week,
-                SecondaryFormat = "date.week-start-day",
                 ShowPrimary = true,
                 ShowSecondary = true,
                 MinPrimaryWidth = 100,
                 MinSecondaryWidth = 15
             },
 
-            TimelineZoomLevel.MonthWeekMedium => new TimelineHeaderConfiguration
+            TimelineZoomLevel.MonthDay48px => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Month,
                 PrimaryFormat = "date.month-year",
@@ -109,11 +99,12 @@ public static class TimelineHeaderAdapter
                 SecondaryFormat = "date.day-number",
                 ShowPrimary = true,
                 ShowSecondary = true,
-                MinPrimaryWidth = 100, // Same as MonthDay
+                MinPrimaryWidth = 100, // Same as MonthDay34px
                 MinSecondaryWidth = 15
             },
 
-            TimelineZoomLevel.MonthWeekLow => new TimelineHeaderConfiguration
+            // Quarter→Month patterns (levels 6-7: 17px, 24px)
+            TimelineZoomLevel.QuarterMonth17px => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Quarter,
                 PrimaryFormat = "date.quarter-year",
@@ -121,11 +112,49 @@ public static class TimelineHeaderAdapter
                 SecondaryFormat = "date.month-short",
                 ShowPrimary = true,
                 ShowSecondary = true,
-                MinPrimaryWidth = 180, // Same as MonthWeek
+                MinPrimaryWidth = 180,
                 MinSecondaryWidth = 45
             },
 
-            TimelineZoomLevel.YearQuarter => new TimelineHeaderConfiguration
+            TimelineZoomLevel.QuarterMonth24px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Quarter,
+                PrimaryFormat = "date.quarter-year",
+                SecondaryUnit = TimelineHeaderUnit.Month,
+                SecondaryFormat = "date.month-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 180, // Same as QuarterMonth17px
+                MinSecondaryWidth = 45
+            },
+
+            // Month-only patterns (levels 4-5: 8px, 12px)
+            TimelineZoomLevel.Month8px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Year,
+                PrimaryFormat = "date.year",
+                SecondaryUnit = TimelineHeaderUnit.Month,
+                SecondaryFormat = "date.month-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 150,
+                MinSecondaryWidth = 25
+            },
+
+            TimelineZoomLevel.Month12px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Year,
+                PrimaryFormat = "date.year",
+                SecondaryUnit = TimelineHeaderUnit.Month,
+                SecondaryFormat = "date.month-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 150, // Same as Month8px
+                MinSecondaryWidth = 25
+            },
+
+            // Year→Quarter patterns (levels 1-3: 3px, 4px, 6px)
+            TimelineZoomLevel.YearQuarter3px => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Year,
                 PrimaryFormat = "date.year",
@@ -137,7 +166,7 @@ public static class TimelineHeaderAdapter
                 MinSecondaryWidth = 30  // "Q1", "Q2", etc.
             },
 
-            TimelineZoomLevel.YearQuarterMedium => new TimelineHeaderConfiguration
+            TimelineZoomLevel.YearQuarter4px => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Year,
                 PrimaryFormat = "date.year",
@@ -145,11 +174,11 @@ public static class TimelineHeaderAdapter
                 SecondaryFormat = "date.quarter-short",
                 ShowPrimary = true,
                 ShowSecondary = true,
-                MinPrimaryWidth = 200, // Same as QuarterWeek
+                MinPrimaryWidth = 200, // Same as YearQuarter3px
                 MinSecondaryWidth = 30
             },
 
-            TimelineZoomLevel.QuarterMonth => new TimelineHeaderConfiguration
+            TimelineZoomLevel.YearQuarter6px => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Year,
                 PrimaryFormat = "date.year",
@@ -157,44 +186,8 @@ public static class TimelineHeaderAdapter
                 SecondaryFormat = "date.quarter-short",
                 ShowPrimary = true,
                 ShowSecondary = true,
-                MinPrimaryWidth = 150,
-                MinSecondaryWidth = 25
-            },
-
-            TimelineZoomLevel.QuarterMonthMedium => new TimelineHeaderConfiguration
-            {
-                PrimaryUnit = TimelineHeaderUnit.Year,
-                PrimaryFormat = "date.year",
-                SecondaryUnit = TimelineHeaderUnit.Quarter,
-                SecondaryFormat = "date.quarter-short",
-                ShowPrimary = true,
-                ShowSecondary = true,
-                MinPrimaryWidth = 150, // Same as QuarterMonth
-                MinSecondaryWidth = 25
-            },
-
-            TimelineZoomLevel.YearQuarterLow => new TimelineHeaderConfiguration
-            {
-                PrimaryUnit = TimelineHeaderUnit.Decade,
-                PrimaryFormat = "date.decade",
-                SecondaryUnit = TimelineHeaderUnit.Year,
-                SecondaryFormat = "date.year",
-                ShowPrimary = true,
-                ShowSecondary = true,
-                MinPrimaryWidth = 300, // "2020-2029"
-                MinSecondaryWidth = 40   // "2025"
-            },
-
-            TimelineZoomLevel.YearQuarterMin => new TimelineHeaderConfiguration
-            {
-                PrimaryUnit = TimelineHeaderUnit.Decade,
-                PrimaryFormat = "date.decade-short",
-                SecondaryUnit = TimelineHeaderUnit.Year,
-                SecondaryFormat = "date.year-short",
-                ShowPrimary = true,
-                ShowSecondary = true,
-                MinPrimaryWidth = 200, // "20s"
-                MinSecondaryWidth = 30   // "25"
+                MinPrimaryWidth = 200, // Same as YearQuarter3px
+                MinSecondaryWidth = 30
             },
 
             _ => throw new ArgumentOutOfRangeException(nameof(zoomLevel))
@@ -319,25 +312,26 @@ public static class TimelineHeaderAdapter
     {
         return zoomLevel switch
         {
-            // Ultra-wide levels need space for verbose formats
-            TimelineZoomLevel.WeekDay => 120,           // "January 2025"
-            TimelineZoomLevel.WeekDayMedium => 100,     // "Jan 2025"
-            TimelineZoomLevel.WeekDayLow => 60,         // "Jan"
+            // Week→Day patterns (levels 10-11: 68px, 97px) need space for verbose formats
+            TimelineZoomLevel.WeekDay68px => 120,           // "January 2025"
+            TimelineZoomLevel.WeekDay97px => 100,     // "Jan 2025"
 
-            // Wide levels use standard formats
-            TimelineZoomLevel.MonthWeek => 60,           // "Jan"
-            TimelineZoomLevel.MonthWeekMedium => 40,     // "Q1"
+            // Month→Day patterns (levels 8-9: 34px, 48px) use standard formats
+            TimelineZoomLevel.MonthDay34px => 60,           // "Jan"
+            TimelineZoomLevel.MonthDay48px => 40,     // "Q1"
 
-            // Medium levels use quarterly/yearly formats
-            TimelineZoomLevel.QuarterMonth => 80,          // "Q1 2025"
-            TimelineZoomLevel.QuarterMonthMedium => 40,    // "Q1"
-            TimelineZoomLevel.QuarterMonthLow => 60,       // "2025"
+            // Quarter→Month patterns (levels 6-7: 17px, 24px) use quarterly/yearly formats
+            TimelineZoomLevel.QuarterMonth17px => 80,          // "Q1 2025"
+            TimelineZoomLevel.QuarterMonth24px => 40,    // "Q1"
 
-            // Narrow levels use yearly/decade formats
-            TimelineZoomLevel.YearQuarter => 60,        // "2025"
-            TimelineZoomLevel.YearQuarterMedium => 100, // "2020-2029"
-            TimelineZoomLevel.YearQuarterLow => 60,       // "20s"
-            TimelineZoomLevel.YearQuarterMin => 40,        // "20", "30" (minimal)
+            // Month-only patterns (levels 4-5: 8px, 12px) use yearly formats
+            TimelineZoomLevel.Month8px => 60,       // "2025"
+            TimelineZoomLevel.Month12px => 60,        // "2025"
+
+            // Year→Quarter patterns (levels 1-3: 3px, 4px, 6px) use yearly/decade formats
+            TimelineZoomLevel.YearQuarter3px => 100, // "2020-2029"
+            TimelineZoomLevel.YearQuarter4px => 60,       // "20s"
+            TimelineZoomLevel.YearQuarter6px => 40,        // "20", "30" (minimal)
 
             _ => 60 // Default fallback
         };
@@ -351,26 +345,26 @@ public static class TimelineHeaderAdapter
     {
         return zoomLevel switch
         {
-            // Day-level secondary headers
-            TimelineZoomLevel.WeekDay => 20,            // "1", "2", "3"
-            TimelineZoomLevel.WeekDayMedium => 20,      // "1", "2", "3"
-            TimelineZoomLevel.WeekDayLow => 20,         // "1", "2", "3"
-            TimelineZoomLevel.MonthWeek => 20,           // "1", "2", "3"
-            TimelineZoomLevel.MonthWeekMedium => 25,     // "M", "T", "W" (day abbrev)
+            // Week→Day patterns (levels 10-11: 68px, 97px) - Day-level secondary headers
+            TimelineZoomLevel.WeekDay68px => 20,            // "1", "2", "3"
+            TimelineZoomLevel.WeekDay97px => 20,      // "1", "2", "3"
 
-            // Month-level secondary headers
-            TimelineZoomLevel.MonthWeekLow => 25,          // "J", "F", "M"
-            TimelineZoomLevel.QuarterMonth => 25,    // "J", "F", "M"
-            TimelineZoomLevel.QuarterMonthMedium => 15,       // "1", "2", "3", "4"
+            // Month→Day patterns (levels 8-9: 34px, 48px) - Day-level secondary headers
+            TimelineZoomLevel.MonthDay34px => 20,         // "1", "2", "3"
+            TimelineZoomLevel.MonthDay48px => 20,           // "1", "2", "3"
 
-            // Quarter/year-level secondary headers
-            TimelineZoomLevel.QuarterMonthLow => 15,        // "1", "2", "3", "4"
-            TimelineZoomLevel.YearQuarter => 25,  // "25", "26", "27"
-            TimelineZoomLevel.YearQuarterMedium => 25,       // "25", "26", "27"
-            TimelineZoomLevel.YearQuarterLow => 15, // "5", "6", "7"
+            // Quarter→Month patterns (levels 6-7: 17px, 24px) - Month-level secondary headers
+            TimelineZoomLevel.QuarterMonth17px => 25,     // "M", "T", "W" (day abbrev)
+            TimelineZoomLevel.QuarterMonth24px => 25,          // "J", "F", "M"
 
-            // Minimal secondary headers
-            TimelineZoomLevel.YearQuarterMin => 15,        // "5", "6", "7"
+            // Month-only patterns (levels 4-5: 8px, 12px) - Month-level secondary headers
+            TimelineZoomLevel.Month8px => 25,    // "J", "F", "M"
+            TimelineZoomLevel.Month12px => 15,       // "1", "2", "3", "4"
+
+            // Year→Quarter patterns (levels 1-3: 3px, 4px, 6px) - Quarter/year-level secondary headers
+            TimelineZoomLevel.YearQuarter3px => 15,        // "1", "2", "3", "4"
+            TimelineZoomLevel.YearQuarter4px => 25,  // "25", "26", "27"
+            TimelineZoomLevel.YearQuarter6px => 25,       // "25", "26", "27"
 
             _ => 20 // Default fallback
         };

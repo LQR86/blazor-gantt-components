@@ -341,19 +341,17 @@ namespace GanttComponents.Tests.Unit.Services
         #region Zoom I18N Tests
 
         [Theory]
-        [InlineData("ZoomLevel.WeekDay", "Week-Day View")]
-        [InlineData("ZoomLevel.WeekDayMedium", "Week-Day Medium")]
-        [InlineData("ZoomLevel.WeekDayLow", "Week-Day Compact")]
-        [InlineData("ZoomLevel.MonthWeek", "Month-Week View")]
-        [InlineData("ZoomLevel.MonthWeekMedium", "Month-Week Medium")]
-        [InlineData("ZoomLevel.MonthWeekLow", "Month-Week Compact")]
-        [InlineData("ZoomLevel.QuarterMonth", "Quarter-Month View")]
-        [InlineData("ZoomLevel.QuarterMonthMedium", "Quarter-Month Medium")]
-        [InlineData("ZoomLevel.QuarterMonthLow", "Quarter-Month Compact")]
-        [InlineData("ZoomLevel.YearQuarter", "Year-Quarter View")]
-        [InlineData("ZoomLevel.YearQuarterMedium", "Year-Quarter Medium")]
-        [InlineData("ZoomLevel.YearQuarterLow", "Year-Quarter Compact")]
-        [InlineData("ZoomLevel.YearQuarterMin", "Year-Quarter Minimal")]
+        [InlineData("ZoomLevel.WeekDay97px", "Week-Day Maximum")]
+        [InlineData("ZoomLevel.WeekDay68px", "Week-Day Medium")]
+        [InlineData("ZoomLevel.MonthDay48px", "Month-Day View")]
+        [InlineData("ZoomLevel.MonthDay34px", "Month-Day Medium")]
+        [InlineData("ZoomLevel.QuarterMonth24px", "Quarter-Month View")]
+        [InlineData("ZoomLevel.QuarterMonth17px", "Quarter-Month Medium")]
+        [InlineData("ZoomLevel.Month12px", "Month View")]
+        [InlineData("ZoomLevel.Month8px", "Month Compact")]
+        [InlineData("ZoomLevel.YearQuarter6px", "Year-Quarter View")]
+        [InlineData("ZoomLevel.YearQuarter4px", "Year-Quarter Medium")]
+        [InlineData("ZoomLevel.YearQuarter3px", "Year-Quarter Minimal")]
         public void T_ZoomLevelNames_English_ReturnsCorrectTranslation(string key, string expected)
         {
             // Arrange
@@ -367,19 +365,17 @@ namespace GanttComponents.Tests.Unit.Services
         }
 
         [Theory]
-        [InlineData("ZoomLevel.WeekDay", "周-日视图")]
-        [InlineData("ZoomLevel.WeekDayMedium", "周-日中等")]
-        [InlineData("ZoomLevel.WeekDayLow", "周-日紧凑")]
-        [InlineData("ZoomLevel.MonthWeek", "月-周视图")]
-        [InlineData("ZoomLevel.MonthWeekMedium", "月-周中等")]
-        [InlineData("ZoomLevel.MonthWeekLow", "月-周紧凑")]
-        [InlineData("ZoomLevel.QuarterMonth", "季-月视图")]
-        [InlineData("ZoomLevel.QuarterMonthMedium", "季-月中等")]
-        [InlineData("ZoomLevel.QuarterMonthLow", "季-月紧凑")]
-        [InlineData("ZoomLevel.YearQuarter", "年-季视图")]
-        [InlineData("ZoomLevel.YearQuarterMedium", "年-季中等")]
-        [InlineData("ZoomLevel.YearQuarterLow", "年-季紧凑")]
-        [InlineData("ZoomLevel.YearQuarterMin", "年-季最小")]
+        [InlineData("ZoomLevel.WeekDay97px", "周-日最大")]
+        [InlineData("ZoomLevel.WeekDay68px", "周-日中等")]
+        [InlineData("ZoomLevel.MonthDay48px", "月-日视图")]
+        [InlineData("ZoomLevel.MonthDay34px", "月-日中等")]
+        [InlineData("ZoomLevel.QuarterMonth24px", "季-月视图")]
+        [InlineData("ZoomLevel.QuarterMonth17px", "季-月中等")]
+        [InlineData("ZoomLevel.Month12px", "月视图")]
+        [InlineData("ZoomLevel.Month8px", "月紧凑")]
+        [InlineData("ZoomLevel.YearQuarter6px", "年-季视图")]
+        [InlineData("ZoomLevel.YearQuarter4px", "年-季中等")]
+        [InlineData("ZoomLevel.YearQuarter3px", "年-季最小")]
         public void T_ZoomLevelNames_Chinese_ReturnsCorrectTranslation(string key, string expected)
         {
             // Arrange
@@ -393,19 +389,17 @@ namespace GanttComponents.Tests.Unit.Services
         }
 
         [Theory]
-        [InlineData("ZoomLevel.WeekDay.Description", "Daily sprint planning with weekly context (60px/day)")]
-        [InlineData("ZoomLevel.WeekDayMedium.Description", "Medium weekly view with daily granularity (45px/day)")]
-        [InlineData("ZoomLevel.WeekDayLow.Description", "Compact weekly view with daily tracking (35px/day)")]
-        [InlineData("ZoomLevel.MonthWeek.Description", "Monthly overview with weekly breakdown (25px/day)")]
-        [InlineData("ZoomLevel.MonthWeekMedium.Description", "Medium monthly view with weekly periods (20px/day)")]
-        [InlineData("ZoomLevel.MonthWeekLow.Description", "Compact monthly view with weekly periods (18px/day)")]
-        [InlineData("ZoomLevel.QuarterMonth.Description", "Quarterly overview with monthly breakdown (15px/day)")]
-        [InlineData("ZoomLevel.QuarterMonthMedium.Description", "Medium quarterly view with monthly periods (12px/day)")]
-        [InlineData("ZoomLevel.QuarterMonthLow.Description", "Compact quarterly view with monthly markers (10px/day)")]
-        [InlineData("ZoomLevel.YearQuarter.Description", "Annual overview with quarterly breakdown (8px/day)")]
-        [InlineData("ZoomLevel.YearQuarterMedium.Description", "Medium annual view with quarterly periods (6.5px/day)")]
-        [InlineData("ZoomLevel.YearQuarterLow.Description", "Extended multi-year planning with quarterly markers (5px/day)")]
-        [InlineData("ZoomLevel.YearQuarterMin.Description", "Long-term strategic view with minimum day width (3px/day)")]
+        [InlineData("ZoomLevel.WeekDay97px.Description", "Daily sprint planning with weekly context (97px/day)")]
+        [InlineData("ZoomLevel.WeekDay68px.Description", "Medium weekly view with daily granularity (68px/day)")]
+        [InlineData("ZoomLevel.MonthDay48px.Description", "Monthly overview with daily breakdown (48px/day)")]
+        [InlineData("ZoomLevel.MonthDay34px.Description", "Medium monthly view with daily periods (34px/day)")]
+        [InlineData("ZoomLevel.QuarterMonth24px.Description", "Quarterly overview with monthly breakdown (24px/day)")]
+        [InlineData("ZoomLevel.QuarterMonth17px.Description", "Medium quarterly view with monthly periods (17px/day)")]
+        [InlineData("ZoomLevel.Month12px.Description", "Monthly view with compact layout (12px/day)")]
+        [InlineData("ZoomLevel.Month8px.Description", "Annual overview with monthly breakdown (8px/day)")]
+        [InlineData("ZoomLevel.YearQuarter6px.Description", "Medium annual view with quarterly periods (6px/day)")]
+        [InlineData("ZoomLevel.YearQuarter4px.Description", "Extended multi-year planning with quarterly markers (4px/day)")]
+        [InlineData("ZoomLevel.YearQuarter3px.Description", "Long-term strategic view with minimum day width (3px/day)")]
         public void T_ZoomDescriptions_English_ReturnsCorrectTranslation(string key, string expected)
         {
             // Arrange
@@ -419,19 +413,17 @@ namespace GanttComponents.Tests.Unit.Services
         }
 
         [Theory]
-        [InlineData("ZoomLevel.WeekDay.Description", "带周上下文的每日冲刺规划 (60px/天)")]
-        [InlineData("ZoomLevel.WeekDayMedium.Description", "具有每日粒度的中等周视图 (45px/天)")]
-        [InlineData("ZoomLevel.WeekDayLow.Description", "带每日跟踪的紧凑周视图 (35px/天)")]
-        [InlineData("ZoomLevel.MonthWeek.Description", "带周分解的月度概览 (25px/天)")]
-        [InlineData("ZoomLevel.MonthWeekMedium.Description", "具有周期的中等月度视图 (20px/天)")]
-        [InlineData("ZoomLevel.MonthWeekLow.Description", "具有周期的紧凑月度视图 (18px/天)")]
-        [InlineData("ZoomLevel.QuarterMonth.Description", "带月分解的季度概览 (15px/天)")]
-        [InlineData("ZoomLevel.QuarterMonthMedium.Description", "具有月周期的中等季度视图 (12px/天)")]
-        [InlineData("ZoomLevel.QuarterMonthLow.Description", "带月标记的紧凑季度视图 (10px/天)")]
-        [InlineData("ZoomLevel.YearQuarter.Description", "带季度分解的年度概览 (8px/天)")]
-        [InlineData("ZoomLevel.YearQuarterMedium.Description", "具有季度周期的中等年度视图 (6.5px/天)")]
-        [InlineData("ZoomLevel.YearQuarterLow.Description", "带季度标记的扩展多年规划 (5px/天)")]
-        [InlineData("ZoomLevel.YearQuarterMin.Description", "具有最小日宽度的长期战略视图 (3px/天)")]
+        [InlineData("ZoomLevel.WeekDay97px.Description", "带周上下文的每日冲刺规划 (97px/天)")]
+        [InlineData("ZoomLevel.WeekDay68px.Description", "具有每日粒度的中等周视图 (68px/天)")]
+        [InlineData("ZoomLevel.MonthDay48px.Description", "带日分解的月度概览 (48px/天)")]
+        [InlineData("ZoomLevel.MonthDay34px.Description", "具有日周期的中等月度视图 (34px/天)")]
+        [InlineData("ZoomLevel.QuarterMonth24px.Description", "带月分解的季度概览 (24px/天)")]
+        [InlineData("ZoomLevel.QuarterMonth17px.Description", "具有月周期的中等季度视图 (17px/天)")]
+        [InlineData("ZoomLevel.Month12px.Description", "紧凑月度视图 (12px/天)")]
+        [InlineData("ZoomLevel.Month8px.Description", "带月分解的年度概览 (8px/天)")]
+        [InlineData("ZoomLevel.YearQuarter6px.Description", "具有季度周期的中等年度视图 (6px/天)")]
+        [InlineData("ZoomLevel.YearQuarter4px.Description", "带季度标记的扩展多年规划 (4px/天)")]
+        [InlineData("ZoomLevel.YearQuarter3px.Description", "具有最小日宽度的长期战略视图 (3px/天)")]
         public void T_ZoomDescriptions_Chinese_ReturnsCorrectTranslation(string key, string expected)
         {
             // Arrange
@@ -570,8 +562,8 @@ namespace GanttComponents.Tests.Unit.Services
             // Act
             var result = _i18nService.GetAllZoomLevelInfo();
 
-            // Assert - Our new 13-level system 
-            Assert.Equal(13, result.Count);
+            // Assert - Our new 11-level system 
+            Assert.Equal(11, result.Count);
 
             // WeekDay pattern (2 levels)
             Assert.True(result.ContainsKey(TimelineZoomLevel.WeekDay97px));

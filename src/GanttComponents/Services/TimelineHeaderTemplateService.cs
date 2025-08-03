@@ -17,65 +17,49 @@ namespace GanttComponents.Services;
 public static class TimelineHeaderTemplateService
 {
     /// <summary>
-    /// Predefined header templates for all 13 zoom levels.
+    /// Predefined header templates for all 11 zoom levels.
     /// Each template is optimized for its specific day width and use case.
-    /// Based on GanttResources.resx specifications.
+    /// Based on GanttResources.resx specifications with integral pixel widths.
     /// </summary>
     private static readonly Dictionary<TimelineZoomLevel, TimelineHeaderTemplate> _templates =
         new Dictionary<TimelineZoomLevel, TimelineHeaderTemplate>
         {
-            // WeekDay Pattern Levels (Week → Day) - 60px, 45px, 35px
-            [TimelineZoomLevel.WeekDay] = TimelineHeaderTemplate.Create(
+            // Week→Day Pattern Levels (Week → Day) - 97px, 68px
+            [TimelineZoomLevel.WeekDay97px] = TimelineHeaderTemplate.Create(
                 TimelineHeaderUnit.Week,
-                "date.week-range",          // "Feb 15, 2025" - top tier: week start with month-year
+                "date.week-range",          // "Feb 17-23, 2025" - top tier: week range with year
                 TimelineHeaderUnit.Day,
                 "date.day-name-short",      // "Mon", "Tue", "Wed" - bottom tier: day abbreviations
                 "Daily sprint planning with weekly context"
             ),
 
-            [TimelineZoomLevel.WeekDayMedium] = TimelineHeaderTemplate.Create(
+            [TimelineZoomLevel.WeekDay68px] = TimelineHeaderTemplate.Create(
                 TimelineHeaderUnit.Week,
-                "date.week-range",          // "Feb 15, 2025" - top tier: week start with month-year
+                "date.week-range",          // "Feb 17-23, 2025" - top tier: week range with year
                 TimelineHeaderUnit.Day,
-                "date.day-number",          // "1", "2", "3" - bottom tier: day numbers
-                "Medium weekly view with daily granularity"
+                "date.day-number",          // "17", "18", "19" - bottom tier: day numbers
+                "Weekly view with daily granularity"
             ),
 
-            [TimelineZoomLevel.WeekDayLow] = TimelineHeaderTemplate.Create(
-                TimelineHeaderUnit.Week,
-                "date.week-range",          // "Dec 30, 2024" - top tier: week start with month-year
-                TimelineHeaderUnit.Day,
-                "date.day-number",          // "1", "2", "3" - bottom tier: day numbers
-                "Compact weekly view with daily tracking"
-            ),
-
-            // MonthWeek Pattern Levels (Month → Week) - 25px, 20px, 18px
-            [TimelineZoomLevel.MonthWeek] = TimelineHeaderTemplate.Create(
+            // Month→Day Pattern Levels (Month → Day) - 48px, 34px
+            [TimelineZoomLevel.MonthDay48px] = TimelineHeaderTemplate.Create(
                 TimelineHeaderUnit.Month,
-                "date.month-year",          // "Feb 2025" - top tier: month with year
-                TimelineHeaderUnit.Week,
-                "date.week-start-day",      // "1 Feb", "8 Feb" - bottom tier: week start dates
-                "Monthly overview with weekly breakdown"
+                "date.month-year",          // "February 2025" - top tier: month with year
+                TimelineHeaderUnit.Day,
+                "date.day-number",          // "17", "18", "19", "20", "21" - bottom tier: day numbers
+                "Monthly overview with daily breakdown"
             ),
 
-            [TimelineZoomLevel.MonthWeekMedium] = TimelineHeaderTemplate.Create(
+            [TimelineZoomLevel.MonthDay34px] = TimelineHeaderTemplate.Create(
                 TimelineHeaderUnit.Month,
                 "date.month-abbrev",        // "Feb", "Mar" - top tier: month abbreviations
-                TimelineHeaderUnit.Week,
-                "date.week-start",          // "1", "8", "15" - bottom tier: week start day numbers
-                "Medium monthly view with weekly periods"
+                TimelineHeaderUnit.Day,
+                "date.day-number",          // "17", "18", "19" - bottom tier: day numbers
+                "Compact monthly view with daily tracking"
             ),
 
-            [TimelineZoomLevel.MonthWeekLow] = TimelineHeaderTemplate.Create(
-                TimelineHeaderUnit.Month,
-                "date.month-abbrev",        // "Feb", "Mar" - top tier: month abbreviations
-                TimelineHeaderUnit.Week,
-                "date.week-start",          // "1", "8", "15" - bottom tier: week start day numbers
-                "Compact monthly view with weekly periods"
-            ),
-
-            // QuarterMonth Pattern Levels (Quarter → Month) - 15px, 12px, 10px
-            [TimelineZoomLevel.QuarterMonth] = TimelineHeaderTemplate.Create(
+            // Quarter→Month Pattern Levels (Quarter → Month) - 24px, 17px
+            [TimelineZoomLevel.QuarterMonth24px] = TimelineHeaderTemplate.Create(
                 TimelineHeaderUnit.Quarter,
                 "date.quarter-year",        // "Q1 2025" - top tier: quarter with year
                 TimelineHeaderUnit.Month,
@@ -83,48 +67,49 @@ public static class TimelineHeaderTemplateService
                 "Quarterly overview with monthly breakdown"
             ),
 
-            [TimelineZoomLevel.QuarterMonthMedium] = TimelineHeaderTemplate.Create(
+            [TimelineZoomLevel.QuarterMonth17px] = TimelineHeaderTemplate.Create(
                 TimelineHeaderUnit.Quarter,
                 "date.quarter-short",       // "Q1", "Q2" - top tier: quarter abbreviations  
                 TimelineHeaderUnit.Month,
                 "date.month-abbrev",        // "Jan", "Feb", "Mar" - bottom tier: month abbreviations
-                "Medium quarterly view with monthly periods"
+                "Compact quarterly view with monthly periods"
             ),
 
-            [TimelineZoomLevel.QuarterMonthLow] = TimelineHeaderTemplate.Create(
-                TimelineHeaderUnit.Quarter,
-                "date.quarter-short",       // "Q1", "Q2" - top tier: quarter abbreviations
+            // Month-only Pattern Levels (Month-only) - 12px, 8px
+            [TimelineZoomLevel.Month12px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Year,
+                "date.year",                // "2025" - top tier: full years
                 TimelineHeaderUnit.Month,
-                "date.month-abbrev",        // "Jan", "Feb", "Mar" - bottom tier: month abbreviations
-                "Compact quarterly view with monthly markers"
+                "date.month-abbrev",        // "Jan", "Feb", "Mar", "Apr", "May" - bottom tier: month abbreviations
+                "Annual overview with monthly breakdown"
             ),
 
-            // YearQuarter Pattern Levels (Year → Quarter) - 8px, 6.5px, 5px, 3px
-            [TimelineZoomLevel.YearQuarter] = TimelineHeaderTemplate.Create(
+            [TimelineZoomLevel.Month8px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Year,
+                "date.year",                // "2025" - top tier: full years
+                TimelineHeaderUnit.Month,
+                "date.month-abbrev",        // "Jan", "Feb", "Mar", "Apr", "May" - bottom tier: month abbreviations
+                "Compact annual view with monthly periods"
+            ),
+
+            // Year→Quarter Pattern Levels (Year → Quarter) - 6px, 4px, 3px
+            [TimelineZoomLevel.YearQuarter6px] = TimelineHeaderTemplate.Create(
                 TimelineHeaderUnit.Year,
                 "date.year",                // "2025", "2026" - top tier: full years
                 TimelineHeaderUnit.Quarter,
                 "date.quarter-short",       // "Q1", "Q2", "Q3", "Q4" - bottom tier: quarter abbreviations
-                "Annual overview with quarterly breakdown"
+                "Multi-year overview with quarterly breakdown"
             ),
 
-            [TimelineZoomLevel.YearQuarterMedium] = TimelineHeaderTemplate.Create(
+            [TimelineZoomLevel.YearQuarter4px] = TimelineHeaderTemplate.Create(
                 TimelineHeaderUnit.Year,
                 "date.year",                // "2025", "2026" - top tier: full years
                 TimelineHeaderUnit.Quarter,
                 "date.quarter-minimal",     // "1", "2", "3", "4" - bottom tier: quarter numbers
-                "Medium annual view with quarterly periods"
+                "Extended multi-year view with quarterly periods"
             ),
 
-            [TimelineZoomLevel.YearQuarterLow] = TimelineHeaderTemplate.Create(
-                TimelineHeaderUnit.Year,
-                "date.year-short",          // "25", "26" - top tier: year abbreviations
-                TimelineHeaderUnit.Quarter,
-                "date.quarter-minimal",     // "1", "2", "3", "4" - bottom tier: quarter numbers
-                "Extended multi-year planning with quarterly markers"
-            ),
-
-            [TimelineZoomLevel.YearQuarterMin] = TimelineHeaderTemplate.Create(
+            [TimelineZoomLevel.YearQuarter3px] = TimelineHeaderTemplate.Create(
                 TimelineHeaderUnit.Year,
                 "date.year-short",          // "25", "26" - top tier: year abbreviations
                 TimelineHeaderUnit.Quarter,

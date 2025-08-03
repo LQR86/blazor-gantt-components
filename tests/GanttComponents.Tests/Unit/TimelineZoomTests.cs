@@ -107,16 +107,16 @@ public class TimelineZoomTests
         var (level, factor) = TimelineZoomService.GetDefaultZoomSettings();
         var dayWidth = TimelineZoomService.CalculateEffectiveDayWidth(level, factor);
 
-        // Assert - In preset-only system, factor is always 1.0, but effective day width remains 40px
-        Assert.Equal(TimelineZoomLevel.MonthDay48px, level);
+        // Assert - In 11-level system, QuarterMonth24px is the default
+        Assert.Equal(TimelineZoomLevel.QuarterMonth24px, level);
         Assert.Equal(1.0, factor); // Preset-only: factors are always 1.0
-        Assert.Equal(48.0, dayWidth, precision: 1); // Day width at 48px for MonthDay48px
+        Assert.Equal(24.0, dayWidth, precision: 1); // Day width at 24px for QuarterMonth24px
     }
 
     [Theory]
     [InlineData(1.0, TimelineZoomLevel.WeekDay97px, 1.0, true)]      // 97px wide = visible 
     [InlineData(0.1, TimelineZoomLevel.WeekDay97px, 1.0, false)]     // 9.7px wide = hidden 
-    [InlineData(1.0, TimelineZoomLevel.Month8px, 1.0, true)]         // 8px wide = visible 
+    [InlineData(1.0, TimelineZoomLevel.Month8px, 1.0, false)]        // 8px wide = hidden (below 12px threshold) 
     [InlineData(0.8, TimelineZoomLevel.YearQuarter3px, 1.0, false)]  // 2.4px wide = hidden
     [InlineData(5.0, TimelineZoomLevel.YearQuarter3px, 1.0, true)]   // 15px wide = visible (3*5)
     [InlineData(0.2, TimelineZoomLevel.MonthDay48px, 1.6, false)]    // 8px wide = hidden (40px * 0.2)
@@ -187,9 +187,9 @@ public class TimelineZoomTests
         // Act
         var config = TimelineZoomService.GetConfiguration(invalidLevel);
 
-        // Assert - Should return default configuration with preset-only base width
+        // Assert - Should return default configuration (QuarterMonth24px in 11-level system)
         Assert.Equal(TaskDisplayConstants.DEFAULT_ZOOM_LEVEL, config.Level);
-        Assert.Equal(48.0, config.BaseDayWidth); // MonthDay integral pixel base width
+        Assert.Equal(24.0, config.BaseDayWidth); // QuarterMonth24px integral pixel base width
     }
 
     [Theory]

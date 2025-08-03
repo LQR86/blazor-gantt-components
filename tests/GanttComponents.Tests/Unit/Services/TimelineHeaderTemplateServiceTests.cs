@@ -112,7 +112,7 @@ public class TimelineHeaderTemplateServiceTests
         var allTemplates = TimelineHeaderTemplateService.GetAllTemplates();
 
         // Assert
-        Assert.Equal(13, allTemplates.Count);
+        Assert.Equal(11, allTemplates.Count); // 11-level system has 11 templates
 
         // Verify all zoom levels are covered
         var allZoomLevels = Enum.GetValues<TimelineZoomLevel>();

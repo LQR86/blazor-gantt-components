@@ -53,11 +53,11 @@ public class TimelineHeaderAdapterTests
         // Act
         var config = TimelineHeaderAdapter.GetHeaderConfiguration(zoomLevel, effectiveDayWidth);
 
-        // Assert
+        // Assert - MonthDay48px in 11-level system: Month→Day
         Assert.Equal(TimelineHeaderUnit.Month, config.PrimaryUnit);
         Assert.Equal("date.month-year", config.PrimaryFormat);
-        Assert.Equal(TimelineHeaderUnit.Week, config.SecondaryUnit);
-        Assert.Equal("date.week-start-day", config.SecondaryFormat);
+        Assert.Equal(TimelineHeaderUnit.Day, config.SecondaryUnit);
+        Assert.Equal("date.day-number", config.SecondaryFormat);
     }
 
     [Fact]

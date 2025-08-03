@@ -23,10 +23,6 @@ public static class TimelineHeaderAdapter
         // Get preset template for this zoom level
         var template = TimelineHeaderTemplateService.GetTemplate(zoomLevel);
 
-        // Debug logging
-        logger?.LogDebugInfo($"TEMPLATE DEBUG: ZoomLevel: {zoomLevel}, PrimaryUnit: {template.PrimaryUnit}, SecondaryUnit: {template.SecondaryUnit}");
-        logger?.LogDebugInfo($"TEMPLATE FORMATS: Primary: {template.PrimaryFormat}, Secondary: {template.SecondaryFormat}");
-
         // Convert template to configuration structure
         return new TimelineHeaderConfiguration
         {
@@ -251,12 +247,6 @@ public static class TimelineHeaderAdapter
             _ => throw new ArgumentOutOfRangeException(nameof(unit))
         };
 
-        // Debug logging for week calculations
-        if (unit == TimelineHeaderUnit.Week)
-        {
-            logger?.LogDebugInfo($"GetPeriodStart DEBUG: Input date: {date:yyyy-MM-dd (ddd)}, Week start: {result:yyyy-MM-dd (ddd)}");
-        }
-
         return result;
     }
 
@@ -286,8 +276,6 @@ public static class TimelineHeaderAdapter
         // DayOfWeek: Sunday=0, Monday=1, Tuesday=2, ..., Saturday=6
         int daysFromMonday = ((int)date.DayOfWeek + 6) % 7; // Convert to Monday-based week
         var result = date.Date.AddDays(-daysFromMonday);
-
-        logger?.LogDebugInfo($"GetMondayWeekStart DEBUG: Input: {date:yyyy-MM-dd (ddd)}, DaysFromMonday: {daysFromMonday}, Result: {result:yyyy-MM-dd (ddd)}");
 
         return result;
     }

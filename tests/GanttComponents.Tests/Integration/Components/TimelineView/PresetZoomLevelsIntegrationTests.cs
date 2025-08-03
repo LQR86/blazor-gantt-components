@@ -301,16 +301,16 @@ public class PresetZoomLevelsIntegrationTests
             Assert.True(timelineHeight > 0, $"Timeline height should be positive for {level}");
 
             // Performance consideration - very wide timelines might cause issues
-            if (level == TimelineZoomLevel.WeekDay)
+            if (level == TimelineZoomLevel.WeekDay97px)
             {
-                // WeekDay level for 6-month project: ~17,664px width (184 days * 96px) - should be manageable
-                Assert.True(timelineWidth < 25000, "WeekDay zoom should not create excessively wide timelines");
+                // WeekDay97px level for 6-month project: ~17,664px width (184 days * 96px) - should be manageable
+                Assert.True(timelineWidth < 25000, "WeekDay97px zoom should not create excessively wide timelines");
             }
 
-            if (level == TimelineZoomLevel.YearQuarter)
+            if (level == TimelineZoomLevel.Month8px)
             {
-                // YearQuarter level should maintain minimum usability
-                Assert.True(timelineWidth > 500, "YearQuarter zoom should maintain minimum timeline width");
+                // Month8px level should maintain minimum usability
+                Assert.True(timelineWidth > 500, "Month8px zoom should maintain minimum timeline width");
             }
         }
     }

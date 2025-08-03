@@ -21,7 +21,7 @@ public class PresetOnlyZoomValidationTests
     public void PresetOnlySystem_AllZoomFactors_ClampedToOne(double inputFactor, double expectedFactor)
     {
         // Arrange - Test with WeekDay level (should behave same for all levels in preset-only)
-        var level = TimelineZoomLevel.WeekDay;
+        var level = TimelineZoomLevel.WeekDay97px;
 
         // Act - Clamp the zoom factor using preset-only system
         var actualFactor = TimelineZoomService.ClampZoomFactor(level, inputFactor);
@@ -31,11 +31,10 @@ public class PresetOnlyZoomValidationTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 96.0)]        // 60 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.MonthDay, 40.0)]       // 25 * 1.6 backward compatibility  
-    [InlineData(TimelineZoomLevel.MonthWeek, 24.0)]      // 15 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.QuarterMonth, 8.0)]    // 5 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.YearQuarter, 3.0)]     // 3px minimum constraint
+    [InlineData(TimelineZoomLevel.WeekDay97px, 97.0)]        // 11-level integral: 97px
+    [InlineData(TimelineZoomLevel.MonthDay48px, 48.0)]       // 11-level integral: 48px  
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 24.0)]    // 11-level integral: 24px
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 6.0)]     // 11-level integral: 6px
     public void PresetOnlySystem_AllLevels_ConsistentDayWidthRegardlessOfFactor(TimelineZoomLevel level, double expectedDayWidth)
     {
         // Arrange - Test various zoom factors that should all produce same result

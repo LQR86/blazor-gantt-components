@@ -1,0 +1,579 @@
+@page "/timeline-header-template-validation"
+@using GanttComponents.Components.GanttComposer
+@using GanttComponents.Components.TimelineView
+@using GanttComponents.Models
+@using GanttComponents.Services
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Timeline Header Template Validation</PageTitle>
+
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h4 mb-3">🧪 Timeline Header Template Validation</h1>
+            <p class="text-muted mb-4">
+                Interactive validation of the preset header template system across all zoom levels.
+                This validates header format correctness, template availability, and visual behavior.
+            </p>
+        </div>
+    </div>
+
+    <!-- Test Status Dashboard -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">🎭 Test Status Dashboard</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="card border-@(GetStatusColor(TemplateAvailabilityTestStatus))">
+                                <div class="card-body text-center">
+                                    <div class="badge bg-@(GetStatusColor(TemplateAvailabilityTestStatus)) mb-2">
+                                        @GetTestStatusText(TemplateAvailabilityTestStatus)
+                                    </div>
+                                    <div>Template Availability</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-@(GetStatusColor(FormatCorrectnessTestStatus))">
+                                <div class="card-body text-center">
+                                    <div class="badge bg-@(GetStatusColor(FormatCorrectnessTestStatus)) mb-2">
+                                        @GetTestStatusText(FormatCorrectnessTestStatus)
+                                    </div>
+                                    <div>Format Correctness</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-@(GetStatusColor(ZoomLevelMappingTestStatus))">
+                                <div class="card-body text-center">
+                                    <div class="badge bg-@(GetStatusColor(ZoomLevelMappingTestStatus)) mb-2">
+                                        @GetTestStatusText(ZoomLevelMappingTestStatus)
+                                    </div>
+                                    <div>Zoom Level Mapping</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-@(GetStatusColor(PerformanceTestStatus))">
+                                <div class="card-body text-center">
+                                    <div class="badge bg-@(GetStatusColor(PerformanceTestStatus)) mb-2">
+                                        @GetTestStatusText(PerformanceTestStatus)
+                                    </div>
+                                    <div>Performance</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Controls -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">⚡ Test Execution Controls</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <button @onclick="RunAllTests" disabled="@IsRunningTests" class="btn btn-primary w-100">
+                                @if (IsRunningTests)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+                                🧪 Run All Validation Tests
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button @onclick="ClearResults" disabled="@IsRunningTests" class="btn btn-outline-secondary w-100">
+                                🗑️ Clear Test Results
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-3">
+                            <button @onclick="RunTemplateAvailabilityTest" disabled="@IsRunningTests" class="btn btn-outline-primary w-100">
+                                Template Availability
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button @onclick="RunFormatCorrectnessTest" disabled="@IsRunningTests" class="btn btn-outline-primary w-100">
+                                Format Correctness
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button @onclick="RunZoomLevelMappingTest" disabled="@IsRunningTests" class="btn btn-outline-primary w-100">
+                                Zoom Mapping
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button @onclick="RunPerformanceTest" disabled="@IsRunningTests" class="btn btn-outline-primary w-100">
+                                Performance
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Template Display -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">📋 Current Template Preview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Zoom Level:</label>
+                            <select @onchange="OnZoomLevelChanged" class="form-select">
+                                @foreach (var zoomLevel in Enum.GetValues<TimelineZoomLevel>())
+                                {
+                                    <option value="@zoomLevel" selected="@(zoomLevel == CurrentZoomLevel)">
+                                        @zoomLevel (@($"{(int)zoomLevel}px"))
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            @if (CurrentTemplate != null)
+                            {
+                                <div class="mt-3">
+                                    <strong>Template Info:</strong><br />
+                                    Primary: @CurrentTemplate.PrimaryUnit (@CurrentTemplate.PrimaryFormat)<br />
+                                    Secondary: @CurrentTemplate.SecondaryUnit (@CurrentTemplate.SecondaryFormat)<br />
+                                    Description: @CurrentTemplate.Description
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    @if (PerformanceData != null)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">📊 Performance Metrics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="h3 text-primary">@PerformanceData.TemplateRetrievalTime ms</div>
+                                <div class="text-muted">Template Retrieval</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="h3 text-success">@PerformanceData.FormatProcessingTime ms</div>
+                                <div class="text-muted">Format Processing</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="h3 text-info">@PerformanceData.TotalProcessingTime ms</div>
+                                <div class="text-muted">Total Processing</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="h3 text-@(PerformanceData.TotalProcessingTime < 10 ? "success" : "warning")">
+                                    @(PerformanceData.TotalProcessingTime < 10 ? "✅" : "⚠️")
+                                </div>
+                                <div class="text-muted">Performance Target (&lt;10ms)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Test Results -->
+    @if (TestResults.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">📈 Test Results History</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Test Name</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Duration</th>
+                                        <th>Details</th>
+                                        <th>Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var result in TestResults.OrderByDescending(r => r.Timestamp))
+                                    {
+                                        <tr class="@(result.Success ? "table-success" : "table-danger")">
+                                            <td>@result.TestName</td>
+                                            <td>@result.Category</td>
+                                            <td>
+                                                <span class="badge bg-@(result.Success ? "success" : "danger")">
+                                                    @(result.Success ? "✅ PASS" : "❌ FAIL")
+                                                </span>
+                                            </td>
+                                            <td>@result.Duration ms</td>
+                                            <td>@result.Details</td>
+                                            <td>@result.Timestamp.ToString("HH:mm:ss")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    // Test Status Properties
+    private TestStatus TemplateAvailabilityTestStatus = TestStatus.NotRun;
+    private TestStatus FormatCorrectnessTestStatus = TestStatus.NotRun;
+    private TestStatus ZoomLevelMappingTestStatus = TestStatus.NotRun;
+    private TestStatus PerformanceTestStatus = TestStatus.NotRun;
+
+    // UI State
+    private bool IsRunningTests = false;
+    private TimelineZoomLevel CurrentZoomLevel = TimelineZoomLevel.QuarterMonth24px;
+    private TimelineHeaderTemplate? CurrentTemplate = null;
+
+    // Test Results
+    private List<TestResult> TestResults = new();
+    private PerformanceMetrics? PerformanceData = null;
+
+    // Test Status Enum
+    private enum TestStatus { NotRun, Running, Passed, Failed }
+
+    // Models
+    private class TestResult
+    {
+        public string TestName { get; set; } = "";
+        public string Category { get; set; } = "";
+        public bool Success { get; set; }
+        public int Duration { get; set; }
+        public string Details { get; set; } = "";
+        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    }
+
+    private class PerformanceMetrics
+    {
+        public int TemplateRetrievalTime { get; set; }
+        public int FormatProcessingTime { get; set; }
+        public int TotalProcessingTime { get; set; }
+    }
+
+    protected override void OnInitialized()
+    {
+        LoadCurrentTemplate();
+    }
+
+    private void LoadCurrentTemplate()
+    {
+        CurrentTemplate = TimelineHeaderTemplateService.GetTemplate(CurrentZoomLevel);
+        StateHasChanged();
+    }
+
+    private void OnZoomLevelChanged(ChangeEventArgs e)
+    {
+        if (Enum.TryParse<TimelineZoomLevel>(e.Value?.ToString(), out var zoomLevel))
+        {
+            CurrentZoomLevel = zoomLevel;
+            LoadCurrentTemplate();
+        }
+    }
+
+    private async Task RunAllTests()
+    {
+        IsRunningTests = true;
+        ClearResults();
+
+        try
+        {
+            await RunTemplateAvailabilityTest();
+            await Task.Delay(100);
+            await RunFormatCorrectnessTest();
+            await Task.Delay(100);
+            await RunZoomLevelMappingTest();
+            await Task.Delay(100);
+            await RunPerformanceTest();
+        }
+        finally
+        {
+            IsRunningTests = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task RunTemplateAvailabilityTest()
+    {
+        TemplateAvailabilityTestStatus = TestStatus.Running;
+        StateHasChanged();
+
+        var startTime = DateTime.UtcNow;
+        var allPassed = true;
+
+        try
+        {
+            var allZoomLevels = Enum.GetValues<TimelineZoomLevel>();
+            
+            foreach (var zoomLevel in allZoomLevels)
+            {
+                var template = TimelineHeaderTemplateService.GetTemplate(zoomLevel);
+                var templateExists = template != null;
+                
+                RecordTestResult(
+                    "Template Availability", 
+                    zoomLevel.ToString(), 
+                    templateExists,
+                    templateExists ? $"Template found for {zoomLevel}" : $"No template for {zoomLevel}"
+                );
+
+                allPassed &= templateExists;
+            }
+
+            TemplateAvailabilityTestStatus = allPassed ? TestStatus.Passed : TestStatus.Failed;
+        }
+        catch (Exception ex)
+        {
+            RecordTestResult("Template Availability", "Exception", false, ex.Message);
+            TemplateAvailabilityTestStatus = TestStatus.Failed;
+        }
+
+        await Task.Delay(1); // Make async
+        StateHasChanged();
+    }
+
+    private async Task RunFormatCorrectnessTest()
+    {
+        FormatCorrectnessTestStatus = TestStatus.Running;
+        StateHasChanged();
+
+        var allPassed = true;
+
+        try
+        {
+            var allZoomLevels = Enum.GetValues<TimelineZoomLevel>();
+            
+            foreach (var zoomLevel in allZoomLevels)
+            {
+                var template = TimelineHeaderTemplateService.GetTemplate(zoomLevel);
+                if (template == null) continue;
+
+                // Validate format strings are not empty
+                var primaryFormatValid = !string.IsNullOrWhiteSpace(template.PrimaryFormat);
+                var secondaryFormatValid = !string.IsNullOrWhiteSpace(template.SecondaryFormat);
+                var formatValid = primaryFormatValid && secondaryFormatValid;
+
+                RecordTestResult(
+                    "Format Correctness", 
+                    zoomLevel.ToString(), 
+                    formatValid,
+                    formatValid ? "Formats valid" : "Invalid format strings"
+                );
+
+                allPassed &= formatValid;
+            }
+
+            FormatCorrectnessTestStatus = allPassed ? TestStatus.Passed : TestStatus.Failed;
+        }
+        catch (Exception ex)
+        {
+            RecordTestResult("Format Correctness", "Exception", false, ex.Message);
+            FormatCorrectnessTestStatus = TestStatus.Failed;
+        }
+
+        await Task.Delay(1); // Make async
+        StateHasChanged();
+    }
+
+    private async Task RunZoomLevelMappingTest()
+    {
+        ZoomLevelMappingTestStatus = TestStatus.Running;
+        StateHasChanged();
+
+        var allPassed = true;
+
+        try
+        {
+            var allZoomLevels = Enum.GetValues<TimelineZoomLevel>();
+            
+            foreach (var zoomLevel in allZoomLevels)
+            {
+                var template = TimelineHeaderTemplateService.GetTemplate(zoomLevel);
+                if (template == null) continue;
+
+                // Validate template has appropriate granularity for zoom level
+                var pixelWidth = (int)zoomLevel;
+                var isWideZoom = pixelWidth >= 60; // Wide zoom levels
+                var isNarrowZoom = pixelWidth <= 12; // Narrow zoom levels
+
+                var mappingCorrect = true;
+                var details = "";
+
+                if (isWideZoom)
+                {
+                    // Wide zoom should have detailed formats
+                    mappingCorrect = template.PrimaryUnit != TimelineHeaderUnit.Year || 
+                                   template.SecondaryUnit != TimelineHeaderUnit.Year;
+                    details = mappingCorrect ? "Wide zoom has detailed format" : "Wide zoom format too coarse";
+                }
+                else if (isNarrowZoom)
+                {
+                    // Narrow zoom should have simpler formats  
+                    mappingCorrect = template.PrimaryUnit != TimelineHeaderUnit.Day;
+                    details = mappingCorrect ? "Narrow zoom has appropriate format" : "Narrow zoom format too detailed";
+                }
+                else
+                {
+                    details = "Medium zoom level - format appropriate";
+                }
+
+                RecordTestResult(
+                    "Zoom Level Mapping", 
+                    zoomLevel.ToString(), 
+                    mappingCorrect,
+                    details
+                );
+
+                allPassed &= mappingCorrect;
+            }
+
+            ZoomLevelMappingTestStatus = allPassed ? TestStatus.Passed : TestStatus.Failed;
+        }
+        catch (Exception ex)
+        {
+            RecordTestResult("Zoom Level Mapping", "Exception", false, ex.Message);
+            ZoomLevelMappingTestStatus = TestStatus.Failed;
+        }
+
+        await Task.Delay(1); // Make async
+        StateHasChanged();
+    }
+
+    private async Task RunPerformanceTest()
+    {
+        PerformanceTestStatus = TestStatus.Running;
+        StateHasChanged();
+
+        var allPassed = true;
+
+        try
+        {
+            var allZoomLevels = Enum.GetValues<TimelineZoomLevel>();
+            
+            // Measure template retrieval performance
+            var retrievalStart = DateTime.UtcNow;
+            foreach (var zoomLevel in allZoomLevels)
+            {
+                var template = TimelineHeaderTemplateService.GetTemplate(zoomLevel);
+            }
+            var retrievalTime = (int)(DateTime.UtcNow - retrievalStart).TotalMilliseconds;
+
+            // Measure format processing performance (simulate)
+            var processingStart = DateTime.UtcNow;
+            foreach (var zoomLevel in allZoomLevels)
+            {
+                var template = TimelineHeaderTemplateService.GetTemplate(zoomLevel);
+                if (template != null)
+                {
+                    // Simulate format processing
+                    var testDate = DateTime.Today;
+                    var primaryText = template.PrimaryFormat;
+                    var secondaryText = template.SecondaryFormat;
+                }
+            }
+            var processingTime = (int)(DateTime.UtcNow - processingStart).TotalMilliseconds;
+
+            var totalTime = retrievalTime + processingTime;
+
+            PerformanceData = new PerformanceMetrics
+            {
+                TemplateRetrievalTime = retrievalTime,
+                FormatProcessingTime = processingTime,
+                TotalProcessingTime = totalTime
+            };
+
+            // Performance targets: < 10ms total
+            var performanceGood = totalTime < 10;
+
+            RecordTestResult(
+                "Performance", 
+                "All Zoom Levels", 
+                performanceGood,
+                $"Total: {totalTime}ms (Target: <10ms)"
+            );
+
+            PerformanceTestStatus = performanceGood ? TestStatus.Passed : TestStatus.Failed;
+            allPassed &= performanceGood;
+        }
+        catch (Exception ex)
+        {
+            RecordTestResult("Performance", "Exception", false, ex.Message);
+            PerformanceTestStatus = TestStatus.Failed;
+        }
+
+        await Task.Delay(1); // Make async
+        StateHasChanged();
+    }
+
+    private void RecordTestResult(string testName, string category, bool success, string details = "")
+    {
+        TestResults.Add(new TestResult
+        {
+            TestName = testName,
+            Category = category,
+            Success = success,
+            Details = details,
+            Timestamp = DateTime.UtcNow
+        });
+    }
+
+    private void ClearResults()
+    {
+        TestResults.Clear();
+        PerformanceData = null;
+        TemplateAvailabilityTestStatus = TestStatus.NotRun;
+        FormatCorrectnessTestStatus = TestStatus.NotRun;
+        ZoomLevelMappingTestStatus = TestStatus.NotRun;
+        PerformanceTestStatus = TestStatus.NotRun;
+        StateHasChanged();
+    }
+
+    private string GetStatusColor(TestStatus status) => status switch
+    {
+        TestStatus.NotRun => "secondary",
+        TestStatus.Running => "warning",
+        TestStatus.Passed => "success",
+        TestStatus.Failed => "danger",
+        _ => "secondary"
+    };
+
+    private string GetTestStatusText(TestStatus status) => status switch
+    {
+        TestStatus.NotRun => "Not Run",
+        TestStatus.Running => "Running...",
+        TestStatus.Passed => "PASSED",
+        TestStatus.Failed => "FAILED",
+        _ => "Unknown"
+    };
+}

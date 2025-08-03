@@ -9,7 +9,7 @@ public class TimelineHeaderAdapterTests
     public void GetHeaderConfiguration_WeekDayLevel_ReturnsCorrectConfiguration()
     {
         // Arrange
-        var zoomLevel = TimelineZoomLevel.WeekDay;
+        var zoomLevel = TimelineZoomLevel.WeekDay97px;
         var effectiveDayWidth = 60.0;
 
         // Act
@@ -28,7 +28,7 @@ public class TimelineHeaderAdapterTests
     public void GetHeaderConfiguration_MonthDayLevel_ReturnsCorrectConfiguration()
     {
         // Arrange
-        var zoomLevel = TimelineZoomLevel.MonthDay;
+        var zoomLevel = TimelineZoomLevel.WeekDay97px;
         var effectiveDayWidth = 25.0;
 
         // Act
@@ -47,17 +47,17 @@ public class TimelineHeaderAdapterTests
     public void GetHeaderConfiguration_MonthWeekLevel_ReturnsCorrectConfiguration()
     {
         // Arrange
-        var zoomLevel = TimelineZoomLevel.MonthWeek;
+        var zoomLevel = TimelineZoomLevel.MonthDay48px;
         var effectiveDayWidth = 15.0;
 
         // Act
         var config = TimelineHeaderAdapter.GetHeaderConfiguration(zoomLevel, effectiveDayWidth);
 
-        // Assert
-        Assert.Equal(TimelineHeaderUnit.Quarter, config.PrimaryUnit);
-        Assert.Equal("date.quarter-year", config.PrimaryFormat);
-        Assert.Equal(TimelineHeaderUnit.Month, config.SecondaryUnit);
-        Assert.Equal("date.month-short", config.SecondaryFormat);
+        // Assert - MonthDay48px in 11-level system: Month→Day
+        Assert.Equal(TimelineHeaderUnit.Month, config.PrimaryUnit);
+        Assert.Equal("date.month-year", config.PrimaryFormat);
+        Assert.Equal(TimelineHeaderUnit.Day, config.SecondaryUnit);
+        Assert.Equal("date.day-number", config.SecondaryFormat);
     }
 
     [Fact]

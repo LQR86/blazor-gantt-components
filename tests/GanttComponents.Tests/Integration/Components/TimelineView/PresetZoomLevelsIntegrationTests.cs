@@ -57,12 +57,10 @@ public class PresetZoomLevelsIntegrationTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 96.0)]           // 60 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.MonthDay, 40.0)]          // 25 * 1.6 backward compatibility  
-    [InlineData(TimelineZoomLevel.MonthWeek, 24.0)]         // 15 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.QuarterWeek, 12.8)]       // 8 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.QuarterMonth, 8.0)]       // 5 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.YearQuarter, 3.0)]        // Maintains 3px minimum constraint
+    [InlineData(TimelineZoomLevel.WeekDay97px, 97.0)]           // 11-level integral: 97px
+    [InlineData(TimelineZoomLevel.MonthDay48px, 48.0)]          // 11-level integral: 48px  
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 24.0)]       // 11-level integral: 24px
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 6.0)]        // 11-level integral: 6px
     public void AllPresetZoomLevels_WithBaseFactor_ShouldRenderWithCorrectDayWidths(
         TimelineZoomLevel zoomLevel, double expectedDayWidth)
     {
@@ -78,12 +76,10 @@ public class PresetZoomLevelsIntegrationTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 1.5, 96.0)]     // Preset-only: factor clamped to 1.0, so 96 * 1.0 = 96
-    [InlineData(TimelineZoomLevel.MonthDay, 1.6, 40.0)]    // Preset-only: factor clamped to 1.0, so 40 * 1.0 = 40  
-    [InlineData(TimelineZoomLevel.MonthWeek, 2.0, 24.0)]   // Preset-only: factor clamped to 1.0, so 24 * 1.0 = 24
-    [InlineData(TimelineZoomLevel.QuarterWeek, 2.5, 12.8)] // Preset-only: factor clamped to 1.0, so 12.8 * 1.0 = 12.8
-    [InlineData(TimelineZoomLevel.QuarterMonth, 3.0, 8.0)] // Preset-only: factor clamped to 1.0, so 8 * 1.0 = 8
-    [InlineData(TimelineZoomLevel.YearQuarter, 2.0, 3.0)]  // Preset-only: factor clamped to 1.0, so 3 * 1.0 = 3
+    [InlineData(TimelineZoomLevel.WeekDay97px, 1.5, 97.0)]     // Preset-only: factor clamped to 1.0, so 97 * 1.0 = 97
+    [InlineData(TimelineZoomLevel.MonthDay48px, 1.6, 48.0)]    // Preset-only: factor clamped to 1.0, so 48 * 1.0 = 48
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 2.5, 24.0)] // Preset-only: factor clamped to 1.0, so 24 * 1.0 = 24
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 2.0, 6.0)]  // Preset-only: factor clamped to 1.0, so 6 * 1.0 = 6
     public void AllPresetZoomLevels_WithVariousFactors_ShouldScaleCorrectly(
         TimelineZoomLevel zoomLevel, double factor, double expectedDayWidth)
     {
@@ -104,12 +100,10 @@ public class PresetZoomLevelsIntegrationTests
         var factor = 1.0;
         var allLevels = new[]
         {
-            TimelineZoomLevel.WeekDay,
-            TimelineZoomLevel.MonthDay,
-            TimelineZoomLevel.MonthWeek,
-            TimelineZoomLevel.QuarterWeek,
-            TimelineZoomLevel.QuarterMonth,
-            TimelineZoomLevel.YearQuarter
+            TimelineZoomLevel.WeekDay97px,
+            TimelineZoomLevel.MonthDay48px,
+            TimelineZoomLevel.QuarterMonth24px,
+            TimelineZoomLevel.YearQuarter6px
         };
 
         // Act
@@ -121,16 +115,13 @@ public class PresetZoomLevelsIntegrationTests
         }
 
         // Assert - All day widths should be different
-        Assert.Equal(6, dayWidths.Distinct().Count());
+        Assert.Equal(4, dayWidths.Distinct().Count());
 
-        // Assert - Should be in descending order (WeekDay largest, YearQuarter smallest)
-        // Note: This test still uses the 6 main zoom levels for backward compatibility testing
-        Assert.Equal(96.0, dayWidths[0]);  // WeekDay: 60 * 1.6 backward compatibility
-        Assert.Equal(40.0, dayWidths[1]);  // MonthDay: 25 * 1.6 backward compatibility
-        Assert.Equal(24.0, dayWidths[2]);  // MonthWeek: 15 * 1.6 backward compatibility
-        Assert.Equal(12.8, dayWidths[3]);  // QuarterWeek: 8 * 1.6 backward compatibility
-        Assert.Equal(8.0, dayWidths[4]);   // QuarterMonth: 5 * 1.6 backward compatibility
-        Assert.Equal(3.0, dayWidths[5]);   // YearQuarter: maintains 3px minimum constraint
+        // Assert - Should be in descending order (WeekDay97px largest, YearQuarter6px smallest)
+        Assert.Equal(97.0, dayWidths[0]);  // WeekDay97px: 11-level integral 97px
+        Assert.Equal(48.0, dayWidths[1]);  // MonthDay48px: 11-level integral 48px
+        Assert.Equal(24.0, dayWidths[2]);  // QuarterMonth24px: 11-level integral 24px
+        Assert.Equal(6.0, dayWidths[3]);  // YearQuarter6px: 11-level integral 6px
     }
 
     [Fact]
@@ -143,12 +134,12 @@ public class PresetZoomLevelsIntegrationTests
 
         var allLevels = new[]
         {
-            TimelineZoomLevel.WeekDay,
-            TimelineZoomLevel.MonthDay,
-            TimelineZoomLevel.MonthWeek,
-            TimelineZoomLevel.QuarterWeek,
-            TimelineZoomLevel.QuarterMonth,
-            TimelineZoomLevel.YearQuarter
+            TimelineZoomLevel.WeekDay97px,
+            TimelineZoomLevel.MonthDay48px,
+            TimelineZoomLevel.MonthDay48px,
+            TimelineZoomLevel.QuarterMonth24px,
+            TimelineZoomLevel.QuarterMonth24px,
+            TimelineZoomLevel.YearQuarter6px
         };
 
         // Act & Assert
@@ -176,22 +167,18 @@ public class PresetZoomLevelsIntegrationTests
 
         var allLevels = new[]
         {
-            TimelineZoomLevel.WeekDay,
-            TimelineZoomLevel.MonthDay,
-            TimelineZoomLevel.MonthWeek,
-            TimelineZoomLevel.QuarterWeek,
-            TimelineZoomLevel.QuarterMonth,
-            TimelineZoomLevel.YearQuarter
+            TimelineZoomLevel.WeekDay97px,
+            TimelineZoomLevel.MonthDay48px,
+            TimelineZoomLevel.QuarterMonth24px,
+            TimelineZoomLevel.Month8px
         };
 
         var expectedWidths = new[]
         {
-            totalDays * 96.0,  // WeekDay: ~10176px (60 * 1.6 backward compatibility)
-            totalDays * 40.0,  // MonthDay: ~4240px (25 * 1.6 backward compatibility)
-            totalDays * 24.0,  // MonthWeek: ~2544px (15 * 1.6 backward compatibility)
-            totalDays * 12.8,  // QuarterWeek: ~1356.8px (8 * 1.6 backward compatibility)
-            totalDays * 8.0,   // QuarterMonth: ~848px (5 * 1.6 backward compatibility)
-            totalDays * 3.0    // YearQuarter: ~318px (maintains 3px minimum constraint)
+            totalDays * 97.0,  // WeekDay97px: ~10283px 
+            totalDays * 48.0,  // MonthDay48px: ~5088px 
+            totalDays * 24.0,  // QuarterMonth24px: ~2544px 
+            totalDays * 8.0    // Month8px: ~848px (integral 8px)
         };
 
         // Act & Assert
@@ -205,7 +192,7 @@ public class PresetZoomLevelsIntegrationTests
         }
 
         // Assert significant variation between zoom levels
-        Assert.True(expectedWidths[0] > expectedWidths[5] * 30); // WeekDay should be 30x+ larger than YearQuarter (96/3 = 32x)
+        Assert.True(expectedWidths[0] > expectedWidths[3] * 12); // WeekDay97px should be 12x+ larger than Month8px (97/8 = 12.1x)
     }
 
     [Fact]
@@ -214,12 +201,12 @@ public class PresetZoomLevelsIntegrationTests
         // Arrange
         var allLevels = new[]
         {
-            TimelineZoomLevel.WeekDay,
-            TimelineZoomLevel.MonthDay,
-            TimelineZoomLevel.MonthWeek,
-            TimelineZoomLevel.QuarterWeek,
-            TimelineZoomLevel.QuarterMonth,
-            TimelineZoomLevel.YearQuarter
+            TimelineZoomLevel.WeekDay97px,
+            TimelineZoomLevel.MonthDay48px,
+            TimelineZoomLevel.MonthDay34px,
+            TimelineZoomLevel.QuarterMonth24px,
+            TimelineZoomLevel.QuarterMonth17px,
+            TimelineZoomLevel.Month8px
         };
 
         var stopwatch = new Stopwatch();
@@ -245,12 +232,12 @@ public class PresetZoomLevelsIntegrationTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 0.5, 96.0)]     // Preset-only: factor clamped to 1.0, base 96px
-    [InlineData(TimelineZoomLevel.WeekDay, 3.0, 96.0)]     // Preset-only: factor clamped to 1.0, base 96px
-    [InlineData(TimelineZoomLevel.MonthDay, 0.5, 40.0)]    // Preset-only: factor clamped to 1.0, base 40px
-    [InlineData(TimelineZoomLevel.MonthDay, 3.0, 40.0)]    // Preset-only: factor clamped to 1.0, base 40px
-    [InlineData(TimelineZoomLevel.YearQuarter, 0.5, 3.0)]  // Preset-only: factor clamped to 1.0, base 3px (minimum)
-    [InlineData(TimelineZoomLevel.YearQuarter, 3.0, 3.0)]  // Preset-only: factor clamped to 1.0, base 3px (minimum)
+    [InlineData(TimelineZoomLevel.WeekDay97px, 0.5, 97.0)]     // Preset-only: factor clamped to 1.0, base 97px
+    [InlineData(TimelineZoomLevel.WeekDay97px, 3.0, 97.0)]     // Preset-only: factor clamped to 1.0, base 97px
+    [InlineData(TimelineZoomLevel.MonthDay48px, 0.5, 48.0)]    // Preset-only: factor clamped to 1.0, base 48px
+    [InlineData(TimelineZoomLevel.MonthDay48px, 3.0, 48.0)]    // Preset-only: factor clamped to 1.0, base 48px
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 0.5, 6.0)]   // Preset-only: factor clamped to 1.0, base 6px
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 3.0, 6.0)]   // Preset-only: factor clamped to 1.0, base 6px
     public void ZoomFactorBounds_WithAllPresetZoomLevels_ShouldWorkCorrectly(
         TimelineZoomLevel zoomLevel, double factor, double expectedDayWidth)
     {
@@ -265,12 +252,12 @@ public class PresetZoomLevelsIntegrationTests
     }
 
     [Fact]
-    public void BackwardCompatibility_DefaultMonthDayAt1Point0_ShouldMaintain40PixelWidth()
+    public void IntegralPixelDesign_DefaultMonthDayAt1Point0_ShouldReturn48PixelWidth()
     {
         // Arrange
-        var defaultLevel = TimelineZoomLevel.MonthDay;
+        var defaultLevel = TimelineZoomLevel.MonthDay48px;
         var defaultFactor = 1.0; // Preset-only: factors are always 1.0
-        var expectedWidth = 40.0; // New base day width for backward compatibility (25 * 1.6)
+        var expectedWidth = 48.0; // Integral pixel value for MonthDay48px
 
         // Act
         var config = TimelineZoomService.GetConfiguration(defaultLevel);
@@ -291,12 +278,12 @@ public class PresetZoomLevelsIntegrationTests
 
         var allLevels = new[]
         {
-            TimelineZoomLevel.WeekDay,
-            TimelineZoomLevel.MonthDay,
-            TimelineZoomLevel.MonthWeek,
-            TimelineZoomLevel.QuarterWeek,
-            TimelineZoomLevel.QuarterMonth,
-            TimelineZoomLevel.YearQuarter
+            TimelineZoomLevel.WeekDay97px,
+            TimelineZoomLevel.MonthDay48px,
+            TimelineZoomLevel.MonthDay34px,
+            TimelineZoomLevel.QuarterMonth24px,
+            TimelineZoomLevel.QuarterMonth17px,
+            TimelineZoomLevel.Month8px
         };
 
         // Act & Assert - All zoom levels should handle medium projects efficiently
@@ -314,16 +301,16 @@ public class PresetZoomLevelsIntegrationTests
             Assert.True(timelineHeight > 0, $"Timeline height should be positive for {level}");
 
             // Performance consideration - very wide timelines might cause issues
-            if (level == TimelineZoomLevel.WeekDay)
+            if (level == TimelineZoomLevel.WeekDay97px)
             {
-                // WeekDay level for 6-month project: ~17,664px width (184 days * 96px) - should be manageable
-                Assert.True(timelineWidth < 25000, "WeekDay zoom should not create excessively wide timelines");
+                // WeekDay97px level for 6-month project: ~17,664px width (184 days * 96px) - should be manageable
+                Assert.True(timelineWidth < 25000, "WeekDay97px zoom should not create excessively wide timelines");
             }
 
-            if (level == TimelineZoomLevel.YearQuarter)
+            if (level == TimelineZoomLevel.Month8px)
             {
-                // YearQuarter level should maintain minimum usability
-                Assert.True(timelineWidth > 500, "YearQuarter zoom should maintain minimum timeline width");
+                // Month8px level should maintain minimum usability
+                Assert.True(timelineWidth > 500, "Month8px zoom should maintain minimum timeline width");
             }
         }
     }

@@ -43,14 +43,14 @@ public class GanttComposerZoomIntegrationTests : IDisposable
         var zoomService = _serviceProvider.GetRequiredService<TimelineZoomService>();
         var testCases = new[]
         {
-            // Preset-only system: factors ignored, backward-compatible day widths (original * 1.6)
-            (TimelineZoomLevel.WeekDay, 1.0, 96.0),     // 60 * 1.6 for backward compatibility
-            (TimelineZoomLevel.MonthWeek, 1.0, 24.0),   // 15 * 1.6 for backward compatibility
-            (TimelineZoomLevel.QuarterMonth, 1.0, 8.0), // 5 * 1.6 for backward compatibility
-            (TimelineZoomLevel.YearQuarter, 1.0, 3.0),  // 3px minimum constraint
+            // 11-level integral pixel system: exact pixel values
+            (TimelineZoomLevel.WeekDay97px, 1.0, 97.0),     // 97px integral pixel
+            (TimelineZoomLevel.MonthDay48px, 1.0, 48.0),    // 48px integral pixel
+            (TimelineZoomLevel.QuarterMonth24px, 1.0, 24.0), // 24px integral pixel
+            (TimelineZoomLevel.YearQuarter6px, 1.0, 6.0),   // 6px integral pixel
             // In preset-only system, factors are clamped to 1.0 (same result regardless of input factor)
-            (TimelineZoomLevel.WeekDay, 0.5, 96.0),     // Factor ignored, same as 1.0
-            (TimelineZoomLevel.WeekDay, 2.0, 96.0),     // Factor ignored, same as 1.0
+            (TimelineZoomLevel.WeekDay97px, 0.5, 97.0),     // Factor ignored, same as 1.0
+            (TimelineZoomLevel.WeekDay97px, 2.0, 97.0),     // Factor ignored, same as 1.0
         };
 
         foreach (var (level, factor, expected) in testCases)
@@ -68,7 +68,7 @@ public class GanttComposerZoomIntegrationTests : IDisposable
     {
         // Arrange
         var allLevels = Enum.GetValues<TimelineZoomLevel>();
-        var currentLevel = TimelineZoomLevel.WeekDay;
+        var currentLevel = TimelineZoomLevel.WeekDay97px;
         var currentFactor = 1.0;
 
         foreach (TimelineZoomLevel targetLevel in allLevels)
@@ -88,13 +88,13 @@ public class GanttComposerZoomIntegrationTests : IDisposable
     {
         // Arrange - In preset-only system, factors are always clamped to 1.0
         var testFactors = new[] { 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5, 3.0 };
-        var testLevel = TimelineZoomLevel.WeekDay; // 96px base (60 * 1.6)
+        var testLevel = TimelineZoomLevel.WeekDay97px; // 97px integral pixel
 
         foreach (var factor in testFactors)
         {
             // Act - In preset-only system, all factors result in same day width
             var dayWidth = TimelineZoomService.CalculateEffectiveDayWidth(testLevel, factor);
-            var expectedWidth = 96.0; // Always 96px regardless of factor (preset-only)
+            var expectedWidth = 97.0; // Always 97px regardless of factor (preset-only)
 
             // Assert - All factors should produce same day width in preset-only system
             Assert.Equal(expectedWidth, dayWidth, 0.1);
@@ -104,10 +104,10 @@ public class GanttComposerZoomIntegrationTests : IDisposable
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 1.0, 1)] // 1-day task at 60px = 60px (visible)
-    [InlineData(TimelineZoomLevel.YearQuarter, 0.5, 1)] // 1-day task at 1.5px (needs overflow handling)
-    [InlineData(TimelineZoomLevel.QuarterMonth, 1.0, 7)] // 7-day task at 15px = 105px (visible)
-    [InlineData(TimelineZoomLevel.MonthWeek, 2.0, 3)] // 3-day task at 60px = 180px (visible)
+    [InlineData(TimelineZoomLevel.WeekDay97px, 1.0, 1)] // 1-day task at 60px = 60px (visible)
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 0.5, 1)] // 1-day task at 1.5px (needs overflow handling)
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 1.0, 7)] // 7-day task at 15px = 105px (visible)
+    [InlineData(TimelineZoomLevel.MonthDay48px, 2.0, 3)] // 3-day task at 60px = 180px (visible)
     public void TaskVisibility_VariousZoomLevelsAndDurations_CalculatesCorrectWidth(
         TimelineZoomLevel level, double factor, int durationDays)
     {
@@ -157,18 +157,18 @@ public class GanttComposerZoomIntegrationTests : IDisposable
     public void Integration_ZoomControlsAndComposer_ParameterFlow()
     {
         // Arrange
-        var initialLevel = TimelineZoomLevel.WeekDay;
+        var initialLevel = TimelineZoomLevel.WeekDay97px;
         var initialFactor = 1.0;
-        var targetLevel = TimelineZoomLevel.MonthWeek;
+        var targetLevel = TimelineZoomLevel.MonthDay48px;
         var targetFactor = 1.5;
 
         // Act - Simulate zoom controls affecting composer
         var initialDayWidth = TimelineZoomService.CalculateEffectiveDayWidth(initialLevel, initialFactor);
         var targetDayWidth = TimelineZoomService.CalculateEffectiveDayWidth(targetLevel, targetFactor);
 
-        // Assert - Parameter flow validation for preset-only system
-        Assert.Equal(96.0, initialDayWidth); // WeekDay in preset-only: 96px (60 * 1.6)
-        Assert.Equal(24.0, targetDayWidth);  // MonthWeek in preset-only: 24px (15 * 1.6, factor ignored)
+        // Assert - Parameter flow validation for 11-level integral pixel system
+        Assert.Equal(97.0, initialDayWidth); // WeekDay97px: 97px integral pixel
+        Assert.Equal(48.0, targetDayWidth);  // MonthDay48px: 48px integral pixel
 
         // Verify the integration maintains different day widths for different settings
         Assert.NotEqual(initialDayWidth, targetDayWidth);

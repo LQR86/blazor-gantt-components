@@ -14,10 +14,10 @@ public class TimelineViewZoomStateTests
     public void ZoomLevel_DefaultValue_ShouldBeMonthDay()
     {
         // Arrange & Act
-        var defaultLevel = TimelineZoomLevel.MonthDay;
+        var defaultLevel = TimelineZoomLevel.MonthDay48px;
 
         // Assert
-        Assert.Equal(TimelineZoomLevel.MonthDay, defaultLevel);
+        Assert.Equal(TimelineZoomLevel.MonthDay48px, defaultLevel);
     }
 
     [Fact]
@@ -31,17 +31,17 @@ public class TimelineViewZoomStateTests
     }
 
     [Fact]
-    public void CurrentEffectiveDayWidth_WithDefaults_ShouldBe40Pixels()
+    public void CurrentEffectiveDayWidth_WithDefaults_ShouldBe24Pixels()
     {
         // Arrange
-        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay);
+        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.QuarterMonth24px);
 
         // Act
-        var dayWidth = config.GetEffectiveDayWidth(1.6);
+        var dayWidth = config.GetEffectiveDayWidth(1.0);
 
         // Assert
-        // MonthDay (25px) * 1.6 = 40px (backward compatibility)
-        Assert.Equal(40.0, dayWidth, 1);
+        // QuarterMonth24px (24px) * 1.0 = 24px (11-level integral design)
+        Assert.Equal(24.0, dayWidth, 1);
     }
 
     [Theory]
@@ -115,12 +115,10 @@ public class TimelineViewZoomStateTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 1.0, 96.0)]        // 60 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.MonthDay, 1.0, 40.0)]       // 25 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.MonthWeek, 1.0, 24.0)]      // 15 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.QuarterWeek, 1.0, 12.8)]    // 8 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.QuarterMonth, 1.0, 8.0)]    // 5 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.YearQuarter, 1.0, 3.0)]     // Maintains 3px minimum constraint
+    [InlineData(TimelineZoomLevel.WeekDay97px, 1.0, 97.0)]        // 11-level integral: 97px
+    [InlineData(TimelineZoomLevel.MonthDay48px, 1.0, 48.0)]       // 11-level integral: 48px
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 1.0, 24.0)]    // 11-level integral: 24px
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 1.0, 6.0)]     // 11-level integral: 6px
     public void EffectiveDayWidth_WithDifferentZoomLevels_ShouldCalculateCorrectly(
         TimelineZoomLevel level, double factor, double expectedWidth)
     {
@@ -138,27 +136,27 @@ public class TimelineViewZoomStateTests
     public void EffectiveDayWidth_WithZoomFactor_ShouldScaleCorrectly()
     {
         // Arrange
-        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay);
+        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay48px);
 
         // Act - MonthDay (40px base) with preset-only factor (always 1.0)
         var actualWidth = config.GetEffectiveDayWidth(2.0); // Factor clamped to 1.0
 
         // Assert
-        Assert.Equal(40.0, actualWidth, 1); // Preset-only: 40 * 1.0 = 40 (factor clamped)
+        Assert.Equal(48.0, actualWidth, 1); // Preset-only: 48 * 1.0 = 48 (factor clamped)
     }
 
     [Fact]
     public void ZoomDescription_ShouldFormatCorrectly()
     {
         // Arrange
-        var level = TimelineZoomLevel.MonthDay;
+        var level = TimelineZoomLevel.MonthDay48px;
         var factor = 1.6;
 
         // Act
         var description = $"{level} @ {factor:F1}x";
 
         // Assert
-        Assert.Equal("MonthDay @ 1.6x", description);
+        Assert.Equal("MonthDay48px @ 1.6x", description);
     }
 
     [Theory]
@@ -200,18 +198,18 @@ public class TimelineViewZoomStateTests
     }
 
     [Fact]
-    public void BackwardCompatibility_DefaultParameters_ShouldMaintain40PixelDayWidth()
+    public void IntegralPixelDesign_DefaultParameters_ShouldReturn48PixelDayWidth()
     {
         // Arrange
-        var defaultLevel = TimelineZoomLevel.MonthDay;
+        var defaultLevel = TimelineZoomLevel.MonthDay48px;
         var defaultFactor = 1.6;
-        var legacyDayWidth = 40.0;
+        var expectedDayWidth = 48.0;
 
         // Act
         var config = TimelineZoomService.GetConfiguration(defaultLevel);
         var actualDayWidth = config.GetEffectiveDayWidth(defaultFactor);
 
         // Assert
-        Assert.Equal(legacyDayWidth, actualDayWidth, 1);
+        Assert.Equal(expectedDayWidth, actualDayWidth, 1);
     }
 }

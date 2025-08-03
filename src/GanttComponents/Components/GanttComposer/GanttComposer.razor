@@ -4,6 +4,7 @@
 @using GanttComponents.Services
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
+@inject IUniversalLogger Logger
 
 <div id="gantt-composer-@ComponentId" class="gantt-composer @(ShowDebugAlignment ? "debug-alignment" : "")" 
      style="position: relative; width: 100%; height: @(ContainerHeight)px;">
@@ -52,7 +53,7 @@
     [Parameter] public int ContainerHeight { get; set; } = 600; // Container height (configurable)
     
     // Timeline Zoom Parameters
-    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthDay;
+    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.QuarterMonth24px;
     [Parameter] public double ZoomFactor { get; set; } = 1.6;
     [Parameter] public EventCallback<TimelineZoomLevel> OnZoomLevelChanged { get; set; }
     [Parameter] public EventCallback<double> OnZoomFactorChanged { get; set; }
@@ -164,8 +165,12 @@
         
         try
         {
-            // Calculate timeline start date (same logic as TimelineView.CalculateTimelineRange)
-            var startDate = Tasks.Min(t => t.StartDate).Date.AddDays(-7);
+            // Calculate timeline start date using EXACT same logic as TimelineView.CalculateTimelineRange
+            var taskStartDate = Tasks.Min(t => t.StartDate).Date.AddDays(-7);
+            
+            // Get header configuration and align to period boundary (critical for accuracy!)
+            var headerConfig = TimelineHeaderAdapter.GetHeaderConfigurationFromTemplate(ZoomLevel, null);
+            var startDate = TimelineHeaderAdapter.GetPeriodStart(taskStartDate, headerConfig.PrimaryUnit, null);
             
             // Use dynamic day width based on current zoom level and factor
             var effectiveDayWidth = TimelineZoomService.CalculateEffectiveDayWidth(ZoomLevel, ZoomFactor);

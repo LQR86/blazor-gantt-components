@@ -117,11 +117,11 @@ public class PresetZoomLevelsIntegrationTests
         // Assert - All day widths should be different
         Assert.Equal(4, dayWidths.Distinct().Count());
 
-        // Assert - Should be in descending order (WeekDay largest, YearQuarter smallest)
-        Assert.Equal(96.0, dayWidths[0]);  // WeekDay: 60 * 1.6 backward compatibility
-        Assert.Equal(40.0, dayWidths[1]);  // MonthWeek: 25 * 1.6 backward compatibility
-        Assert.Equal(24.0, dayWidths[2]);  // QuarterMonth: 15 * 1.6 backward compatibility
-        Assert.Equal(12.8, dayWidths[3]);  // YearQuarter: 8 * 1.6 backward compatibility
+        // Assert - Should be in descending order (WeekDay97px largest, Month8px smallest)
+        Assert.Equal(96.0, dayWidths[0]);  // WeekDay97px: 60 * 1.6 backward compatibility
+        Assert.Equal(40.0, dayWidths[1]);  // MonthDay48px: 25 * 1.6 backward compatibility
+        Assert.Equal(24.0, dayWidths[2]);  // QuarterMonth24px: 15 * 1.6 backward compatibility
+        Assert.Equal(12.8, dayWidths[3]);  // Month8px: 8 * 1.6 backward compatibility
     }
 
     [Fact]
@@ -167,18 +167,18 @@ public class PresetZoomLevelsIntegrationTests
 
         var allLevels = new[]
         {
-            TimelineZoomLevel.WeekDay,
-            TimelineZoomLevel.MonthWeek,
-            TimelineZoomLevel.QuarterMonth,
-            TimelineZoomLevel.YearQuarter
+            TimelineZoomLevel.WeekDay97px,
+            TimelineZoomLevel.MonthDay48px,
+            TimelineZoomLevel.QuarterMonth24px,
+            TimelineZoomLevel.Month8px
         };
 
         var expectedWidths = new[]
         {
-            totalDays * 96.0,  // WeekDay: ~10176px (60 * 1.6 backward compatibility)
-            totalDays * 40.0,  // MonthWeek: ~4240px (25 * 1.6 backward compatibility)
-            totalDays * 24.0,  // QuarterMonth: ~2544px (15 * 1.6 backward compatibility)
-            totalDays * 12.8   // YearQuarter: ~1356.8px (8 * 1.6 backward compatibility)
+            totalDays * 96.0,  // WeekDay97px: ~10176px (60 * 1.6 backward compatibility)
+            totalDays * 40.0,  // MonthDay48px: ~4240px (25 * 1.6 backward compatibility)
+            totalDays * 24.0,  // QuarterMonth24px: ~2544px (15 * 1.6 backward compatibility)
+            totalDays * 12.8   // Month8px: ~1356.8px (8 * 1.6 backward compatibility)
         };
 
         // Act & Assert
@@ -192,7 +192,7 @@ public class PresetZoomLevelsIntegrationTests
         }
 
         // Assert significant variation between zoom levels
-        Assert.True(expectedWidths[0] > expectedWidths[3] * 7); // WeekDay should be 7x+ larger than YearQuarter (96/12.8 = 7.5x)
+        Assert.True(expectedWidths[0] > expectedWidths[3] * 7); // WeekDay97px should be 7x+ larger than Month8px (96/12.8 = 7.5x)
     }
 
     [Fact]
@@ -201,12 +201,12 @@ public class PresetZoomLevelsIntegrationTests
         // Arrange
         var allLevels = new[]
         {
-            TimelineZoomLevel.WeekDay,
-            TimelineZoomLevel.MonthWeek,
-            TimelineZoomLevel.MonthWeek,
-            TimelineZoomLevel.QuarterMonth,
-            TimelineZoomLevel.QuarterMonth,
-            TimelineZoomLevel.YearQuarter
+            TimelineZoomLevel.WeekDay97px,
+            TimelineZoomLevel.MonthDay48px,
+            TimelineZoomLevel.MonthDay34px,
+            TimelineZoomLevel.QuarterMonth24px,
+            TimelineZoomLevel.QuarterMonth17px,
+            TimelineZoomLevel.Month8px
         };
 
         var stopwatch = new Stopwatch();
@@ -255,7 +255,7 @@ public class PresetZoomLevelsIntegrationTests
     public void BackwardCompatibility_DefaultMonthDayAt1Point0_ShouldMaintain40PixelWidth()
     {
         // Arrange
-        var defaultLevel = TimelineZoomLevel.MonthWeek;
+        var defaultLevel = TimelineZoomLevel.MonthDay48px;
         var defaultFactor = 1.0; // Preset-only: factors are always 1.0
         var expectedWidth = 40.0; // New base day width for backward compatibility (25 * 1.6)
 
@@ -278,12 +278,12 @@ public class PresetZoomLevelsIntegrationTests
 
         var allLevels = new[]
         {
-            TimelineZoomLevel.WeekDay,
-            TimelineZoomLevel.MonthWeek,
-            TimelineZoomLevel.MonthWeek,
-            TimelineZoomLevel.QuarterMonth,
-            TimelineZoomLevel.QuarterMonth,
-            TimelineZoomLevel.YearQuarter
+            TimelineZoomLevel.WeekDay97px,
+            TimelineZoomLevel.MonthDay48px,
+            TimelineZoomLevel.MonthDay34px,
+            TimelineZoomLevel.QuarterMonth24px,
+            TimelineZoomLevel.QuarterMonth17px,
+            TimelineZoomLevel.Month8px
         };
 
         // Act & Assert - All zoom levels should handle medium projects efficiently

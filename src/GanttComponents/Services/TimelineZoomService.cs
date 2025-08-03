@@ -11,83 +11,80 @@ public class TimelineZoomService
     private static readonly Dictionary<TimelineZoomLevel, ZoomLevelConfiguration> _configurations =
         new Dictionary<TimelineZoomLevel, ZoomLevelConfiguration>
         {
-            [TimelineZoomLevel.WeekDay] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.WeekDay,
-                96.0, // 60 * 1.6 for backward compatibility
-                "ZoomLevel.WeekDay",
-                "ZoomLevel.WeekDay.Description"
+            // Week→Day Pattern (68px, 97px): Top tier shows week range with year, bottom tier shows day numbers
+            [TimelineZoomLevel.WeekDay97px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.WeekDay97px,
+                97.0, // Integral pixel width for crisp rendering
+                "ZoomLevel.WeekDay97px",
+                "ZoomLevel.WeekDay97px.Description"
             ),
-            [TimelineZoomLevel.WeekDayMedium] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.WeekDayMedium,
-                72.0, // 45 * 1.6 for backward compatibility
-                "ZoomLevel.WeekDayMedium",
-                "ZoomLevel.WeekDayMedium.Description"
+            [TimelineZoomLevel.WeekDay68px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.WeekDay68px,
+                68.0, // Integral pixel width for crisp rendering
+                "ZoomLevel.WeekDay68px",
+                "ZoomLevel.WeekDay68px.Description"
             ),
-            [TimelineZoomLevel.WeekDayLow] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.WeekDayLow,
-                56.0, // 35 * 1.6 for backward compatibility
-                "ZoomLevel.WeekDayLow",
-                "ZoomLevel.WeekDayLow.Description"
+
+            // Month→Day Pattern (34px, 48px): Top tier shows month with year, bottom tier shows day numbers
+            [TimelineZoomLevel.MonthDay48px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.MonthDay48px,
+                48.0, // Integral pixel width for crisp rendering
+                "ZoomLevel.MonthDay48px",
+                "ZoomLevel.MonthDay48px.Description"
             ),
-            [TimelineZoomLevel.MonthWeek] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.MonthWeek,
-                40.0, // 25 * 1.6 for backward compatibility - matches GanttResources.resx
-                "ZoomLevel.MonthWeek",
-                "ZoomLevel.MonthWeek.Description"
+            [TimelineZoomLevel.MonthDay34px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.MonthDay34px,
+                34.0, // Integral pixel width for crisp rendering
+                "ZoomLevel.MonthDay34px",
+                "ZoomLevel.MonthDay34px.Description"
             ),
-            [TimelineZoomLevel.MonthWeekMedium] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.MonthWeekMedium,
-                32.0, // 20 * 1.6 for backward compatibility - matches GanttResources.resx
-                "ZoomLevel.MonthWeekMedium",
-                "ZoomLevel.MonthWeekMedium.Description"
+
+            // Quarter→Month Pattern (17px, 24px): Top tier shows quarter with year, bottom tier shows month names
+            [TimelineZoomLevel.QuarterMonth24px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.QuarterMonth24px,
+                24.0, // Integral pixel width for crisp rendering
+                "ZoomLevel.QuarterMonth24px",
+                "ZoomLevel.QuarterMonth24px.Description"
             ),
-            [TimelineZoomLevel.MonthWeekLow] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.MonthWeekLow,
-                28.8, // 18 * 1.6 for backward compatibility - matches GanttResources.resx
-                "ZoomLevel.MonthWeekLow",
-                "ZoomLevel.MonthWeekLow.Description"
+            [TimelineZoomLevel.QuarterMonth17px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.QuarterMonth17px,
+                17.0, // Integral pixel width for crisp rendering
+                "ZoomLevel.QuarterMonth17px",
+                "ZoomLevel.QuarterMonth17px.Description"
             ),
-            [TimelineZoomLevel.QuarterMonth] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.QuarterMonth,
-                24.0, // 15 * 1.6 for backward compatibility (15px/day from GanttResources.resx)
-                "ZoomLevel.QuarterMonth",
-                "ZoomLevel.QuarterMonth.Description"
+
+            // Month-only Pattern (8px, 12px): Single tier showing year and month names only
+            [TimelineZoomLevel.Month12px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.Month12px,
+                12.0, // Integral pixel width for crisp rendering
+                "ZoomLevel.Month12px",
+                "ZoomLevel.Month12px.Description"
             ),
-            [TimelineZoomLevel.QuarterMonthMedium] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.QuarterMonthMedium,
-                19.2, // 12 * 1.6 for backward compatibility (12px/day from GanttResources.resx)
-                "ZoomLevel.QuarterMonthMedium",
-                "ZoomLevel.QuarterMonthMedium.Description"
+            [TimelineZoomLevel.Month8px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.Month8px,
+                8.0, // Integral pixel width for crisp rendering
+                "ZoomLevel.Month8px",
+                "ZoomLevel.Month8px.Description"
             ),
-            [TimelineZoomLevel.QuarterMonthLow] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.QuarterMonthLow,
-                16.0, // 10 * 1.6 for backward compatibility (10px/day from GanttResources.resx)
-                "ZoomLevel.QuarterMonthLow",
-                "ZoomLevel.QuarterMonthLow.Description"
+
+            // Year→Quarter Pattern (3px, 4px, 6px): Top tier shows year, bottom tier shows quarters
+            [TimelineZoomLevel.YearQuarter6px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.YearQuarter6px,
+                6.0, // Integral pixel width for crisp rendering
+                "ZoomLevel.YearQuarter6px",
+                "ZoomLevel.YearQuarter6px.Description"
             ),
-            [TimelineZoomLevel.YearQuarter] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.YearQuarter,
-                12.8, // 8 * 1.6 for backward compatibility (8px/day from GanttResources.resx)
-                "ZoomLevel.YearQuarter",
-                "ZoomLevel.YearQuarter.Description"
+            [TimelineZoomLevel.YearQuarter4px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.YearQuarter4px,
+                4.0, // Integral pixel width for crisp rendering
+                "ZoomLevel.YearQuarter4px",
+                "ZoomLevel.YearQuarter4px.Description"
             ),
-            [TimelineZoomLevel.YearQuarterMedium] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.YearQuarterMedium,
-                10.4, // 6.5 * 1.6 for backward compatibility (6.5px/day from GanttResources.resx)
-                "ZoomLevel.YearQuarterMedium",
-                "ZoomLevel.YearQuarterMedium.Description"
-            ),
-            [TimelineZoomLevel.YearQuarterLow] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.YearQuarterLow,
-                8.0, // 5 * 1.6 for backward compatibility (5px/day from GanttResources.resx)
-                "ZoomLevel.YearQuarterLow",
-                "ZoomLevel.YearQuarterLow.Description"
-            ),
-            [TimelineZoomLevel.YearQuarterMin] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.YearQuarterMin,
-                3.0, // Minimum day width constraint (3px/day from GanttResources.resx)
-                "ZoomLevel.YearQuarterMin",
-                "ZoomLevel.YearQuarterMin.Description"
+            [TimelineZoomLevel.YearQuarter3px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.YearQuarter3px,
+                3.0, // Minimum integral pixel width for crisp rendering
+                "ZoomLevel.YearQuarter3px",
+                "ZoomLevel.YearQuarter3px.Description"
             )
         };
 

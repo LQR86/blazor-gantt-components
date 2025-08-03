@@ -12,21 +12,19 @@ public class TimelineZoomTests
 {
     [Theory]
     // WeekDay Pattern Levels (Week → Day) - 97px, 68px, 48px  
-    [InlineData(TimelineZoomLevel.WeekDay97px, 96.0)]         // 60 * 1.6 for backward compatibility
-    [InlineData(TimelineZoomLevel.WeekDay68px, 72.0)]         // 45 * 1.6 for backward compatibility 
-    [InlineData(TimelineZoomLevel.MonthDay48px, 56.0)]        // 35 * 1.6 for backward compatibility
-    // MonthWeek Pattern Levels (Month → Week) - 48px, 34px, 24px
-    [InlineData(TimelineZoomLevel.MonthDay48px, 40.0)]        // 25 * 1.6 for backward compatibility
-    [InlineData(TimelineZoomLevel.MonthDay34px, 32.0)]        // 20 * 1.6 for backward compatibility
-    [InlineData(TimelineZoomLevel.QuarterMonth24px, 28.8)]    // 18 * 1.6 for backward compatibility
-    // QuarterMonth Pattern Levels (Quarter → Month) - 24px, 17px, 12px
-    [InlineData(TimelineZoomLevel.QuarterMonth24px, 24.0)]    // 15 * 1.6 for backward compatibility
-    [InlineData(TimelineZoomLevel.QuarterMonth17px, 19.2)]    // 12 * 1.6 for backward compatibility
-    [InlineData(TimelineZoomLevel.Month12px, 16.0)]           // 10 * 1.6 for backward compatibility
+    [InlineData(TimelineZoomLevel.WeekDay97px, 97.0)]         // Integral pixel design
+    [InlineData(TimelineZoomLevel.WeekDay68px, 68.0)]         // Integral pixel design 
+    [InlineData(TimelineZoomLevel.MonthDay48px, 48.0)]        // Integral pixel design
+    // MonthWeek Pattern Levels (Month → Week) - 34px, 24px
+    [InlineData(TimelineZoomLevel.MonthDay34px, 34.0)]        // Integral pixel design
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 24.0)]    // Integral pixel design
+    // QuarterMonth Pattern Levels (Quarter → Month) - 17px, 12px
+    [InlineData(TimelineZoomLevel.QuarterMonth17px, 17.0)]    // Integral pixel design
+    [InlineData(TimelineZoomLevel.Month12px, 12.0)]           // Integral pixel design
     // YearQuarter Pattern Levels (Year → Quarter) - 8px, 6px, 4px, 3px
-    [InlineData(TimelineZoomLevel.Month8px, 12.8)]            // 8 * 1.6 for backward compatibility
-    [InlineData(TimelineZoomLevel.YearQuarter6px, 10.4)]      // 6.5 * 1.6 for backward compatibility
-    [InlineData(TimelineZoomLevel.YearQuarter4px, 8.0)]       // 5 * 1.6 for backward compatibility
+    [InlineData(TimelineZoomLevel.Month8px, 8.0)]             // Integral pixel design
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 6.0)]       // Integral pixel design
+    [InlineData(TimelineZoomLevel.YearQuarter4px, 4.0)]       // Integral pixel design
     [InlineData(TimelineZoomLevel.YearQuarter3px, 3.0)]       // 3px minimum day width constraint
     public void ZoomLevelConfiguration_HasCorrectBaseDayWidth(TimelineZoomLevel level, double expectedDayWidth)
     {
@@ -39,11 +37,11 @@ public class TimelineZoomTests
     }
 
     [Theory]
-    [InlineData(1.0, 40.0)] // Preset-only: factor always 1.0, base width is 40.0 for MonthDay
-    [InlineData(1.6, 40.0)] // Preset-only: factor clamped to 1.0, base width is 40.0
-    [InlineData(0.5, 40.0)] // Preset-only: factor clamped to 1.0, base width is 40.0
-    [InlineData(3.0, 40.0)] // Preset-only: factor clamped to 1.0, base width is 40.0
-    [InlineData(2.0, 40.0)] // Preset-only: factor clamped to 1.0, base width is 40.0
+    [InlineData(1.0, 48.0)] // Preset-only: factor always 1.0, base width is 48.0 for MonthDay
+    [InlineData(1.6, 48.0)] // Preset-only: factor clamped to 1.0, base width is 48.0
+    [InlineData(0.5, 48.0)] // Preset-only: factor clamped to 1.0, base width is 48.0
+    [InlineData(3.0, 48.0)] // Preset-only: factor clamped to 1.0, base width is 48.0
+    [InlineData(2.0, 48.0)] // Preset-only: factor clamped to 1.0, base width is 48.0
     public void ZoomLevelConfiguration_CalculatesEffectiveDayWidth(double zoomFactor, double expectedWidth)
     {
         // Arrange
@@ -71,7 +69,7 @@ public class TimelineZoomTests
 
         // Act - In preset-only system, all factors are clamped to 1.0
         var clampedWidth = config.GetEffectiveDayWidth(input);
-        var expectedWidth = config.BaseDayWidth * expected; // Always 40.0 * 1.0 = 40.0
+        var expectedWidth = config.BaseDayWidth * expected; // Always 48.0 * 1.0 = 48.0
 
         // Assert - Effective day width is always the base day width in preset-only system
         Assert.Equal(expectedWidth, clampedWidth, precision: 1);
@@ -112,14 +110,14 @@ public class TimelineZoomTests
         // Assert - In preset-only system, factor is always 1.0, but effective day width remains 40px
         Assert.Equal(TimelineZoomLevel.MonthDay48px, level);
         Assert.Equal(1.0, factor); // Preset-only: factors are always 1.0
-        Assert.Equal(40.0, dayWidth, precision: 1); // Day width preserved at 40px through base day width adjustment
+        Assert.Equal(48.0, dayWidth, precision: 1); // Day width at 48px for MonthDay48px
     }
 
     [Theory]
-    [InlineData(1.0, TimelineZoomLevel.WeekDay97px, 1.0, true)]      // 96px wide = visible (60*1.6)
-    [InlineData(0.1, TimelineZoomLevel.WeekDay97px, 1.0, false)]     // 9.6px wide = hidden (60*1.6*0.1)
-    [InlineData(1.0, TimelineZoomLevel.Month8px, 1.0, true)]         // 12.8px wide = visible (8*1.6)
-    [InlineData(0.8, TimelineZoomLevel.YearQuarter3px, 1.0, false)]  // 2.4px wide = hidden (3*0.8)
+    [InlineData(1.0, TimelineZoomLevel.WeekDay97px, 1.0, true)]      // 97px wide = visible 
+    [InlineData(0.1, TimelineZoomLevel.WeekDay97px, 1.0, false)]     // 9.7px wide = hidden 
+    [InlineData(1.0, TimelineZoomLevel.Month8px, 1.0, true)]         // 8px wide = visible 
+    [InlineData(0.8, TimelineZoomLevel.YearQuarter3px, 1.0, false)]  // 2.4px wide = hidden
     [InlineData(5.0, TimelineZoomLevel.YearQuarter3px, 1.0, true)]   // 15px wide = visible (3*5)
     [InlineData(0.2, TimelineZoomLevel.MonthDay48px, 1.6, false)]    // 8px wide = hidden (40px * 0.2)
     [InlineData(0.5, TimelineZoomLevel.MonthDay48px, 1.6, true)]     // 20px wide = visible (40px * 0.5)
@@ -191,15 +189,15 @@ public class TimelineZoomTests
 
         // Assert - Should return default configuration with preset-only base width
         Assert.Equal(TaskDisplayConstants.DEFAULT_ZOOM_LEVEL, config.Level);
-        Assert.Equal(40.0, config.BaseDayWidth); // MonthDay preset-only base width (25 * 1.6)
+        Assert.Equal(48.0, config.BaseDayWidth); // MonthDay integral pixel base width
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay97px, 96.0)]          // WeekDay: 60 * 1.6 = 96.0
-    [InlineData(TimelineZoomLevel.MonthDay48px, 40.0)]         // MonthWeek: 25 * 1.6 = 40.0 (maintains backward compatibility)
-    [InlineData(TimelineZoomLevel.Month8px, 12.8)]             // YearQuarter: 8 * 1.6 = 12.8
-    [InlineData(TimelineZoomLevel.YearQuarter3px, 3.0)]        // YearQuarterMin: 3px minimum day width constraint
-    [InlineData(TimelineZoomLevel.QuarterMonth24px, 24.0)]     // QuarterMonth: 15 * 1.6 = 24.0
+    [InlineData(TimelineZoomLevel.WeekDay97px, 97.0)]          // WeekDay: integral 97px
+    [InlineData(TimelineZoomLevel.MonthDay48px, 48.0)]         // MonthDay: integral 48px
+    [InlineData(TimelineZoomLevel.Month8px, 8.0)]              // Month: integral 8px
+    [InlineData(TimelineZoomLevel.YearQuarter3px, 3.0)]        // YearQuarter: 3px minimum day width constraint
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 24.0)]     // QuarterMonth: integral 24px
     public void TimelineZoomService_PresetOnlyFactorsAlwaysOne(
         TimelineZoomLevel level,
         double expectedDayWidth)

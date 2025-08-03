@@ -72,10 +72,10 @@ public class TimelineViewZoomTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay97px, 1.0, 96.0)]        // 60 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.MonthDay48px, 1.0, 40.0)]       // 25 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.QuarterMonth24px, 1.0, 24.0)]    // 15 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.YearQuarter6px, 1.0, 12.8)]     // 8 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.WeekDay97px, 1.0, 97.0)]        // 11-level integral: 97px
+    [InlineData(TimelineZoomLevel.MonthDay48px, 1.0, 48.0)]       // 11-level integral: 48px
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 1.0, 24.0)]    // 11-level integral: 24px
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 1.0, 6.0)]     // 11-level integral: 6px
     public void ZoomLevel_WithBaseFactor_ShouldReturnExpectedDayWidth(
         TimelineZoomLevel level,
         double factor,

@@ -31,10 +31,10 @@ public class PresetOnlyZoomValidationTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay97px, 96.0)]        // 60 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.MonthDay48px, 40.0)]       // 25 * 1.6 backward compatibility  
-    [InlineData(TimelineZoomLevel.QuarterMonth24px, 24.0)]    // 15 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.YearQuarter6px, 12.8)]     // 8 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.WeekDay97px, 97.0)]        // 11-level integral: 97px
+    [InlineData(TimelineZoomLevel.MonthDay48px, 48.0)]       // 11-level integral: 48px  
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 24.0)]    // 11-level integral: 24px
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 6.0)]     // 11-level integral: 6px
     public void PresetOnlySystem_AllLevels_ConsistentDayWidthRegardlessOfFactor(TimelineZoomLevel level, double expectedDayWidth)
     {
         // Arrange - Test various zoom factors that should all produce same result

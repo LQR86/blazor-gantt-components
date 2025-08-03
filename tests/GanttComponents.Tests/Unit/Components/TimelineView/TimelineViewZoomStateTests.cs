@@ -156,7 +156,7 @@ public class TimelineViewZoomStateTests
         var description = $"{level} @ {factor:F1}x";
 
         // Assert
-        Assert.Equal("MonthWeek @ 1.6x", description);
+        Assert.Equal("MonthDay48px @ 1.6x", description);
     }
 
     [Theory]

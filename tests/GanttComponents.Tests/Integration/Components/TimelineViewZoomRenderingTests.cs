@@ -17,11 +17,11 @@ public class TimelineViewZoomRenderingTests
         var testCases = new[]
         {
             // ZoomLevel, ZoomFactor, ExpectedDayWidth (preset-only system, factors clamped to 1.0)
-            (TimelineZoomLevel.WeekDay97px, 1.0, 96.0),      // Week level: 96px base (60 * 1.6)
-            (TimelineZoomLevel.MonthDay48px, 1.0, 40.0),     // Month level: 40px base (25 * 1.6)
-            (TimelineZoomLevel.MonthDay48px, 1.6, 40.0),     // Preset-only: factor clamped to 1.0
-            (TimelineZoomLevel.MonthDay48px, 2.0, 40.0),     // Preset-only: factor clamped to 1.0
-            (TimelineZoomLevel.Month8px, 1.0, 12.8),         // Year level: 12.8px base (8 * 1.6)
+            (TimelineZoomLevel.WeekDay97px, 1.0, 97.0),      // Week level: 97px base 
+            (TimelineZoomLevel.MonthDay48px, 1.0, 48.0),     // Month level: 48px base 
+            (TimelineZoomLevel.MonthDay48px, 1.6, 48.0),     // Preset-only: factor clamped to 1.0
+            (TimelineZoomLevel.MonthDay48px, 2.0, 48.0),     // Preset-only: factor clamped to 1.0
+            (TimelineZoomLevel.Month8px, 1.0, 8.0),          // Year level: 8px base 
         };
 
         foreach (var (zoomLevel, zoomFactor, expectedDayWidth) in testCases)
@@ -43,10 +43,10 @@ public class TimelineViewZoomRenderingTests
 
         var zoomConfigurations = new[]
         {
-            (level: TimelineZoomLevel.WeekDay97px, factor: 1.0, baseDayWidth: 96.0),   // 60 * 1.6
-            (level: TimelineZoomLevel.MonthDay48px, factor: 1.0, baseDayWidth: 40.0),  // 25 * 1.6  
-            (level: TimelineZoomLevel.QuarterMonth24px, factor: 1.0, baseDayWidth: 24.0), // 15 * 1.6
-            (level: TimelineZoomLevel.Month8px, factor: 1.0, baseDayWidth: 12.8), // 8 * 1.6
+            (level: TimelineZoomLevel.WeekDay97px, factor: 1.0, baseDayWidth: 97.0),      // 97px integral
+            (level: TimelineZoomLevel.MonthDay48px, factor: 1.0, baseDayWidth: 48.0),    // 48px integral  
+            (level: TimelineZoomLevel.QuarterMonth24px, factor: 1.0, baseDayWidth: 24.0), // 24px integral
+            (level: TimelineZoomLevel.Month8px, factor: 1.0, baseDayWidth: 8.0),         // 8px integral
         };
 
         var calculatedWidths = new List<double>();
@@ -78,8 +78,8 @@ public class TimelineViewZoomRenderingTests
     public void ZoomFactorRange_ShouldAffectWidthProportionally()
     {
         // Arrange - In preset-only system, factors are clamped to 1.0
-        var zoomLevel = TimelineZoomLevel.MonthDay48px; // 40px base (25 * 1.6)
-        var baseDayWidth = 40.0;
+        var zoomLevel = TimelineZoomLevel.MonthDay48px; // 48px base (integral pixel)
+        var baseDayWidth = 48.0;
         var testFactors = new[] { 0.5, 1.0, 1.5, 2.0, 3.0 };
 
         var config = TimelineZoomService.GetConfiguration(zoomLevel);
@@ -88,7 +88,7 @@ public class TimelineViewZoomRenderingTests
         {
             // Act - In preset-only system, all factors result in same width (clamped to 1.0)
             var actualDayWidth = config.GetEffectiveDayWidth(factor);
-            var expectedDayWidth = baseDayWidth; // Always 40px regardless of factor
+            var expectedDayWidth = baseDayWidth; // Always 48px regardless of factor
 
             // Assert - All factors should result in same day width in preset-only system
             Assert.Equal(expectedDayWidth, actualDayWidth, precision: 1);
@@ -153,7 +153,7 @@ public class TimelineViewZoomRenderingTests
         // Arrange - Default parameters that should maintain 40px day width
         var defaultZoomLevel = TimelineZoomLevel.MonthDay48px;
         var defaultZoomFactor = 1.6;
-        var expectedLegacyDayWidth = 40.0;
+        var expectedLegacyDayWidth = 48.0; // Updated for 11-level system: MonthDay48px = 48px
 
         // Act
         var config = TimelineZoomService.GetConfiguration(defaultZoomLevel);
@@ -164,14 +164,14 @@ public class TimelineViewZoomRenderingTests
     }
 
     [Theory]
-    [InlineData(1, 40.0)]   // 1 day task
-    [InlineData(7, 280.0)]  // 1 week task  
-    [InlineData(30, 1200.0)] // 1 month task
+    [InlineData(1, 48.0)]    // 1 day task: 1 * 48px = 48px
+    [InlineData(7, 336.0)]   // 1 week task: 7 * 48px = 336px
+    [InlineData(30, 1440.0)] // 1 month task: 30 * 48px = 1440px
     public void TaskWidthCalculation_WithDefaultZoom_ShouldMatchExpected(
         int durationDays,
         double expectedTaskWidth)
     {
-        // Arrange - Using default backward-compatible zoom (MonthWeek @ 1.6x = 40px)
+        // Arrange - Using default zoom (MonthDay48px @ 1.6x = 48px in 11-level system)
         var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay48px);
         var dayWidth = config.GetEffectiveDayWidth(1.6);
 
@@ -179,7 +179,7 @@ public class TimelineViewZoomRenderingTests
         var actualTaskWidth = durationDays * dayWidth;
 
         // Assert - Task width should match expected values
-        Assert.Equal(40.0, dayWidth, precision: 1); // Verify day width first
+        Assert.Equal(48.0, dayWidth, precision: 1); // Verify day width first (11-level system: 48px)
         Assert.Equal(expectedTaskWidth, actualTaskWidth, precision: 1);
     }
 }

@@ -16,7 +16,7 @@ public class TimelineViewZoomTests
         // Arrange
         var defaultZoomLevel = TimelineZoomLevel.MonthDay48px;
         var defaultZoomFactor = 1.6;
-        var expectedDayWidth = 40.0; // Current legacy behavior
+        var expectedDayWidth = 48.0; // 11-level system baseline: 48px * 1.6 / 1.6 = 48px
 
         // Act
         var config = TimelineZoomService.GetConfiguration(defaultZoomLevel);
@@ -34,10 +34,10 @@ public class TimelineViewZoomTests
 
         var testCases = new[]
         {
-            (factor: 1.0, expected: 40.0),  // Preset-only: base day width is 40px (25 * 1.6)
-            (factor: 1.6, expected: 40.0), // Preset-only: factor clamped to 1.0, so 40 * 1.0 = 40
-            (factor: 2.0, expected: 40.0), // Preset-only: factor clamped to 1.0, so 40 * 1.0 = 40
-            (factor: 0.5, expected: 40.0)  // Preset-only: factor clamped to 1.0, so 40 * 1.0 = 40
+            (factor: 1.0, expected: 48.0),  // Preset-only: base day width is 48px 
+            (factor: 1.6, expected: 48.0), // Preset-only: factor clamped to 1.0, so 48 * 1.0 = 48
+            (factor: 2.0, expected: 48.0), // Preset-only: factor clamped to 1.0, so 48 * 1.0 = 48
+            (factor: 0.5, expected: 48.0)  // Preset-only: factor clamped to 1.0, so 48 * 1.0 = 48
         };
 
         var config = TimelineZoomService.GetConfiguration(zoomLevel);
@@ -96,7 +96,7 @@ public class TimelineViewZoomTests
     {
         // Arrange
         var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay48px);
-        var baseDayWidth = 40.0; // Updated for preset-only: 25 * 1.6 = 40px
+        var baseDayWidth = 48.0; // Updated for 11-level system: 48px baseline
 
         var testCases = new[]
         {
@@ -110,7 +110,7 @@ public class TimelineViewZoomTests
         {
             var clampedFactor = Math.Max(config.MinZoomFactor, Math.Min(config.MaxZoomFactor, inputFactor));
             var actualDayWidth = config.GetEffectiveDayWidth(clampedFactor);
-            var expectedDayWidth = baseDayWidth * expectedClamped; // Always 40 * 1.0 = 40
+            var expectedDayWidth = baseDayWidth * expectedClamped; // Always 48 * 1.0 = 48
 
             Assert.Equal(expectedDayWidth, actualDayWidth, precision: 1);
         }

@@ -146,10 +146,10 @@
     [Parameter] public bool ShowDayWidth { get; set; } = false; // Developer feature
     [Parameter] public bool HideCurrentState { get; set; } = false;
     
-    // Zoom level filtering - for different use cases
+    // Zoom level filtering - for different use cases  
     [Parameter] public IReadOnlyList<TimelineZoomLevel>? VisibleZoomLevels { get; set; }
-    [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.WeekDay97px;
-    [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.YearQuarter3px;
+    [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.YearQuarter3px;  // Most zoomed out (overview)
+    [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDay97px;      // Most zoomed in (detail)
     
     // Preset-only approach: Manual zoom controls removed for v0.8.5
     // All zoom control is handled via preset level selection only
@@ -174,7 +174,7 @@
                     HideCurrentState = HideCurrentState,
                     CssClass = CssClass,
                     UseDropdownForPresets = false, // Can be added as parameter if needed
-                    MaxVisiblePresets = 13
+                    MaxVisiblePresets = 11  // Updated for 11-level system
                 };
             }
             else
@@ -207,9 +207,9 @@
             return VisibleZoomLevels;
         }
         
-        // Use min/max range - NOTE: WeekDay=0 (detailed) to YearQuarter=12 (overview)
+        // Use min/max range - NOTE: YearQuarter3px=0 (overview) to WeekDay97px=10 (detail)
         var allLevels = Enum.GetValues<TimelineZoomLevel>().OrderBy(x => (int)x);
-        var filteredLevels = allLevels.Where(level => level >= MinZoomLevel && level <= MaxZoomLevel).ToList();
+        var filteredLevels = allLevels.Where(level => (int)level >= (int)MinZoomLevel && (int)level <= (int)MaxZoomLevel).ToList();
         
         // Apply preset limit for visible presets
         if (EffectiveConfig.MaxVisiblePresets > 0 && filteredLevels.Count > EffectiveConfig.MaxVisiblePresets)
@@ -263,9 +263,9 @@
         var levels = GetVisibleZoomLevels().OrderBy(x => (int)x).ToList();
         var currentIndex = levels.IndexOf(CurrentZoomLevel);
         
-        if (currentIndex > 0) // Can zoom in (higher detail = lower index)
+        if (currentIndex < levels.Count - 1) // Can zoom in (higher detail = higher enum value)
         {
-            var newLevel = levels[currentIndex - 1];
+            var newLevel = levels[currentIndex + 1];
             Logger.LogOperation("ZOOM_CONTROLS", $"ZoomIn: {CurrentZoomLevel} -> {newLevel}");
             await OnZoomLevelSelected(newLevel);
         }
@@ -282,9 +282,9 @@
         var levels = GetVisibleZoomLevels().OrderBy(x => (int)x).ToList();
         var currentIndex = levels.IndexOf(CurrentZoomLevel);
         
-        if (currentIndex < levels.Count - 1) // Can zoom out (lower detail = higher index)
+        if (currentIndex > 0) // Can zoom out (lower detail = lower enum value)
         {
-            var newLevel = levels[currentIndex + 1];
+            var newLevel = levels[currentIndex - 1];
             Logger.LogOperation("ZOOM_CONTROLS", $"ZoomOut: {CurrentZoomLevel} -> {newLevel}");
             await OnZoomLevelSelected(newLevel);
         }
@@ -298,14 +298,14 @@
     private bool IsAtMaxZoom()
     {
         var levels = GetVisibleZoomLevels().OrderBy(x => (int)x).ToList();
-        var result = levels.Count > 0 && CurrentZoomLevel == levels.First();
+        var result = levels.Count > 0 && CurrentZoomLevel == levels.Last(); // Maximum zoom = highest enum value (most detail)
         return result;
     }
     
     private bool IsAtMinZoom()
     {
         var levels = GetVisibleZoomLevels().OrderBy(x => (int)x).ToList();
-        var result = levels.Count > 0 && CurrentZoomLevel == levels.Last();
+        var result = levels.Count > 0 && CurrentZoomLevel == levels.First(); // Minimum zoom = lowest enum value (least detail)
         return result;
     }
 }

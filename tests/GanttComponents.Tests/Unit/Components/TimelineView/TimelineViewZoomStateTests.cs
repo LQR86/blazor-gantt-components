@@ -142,7 +142,7 @@ public class TimelineViewZoomStateTests
         var actualWidth = config.GetEffectiveDayWidth(2.0); // Factor clamped to 1.0
 
         // Assert
-        Assert.Equal(40.0, actualWidth, 1); // Preset-only: 40 * 1.0 = 40 (factor clamped)
+        Assert.Equal(48.0, actualWidth, 1); // Preset-only: 48 * 1.0 = 48 (factor clamped)
     }
 
     [Fact]
@@ -198,18 +198,18 @@ public class TimelineViewZoomStateTests
     }
 
     [Fact]
-    public void BackwardCompatibility_DefaultParameters_ShouldMaintain40PixelDayWidth()
+    public void IntegralPixelDesign_DefaultParameters_ShouldReturn48PixelDayWidth()
     {
         // Arrange
         var defaultLevel = TimelineZoomLevel.MonthDay48px;
         var defaultFactor = 1.6;
-        var legacyDayWidth = 40.0;
+        var expectedDayWidth = 48.0;
 
         // Act
         var config = TimelineZoomService.GetConfiguration(defaultLevel);
         var actualDayWidth = config.GetEffectiveDayWidth(defaultFactor);
 
         // Assert
-        Assert.Equal(legacyDayWidth, actualDayWidth, 1);
+        Assert.Equal(expectedDayWidth, actualDayWidth, 1);
     }
 }

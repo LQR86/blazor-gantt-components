@@ -14,7 +14,7 @@ public class TimelineViewZoomTests
     public void DefaultZoomParameters_ShouldMaintainBackwardCompatibility()
     {
         // Arrange
-        var defaultZoomLevel = TimelineZoomLevel.MonthWeek;
+        var defaultZoomLevel = TimelineZoomLevel.MonthDay48px;
         var defaultZoomFactor = 1.6;
         var expectedDayWidth = 40.0; // Current legacy behavior
 
@@ -30,7 +30,7 @@ public class TimelineViewZoomTests
     public void MonthDayZoomLevel_WithDifferentFactors_ShouldCalculateCorrectly()
     {
         // Arrange
-        var zoomLevel = TimelineZoomLevel.MonthWeek;
+        var zoomLevel = TimelineZoomLevel.MonthDay48px;
 
         var testCases = new[]
         {
@@ -72,10 +72,10 @@ public class TimelineViewZoomTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 1.0, 96.0)]        // 60 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.MonthWeek, 1.0, 40.0)]       // 25 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.QuarterMonth, 1.0, 24.0)]    // 15 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.YearQuarter, 1.0, 12.8)]     // 8 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.WeekDay97px, 1.0, 96.0)]        // 60 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.MonthDay48px, 1.0, 40.0)]       // 25 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 1.0, 24.0)]    // 15 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 1.0, 12.8)]     // 8 * 1.6 backward compatibility
     public void ZoomLevel_WithBaseFactor_ShouldReturnExpectedDayWidth(
         TimelineZoomLevel level,
         double factor,
@@ -95,7 +95,7 @@ public class TimelineViewZoomTests
     public void ZoomFactorValidation_ShouldClampToValidRange()
     {
         // Arrange
-        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthWeek);
+        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay48px);
         var baseDayWidth = 40.0; // Updated for preset-only: 25 * 1.6 = 40px
 
         var testCases = new[]

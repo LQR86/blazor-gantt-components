@@ -57,10 +57,10 @@ public class PresetZoomLevelsIntegrationTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 96.0)]           // 60 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.MonthWeek, 40.0)]          // 25 * 1.6 backward compatibility  
-    [InlineData(TimelineZoomLevel.QuarterMonth, 24.0)]       // 15 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.YearQuarter, 12.8)]        // 8 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.WeekDay97px, 96.0)]           // 60 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.MonthDay48px, 40.0)]          // 25 * 1.6 backward compatibility  
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 24.0)]       // 15 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 12.8)]        // 8 * 1.6 backward compatibility
     public void AllPresetZoomLevels_WithBaseFactor_ShouldRenderWithCorrectDayWidths(
         TimelineZoomLevel zoomLevel, double expectedDayWidth)
     {
@@ -76,10 +76,10 @@ public class PresetZoomLevelsIntegrationTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 1.5, 96.0)]     // Preset-only: factor clamped to 1.0, so 96 * 1.0 = 96
-    [InlineData(TimelineZoomLevel.MonthWeek, 1.6, 40.0)]    // Preset-only: factor clamped to 1.0, so 40 * 1.0 = 40  
-    [InlineData(TimelineZoomLevel.QuarterMonth, 2.5, 24.0)] // Preset-only: factor clamped to 1.0, so 24 * 1.0 = 24
-    [InlineData(TimelineZoomLevel.YearQuarter, 2.0, 12.8)]  // Preset-only: factor clamped to 1.0, so 12.8 * 1.0 = 12.8
+    [InlineData(TimelineZoomLevel.WeekDay97px, 1.5, 96.0)]     // Preset-only: factor clamped to 1.0, so 96 * 1.0 = 96
+    [InlineData(TimelineZoomLevel.MonthDay48px, 1.6, 40.0)]    // Preset-only: factor clamped to 1.0, so 40 * 1.0 = 40
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 2.5, 24.0)] // Preset-only: factor clamped to 1.0, so 24 * 1.0 = 24
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 2.0, 12.8)]  // Preset-only: factor clamped to 1.0, so 12.8 * 1.0 = 12.8
     public void AllPresetZoomLevels_WithVariousFactors_ShouldScaleCorrectly(
         TimelineZoomLevel zoomLevel, double factor, double expectedDayWidth)
     {
@@ -100,10 +100,10 @@ public class PresetZoomLevelsIntegrationTests
         var factor = 1.0;
         var allLevels = new[]
         {
-            TimelineZoomLevel.WeekDay,
-            TimelineZoomLevel.MonthWeek,
-            TimelineZoomLevel.QuarterMonth,
-            TimelineZoomLevel.YearQuarter
+            TimelineZoomLevel.WeekDay97px,
+            TimelineZoomLevel.MonthDay48px,
+            TimelineZoomLevel.QuarterMonth24px,
+            TimelineZoomLevel.YearQuarter6px
         };
 
         // Act
@@ -134,12 +134,12 @@ public class PresetZoomLevelsIntegrationTests
 
         var allLevels = new[]
         {
-            TimelineZoomLevel.WeekDay,
-            TimelineZoomLevel.MonthWeek,
-            TimelineZoomLevel.MonthWeek,
-            TimelineZoomLevel.QuarterMonth,
-            TimelineZoomLevel.QuarterMonth,
-            TimelineZoomLevel.YearQuarter
+            TimelineZoomLevel.WeekDay97px,
+            TimelineZoomLevel.MonthDay48px,
+            TimelineZoomLevel.MonthDay48px,
+            TimelineZoomLevel.QuarterMonth24px,
+            TimelineZoomLevel.QuarterMonth24px,
+            TimelineZoomLevel.YearQuarter6px
         };
 
         // Act & Assert
@@ -232,12 +232,12 @@ public class PresetZoomLevelsIntegrationTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, 0.5, 96.0)]     // Preset-only: factor clamped to 1.0, base 96px
-    [InlineData(TimelineZoomLevel.WeekDay, 3.0, 96.0)]     // Preset-only: factor clamped to 1.0, base 96px
-    [InlineData(TimelineZoomLevel.MonthWeek, 0.5, 40.0)]    // Preset-only: factor clamped to 1.0, base 40px
-    [InlineData(TimelineZoomLevel.MonthWeek, 3.0, 40.0)]    // Preset-only: factor clamped to 1.0, base 40px
-    [InlineData(TimelineZoomLevel.YearQuarter, 0.5, 12.8)]  // Preset-only: factor clamped to 1.0, base 12.8px (8 * 1.6)
-    [InlineData(TimelineZoomLevel.YearQuarter, 3.0, 12.8)]  // Preset-only: factor clamped to 1.0, base 12.8px (8 * 1.6)
+    [InlineData(TimelineZoomLevel.WeekDay97px, 0.5, 96.0)]     // Preset-only: factor clamped to 1.0, base 96px
+    [InlineData(TimelineZoomLevel.WeekDay97px, 3.0, 96.0)]     // Preset-only: factor clamped to 1.0, base 96px
+    [InlineData(TimelineZoomLevel.MonthDay48px, 0.5, 40.0)]    // Preset-only: factor clamped to 1.0, base 40px
+    [InlineData(TimelineZoomLevel.MonthDay48px, 3.0, 40.0)]    // Preset-only: factor clamped to 1.0, base 40px
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 0.5, 12.8)]  // Preset-only: factor clamped to 1.0, base 12.8px (8 * 1.6)
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 3.0, 12.8)]  // Preset-only: factor clamped to 1.0, base 12.8px (8 * 1.6)
     public void ZoomFactorBounds_WithAllPresetZoomLevels_ShouldWorkCorrectly(
         TimelineZoomLevel zoomLevel, double factor, double expectedDayWidth)
     {

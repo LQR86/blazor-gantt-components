@@ -57,10 +57,10 @@ public class PresetZoomLevelsIntegrationTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay97px, 96.0)]           // 60 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.MonthDay48px, 40.0)]          // 25 * 1.6 backward compatibility  
-    [InlineData(TimelineZoomLevel.QuarterMonth24px, 24.0)]       // 15 * 1.6 backward compatibility
-    [InlineData(TimelineZoomLevel.YearQuarter6px, 12.8)]        // 8 * 1.6 backward compatibility
+    [InlineData(TimelineZoomLevel.WeekDay97px, 97.0)]           // 11-level integral: 97px
+    [InlineData(TimelineZoomLevel.MonthDay48px, 48.0)]          // 11-level integral: 48px  
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 24.0)]       // 11-level integral: 24px
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 6.0)]        // 11-level integral: 6px
     public void AllPresetZoomLevels_WithBaseFactor_ShouldRenderWithCorrectDayWidths(
         TimelineZoomLevel zoomLevel, double expectedDayWidth)
     {
@@ -76,10 +76,10 @@ public class PresetZoomLevelsIntegrationTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay97px, 1.5, 96.0)]     // Preset-only: factor clamped to 1.0, so 96 * 1.0 = 96
-    [InlineData(TimelineZoomLevel.MonthDay48px, 1.6, 40.0)]    // Preset-only: factor clamped to 1.0, so 40 * 1.0 = 40
+    [InlineData(TimelineZoomLevel.WeekDay97px, 1.5, 97.0)]     // Preset-only: factor clamped to 1.0, so 97 * 1.0 = 97
+    [InlineData(TimelineZoomLevel.MonthDay48px, 1.6, 48.0)]    // Preset-only: factor clamped to 1.0, so 48 * 1.0 = 48
     [InlineData(TimelineZoomLevel.QuarterMonth24px, 2.5, 24.0)] // Preset-only: factor clamped to 1.0, so 24 * 1.0 = 24
-    [InlineData(TimelineZoomLevel.YearQuarter6px, 2.0, 12.8)]  // Preset-only: factor clamped to 1.0, so 12.8 * 1.0 = 12.8
+    [InlineData(TimelineZoomLevel.YearQuarter6px, 2.0, 6.0)]  // Preset-only: factor clamped to 1.0, so 6 * 1.0 = 6
     public void AllPresetZoomLevels_WithVariousFactors_ShouldScaleCorrectly(
         TimelineZoomLevel zoomLevel, double factor, double expectedDayWidth)
     {
@@ -117,11 +117,11 @@ public class PresetZoomLevelsIntegrationTests
         // Assert - All day widths should be different
         Assert.Equal(4, dayWidths.Distinct().Count());
 
-        // Assert - Should be in descending order (WeekDay97px largest, Month8px smallest)
-        Assert.Equal(96.0, dayWidths[0]);  // WeekDay97px: 60 * 1.6 backward compatibility
-        Assert.Equal(40.0, dayWidths[1]);  // MonthDay48px: 25 * 1.6 backward compatibility
-        Assert.Equal(24.0, dayWidths[2]);  // QuarterMonth24px: 15 * 1.6 backward compatibility
-        Assert.Equal(12.8, dayWidths[3]);  // Month8px: 8 * 1.6 backward compatibility
+        // Assert - Should be in descending order (WeekDay97px largest, YearQuarter6px smallest)
+        Assert.Equal(97.0, dayWidths[0]);  // WeekDay97px: 11-level integral 97px
+        Assert.Equal(48.0, dayWidths[1]);  // MonthDay48px: 11-level integral 48px
+        Assert.Equal(24.0, dayWidths[2]);  // QuarterMonth24px: 11-level integral 24px
+        Assert.Equal(6.0, dayWidths[3]);  // YearQuarter6px: 11-level integral 6px
     }
 
     [Fact]

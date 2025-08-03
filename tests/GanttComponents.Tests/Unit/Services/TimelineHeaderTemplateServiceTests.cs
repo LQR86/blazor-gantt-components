@@ -38,9 +38,9 @@ public class TimelineHeaderTemplateServiceTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay, "date.week-range", "date.day-name-short")]
-    [InlineData(TimelineZoomLevel.MonthWeek, "date.month-year", "date.week-start-day")]
-    [InlineData(TimelineZoomLevel.YearQuarter, "date.year", "date.quarter-short")]
+    [InlineData(TimelineZoomLevel.WeekDay97px, "date.week-range", "date.day-name-short")]
+    [InlineData(TimelineZoomLevel.MonthDay48px, "date.month-year", "date.day-number")]
+    [InlineData(TimelineZoomLevel.YearQuarter6px, "date.year", "date.quarter-short")]
     public void GetTemplate_ReturnsCorrectFormats(TimelineZoomLevel zoomLevel, string expectedPrimaryFormat, string expectedSecondaryFormat)
     {
         // Act
@@ -71,7 +71,7 @@ public class TimelineHeaderTemplateServiceTests
     public void YearQuarter_HasBothHeadersVisible()
     {
         // Act
-        var template = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.YearQuarter);
+        var template = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.YearQuarter6px);
 
         // Assert - Year-Quarter pattern uses Year → Quarter, both visible at 8px day width
         Assert.True(template.ShowPrimary); // Year headers are visible
@@ -83,7 +83,7 @@ public class TimelineHeaderTemplateServiceTests
     {
         // Arrange
         var allLevels = Enum.GetValues<TimelineZoomLevel>()
-            .Where(level => level != TimelineZoomLevel.YearQuarter);
+            .Where(level => level != TimelineZoomLevel.YearQuarter6px);
 
         // Act & Assert
         foreach (var level in allLevels)
@@ -98,7 +98,7 @@ public class TimelineHeaderTemplateServiceTests
     public void GetTemplateDescription_ReturnsNonEmptyDescription()
     {
         // Act
-        var description = TimelineHeaderTemplateService.GetTemplateDescription(TimelineZoomLevel.WeekDay);
+        var description = TimelineHeaderTemplateService.GetTemplateDescription(TimelineZoomLevel.WeekDay97px);
 
         // Assert
         Assert.NotEmpty(description);

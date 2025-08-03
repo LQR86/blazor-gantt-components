@@ -102,9 +102,9 @@ public class TimelineViewZoomRenderingTests
         var daysInMonth = 30;
         var testCases = new[]
         {
-            (level: TimelineZoomLevel.WeekDay97px, factor: 1.0, expectedDayWidth: 96.0),   // 60 * 1.6
-            (level: TimelineZoomLevel.MonthDay48px, factor: 1.6, expectedDayWidth: 40.0), // Preset-only: factor ignored
-            (level: TimelineZoomLevel.Month8px, factor: 1.0, expectedDayWidth: 12.8), // 8 * 1.6
+            (level: TimelineZoomLevel.WeekDay97px, factor: 1.0, expectedDayWidth: 97.0),   // 11-level integral: 97px
+            (level: TimelineZoomLevel.MonthDay48px, factor: 1.6, expectedDayWidth: 48.0), // 11-level integral: 48px (factor ignored)
+            (level: TimelineZoomLevel.Month8px, factor: 1.0, expectedDayWidth: 8.0), // 11-level integral: 8px
         };
 
         foreach (var (level, factor, expectedDayWidth) in testCases)
@@ -128,9 +128,9 @@ public class TimelineViewZoomRenderingTests
         var totalDays = 90;
         var testCases = new[]
         {
-            (level: TimelineZoomLevel.WeekDay97px, factor: 1.0, expectedDayWidth: 96.0),   // 60 * 1.6
-            (level: TimelineZoomLevel.MonthDay48px, factor: 1.6, expectedDayWidth: 40.0), // Preset-only: factor ignored
-            (level: TimelineZoomLevel.Month8px, factor: 1.0, expectedDayWidth: 12.8), // 8 * 1.6
+            (level: TimelineZoomLevel.WeekDay97px, factor: 1.0, expectedDayWidth: 97.0),   // 11-level integral: 97px
+            (level: TimelineZoomLevel.MonthDay48px, factor: 1.6, expectedDayWidth: 48.0), // 11-level integral: 48px (factor ignored)
+            (level: TimelineZoomLevel.Month8px, factor: 1.0, expectedDayWidth: 8.0), // 11-level integral: 8px
         };
 
         foreach (var (level, factor, expectedDayWidth) in testCases)

@@ -14,7 +14,7 @@ public class MonthWeekHeaderTemplateTests
     public void MonthWeek_Template_ShouldHaveCorrectMonthWeekConfiguration()
     {
         // Arrange & Act
-        var template = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.MonthWeek);
+        var template = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.MonthDay48px);
 
         // Assert
         Assert.Equal(TimelineHeaderUnit.Month, template.PrimaryUnit);
@@ -30,7 +30,7 @@ public class MonthWeekHeaderTemplateTests
     public void MonthWeekMedium_Template_ShouldHaveCorrectMonthWeekConfiguration()
     {
         // Arrange & Act
-        var template = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.MonthWeekMedium);
+        var template = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.MonthDay34px);
 
         // Assert
         Assert.Equal(TimelineHeaderUnit.Month, template.PrimaryUnit);
@@ -46,7 +46,7 @@ public class MonthWeekHeaderTemplateTests
     public void MonthWeekLow_Template_ShouldHaveCorrectMonthWeekConfiguration()
     {
         // Arrange & Act
-        var template = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.MonthWeekLow);
+        var template = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.QuarterMonth24px);
 
         // Assert
         Assert.Equal(TimelineHeaderUnit.Month, template.PrimaryUnit);
@@ -59,9 +59,9 @@ public class MonthWeekHeaderTemplateTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.MonthWeek, 40.0)] // 25 * 1.6 for backward compatibility  
-    [InlineData(TimelineZoomLevel.MonthWeekMedium, 32.0)] // 20 * 1.6 for backward compatibility
-    [InlineData(TimelineZoomLevel.MonthWeekLow, 28.8)] // 18 * 1.6 for backward compatibility
+    [InlineData(TimelineZoomLevel.MonthDay48px, 40.0)] // 25 * 1.6 for backward compatibility  
+    [InlineData(TimelineZoomLevel.MonthDay34px, 32.0)] // 20 * 1.6 for backward compatibility
+    [InlineData(TimelineZoomLevel.QuarterMonth24px, 28.8)] // 18 * 1.6 for backward compatibility
     public void MonthWeek_ZoomConfiguration_ShouldHaveCorrectDayWidth(TimelineZoomLevel level, double expectedDayWidth)
     {
         // Arrange & Act
@@ -73,9 +73,9 @@ public class MonthWeekHeaderTemplateTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.MonthWeek)]
-    [InlineData(TimelineZoomLevel.MonthWeekMedium)]
-    [InlineData(TimelineZoomLevel.MonthWeekLow)]
+    [InlineData(TimelineZoomLevel.MonthDay48px)]
+    [InlineData(TimelineZoomLevel.MonthDay34px)]
+    [InlineData(TimelineZoomLevel.QuarterMonth24px)]
     public void MonthWeek_HeaderAdapter_ShouldGenerateValidConfiguration(TimelineZoomLevel level)
     {
         // Arrange
@@ -86,9 +86,9 @@ public class MonthWeekHeaderTemplateTests
 
         // Assert
         Assert.Equal(TimelineHeaderUnit.Month, config.PrimaryUnit);
-        
+
         // Check the correct format based on the level
-        if (level == TimelineZoomLevel.MonthWeek)
+        if (level == TimelineZoomLevel.MonthDay48px)
         {
             Assert.Equal("date.month-year", config.PrimaryFormat);
             Assert.Equal("date.week-start-day", config.SecondaryFormat);
@@ -98,7 +98,7 @@ public class MonthWeekHeaderTemplateTests
             Assert.Equal("date.month-abbrev", config.PrimaryFormat);
             Assert.Equal("date.week-start", config.SecondaryFormat);
         }
-        
+
         Assert.Equal(TimelineHeaderUnit.Week, config.SecondaryUnit);
         Assert.True(config.ShowPrimary);
         Assert.True(config.ShowSecondary);
@@ -110,18 +110,18 @@ public class MonthWeekHeaderTemplateTests
     public void MonthWeek_Levels_ShouldFollowCorrectProgression()
     {
         // Arrange
-        var monthWeekConfig = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthWeek);
-        var monthWeekMediumConfig = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthWeekMedium);
-        var monthWeekLowConfig = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthWeekLow);
+        var monthWeekConfig = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay48px);
+        var monthWeekMediumConfig = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay34px);
+        var monthWeekLowConfig = TimelineZoomService.GetConfiguration(TimelineZoomLevel.QuarterMonth24px);
 
         // Assert - Day widths should decrease for zooming out
         Assert.True(monthWeekConfig.BaseDayWidth > monthWeekMediumConfig.BaseDayWidth);
         Assert.True(monthWeekMediumConfig.BaseDayWidth > monthWeekLowConfig.BaseDayWidth);
 
         // Assert - All should use Month -> Week pattern
-        var monthWeekTemplate = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.MonthWeek);
-        var monthWeekMediumTemplate = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.MonthWeekMedium);
-        var monthWeekLowTemplate = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.MonthWeekLow);
+        var monthWeekTemplate = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.MonthDay48px);
+        var monthWeekMediumTemplate = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.MonthDay34px);
+        var monthWeekLowTemplate = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.QuarterMonth24px);
 
         Assert.Equal(TimelineHeaderUnit.Month, monthWeekTemplate.PrimaryUnit);
         Assert.Equal(TimelineHeaderUnit.Month, monthWeekMediumTemplate.PrimaryUnit);

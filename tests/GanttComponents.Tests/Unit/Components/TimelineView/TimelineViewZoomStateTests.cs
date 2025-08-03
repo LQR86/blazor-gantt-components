@@ -31,17 +31,17 @@ public class TimelineViewZoomStateTests
     }
 
     [Fact]
-    public void CurrentEffectiveDayWidth_WithDefaults_ShouldBe40Pixels()
+    public void CurrentEffectiveDayWidth_WithDefaults_ShouldBe24Pixels()
     {
         // Arrange
-        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay48px);
+        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.QuarterMonth24px);
 
         // Act
-        var dayWidth = config.GetEffectiveDayWidth(1.6);
+        var dayWidth = config.GetEffectiveDayWidth(1.0);
 
         // Assert
-        // MonthDay (25px) * 1.6 = 40px (backward compatibility)
-        Assert.Equal(40.0, dayWidth, 1);
+        // QuarterMonth24px (24px) * 1.0 = 24px (11-level integral design)
+        Assert.Equal(24.0, dayWidth, 1);
     }
 
     [Theory]

@@ -5,8 +5,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-    # This workflow runs on ALL PRs as a safety net
-    # Specialized workflows handle branch-specific validation
+    # This workflow runs on ALL PRs - branch naming validation removed
 
 permissions:
   contents: read
@@ -16,50 +15,9 @@ env:
   DOTNET_VERSION: '8.0.x'
 
 jobs:
-  # Detect branch type for conditional job execution
-  branch-detection:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    outputs:
-      branch-type: ${{ steps.detect.outputs.branch-type }}
-      skip-build: ${{ steps.detect.outputs.skip-build }}
-    steps:
-      - name: Detect Branch Type
-        id: detect
-        run: |
-          BRANCH_NAME="${{ github.head_ref }}"
-          echo "🔍 Detecting branch type: $BRANCH_NAME"
-          
-          # Detect branch type
-          if [[ "$BRANCH_NAME" =~ ^feat/v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-            echo "branch-type=milestone" >> $GITHUB_OUTPUT
-            echo "skip-build=false" >> $GITHUB_OUTPUT
-            echo "📋 Milestone feature branch - full CI/CD required"
-          elif [[ "$BRANCH_NAME" =~ ^(fix|hotfix)/ ]]; then
-            echo "branch-type=fix" >> $GITHUB_OUTPUT
-            echo "skip-build=false" >> $GITHUB_OUTPUT
-            echo "🔧 Fix branch - full testing required"
-          elif [[ "$BRANCH_NAME" =~ ^docs/ ]]; then
-            echo "branch-type=docs" >> $GITHUB_OUTPUT
-            echo "skip-build=true" >> $GITHUB_OUTPUT
-            echo "📚 Documentation branch - skipping build"
-          elif [[ "$BRANCH_NAME" =~ ^ci/ ]]; then
-            echo "branch-type=ci" >> $GITHUB_OUTPUT
-            echo "skip-build=false" >> $GITHUB_OUTPUT
-            echo "🔄 CI branch - testing CI changes"
-          else
-            echo "branch-type=standard" >> $GITHUB_OUTPUT
-            echo "skip-build=false" >> $GITHUB_OUTPUT
-            echo "⚙️ Standard branch - normal CI/CD"
-          fi
-
   # Main build and test job - Windows focused
   build-and-test:
     runs-on: windows-latest  # Using Windows for Windows 7/10 compatibility
-    needs: branch-detection
-    if: |
-      github.event_name == 'push' || 
-      (github.event_name == 'pull_request' && needs.branch-detection.outputs.skip-build != 'true')
     
     steps:
     - name: Checkout code

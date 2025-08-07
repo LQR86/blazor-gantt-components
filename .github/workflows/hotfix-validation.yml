@@ -17,28 +17,21 @@ env:
   DOTNET_VERSION: '8.0.x'
 
 jobs:
-  validate-hotfix-branch:
+  hotfix-info:
     runs-on: ubuntu-latest
-    if: startsWith(github.head_ref, 'hotfix/')
+    if: contains(github.head_ref, 'hotfix')
     steps:
-      - name: Validate Hotfix Branch
+      - name: Hotfix Branch Info
         run: |
           echo "🚨 Hotfix branch detected: ${{ github.head_ref }}"
           echo "🔍 Running critical path validation"
-          
-          # Ensure hotfix follows naming convention
-          if [[ ! "${{ github.head_ref }}" =~ ^hotfix/[a-z0-9-]+$ ]]; then
-            echo "❌ Invalid hotfix branch name: ${{ github.head_ref }}"
-            echo "   Required format: hotfix/security-patch-name"
-            exit 1
-          fi
-          
-          echo "✅ Hotfix branch name is valid"
+          echo "✅ Branch naming validation rules have been removed"
+          echo "🎯 Focus: Security and functionality validation"
 
   security-scan:
     runs-on: ubuntu-latest
-    needs: validate-hotfix-branch
-    if: startsWith(github.head_ref, 'hotfix/')
+    needs: hotfix-info
+    if: contains(github.head_ref, 'hotfix')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -78,8 +71,8 @@ jobs:
 
   fast-deployment-check:
     runs-on: ubuntu-latest
-    needs: [validate-hotfix-branch, security-scan]
-    if: startsWith(github.head_ref, 'hotfix/')
+    needs: [hotfix-info, security-scan]
+    if: contains(github.head_ref, 'hotfix')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

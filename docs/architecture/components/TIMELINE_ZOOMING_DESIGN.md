@@ -3,8 +3,8 @@
 > **Component**: TimelineView  
 > **Feature**: 11-Level Integral Zoom with Fibonacci-like Progression  
 > **Status**: ✅ **IMPLEMENTED & VALIDATED**  
-> **Date**: August 3, 2025  
-> **Version**: v0.8.6
+> **Last Updated**: August 7, 2025  
+> **Version**: v0.8.7 (includes header extraction enhancements)
 
 ## 📋 **Executive Summary**
 
@@ -232,64 +232,84 @@ The Timeline Zooming System provides professional-grade zoom capabilities with *
 
 ---
 
-## ✅ **Implementation Status: v0.8.6 Complete**
+## ✅ **Implementation Status: v0.8.7 Enhanced**
 
 ### **🎉 Implementation Achievements**
 
-**Status**: ✅ **FULLY IMPLEMENTED & VALIDATED**  
-**Implementation Date**: August 3, 2025  
-**Branch**: `feat/v0.8.6-timeline-header-templates`  
-**Test Coverage**: 388/388 tests passing (100% success rate)
+**Status**: ✅ **FULLY IMPLEMENTED & ENHANCED**  
+**Zoom System Implementation**: August 3, 2025 (v0.8.6)  
+**Header Architecture Enhancement**: August 7, 2025 (v0.8.7)  
+**Current Branch**: `feat/v0.8.7-timeline-header-extraction`  
+**Test Coverage**: 401/401 tests passing (100% success rate)
 
 ### **🚀 What Was Delivered**
 
-1. **✅ 11-Level Integral Zoom System**: Complete replacement of previous 13-level system
+1. **✅ 11-Level Integral Zoom System** (v0.8.6): Complete replacement of previous 13-level system
    - All integral pixel widths: [3, 4, 6, 8, 12, 17, 24, 34, 48, 68, 97]px
    - Fibonacci-like natural progression with ~0.7x smooth ratios
    - Eliminates all sub-pixel positioning and rendering issues
 
-2. **✅ Professional Header Patterns**: Logical pattern transitions
+2. **✅ Professional Header Patterns** (v0.8.6): Logical pattern transitions
    - Year→Quarter (3px, 4px, 6px): Strategic overview
    - Month-only (8px, 12px): Annual planning
    - Quarter→Month (17px, 24px): Quarterly planning  
    - Month→Day (34px, 48px): Project management
    - Week→Day (68px, 97px): Sprint/daily management
 
-3. **✅ Zero Breaking Changes**: Complete backward compatibility
+3. **✅ Header Architecture Enhancement** (v0.8.7): Service-driven header generation
+   - **TimelineHeaderService**: Extracted 80+ lines of inline Razor logic
+   - **TimelineHeader Component**: Reusable header component with data-driven rendering
+   - **HeaderPeriod Models**: Clean data structures for header period representation
+   - **Zero Breaking Changes**: 100% backward compatibility maintained
+
+4. **✅ Zero Breaking Changes**: Complete backward compatibility across versions
    - All existing TimelineView usage preserved
    - GanttComposer integration unchanged
    - Row alignment architecture maintained
-
-4. **✅ Performance Optimization**: Production-ready performance
-   - Integral pixels leverage browser optimizations
-   - Debug logging removed from rendering loops
-   - Smooth zoom transitions validated
+   - API contracts fully preserved
 
 ### **🧪 Validation Results**
 
 - **✅ Compilation**: 0 errors across entire codebase
-- **✅ Test Suite**: 388/388 tests passing (100% success rate)
-- **✅ Manual Testing**: All 11 zoom levels validated in demo
+- **✅ Test Suite**: 401/401 tests passing (100% success rate) 
+- **✅ Manual Testing**: All 11 zoom levels validated across demo pages
 - **✅ Integration**: GanttComposer timeline coordination verified
 - **✅ Performance**: Smooth transitions and rendering confirmed
+- **✅ Header Extraction**: TimelineHeader component integration validated
 
 ### **📁 Key Implementation Files**
 
+**Core Zoom System (v0.8.6)**:
 - **Models**: `TimelineZoomLevel.cs`, `ZoomLevelConfiguration.cs`
-- **Services**: `TimelineHeaderAdapter.cs`, `TimelineHeaderTemplateService.cs`
+- **Services**: `TimelineZoomService.cs`, `TimelineHeaderAdapter.cs`
 - **Components**: `TimelineView.razor`, `TimelineZoomControls.razor`, `GanttComposer.razor`
 - **Resources**: `GanttResources.resx`, `GanttResources.zh-CN.resx`
-- **Tests**: Comprehensive test coverage across all zoom levels
+
+**Header Architecture Enhancement (v0.8.7)**:
+- **Services**: `TimelineHeaderService.cs`, `ITimelineHeaderService.cs`
+- **Components**: `TimelineHeader.razor`
+- **Models**: `HeaderPeriod.cs`, `TimelineHeaderResult.cs`
+- **Tests**: Comprehensive header service and integration tests
 
 ### **🎯 Next Steps**
 
-This implementation completes the core 11-level integral zoom system. Future enhancements planned for subsequent branches:
+The zoom system and header architecture are now production-ready. Future enhancements planned:
 - Performance testing with large datasets (500+ tasks)
 - Advanced zoom features (fit viewport, smart shortcuts)
 - Mobile gesture support and touch optimization
+- Dependency line rendering integration
+- Virtual scrolling for massive timelines
 
-*This design document provided the architectural foundation for the successful implementation of the 11-level integral zoom system, achieving all design goals while maintaining complete backward compatibility.*
+### **📚 Related Documentation**
+
+For comprehensive TimelineView component documentation, see:
+- [TimelineView Design Specification](./TimelineView/TIMELINEVIEW_DESIGN_SPECIFICATION.md)
+- [TimelineView Implementation Guide](./TimelineView/TIMELINEVIEW_IMPLEMENTATION_GUIDE.md)
+- [TimelineView Usage Guide](./TimelineView/TIMELINEVIEW_USAGE_GUIDE.md)
+- [TimelineView Architecture Summary](./TimelineView/TIMELINEVIEW_ARCHITECTURE_SUMMARY.md)
+
+*This design document provided the architectural foundation for the successful implementation of the 11-level integral zoom system (v0.8.6) and subsequent header architecture enhancement (v0.8.7), achieving all design goals while maintaining complete backward compatibility. For detailed component documentation, see the [TimelineView documentation suite](./TimelineView/).*
 
 ---
 
-*This design document provides the architectural foundation and design decisions needed to guide timeline zooming implementation. It preserves all existing component integration patterns while enabling professional-grade zoom capabilities.*
+*This design document provides the foundational architecture for timeline zooming implementation. It preserves all existing component integration patterns while enabling professional-grade zoom capabilities and maintains relevance as the zoom system foundation.*

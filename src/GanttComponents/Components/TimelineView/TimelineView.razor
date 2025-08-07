@@ -1,5 +1,6 @@
 @using GanttComponents.Models
 @using GanttComponents.Services
+@using GanttComponents.Components.TimelineHeader
 @inject IUniversalLogger Logger
 @inject IGanttI18N I18N
 @inject DateFormatHelper DateFormatter
@@ -7,81 +8,23 @@
 
 <div class="timeline-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
     <div class="timeline-scroll-container" @onscroll="OnScroll">
-        <div class="timeline-header">
-            @{
-                // Use the new preset template system for predictable, testable header behavior
-                var headerConfig = TimelineHeaderAdapter.GetHeaderConfigurationFromTemplate(ZoomLevel, Logger);
-                var timeSpanDays = (EndDate - StartDate).Days + 1;
-                var shouldCollapse = TimelineHeaderAdapter.ShouldCollapseHeaders(headerConfig, EffectiveDayWidth, timeSpanDays);
-            }
-            
-            @if (headerConfig.ShowPrimary && !shouldCollapse)
-            {
-                <div class="timeline-header-primary">
-                @{
-                    var primaryStart = TimelineHeaderAdapter.GetPeriodStart(StartDate, headerConfig.PrimaryUnit, Logger);
-                    var increment = TimelineHeaderAdapter.GetDateIncrement(headerConfig.PrimaryUnit);
-                    var current = primaryStart;
-                }                    @while (current <= EndDate)
-                    {
-                        var periodWidth = TimelineHeaderAdapter.GetPeriodWidth(current, headerConfig.PrimaryUnit, EffectiveDayWidth);
-                        var nextPeriod = increment(current);
-                        
-                        // Adjust width if period extends beyond timeline
-                        if (nextPeriod > EndDate.AddDays(1))
-                        {
-                            var visibleDays = (EndDate.AddDays(1) - current).Days;
-                            periodWidth = visibleDays * EffectiveDayWidth;
-                        }
-                        
-                        // Skip if period starts after timeline end
-                        if (current > EndDate)
-                        {
-                            break;
-                        }
-                        
-                        <div class="timeline-primary-unit" style="width: @(periodWidth)px;">
-                            @DateFormatter.FormatTimelineHeader(current, headerConfig.PrimaryFormat)
-                        </div>
-                        
-                        current = nextPeriod;
-                    }
-                </div>
-            }
-            
-            <div class="timeline-header-secondary">
-                @{
-                    var secondaryStart = TimelineHeaderAdapter.GetPeriodStart(StartDate, headerConfig.SecondaryUnit, Logger);
-                    var secondaryIncrement = TimelineHeaderAdapter.GetDateIncrement(headerConfig.SecondaryUnit);
-                    var secondaryCurrent = secondaryStart;
-                }
-                
-                @while (secondaryCurrent <= EndDate)
-                {
-                    var secondaryWidth = TimelineHeaderAdapter.GetPeriodWidth(secondaryCurrent, headerConfig.SecondaryUnit, EffectiveDayWidth);
-                    var nextSecondary = secondaryIncrement(secondaryCurrent);
-                    
-                    // Adjust width if period extends beyond timeline
-                    if (nextSecondary > EndDate.AddDays(1))
-                    {
-                        var visibleDays = (EndDate.AddDays(1) - secondaryCurrent).Days;
-                        secondaryWidth = visibleDays * EffectiveDayWidth;
-                    }
-                    
-                    // Skip if period starts after timeline end
-                    if (secondaryCurrent > EndDate)
-                    {
-                        break;
-                    }
-                    
-                    <div class="timeline-secondary-unit" style="width: @(secondaryWidth)px;">
-                        @DateFormatter.FormatTimelineHeader(secondaryCurrent, headerConfig.SecondaryFormat)
-                    </div>
-                    
-                    secondaryCurrent = nextSecondary;
-                }
-            </div>
-        </div>
+        @* 
+        === TIMELINE HEADER ARCHITECTURE ===
+        Header rendering is now handled by the dedicated TimelineHeader component for better:
+        - Maintainability: Header logic isolated in its own service and component
+        - Testability: Business logic can be unit tested independently  
+        - Reusability: TimelineHeader can be used standalone or in other contexts
+        - Performance: Data-driven rendering using HeaderPeriod models
+        
+        The TimelineHeader component uses TimelineHeaderService to generate periods
+        and renders them using the same CSS classes for visual consistency.
+        *@
+        <TimelineHeader StartDate="@StartDate" 
+                       EndDate="@EndDate" 
+                       EffectiveDayWidth="@EffectiveDayWidth" 
+                       ZoomLevel="@ZoomLevel"
+                       HeaderMonthHeight="@HeaderMonthHeight"
+                       HeaderDayHeight="@HeaderDayHeight" />
         
         <div class="timeline-body">
         <svg class="timeline-svg" width="@(TotalWidth)" height="@(TotalHeight)">
@@ -394,6 +337,9 @@
         position: relative;
     }
 
+    /* === HEADER STYLES === */
+    /* NOTE: Header rendering now handled by TimelineHeader component, but keeping CSS for backward compatibility */
+    
     .timeline-header {
         position: sticky;
         top: 0;
@@ -452,7 +398,8 @@
         white-space: nowrap;
     }
 
-    /* Legacy classes for backward compatibility - deprecated */
+    /* === LEGACY HEADER CLASSES (DEPRECATED) === */
+    /* Keep for backward compatibility - may be used by external CSS or JS */
     .timeline-header-months {
         display: flex;
         height: var(--header-month-height);

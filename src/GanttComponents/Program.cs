@@ -34,6 +34,9 @@ builder.Services.AddSingleton<IGanttI18N, GanttI18N>();
 // Add DateFormatHelper as scoped service
 builder.Services.AddScoped<DateFormatHelper>();
 
+// Add TimelineHeader services
+builder.Services.AddScoped<ITimelineHeaderService, TimelineHeaderService>();
+
 var app = builder.Build();
 
 // Initialize database

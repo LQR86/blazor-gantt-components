@@ -1,0 +1,48 @@
+@using GanttComponents.Models
+@using GanttComponents.Services
+@inject IUniversalLogger Logger
+@inject IGanttI18N I18N
+@inject DateFormatHelper DateFormatter
+
+@* TimelineHeader Component Stub - Phase 1 Foundation *@
+<div class="timeline-header-stub">
+    <div class="timeline-header-primary">
+        <div class="timeline-primary-unit">TimelineHeader Stub - Phase 1</div>
+    </div>
+    <div class="timeline-header-secondary">
+        <div class="timeline-secondary-unit">Component Foundation Created</div>
+    </div>
+</div>
+
+@code {
+    // Parameter stubs - will match TimelineView interface exactly
+    [Parameter] public DateTime StartDate { get; set; }
+    [Parameter] public DateTime EndDate { get; set; }
+    [Parameter] public double EffectiveDayWidth { get; set; }
+    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; }
+    [Parameter] public int HeaderMonthHeight { get; set; } = 32;
+    [Parameter] public int HeaderDayHeight { get; set; } = 24;
+    
+    protected override void OnInitialized()
+    {
+        Logger.LogComponentLifecycle("TimelineHeader", "OnInitialized - Foundation Phase", new { 
+            StartDate, EndDate, ZoomLevel, EffectiveDayWidth 
+        });
+    }
+}
+
+<style>
+    .timeline-header-stub {
+        background: #fffacd;
+        border: 2px dashed #ffa500;
+        padding: 8px;
+        text-align: center;
+        font-weight: bold;
+        color: #ff6600;
+    }
+    
+    .timeline-header-primary,
+    .timeline-header-secondary {
+        padding: 4px;
+    }
+</style>

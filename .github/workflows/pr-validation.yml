@@ -33,9 +33,13 @@ jobs:
           REFACTOR_PATTERN="^refactor/[a-z0-9-]+$"
           TEST_PATTERN="^test/[a-z0-9-]+$"
           PERF_PATTERN="^perf/[a-z0-9-]+$"
+          DEPENDABOT_PATTERN="^dependabot/"
           
           # Check if branch matches any allowed pattern
-          if [[ "$BRANCH_NAME" =~ $FEATURE_VERSION_PATTERN ]]; then
+          if [[ "$BRANCH_NAME" =~ $DEPENDABOT_PATTERN ]]; then
+            echo "✅ Valid Dependabot branch: $BRANCH_NAME"
+            echo "branch-type=dependabot" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH_NAME" =~ $FEATURE_VERSION_PATTERN ]]; then
             echo "✅ Valid feature branch with version: $BRANCH_NAME"
             echo "branch-type=feature-version" >> $GITHUB_OUTPUT
           elif [[ "$BRANCH_NAME" =~ $FIX_PATTERN ]]; then
@@ -69,6 +73,7 @@ jobs:
             echo "❌ Invalid branch naming convention: $BRANCH_NAME"
             echo ""
             echo "📋 Allowed branch naming patterns:"
+            echo "   dependabot/*                       (dependency updates)"
             echo "   feat/v0.3.0-alpha-component-name  (feature with version)"
             echo "   fix/timeline-scrolling-bug        (bug fixes)"
             echo "   hotfix/critical-security-patch    (urgent fixes)"
@@ -80,7 +85,7 @@ jobs:
             echo "   test/add-unit-tests                (testing)"
             echo "   perf/optimize-rendering            (performance)"
             echo ""
-            echo "ℹ️  Branch names must use lowercase letters, numbers, and hyphens only"
+            echo "ℹ️  Branch names must use lowercase letters, numbers, and hyphens only (except dependabot/*)"
             exit 1
           fi
 
@@ -98,6 +103,12 @@ jobs:
           BRANCH_TYPE="${{ needs.branch-validation.outputs.branch-type }}"
           
           echo "📋 Branch type detected: $BRANCH_TYPE"
+          
+          # Skip validation for Dependabot PRs
+          if [[ "$BRANCH_TYPE" == "dependabot" ]]; then
+            echo "✅ Dependabot PR - skipping title format validation"
+            exit 0
+          fi
           
           # Check if this is a feature branch with version
           if [[ "$BRANCH_TYPE" == "feature-version" ]]; then

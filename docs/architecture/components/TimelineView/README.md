@@ -29,6 +29,17 @@ This folder contains comprehensive documentation for the TimelineView component 
 - CSS implementation and styling approaches
 - Testing strategies and examples
 
+### **🎨 [Header Customization Guide](./TIMELINEHEADER_CUSTOMIZATION_GUIDE.md)**
+**Purpose**: Comprehensive guide for customizing timeline headers  
+**Audience**: Developers implementing custom header behavior  
+**Contents**:
+- Service-based customization patterns
+- Custom date formats and styling approaches
+- Industry-specific header implementations
+- Component-level customization techniques
+- Advanced data-driven header configurations
+- Migration guide from v0.8.6 inline modifications
+
 ### **📚 [Usage Guide](./TIMELINEVIEW_USAGE_GUIDE.md)**
 **Purpose**: Practical usage examples and integration patterns  
 **Audience**: Application developers, component consumers  

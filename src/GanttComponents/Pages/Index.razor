@@ -8,4 +8,134 @@
 
 <p>@I18N.T("home.description")</p>
 
-<p><a href="/gantt-demo">@I18N.T("home.try-demo")</a></p>
+<div class="main-demos mb-4">
+    <h3>🎯 Main Components</h3>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">TaskGrid Demo</h5>
+                    <p class="card-text">Hierarchical task management with WBS codes and tree structure.</p>
+                    <a href="/gantt-demo" class="btn btn-primary">@I18N.T("home.try-demo")</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Timeline Demo</h5>
+                    <p class="card-text">SVG-based timeline with zoom controls and task bars.</p>
+                    <a href="/timeline-demo" class="btn btn-primary">View Timeline</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Gantt Composer Demo</h5>
+                    <p class="card-text">Integrated TaskGrid + TimelineView with perfect row alignment.</p>
+                    <a href="/gantt-composer-demo" class="btn btn-primary">View Composer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="advanced-demos mb-4">
+    <h3>🧪 Advanced Demos & Validation</h3>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Timeline Header Demo</h6>
+                    <p class="card-text small">Service-driven header templates with customization.</p>
+                    <a href="/timeline-header-demo" class="btn btn-outline-primary btn-sm">View Demo</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Zoom Validation</h6>
+                    <p class="card-text small">Comprehensive zoom level testing and validation.</p>
+                    <a href="/gantt-composer-zoom-validation" class="btn btn-outline-primary btn-sm">View Test</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Zoom Presets</h6>
+                    <p class="card-text small">Preset configurations for different UI scenarios.</p>
+                    <a href="/zoom-presets-demo" class="btn btn-outline-primary btn-sm">View Presets</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Header Templates</h6>
+                    <p class="card-text small">Timeline header template validation and testing.</p>
+                    <a href="/timeline-header-template-validation" class="btn btn-outline-primary btn-sm">View Templates</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">WBS Demo</h6>
+                    <p class="card-text small">Work Breakdown Structure validation and management.</p>
+                    <a href="/wbs-demo" class="btn btn-outline-primary btn-sm">View WBS</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Logger Demo</h6>
+                    <p class="card-text small">Universal logging system demonstration.</p>
+                    <a href="/logger-demo" class="btn btn-outline-primary btn-sm">View Logger</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        height: 100%;
+        border: 1px solid var(--gantt-outline, #e0e0e0);
+        transition: box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .card-title {
+        color: var(--gantt-primary, #1976d2);
+        font-weight: 600;
+    }
+    
+    .card-text {
+        color: var(--gantt-on-surface-variant, #666);
+    }
+    
+    .btn-primary {
+        background-color: var(--gantt-primary, #1976d2);
+        border-color: var(--gantt-primary, #1976d2);
+    }
+    
+    .btn-outline-primary {
+        color: var(--gantt-primary, #1976d2);
+        border-color: var(--gantt-primary, #1976d2);
+    }
+    
+    .main-demos h3,
+    .advanced-demos h3 {
+        color: var(--gantt-on-surface, #333);
+        border-bottom: 2px solid var(--gantt-primary, #1976d2);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+</style>

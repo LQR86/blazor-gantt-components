@@ -3,19 +3,39 @@
 @inject IUniversalLogger Logger
 @inject IGanttI18N I18N
 @inject DateFormatHelper DateFormatter
+@inject ITimelineHeaderService HeaderService
 
-@* TimelineHeader Component Stub - Phase 1 Foundation *@
-<div class="timeline-header-stub">
-    <div class="timeline-header-primary">
-        <div class="timeline-primary-unit">TimelineHeader Stub - Phase 1</div>
-    </div>
+@* TimelineHeader Component - Phase 3 Implementation *@
+<div class="timeline-header" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
+    @{
+        // Generate header periods using the service (Phase 3.2 - Data-driven rendering)
+        var headerResult = HeaderService.GenerateHeaderPeriods(StartDate, EndDate, EffectiveDayWidth, ZoomLevel, Logger);
+    }
+    
+    @if (headerResult.PrimaryPeriods.Any())
+    {
+        <div class="timeline-header-primary">
+            @foreach (var period in headerResult.PrimaryPeriods)
+            {
+                <div class="timeline-primary-unit" style="width: @(period.Width)px;">
+                    @period.Label
+                </div>
+            }
+        </div>
+    }
+    
     <div class="timeline-header-secondary">
-        <div class="timeline-secondary-unit">Component Foundation Created</div>
+        @foreach (var period in headerResult.SecondaryPeriods)
+        {
+            <div class="timeline-secondary-unit" style="width: @(period.Width)px;">
+                @period.Label
+            </div>
+        }
     </div>
 </div>
 
 @code {
-    // Parameter stubs - will match TimelineView interface exactly
+    // Parameters matching TimelineView interface exactly (Phase 3.4)
     [Parameter] public DateTime StartDate { get; set; }
     [Parameter] public DateTime EndDate { get; set; }
     [Parameter] public double EffectiveDayWidth { get; set; }
@@ -25,24 +45,75 @@
     
     protected override void OnInitialized()
     {
-        Logger.LogComponentLifecycle("TimelineHeader", "OnInitialized - Foundation Phase", new { 
-            StartDate, EndDate, ZoomLevel, EffectiveDayWidth 
+        Logger.LogComponentLifecycle("TimelineHeader", "OnInitialized - Phase 3 Implementation", new { 
+            StartDate, EndDate, ZoomLevel, EffectiveDayWidth, HeaderMonthHeight, HeaderDayHeight
+        });
+    }
+    
+    protected override void OnParametersSet()
+    {
+        Logger.LogComponentLifecycle("TimelineHeader", "OnParametersSet - Parameters updated", new {
+            StartDate, EndDate, ZoomLevel, EffectiveDayWidth
         });
     }
 }
 
 <style>
-    .timeline-header-stub {
-        background: #fffacd;
-        border: 2px dashed #ffa500;
-        padding: 8px;
-        text-align: center;
-        font-weight: bold;
-        color: #ff6600;
+    .timeline-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--gantt-surface, #ffffff);
+        border-bottom: 1px solid var(--gantt-outline, #e0e0e0);
+        min-width: fit-content;
     }
-    
-    .timeline-header-primary,
+
+    /* Zoom-adaptive primary header row (quarters, years, decades) */
+    .timeline-header-primary {
+        display: flex;
+        height: var(--header-month-height);
+        border-bottom: 1px solid var(--gantt-outline, #e0e0e0);
+    }
+
+    .timeline-primary-unit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        font-family: var(--gantt-monospace-font, 'Consolas', 'Monaco', 'Courier New', monospace);
+        border-right: 1px solid var(--gantt-outline, #e0e0e0);
+        background: var(--gantt-surface-variant, #f5f5f5);
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        flex-shrink: 0;
+        min-width: 0; /* Allow text overflow handling */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Zoom-adaptive secondary header row (months, quarters, years) */
     .timeline-header-secondary {
-        padding: 4px;
+        display: flex;
+        height: var(--header-day-height);
+    }
+
+    .timeline-secondary-unit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-family: var(--gantt-monospace-font, 'Consolas', 'Monaco', 'Courier New', monospace);
+        border-right: 1px solid var(--gantt-outline, #e0e0e0);
+        background: var(--gantt-surface, #ffffff);
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        flex-shrink: 0;
+        min-width: 0; /* Allow text overflow handling */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 </style>

@@ -39,10 +39,10 @@ public class TimelineHeaderServiceTests
         Assert.NotNull(result);
         Assert.NotNull(result.PrimaryPeriods);
         Assert.NotNull(result.SecondaryPeriods);
-        
+
         // Since we now have real implementation, expect actual periods for 3 months
         Assert.True(result.SecondaryPeriods.Count >= 3, "Should have at least 3 months of periods");
-        
+
         // Verify each period has valid data
         foreach (var period in result.SecondaryPeriods)
         {

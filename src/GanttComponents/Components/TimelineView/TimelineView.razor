@@ -8,7 +8,17 @@
 
 <div class="timeline-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
     <div class="timeline-scroll-container" @onscroll="OnScroll">
-        @* Phase 4: Using new TimelineHeader component instead of inline header logic *@
+        @* 
+        === TIMELINE HEADER ARCHITECTURE ===
+        Header rendering is now handled by the dedicated TimelineHeader component for better:
+        - Maintainability: Header logic isolated in its own service and component
+        - Testability: Business logic can be unit tested independently  
+        - Reusability: TimelineHeader can be used standalone or in other contexts
+        - Performance: Data-driven rendering using HeaderPeriod models
+        
+        The TimelineHeader component uses TimelineHeaderService to generate periods
+        and renders them using the same CSS classes for visual consistency.
+        *@
         <TimelineHeader StartDate="@StartDate" 
                        EndDate="@EndDate" 
                        EffectiveDayWidth="@EffectiveDayWidth" 
@@ -327,6 +337,9 @@
         position: relative;
     }
 
+    /* === HEADER STYLES === */
+    /* NOTE: Header rendering now handled by TimelineHeader component, but keeping CSS for backward compatibility */
+    
     .timeline-header {
         position: sticky;
         top: 0;
@@ -385,7 +398,8 @@
         white-space: nowrap;
     }
 
-    /* Legacy classes for backward compatibility - deprecated */
+    /* === LEGACY HEADER CLASSES (DEPRECATED) === */
+    /* Keep for backward compatibility - may be used by external CSS or JS */
     .timeline-header-months {
         display: flex;
         height: var(--header-month-height);

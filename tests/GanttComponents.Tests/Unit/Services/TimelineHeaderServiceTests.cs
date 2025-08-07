@@ -35,18 +35,21 @@ public class TimelineHeaderServiceTests
         // Act
         var result = _service.GenerateHeaderPeriods(startDate, endDate, effectiveDayWidth, zoomLevel, _logger);
 
-        // Assert - Phase 1: Basic structure validation
+        // Assert - Updated for real implementation: Basic structure validation
         Assert.NotNull(result);
         Assert.NotNull(result.PrimaryPeriods);
         Assert.NotNull(result.SecondaryPeriods);
-        Assert.NotEmpty(result.PrimaryPeriods);
-        Assert.NotEmpty(result.SecondaryPeriods);
-
-        // Phase 1: Stub validation
-        Assert.Single(result.PrimaryPeriods);
-        Assert.Single(result.SecondaryPeriods);
-        Assert.Equal("Phase 1 Stub", result.PrimaryPeriods[0].Label);
-        Assert.Equal("Service Foundation", result.SecondaryPeriods[0].Label);
+        
+        // Since we now have real implementation, expect actual periods for 3 months
+        Assert.True(result.SecondaryPeriods.Count >= 3, "Should have at least 3 months of periods");
+        
+        // Verify each period has valid data
+        foreach (var period in result.SecondaryPeriods)
+        {
+            Assert.True(period.Width > 0, "Period width should be positive");
+            Assert.NotNull(period.Label);
+            Assert.NotEqual(string.Empty, period.Label);
+        }
     }
 
     [Fact]

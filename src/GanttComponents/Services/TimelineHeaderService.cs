@@ -1,4 +1,5 @@
 using GanttComponents.Models;
+using GanttComponents.Services;
 
 namespace GanttComponents.Services;
 
@@ -32,14 +33,17 @@ public interface ITimelineHeaderService
 /// <summary>
 /// Implementation of timeline header service with extracted business logic.
 /// Phase 2: Full implementation with identical logic to current TimelineView.
+/// Enhanced with I18N integration for localized header content.
 /// </summary>
 public class TimelineHeaderService : ITimelineHeaderService
 {
     private readonly DateFormatHelper _dateFormatter;
+    private readonly IGanttI18N _i18n;
 
-    public TimelineHeaderService(DateFormatHelper dateFormatter)
+    public TimelineHeaderService(DateFormatHelper dateFormatter, IGanttI18N i18n)
     {
         _dateFormatter = dateFormatter;
+        _i18n = i18n;
     }
     public TimelineHeaderResult GenerateHeaderPeriods(
         DateTime startDate,
@@ -207,11 +211,44 @@ public class TimelineHeaderService : ITimelineHeaderService
     }
 
     /// <summary>
-    /// Format period label using exact same logic as TimelineView DateFormatter
+    /// Format period label using I18N-enhanced logic for localized headers.
+    /// Maintains backward compatibility with existing DateFormatHelper while adding I18N support.
     /// </summary>
     private string FormatPeriodLabel(DateTime date, string format)
     {
-        // Phase 2: Use DateFormatHelper for identical formatting to TimelineView
-        return _dateFormatter.FormatTimelineHeader(date, format);
+        // Phase 2: Enhanced with I18N-aware format selection while maintaining DateFormatHelper compatibility
+        var i18nFormat = GetI18NEnhancedFormat(format);
+        return _dateFormatter.FormatTimelineHeader(date, i18nFormat);
+    }
+
+    /// <summary>
+    /// Get I18N-enhanced format string for temporal units.
+    /// Provides foundation for future floating headers and information-dense headers.
+    /// Maps generic formats to culture-aware format keys.
+    /// </summary>
+    private string GetI18NEnhancedFormat(string originalFormat)
+    {
+        // For now, maintain backward compatibility with existing formats
+        // Future enhancement: Map to culture-specific timeline header formats
+        return originalFormat switch
+        {
+            // Timeline-specific header formats (future enhancement for dense headers)
+            var f when f.Contains("quarter") => _i18n.HasTranslation("timeline.header.quarter-format")
+                ? "timeline.header.quarter-format"
+                : f,
+            var f when f.Contains("year") => _i18n.HasTranslation("timeline.header.year-format")
+                ? "timeline.header.year-format"
+                : f,
+            var f when f.Contains("month") => _i18n.HasTranslation("timeline.header.month-format")
+                ? "timeline.header.month-format"
+                : f,
+            var f when f.Contains("week") => _i18n.HasTranslation("timeline.header.week-format")
+                ? "timeline.header.week-format"
+                : f,
+            var f when f.Contains("day") => _i18n.HasTranslation("timeline.header.day-format")
+                ? "timeline.header.day-format"
+                : f,
+            _ => originalFormat // Fallback to original format for full backward compatibility
+        };
     }
 }

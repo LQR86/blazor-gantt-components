@@ -18,7 +18,7 @@ public class TimelineHeaderTests
     {
         var i18n = new GanttI18N();
         var dateFormatter = new DateFormatHelper(i18n);
-        _headerService = new TimelineHeaderService(dateFormatter);
+        _headerService = new TimelineHeaderService(dateFormatter, i18n);
         _logger = new UniversalLogger(NullLogger<UniversalLogger>.Instance);
     }
 

@@ -37,6 +37,9 @@ builder.Services.AddScoped<DateFormatHelper>();
 // Add TimelineHeader services
 builder.Services.AddScoped<ITimelineHeaderService, TimelineHeaderService>();
 
+// Add Timeline Tooltip service
+builder.Services.AddScoped<ITimelineTooltipService, TimelineTooltipService>();
+
 var app = builder.Build();
 
 // Initialize database

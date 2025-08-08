@@ -2,32 +2,33 @@
 @using GanttComponents.Services
 @using GanttComponents.Components.TimelineHeader
 @using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components
 @inject IUniversalLogger Logger
 @inject IGanttI18N I18N
 @inject DateFormatHelper DateFormatter
 @inject IJSRuntime JSRuntime
 @inject ITimelineHeaderService HeaderService
+@inject ITimelineTooltipService TooltipService
 @implements IDisposable
 
 <div class="timeline-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
     
     @* Floating edge tooltips - stay fixed at viewport corners during horizontal scroll *@
     @{
-        var leftTooltip = GetHiddenLeftLabel();
-        var rightTooltip = GetHiddenRightLabel();
+        var tooltipResult = GetTooltipResult();
     }
     
-    @if (!string.IsNullOrEmpty(leftTooltip))
+    @if (tooltipResult.HasLeftTooltip)
     {
         <div class="timeline-viewport-tooltip timeline-viewport-tooltip-left" title="Hidden periods to the left">
-            @leftTooltip
+            @tooltipResult.LeftTooltip
         </div>
     }
     
-    @if (!string.IsNullOrEmpty(rightTooltip))
+    @if (tooltipResult.HasRightTooltip)
     {
         <div class="timeline-viewport-tooltip timeline-viewport-tooltip-right" title="Hidden periods to the right">
-            @rightTooltip
+            @tooltipResult.RightTooltip
         </div>
     }
     
@@ -100,13 +101,13 @@
 </div>
 
 @code {
-    [Parameter] public List<GanttTask>? Tasks { get; set; }
+    [Parameter, EditorRequired] public List<GanttTask> Tasks { get; set; } = new();
     [Parameter] public EventCallback<int> OnTaskSelected { get; set; }
     [Parameter] public EventCallback<EventArgs> OnScrollChanged { get; set; }
     [Parameter] public int? SelectedTaskId { get; set; }
-    [Parameter] public int RowHeight { get; set; } = 32; // Default row height for alignment
-    [Parameter] public int HeaderMonthHeight { get; set; } = 32; // Month row height
-    [Parameter] public int HeaderDayHeight { get; set; } = 24; // Day row height
+    [Parameter, EditorRequired] public int RowHeight { get; set; } = 32; // Default row height for alignment
+    [Parameter, EditorRequired] public int HeaderMonthHeight { get; set; } = 32; // Month row height
+    [Parameter, EditorRequired] public int HeaderDayHeight { get; set; } = 24; // Day row height
     [Parameter] public EventCallback<int?> OnTaskHovered { get; set; }
     [Parameter] public int? HoveredTaskId { get; set; }
     
@@ -149,7 +150,7 @@
 
     protected override void OnInitialized()
     {
-        Logger.LogComponentLifecycle("TimelineView", "OnInitialized", new { TaskCount = Tasks?.Count ?? 0 });
+        Logger.LogComponentLifecycle("TimelineView", "OnInitialized", new { TaskCount = Tasks.Count });
         
         // Subscribe to language changes
         I18N.LanguageChanged += OnLanguageChanged;
@@ -159,6 +160,9 @@
 
     protected override void OnParametersSet()
     {
+        // Validate required parameters for tooltip functionality
+        ValidateRequiredParameters();
+        
         CalculateTimelineRange();
         StateHasChanged();
     }
@@ -185,7 +189,7 @@
     {
         DateTime taskStartDate, taskEndDate;
         
-        if (Tasks == null || !Tasks.Any())
+        if (!Tasks.Any())
         {
             // Default range if no tasks
             taskStartDate = DateTime.UtcNow.Date.AddDays(-30);
@@ -210,7 +214,7 @@
         
         var totalDays = (EndDate - StartDate).Days + 1;
         TotalWidth = (int)(totalDays * EffectiveDayWidth);
-        TotalHeight = (Tasks?.Count ?? 0) * RowHeight;
+        TotalHeight = Tasks.Count * RowHeight;
     }
 
     private double DayToPixel(DateTime date)
@@ -351,89 +355,34 @@
     public double CurrentEffectiveDayWidth => EffectiveDayWidth;
     public string CurrentZoomDescription => $"{ZoomLevel} @ {ZoomFactor:F1}x";
 
-    // Tooltip methods for viewport-fixed tooltips
-    private bool HasHiddenPeriodsLeft()
+    // Tooltip calculation using dedicated service
+    private TimelineTooltipResult GetTooltipResult()
     {
-        return ViewportScrollLeft > 0;
-    }
-
-    private bool HasHiddenPeriodsRight()
-    {
-        var totalViewportWidth = TotalWidth;
-        var rightEdge = ViewportScrollLeft + ViewportWidth;
-        return rightEdge < totalViewportWidth;
-    }
-
-    private string GetHiddenLeftLabel()
-    {
-        if (!HasHiddenPeriodsLeft()) return "";
-        
         try
         {
-            // Get the header periods to find the partially hidden one
-            var headerResult = HeaderService.GenerateHeaderPeriods(StartDate, EndDate, EffectiveDayWidth, ZoomLevel, Logger);
-            
-            // Find the period that's partially visible at the left edge
-            var leftEdgeX = ViewportScrollLeft;
-            var partiallyHiddenPeriod = headerResult.PrimaryPeriods
-                .FirstOrDefault(p => p.XPosition < leftEdgeX && (p.XPosition + p.Width) > leftEdgeX);
-            
-            if (partiallyHiddenPeriod != null)
+            var request = new TimelineTooltipRequest
             {
-                // Calculate how much of the period is hidden vs visible
-                var periodRightEdge = partiallyHiddenPeriod.XPosition + partiallyHiddenPeriod.Width;
-                var visibleWidth = periodRightEdge - leftEdgeX;
-                var hiddenWidth = leftEdgeX - partiallyHiddenPeriod.XPosition;
-                
-                // Show tooltip when more than HALF is hidden, hide when completely hidden
-                if (hiddenWidth > (partiallyHiddenPeriod.Width / 2) && visibleWidth > 0)
+                StartDate = StartDate,
+                EndDate = EndDate,
+                EffectiveDayWidth = EffectiveDayWidth,
+                ZoomLevel = ZoomLevel,
+                ViewportScrollLeft = ViewportScrollLeft,
+                ViewportWidth = ViewportWidth,
+                Options = new TimelineTooltipOptions
                 {
-                    return $"←{partiallyHiddenPeriod.Label}";
+                    HiddenThreshold = 0.5, // Show when >50% hidden
+                    LeftArrow = "←",
+                    RightArrow = "→",
+                    UsePrimaryPeriods = true
                 }
-            }
-            
-            return "";
+            };
+
+            return TooltipService.CalculateTooltips(request);
         }
         catch (Exception ex)
         {
-            Logger.LogError($"Error calculating left tooltip: {ex.Message}");
-            return "";
-        }
-    }
-
-    private string GetHiddenRightLabel()
-    {
-        if (!HasHiddenPeriodsRight()) return "";
-        
-        try
-        {
-            // Get the header periods to find the partially hidden one
-            var headerResult = HeaderService.GenerateHeaderPeriods(StartDate, EndDate, EffectiveDayWidth, ZoomLevel, Logger);
-            
-            // Find the period that's partially visible at the right edge
-            var rightEdgeX = ViewportScrollLeft + ViewportWidth;
-            var partiallyHiddenPeriod = headerResult.PrimaryPeriods
-                .FirstOrDefault(p => p.XPosition < rightEdgeX && (p.XPosition + p.Width) > rightEdgeX);
-            
-            if (partiallyHiddenPeriod != null)
-            {
-                // Calculate how much of the period is hidden vs visible
-                var visibleWidth = rightEdgeX - partiallyHiddenPeriod.XPosition;
-                var hiddenWidth = (partiallyHiddenPeriod.XPosition + partiallyHiddenPeriod.Width) - rightEdgeX;
-                
-                // Show tooltip when more than HALF is hidden, hide when completely hidden
-                if (hiddenWidth > (partiallyHiddenPeriod.Width / 2) && visibleWidth > 0)
-                {
-                    return $"{partiallyHiddenPeriod.Label}→";
-                }
-            }
-            
-            return "";
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError($"Error calculating right tooltip: {ex.Message}");
-            return "";
+            Logger.LogError($"Error getting tooltip result: {ex.Message}");
+            return new TimelineTooltipResult();
         }
     }
 
@@ -443,6 +392,46 @@
         var dayOfWeek = culture.DateTimeFormat.FirstDayOfWeek;
         var weekRule = culture.DateTimeFormat.CalendarWeekRule;
         return culture.Calendar.GetWeekOfYear(date, weekRule, dayOfWeek);
+    }
+
+    /// <summary>
+    /// Validates that all required parameters are properly set for tooltip functionality.
+    /// Throws meaningful exceptions if critical parameters are missing.
+    /// </summary>
+    private void ValidateRequiredParameters()
+    {
+        if (RowHeight <= 0)
+        {
+            throw new InvalidOperationException(
+                "TimelineView requires RowHeight > 0. " +
+                "This parameter is critical for proper row alignment and tooltip positioning. " +
+                "Example: <TimelineView RowHeight=\"32\" ... />");
+        }
+
+        if (HeaderMonthHeight <= 0)
+        {
+            throw new InvalidOperationException(
+                "TimelineView requires HeaderMonthHeight > 0. " +
+                "This parameter is critical for tooltip positioning (CSS calc). " +
+                "Example: <TimelineView HeaderMonthHeight=\"32\" ... />");
+        }
+
+        if (HeaderDayHeight <= 0)
+        {
+            throw new InvalidOperationException(
+                "TimelineView requires HeaderDayHeight > 0. " +
+                "This parameter is critical for header rendering and alignment. " +
+                "Example: <TimelineView HeaderDayHeight=\"24\" ... />");
+        }
+
+        // Validate Tasks parameter
+        if (Tasks == null)
+        {
+            throw new InvalidOperationException(
+                "TimelineView requires a non-null Tasks parameter. " +
+                "Pass an empty list if no tasks are available. " +
+                "Example: <TimelineView Tasks=\"@(new List<GanttTask>())\" ... />");
+        }
     }
 
     public void Dispose()

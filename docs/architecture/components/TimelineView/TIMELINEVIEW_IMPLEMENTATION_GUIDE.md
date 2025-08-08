@@ -26,8 +26,14 @@ The TimelineView component relies on several core services:
 @inject IUniversalLogger Logger
 @inject IGanttI18N I18N  
 @inject DateFormatHelper DateFormatter
-@inject ITimelineHeaderService HeaderService  // New: extracted header logic
+@inject ITimelineHeaderService HeaderService  // Enhanced with I18N support
 ```
+
+**New in v0.8.8**: The TimelineHeaderService now includes comprehensive I18N integration:
+- **IGanttI18N Service**: Automatic dependency injection for timeline localization
+- **Enhanced Format Selection**: Intelligent fallback from I18N keys to standard formats
+- **Cultural Adaptation**: Support for locale-specific date/time formatting patterns
+- **Zero Breaking Changes**: Existing functionality preserved with optional I18N enhancement
 
 ## 📊 **Zoom System Implementation**
 

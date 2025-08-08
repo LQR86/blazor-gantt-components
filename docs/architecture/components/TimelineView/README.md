@@ -34,11 +34,23 @@ This folder contains comprehensive documentation for the TimelineView component 
 **Audience**: Developers implementing custom header behavior  
 **Contents**:
 - Service-based customization patterns
+- I18N integration and localization support (New in v0.8.8)
 - Custom date formats and styling approaches
 - Industry-specific header implementations
 - Component-level customization techniques
 - Advanced data-driven header configurations
 - Migration guide from v0.8.6 inline modifications
+
+### **🌐 [I18N Migration Guide](./I18N_MIGRATION_GUIDE.md)**
+**Purpose**: Migration guidance for I18N foundation integration  
+**Audience**: Developers upgrading to v0.8.8 and beyond  
+**Contents**:
+- Zero breaking changes overview
+- Enhanced service architecture explanation
+- Migration steps for custom implementations
+- New localization capabilities and usage
+- Future-ready features and benefits
+- Troubleshooting and validation checklist
 
 ### **📚 [Usage Guide](./TIMELINEVIEW_USAGE_GUIDE.md)**
 **Purpose**: Practical usage examples and integration patterns  

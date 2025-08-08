@@ -58,7 +58,45 @@ services.AddScoped<ITimelineHeaderService, CustomDateHeaderService>();
 
 ## 🔧 **Service-Based Customization**
 
-### **🏗️ Custom Header Service Implementation**
+### **� I18N Integration (New in v0.8.8)**
+
+The TimelineHeaderService now includes comprehensive internationalization support through IGanttI18N service integration:
+
+```csharp
+public class LocalizedHeaderService : TimelineHeaderService
+{
+    public LocalizedHeaderService(
+        DateFormatHelper dateFormatter, 
+        IGanttI18N i18n,
+        IUniversalLogger logger) 
+        : base(dateFormatter, i18n, logger)
+    {
+        // I18N service automatically available for localization
+    }
+    
+    protected override string GetFormattedLabel(DateTime date, string formatKey, TimelineZoomLevel zoomLevel)
+    {
+        // Use I18N-enhanced formatting with automatic fallback
+        var enhancedFormat = GetI18NEnhancedFormat(formatKey, zoomLevel);
+        return date.ToString(enhancedFormat);
+    }
+}
+```
+
+#### **📚 Available I18N Keys**
+The system includes comprehensive timeline localization keys:
+
+```
+timeline.header.year-format      // "yyyy" / "yyyy年"
+timeline.header.quarter-format   // "'Q'q yyyy" / "yyyy年第q季度"  
+timeline.header.month-format     // "MMM yyyy" / "yyyy年M月"
+timeline.header.week-format      // "'Week' w" / "第w周"
+timeline.header.day-format       // "dd MMM" / "M月d日"
+timeline.component.*             // Component-level enhancements
+timeline.floating.*              // Future floating header features
+```
+
+### **�🏗️ Custom Header Service Implementation**
 
 #### **1. Basic Service Extension**
 ```csharp
@@ -68,9 +106,10 @@ public class ProjectHeaderService : TimelineHeaderService
     
     public ProjectHeaderService(
         DateFormatHelper dateFormatter, 
+        IGanttI18N i18n,
         IUniversalLogger logger,
         IProjectService projectService) 
-        : base(dateFormatter, logger)
+        : base(dateFormatter, i18n, logger)
     {
         _projectService = projectService;
     }

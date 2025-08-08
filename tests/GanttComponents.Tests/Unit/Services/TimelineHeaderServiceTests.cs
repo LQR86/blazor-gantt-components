@@ -19,7 +19,7 @@ public class TimelineHeaderServiceTests
     {
         var i18n = new GanttI18N();
         var dateFormatter = new DateFormatHelper(i18n);
-        _service = new TimelineHeaderService(dateFormatter);
+        _service = new TimelineHeaderService(dateFormatter, i18n);
         _logger = new UniversalLogger(NullLogger<UniversalLogger>.Instance);
     }
 
@@ -148,7 +148,7 @@ public class TimelineHeaderServiceIntegrationTests
         // Service should be able to use this config in Phase 2
         var i18n = new GanttI18N();
         var dateFormatter = new DateFormatHelper(i18n);
-        var service = new TimelineHeaderService(dateFormatter);
+        var service = new TimelineHeaderService(dateFormatter, i18n);
         Assert.NotNull(service);
     }
 }

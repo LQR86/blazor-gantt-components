@@ -4,18 +4,27 @@
 
 This document provides an executive summary of the TimelineView component architecture, highlighting the key design decisions, recent improvements, and technical achievements.
 
-## 🎉 **Recent Architecture Achievements (v0.8.7)**
+## 🎉 **Recent Architecture Achievements (v0.8.7-v0.8.8)**
 
-### **✅ Header Logic Extraction**
+### **✅ Header Logic Extraction (v0.8.7)**
 - **Challenge**: Complex inline Razor logic with 80+ lines of header generation code mixed with presentation
 - **Solution**: Extracted dedicated TimelineHeader component with TimelineHeaderService
 - **Benefits**: Improved maintainability, testability, and reusability
 - **Impact**: Zero breaking changes, 100% backward compatibility maintained
 
+### **� I18N Foundation Integration (v0.8.8)**
+- **Challenge**: Timeline headers not integrated with existing I18N infrastructure
+- **Solution**: Enhanced TimelineHeaderService with IGanttI18N dependency injection
+- **Architecture**: Two-layer I18N enhancement (Service-level + Component-level)
+- **Resources**: Comprehensive timeline localization keys in English and Chinese
+- **Benefits**: Cultural adaptation, future-ready for floating headers and information-dense features
+- **Impact**: Zero breaking changes, all existing demos continue to work perfectly
+
 ### **🏗️ Service-Driven Architecture**
-- **TimelineHeaderService**: Business logic for header period calculation
-- **Data-Driven Rendering**: HeaderPeriod models replace inline calculations
+- **TimelineHeaderService**: Enhanced with I18N integration and intelligent fallback
+- **Data-Driven Rendering**: HeaderPeriod models with optional I18N enhancement
 - **Clean Separation**: Business logic isolated from presentation concerns
+- **I18N Ready**: Foundation for Milestone 1 (floating headers) and advanced features
 
 ### **🎚️ 11-Level Zoom System**
 - **Fibonacci-Like Progression**: [3, 4, 6, 8, 12, 17, 24, 34, 48, 68, 97] px day widths
@@ -36,11 +45,11 @@ TimelineView (Main Component)
 ```
 
 ### **🔄 Service Dependencies**
-- **ITimelineHeaderService**: Header period generation and configuration
+- **ITimelineHeaderService**: Header period generation with I18N integration
 - **TimelineZoomService**: Zoom level management and day width calculation
 - **TimelineHeaderAdapter**: Zoom-appropriate header configuration
-- **DateFormatHelper**: Consistent date formatting
-- **IGanttI18N**: Internationalization support
+- **DateFormatHelper**: Consistent date formatting with I18N fallback
+- **IGanttI18N**: Comprehensive internationalization support (enhanced in v0.8.8)
 - **IUniversalLogger**: Comprehensive debugging and monitoring
 
 ## 🎯 **Key Design Principles**

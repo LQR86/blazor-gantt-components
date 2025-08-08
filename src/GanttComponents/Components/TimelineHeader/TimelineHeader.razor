@@ -18,7 +18,7 @@
             @foreach (var period in headerResult.PrimaryPeriods)
             {
                 <div class="timeline-primary-unit" style="width: @(period.Width)px;">
-                    @period.Label
+                    @GetLocalizedHeaderContent(period)
                 </div>
             }
         </div>
@@ -28,7 +28,7 @@
         @foreach (var period in headerResult.SecondaryPeriods)
         {
             <div class="timeline-secondary-unit" style="width: @(period.Width)px;">
-                @period.Label
+                @GetLocalizedHeaderContent(period)
             </div>
         }
     </div>
@@ -55,6 +55,46 @@
         Logger.LogComponentLifecycle("TimelineHeader", "OnParametersSet - Parameters updated", new {
             StartDate, EndDate, ZoomLevel, EffectiveDayWidth
         });
+    }
+    
+    /// <summary>
+    /// Get localized header content for a period.
+    /// Provides component-level I18N integration with fallback to service-generated labels.
+    /// Foundation for future floating headers and information-dense headers.
+    /// </summary>
+    private string GetLocalizedHeaderContent(HeaderPeriod period)
+    {
+        // Phase 3: Component-level I18N integration with intelligent enhancement
+        // The TimelineHeaderService already provides I18N-enhanced labels via GetI18NEnhancedFormat
+        // This method provides additional component-level localization opportunities
+        
+        // For now, use the service-generated label (already I18N-enhanced)
+        // Future enhancement: Additional component-specific I18N keys for floating/dense headers
+        var serviceLabel = period.Label;
+        
+        // Optional: Add component-level I18N enhancement for specific timeline header contexts
+        return EnhanceHeaderContentWithComponentI18N(period, serviceLabel);
+    }
+    
+    /// <summary>
+    /// Enhance header content with component-level I18N features.
+    /// Provides foundation for future floating headers and information-dense headers.
+    /// </summary>
+    private string EnhanceHeaderContentWithComponentI18N(HeaderPeriod period, string serviceLabel)
+    {
+        // Phase 3: Component-level I18N enhancement opportunities
+        
+        // Check for component-specific I18N keys (future enhancement for dense headers)
+        var componentKey = $"timeline.component.{period.Level.ToString().ToLower()}";
+        
+        if (I18N.HasTranslation(componentKey))
+        {
+            // Future: Use component-specific localization for floating/dense headers
+            return I18N.T(componentKey);
+        }
+        
+        // Fallback to service-generated label (already I18N-enhanced)
+        return serviceLabel;
     }
 }
 

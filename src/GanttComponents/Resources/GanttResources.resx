@@ -161,6 +161,45 @@
     <value>h tt</value>
   </data>
 
+  <!-- Timeline Header I18N Keys for Enhanced Localization -->
+  <data name="timeline.header.year-format" xml:space="preserve">
+    <value>yyyy</value>
+  </data>
+  <data name="timeline.header.quarter-format" xml:space="preserve">
+    <value>'Q'q yyyy</value>
+  </data>
+  <data name="timeline.header.month-format" xml:space="preserve">
+    <value>MMM yyyy</value>
+  </data>
+  <data name="timeline.header.week-format" xml:space="preserve">
+    <value>'Week' w</value>
+  </data>
+  <data name="timeline.header.day-format" xml:space="preserve">
+    <value>dd MMM</value>
+  </data>
+
+  <!-- Timeline Component-Level I18N Keys (for future floating/dense headers) -->
+  <data name="timeline.component.primary" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="timeline.component.secondary" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+
+  <!-- Timeline Floating Headers (Milestone 1 Foundation) -->
+  <data name="timeline.floating.year" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="timeline.floating.quarter" xml:space="preserve">
+    <value>Q{0}</value>
+  </data>
+  <data name="timeline.floating.month" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="timeline.floating.context" xml:space="preserve">
+    <value>{0} • {1} • {2}</value>
+  </data>
+
   <!-- Common UI Elements -->
   <data name="common.save" xml:space="preserve">
     <value>Save</value>

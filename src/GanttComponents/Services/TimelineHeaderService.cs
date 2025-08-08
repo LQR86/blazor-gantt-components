@@ -228,8 +228,13 @@ public class TimelineHeaderService : ITimelineHeaderService
     /// </summary>
     private string GetI18NEnhancedFormat(string originalFormat)
     {
-        // For now, maintain backward compatibility with existing formats
-        // Future enhancement: Map to culture-specific timeline header formats
+        // Phase 2: Maintain backward compatibility - disable enhanced format selection for now
+        // The timeline.header.* keys are available but need proper integration with DateFormatHelper
+        // Future enhancement: Map to culture-specific timeline header formats when properly integrated
+
+        return originalFormat; // Always use original format for backward compatibility
+
+        /* Future enhancement when DateFormatHelper integration is complete:
         return originalFormat switch
         {
             // Timeline-specific header formats (future enhancement for dense headers)
@@ -250,5 +255,6 @@ public class TimelineHeaderService : ITimelineHeaderService
                 : f,
             _ => originalFormat // Fallback to original format for full backward compatibility
         };
+        */
     }
 }

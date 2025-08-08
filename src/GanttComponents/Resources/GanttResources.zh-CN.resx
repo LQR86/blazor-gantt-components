@@ -180,24 +180,24 @@
 
   <!-- Timeline Component-Level I18N Keys (for future floating/dense headers) -->
   <data name="timeline.component.primary" xml:space="preserve">
-    <value>{0}</value>
+    <value></value>
   </data>
   <data name="timeline.component.secondary" xml:space="preserve">
-    <value>{0}</value>
+    <value></value>
   </data>
 
   <!-- Timeline Floating Headers (Milestone 1 Foundation) -->
   <data name="timeline.floating.year" xml:space="preserve">
-    <value>{0}年</value>
+    <value></value>
   </data>
   <data name="timeline.floating.quarter" xml:space="preserve">
-    <value>第{0}季度</value>
+    <value></value>
   </data>
   <data name="timeline.floating.month" xml:space="preserve">
-    <value>{0}月</value>
+    <value></value>
   </data>
   <data name="timeline.floating.context" xml:space="preserve">
-    <value>{0} • {1} • {2}</value>
+    <value></value>
   </data>
 
   <!-- Common UI Elements -->

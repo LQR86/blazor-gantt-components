@@ -1,12 +1,36 @@
 @using GanttComponents.Models
 @using GanttComponents.Services
 @using GanttComponents.Components.TimelineHeader
+@using Microsoft.JSInterop
 @inject IUniversalLogger Logger
 @inject IGanttI18N I18N
 @inject DateFormatHelper DateFormatter
+@inject IJSRuntime JSRuntime
+@inject ITimelineHeaderService HeaderService
 @implements IDisposable
 
 <div class="timeline-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
+    
+    @* Floating edge tooltips - stay fixed at viewport corners during horizontal scroll *@
+    @{
+        var leftTooltip = GetHiddenLeftLabel();
+        var rightTooltip = GetHiddenRightLabel();
+    }
+    
+    @if (!string.IsNullOrEmpty(leftTooltip))
+    {
+        <div class="timeline-viewport-tooltip timeline-viewport-tooltip-left" title="Hidden periods to the left">
+            @leftTooltip
+        </div>
+    }
+    
+    @if (!string.IsNullOrEmpty(rightTooltip))
+    {
+        <div class="timeline-viewport-tooltip timeline-viewport-tooltip-right" title="Hidden periods to the right">
+            @rightTooltip
+        </div>
+    }
+    
     <div class="timeline-scroll-container" @onscroll="OnScroll">
         @* 
         === TIMELINE HEADER ARCHITECTURE ===
@@ -88,6 +112,10 @@
     
     // Zoom parameters - maintain backward compatibility with current 40px day width
     [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.QuarterMonth24px;
+    
+    // Viewport tracking for tooltip edge detection
+    private double ViewportScrollLeft { get; set; } = 0;
+    private double ViewportWidth { get; set; } = 1000;
     [Parameter] public double ZoomFactor { get; set; } = 1.6; // 25px * 1.6 = 40px (maintains current behavior)
     
     // Zoom state change events
@@ -133,6 +161,24 @@
     {
         CalculateTimelineRange();
         StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                // Initialize viewport width after first render
+                ViewportWidth = await JSRuntime.InvokeAsync<double>("eval", "document.querySelector('.timeline-scroll-container')?.clientWidth || 1000");
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"Error initializing viewport width: {ex.Message}");
+                ViewportWidth = 1000; // Fallback default
+            }
+        }
     }
 
     private void CalculateTimelineRange()
@@ -209,6 +255,20 @@
 
     private async Task OnScroll(EventArgs e)
     {
+        try
+        {
+            // Update viewport properties for tooltip edge detection
+            ViewportScrollLeft = await JSRuntime.InvokeAsync<double>("eval", "document.querySelector('.timeline-scroll-container').scrollLeft");
+            ViewportWidth = await JSRuntime.InvokeAsync<double>("eval", "document.querySelector('.timeline-scroll-container').clientWidth");
+            
+            // Force re-render to update tooltips
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error updating viewport data during scroll: {ex.Message}");
+        }
+
         if (OnScrollChanged.HasDelegate)
         {
             await OnScrollChanged.InvokeAsync(e);
@@ -290,6 +350,100 @@
     // Read-only properties for current zoom state
     public double CurrentEffectiveDayWidth => EffectiveDayWidth;
     public string CurrentZoomDescription => $"{ZoomLevel} @ {ZoomFactor:F1}x";
+
+    // Tooltip methods for viewport-fixed tooltips
+    private bool HasHiddenPeriodsLeft()
+    {
+        return ViewportScrollLeft > 0;
+    }
+
+    private bool HasHiddenPeriodsRight()
+    {
+        var totalViewportWidth = TotalWidth;
+        var rightEdge = ViewportScrollLeft + ViewportWidth;
+        return rightEdge < totalViewportWidth;
+    }
+
+    private string GetHiddenLeftLabel()
+    {
+        if (!HasHiddenPeriodsLeft()) return "";
+        
+        try
+        {
+            // Get the header periods to find the partially hidden one
+            var headerResult = HeaderService.GenerateHeaderPeriods(StartDate, EndDate, EffectiveDayWidth, ZoomLevel, Logger);
+            
+            // Find the period that's partially visible at the left edge
+            var leftEdgeX = ViewportScrollLeft;
+            var partiallyHiddenPeriod = headerResult.PrimaryPeriods
+                .FirstOrDefault(p => p.XPosition < leftEdgeX && (p.XPosition + p.Width) > leftEdgeX);
+            
+            if (partiallyHiddenPeriod != null)
+            {
+                // Calculate how much of the period is hidden vs visible
+                var periodRightEdge = partiallyHiddenPeriod.XPosition + partiallyHiddenPeriod.Width;
+                var visibleWidth = periodRightEdge - leftEdgeX;
+                var hiddenWidth = leftEdgeX - partiallyHiddenPeriod.XPosition;
+                
+                // Show tooltip when more than HALF is hidden, hide when completely hidden
+                if (hiddenWidth > (partiallyHiddenPeriod.Width / 2) && visibleWidth > 0)
+                {
+                    return $"←{partiallyHiddenPeriod.Label}";
+                }
+            }
+            
+            return "";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error calculating left tooltip: {ex.Message}");
+            return "";
+        }
+    }
+
+    private string GetHiddenRightLabel()
+    {
+        if (!HasHiddenPeriodsRight()) return "";
+        
+        try
+        {
+            // Get the header periods to find the partially hidden one
+            var headerResult = HeaderService.GenerateHeaderPeriods(StartDate, EndDate, EffectiveDayWidth, ZoomLevel, Logger);
+            
+            // Find the period that's partially visible at the right edge
+            var rightEdgeX = ViewportScrollLeft + ViewportWidth;
+            var partiallyHiddenPeriod = headerResult.PrimaryPeriods
+                .FirstOrDefault(p => p.XPosition < rightEdgeX && (p.XPosition + p.Width) > rightEdgeX);
+            
+            if (partiallyHiddenPeriod != null)
+            {
+                // Calculate how much of the period is hidden vs visible
+                var visibleWidth = rightEdgeX - partiallyHiddenPeriod.XPosition;
+                var hiddenWidth = (partiallyHiddenPeriod.XPosition + partiallyHiddenPeriod.Width) - rightEdgeX;
+                
+                // Show tooltip when more than HALF is hidden, hide when completely hidden
+                if (hiddenWidth > (partiallyHiddenPeriod.Width / 2) && visibleWidth > 0)
+                {
+                    return $"{partiallyHiddenPeriod.Label}→";
+                }
+            }
+            
+            return "";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error calculating right tooltip: {ex.Message}");
+            return "";
+        }
+    }
+
+    private int GetWeekOfYear(DateTime date)
+    {
+        var culture = System.Globalization.CultureInfo.CurrentCulture;
+        var dayOfWeek = culture.DateTimeFormat.FirstDayOfWeek;
+        var weekRule = culture.DateTimeFormat.CalendarWeekRule;
+        return culture.Calendar.GetWeekOfYear(date, weekRule, dayOfWeek);
+    }
 
     public void Dispose()
     {
@@ -485,5 +639,31 @@
         font-family: var(--gantt-font-family, system-ui);
         pointer-events: none;
         user-select: none;
+    }
+
+    /* Viewport-fixed tooltips */
+    .timeline-viewport-tooltip {
+        position: absolute;
+        top: calc(var(--header-month-height) / 2);
+        transform: translateY(-50%);
+        background: var(--gantt-inverse-surface, rgba(32, 33, 36, 0.9));
+        color: var(--gantt-inverse-on-surface, #ffffff);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-family: var(--gantt-monospace-font, 'Consolas', 'Monaco', 'Courier New', monospace);
+        font-weight: 500;
+        z-index: 100;
+        pointer-events: none;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .timeline-viewport-tooltip-left {
+        left: 8px;
+    }
+
+    .timeline-viewport-tooltip-right {
+        right: 8px;
     }
 </style>

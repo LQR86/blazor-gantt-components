@@ -38,9 +38,9 @@ public class TimelineHeaderTemplateServiceTests
     }
 
     [Theory]
-    [InlineData(TimelineZoomLevel.WeekDay97px, "date.week-range", "date.day-name-short")]
-    [InlineData(TimelineZoomLevel.MonthDay48px, "date.month-year", "date.day-number")]
-    [InlineData(TimelineZoomLevel.YearQuarter6px, "date.year", "date.quarter-short")]
+    [InlineData(TimelineZoomLevel.WeekDayOptimal60px, "date.week-range", "date.day-name-short")]
+    [InlineData(TimelineZoomLevel.MonthWeekOptimal50px, "date.month-year", "date.week-start")]
+    [InlineData(TimelineZoomLevel.YearQuarterOptimal50px, "date.year", "date.quarter-short")]
     public void GetTemplate_ReturnsCorrectFormats(TimelineZoomLevel zoomLevel, string expectedPrimaryFormat, string expectedSecondaryFormat)
     {
         // Act
@@ -71,9 +71,9 @@ public class TimelineHeaderTemplateServiceTests
     public void YearQuarter_HasBothHeadersVisible()
     {
         // Act
-        var template = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.YearQuarter6px);
+        var template = TimelineHeaderTemplateService.GetTemplate(TimelineZoomLevel.YearQuarterOptimal50px);
 
-        // Assert - Year-Quarter pattern uses Year → Quarter, both visible at 8px day width
+        // Assert - Year-Quarter pattern uses Year → Quarter, both visible with optimal cell size
         Assert.True(template.ShowPrimary); // Year headers are visible
         Assert.True(template.ShowSecondary); // Quarter headers are visible
     }
@@ -83,7 +83,7 @@ public class TimelineHeaderTemplateServiceTests
     {
         // Arrange
         var allLevels = Enum.GetValues<TimelineZoomLevel>()
-            .Where(level => level != TimelineZoomLevel.YearQuarter6px);
+            .Where(level => level != TimelineZoomLevel.YearQuarterOptimal50px);
 
         // Act & Assert
         foreach (var level in allLevels)
@@ -98,7 +98,7 @@ public class TimelineHeaderTemplateServiceTests
     public void GetTemplateDescription_ReturnsNonEmptyDescription()
     {
         // Act
-        var description = TimelineHeaderTemplateService.GetTemplateDescription(TimelineZoomLevel.WeekDay97px);
+        var description = TimelineHeaderTemplateService.GetTemplateDescription(TimelineZoomLevel.WeekDayOptimal60px);
 
         // Assert
         Assert.NotEmpty(description);

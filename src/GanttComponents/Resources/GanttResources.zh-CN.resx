@@ -178,28 +178,6 @@
     <value>M月d日</value>
   </data>
 
-  <!-- Timeline Component-Level I18N Keys (for future floating/dense headers) -->
-  <data name="timeline.component.primary" xml:space="preserve">
-    <value></value>
-  </data>
-  <data name="timeline.component.secondary" xml:space="preserve">
-    <value></value>
-  </data>
-
-  <!-- Timeline Floating Headers (Milestone 1 Foundation) -->
-  <data name="timeline.floating.year" xml:space="preserve">
-    <value></value>
-  </data>
-  <data name="timeline.floating.quarter" xml:space="preserve">
-    <value></value>
-  </data>
-  <data name="timeline.floating.month" xml:space="preserve">
-    <value></value>
-  </data>
-  <data name="timeline.floating.context" xml:space="preserve">
-    <value></value>
-  </data>
-
   <!-- Common UI Elements -->
   <data name="common.save" xml:space="preserve">
     <value>保存</value>
@@ -352,85 +330,6 @@
   </data>
   <data name="task.progress" xml:space="preserve">
     <value>进度</value>
-  </data>
-
-  <!-- Timeline Zoom Levels - Syncfusion Aligned (13 levels) -->
-  
-  <!-- 11级整数像素缩放系统 -->
-  <!-- 周→日模式级别 (级别 10-11: 68px, 97px) -->
-  <data name="ZoomLevel.WeekDay97px" xml:space="preserve">
-    <value>周-日最大</value>
-  </data>
-  <data name="ZoomLevel.WeekDay97px.Description" xml:space="preserve">
-    <value>带周上下文的每日冲刺规划 (97px/天)</value>
-  </data>
-  <data name="ZoomLevel.WeekDay68px" xml:space="preserve">
-    <value>周-日中等</value>
-  </data>
-  <data name="ZoomLevel.WeekDay68px.Description" xml:space="preserve">
-    <value>具有每日粒度的中等周视图 (68px/天)</value>
-  </data>
-  
-  <!-- 月→日模式级别 (级别 8-9: 34px, 48px) -->
-  <data name="ZoomLevel.MonthDay48px" xml:space="preserve">
-    <value>月-日视图</value>
-  </data>
-  <data name="ZoomLevel.MonthDay48px.Description" xml:space="preserve">
-    <value>带日分解的月度概览 (48px/天)</value>
-  </data>
-  <data name="ZoomLevel.MonthDay34px" xml:space="preserve">
-    <value>月-日中等</value>
-  </data>
-  <data name="ZoomLevel.MonthDay34px.Description" xml:space="preserve">
-    <value>具有日周期的中等月度视图 (34px/天)</value>
-  </data>
-
-  <!-- 季→月模式级别 (级别 6-7: 17px, 24px) -->
-  <data name="ZoomLevel.QuarterMonth24px" xml:space="preserve">
-    <value>季-月视图</value>
-  </data>
-  <data name="ZoomLevel.QuarterMonth24px.Description" xml:space="preserve">
-    <value>带月分解的季度概览 (24px/天)</value>
-  </data>
-  <data name="ZoomLevel.QuarterMonth17px" xml:space="preserve">
-    <value>季-月中等</value>
-  </data>
-  <data name="ZoomLevel.QuarterMonth17px.Description" xml:space="preserve">
-    <value>具有月周期的中等季度视图 (17px/天)</value>
-  </data>
-  
-  <!-- 月专用模式级别 (级别 4-5: 8px, 12px) -->
-  <data name="ZoomLevel.Month12px" xml:space="preserve">
-    <value>月视图</value>
-  </data>
-  <data name="ZoomLevel.Month12px.Description" xml:space="preserve">
-    <value>紧凑月度视图 (12px/天)</value>
-  </data>
-  <data name="ZoomLevel.Month8px" xml:space="preserve">
-    <value>月紧凑</value>
-  </data>
-  <data name="ZoomLevel.Month8px.Description" xml:space="preserve">
-    <value>带月分解的年度概览 (8px/天)</value>
-  </data>
-  
-  <!-- 年→季模式级别 (级别 1-3: 3px, 4px, 6px) -->
-  <data name="ZoomLevel.YearQuarter6px" xml:space="preserve">
-    <value>年-季视图</value>
-  </data>
-  <data name="ZoomLevel.YearQuarter6px.Description" xml:space="preserve">
-    <value>具有季度周期的中等年度视图 (6px/天)</value>
-  </data>
-  <data name="ZoomLevel.YearQuarter4px" xml:space="preserve">
-    <value>年-季中等</value>
-  </data>
-  <data name="ZoomLevel.YearQuarter4px.Description" xml:space="preserve">
-    <value>带季度标记的扩展多年规划 (4px/天)</value>
-  </data>
-  <data name="ZoomLevel.YearQuarter3px" xml:space="preserve">
-    <value>年-季最小</value>
-  </data>
-  <data name="ZoomLevel.YearQuarter3px.Description" xml:space="preserve">
-    <value>具有最小日宽度的长期战略视图 (3px/天)</value>
   </data>
 
   <!-- NEW: 最佳单元格尺寸缩放级别 (4-4-4-4 结构) -->

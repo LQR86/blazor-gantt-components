@@ -178,28 +178,6 @@
     <value>dd MMM</value>
   </data>
 
-  <!-- Timeline Component-Level I18N Keys (for future floating/dense headers) -->
-  <data name="timeline.component.primary" xml:space="preserve">
-    <value></value>
-  </data>
-  <data name="timeline.component.secondary" xml:space="preserve">
-    <value></value>
-  </data>
-
-  <!-- Timeline Floating Headers (Milestone 1 Foundation) -->
-  <data name="timeline.floating.year" xml:space="preserve">
-    <value></value>
-  </data>
-  <data name="timeline.floating.quarter" xml:space="preserve">
-    <value></value>
-  </data>
-  <data name="timeline.floating.month" xml:space="preserve">
-    <value></value>
-  </data>
-  <data name="timeline.floating.context" xml:space="preserve">
-    <value></value>
-  </data>
-
   <!-- Common UI Elements -->
   <data name="common.save" xml:space="preserve">
     <value>Save</value>
@@ -352,85 +330,6 @@
   </data>
   <data name="task.progress" xml:space="preserve">
     <value>Progress</value>
-  </data>
-
-  <!-- Timeline Zoom Levels - Syncfusion Aligned (13 levels) -->
-  
-  <!-- 11-Level Integral Pixel Zoom System -->
-  <!-- Week→Day Pattern Levels (Levels 10-11: 68px, 97px) -->
-  <data name="ZoomLevel.WeekDay97px" xml:space="preserve">
-    <value>Week-Day Maximum</value>
-  </data>
-  <data name="ZoomLevel.WeekDay97px.Description" xml:space="preserve">
-    <value>Daily sprint planning with weekly context (97px/day)</value>
-  </data>
-  <data name="ZoomLevel.WeekDay68px" xml:space="preserve">
-    <value>Week-Day Medium</value>
-  </data>
-  <data name="ZoomLevel.WeekDay68px.Description" xml:space="preserve">
-    <value>Medium weekly view with daily granularity (68px/day)</value>
-  </data>
-  
-  <!-- Month→Day Pattern Levels (Levels 8-9: 34px, 48px) -->
-  <data name="ZoomLevel.MonthDay48px" xml:space="preserve">
-    <value>Month-Day View</value>
-  </data>
-  <data name="ZoomLevel.MonthDay48px.Description" xml:space="preserve">
-    <value>Monthly overview with daily breakdown (48px/day)</value>
-  </data>
-  <data name="ZoomLevel.MonthDay34px" xml:space="preserve">
-    <value>Month-Day Medium</value>
-  </data>
-  <data name="ZoomLevel.MonthDay34px.Description" xml:space="preserve">
-    <value>Medium monthly view with daily periods (34px/day)</value>
-  </data>
-
-  <!-- Quarter→Month Pattern Levels (Levels 6-7: 17px, 24px) -->
-  <data name="ZoomLevel.QuarterMonth24px" xml:space="preserve">
-    <value>Quarter-Month View</value>
-  </data>
-  <data name="ZoomLevel.QuarterMonth24px.Description" xml:space="preserve">
-    <value>Quarterly overview with monthly breakdown (24px/day)</value>
-  </data>
-  <data name="ZoomLevel.QuarterMonth17px" xml:space="preserve">
-    <value>Quarter-Month Medium</value>
-  </data>
-  <data name="ZoomLevel.QuarterMonth17px.Description" xml:space="preserve">
-    <value>Medium quarterly view with monthly periods (17px/day)</value>
-  </data>
-  
-  <!-- Month-only Pattern Levels (Levels 4-5: 8px, 12px) -->
-  <data name="ZoomLevel.Month12px" xml:space="preserve">
-    <value>Month View</value>
-  </data>
-  <data name="ZoomLevel.Month12px.Description" xml:space="preserve">
-    <value>Monthly view with compact layout (12px/day)</value>
-  </data>
-  <data name="ZoomLevel.Month8px" xml:space="preserve">
-    <value>Month Compact</value>
-  </data>
-  <data name="ZoomLevel.Month8px.Description" xml:space="preserve">
-    <value>Annual overview with monthly breakdown (8px/day)</value>
-  </data>
-  
-  <!-- Year→Quarter Pattern Levels (Levels 1-3: 3px, 4px, 6px) -->
-  <data name="ZoomLevel.YearQuarter6px" xml:space="preserve">
-    <value>Year-Quarter View</value>
-  </data>
-  <data name="ZoomLevel.YearQuarter6px.Description" xml:space="preserve">
-    <value>Medium annual view with quarterly periods (6px/day)</value>
-  </data>
-  <data name="ZoomLevel.YearQuarter4px" xml:space="preserve">
-    <value>Year-Quarter Medium</value>
-  </data>
-  <data name="ZoomLevel.YearQuarter4px.Description" xml:space="preserve">
-    <value>Extended multi-year planning with quarterly markers (4px/day)</value>
-  </data>
-  <data name="ZoomLevel.YearQuarter3px" xml:space="preserve">
-    <value>Year-Quarter Minimal</value>
-  </data>
-  <data name="ZoomLevel.YearQuarter3px.Description" xml:space="preserve">
-    <value>Long-term strategic view with minimum day width (3px/day)</value>
   </data>
 
   <!-- NEW: Optimal Cell Size Zoom Levels (4-4-4-4 Structure) -->

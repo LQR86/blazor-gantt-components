@@ -103,24 +103,24 @@ public class TimelineZoomService
             // ========================================
             // Revolutionary cell-size-first approach: ALL levels have perfect 30-70px visual density!
 
-            // Week-Day Pattern (4 levels): 30px-70px day cells - Perfect for detailed daily work
-            [TimelineZoomLevel.WeekDayOptimal70px] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.WeekDayOptimal70px,
-                70.0, // Perfect: 70px day cells with maximum detail and rich interactions
-                "ZoomLevel.WeekDayOptimal70px",
-                "ZoomLevel.WeekDayOptimal70px.Description"
-            ),
+            // Week-Day Pattern (4 levels): 30px-60px day cells - Perfect for detailed daily work
             [TimelineZoomLevel.WeekDayOptimal60px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.WeekDayOptimal60px,
                 60.0, // Perfect: 60px day cells with rich information and team details
                 "ZoomLevel.WeekDayOptimal60px",
                 "ZoomLevel.WeekDayOptimal60px.Description"
             ),
-            [TimelineZoomLevel.WeekDayOptimal45px] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.WeekDayOptimal45px,
-                45.0, // Perfect: 45px day cells with enhanced visibility and icons
-                "ZoomLevel.WeekDayOptimal45px",
-                "ZoomLevel.WeekDayOptimal45px.Description"
+            [TimelineZoomLevel.WeekDayOptimal50px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.WeekDayOptimal50px,
+                50.0, // Perfect: 50px day cells with full detail and team information
+                "ZoomLevel.WeekDayOptimal50px",
+                "ZoomLevel.WeekDayOptimal50px.Description"
+            ),
+            [TimelineZoomLevel.WeekDayOptimal40px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.WeekDayOptimal40px,
+                40.0, // Perfect: 40px day cells with enhanced visibility and icons
+                "ZoomLevel.WeekDayOptimal40px",
+                "ZoomLevel.WeekDayOptimal40px.Description"
             ),
             [TimelineZoomLevel.WeekDayOptimal30px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.WeekDayOptimal30px,
@@ -129,18 +129,24 @@ public class TimelineZoomService
                 "ZoomLevel.WeekDayOptimal30px.Description"
             ),
 
-            // Month-Week Pattern (3 levels): 30px-70px week cells - Perfect for weekly planning
-            [TimelineZoomLevel.MonthWeekOptimal70px] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.MonthWeekOptimal70px,
-                10.0, // Perfect: 10px day width = 70px week cells (10px × 7 days)
-                "ZoomLevel.MonthWeekOptimal70px",
-                "ZoomLevel.MonthWeekOptimal70px.Description"
+            // Month-Week Pattern (4 levels): 30px-60px week cells - Perfect for weekly planning
+            [TimelineZoomLevel.MonthWeekOptimal60px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.MonthWeekOptimal60px,
+                8.57, // Perfect: 8.57px day width = 60px week cells (8.57px × 7 days)
+                "ZoomLevel.MonthWeekOptimal60px",
+                "ZoomLevel.MonthWeekOptimal60px.Description"
             ),
             [TimelineZoomLevel.MonthWeekOptimal50px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.MonthWeekOptimal50px,
                 7.14, // Perfect: 7.14px day width = 50px week cells (7.14px × 7 days)
                 "ZoomLevel.MonthWeekOptimal50px",
                 "ZoomLevel.MonthWeekOptimal50px.Description"
+            ),
+            [TimelineZoomLevel.MonthWeekOptimal40px] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.MonthWeekOptimal40px,
+                5.71, // Perfect: 5.71px day width = 40px week cells (5.71px × 7 days)
+                "ZoomLevel.MonthWeekOptimal40px",
+                "ZoomLevel.MonthWeekOptimal40px.Description"
             ),
             [TimelineZoomLevel.MonthWeekOptimal30px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.MonthWeekOptimal30px,
@@ -149,16 +155,10 @@ public class TimelineZoomService
                 "ZoomLevel.MonthWeekOptimal30px.Description"
             ),
 
-            // Quarter-Month Pattern (5 levels): 30px-70px month cells - Perfect for monthly planning
-            [TimelineZoomLevel.QuarterMonthOptimal70px] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.QuarterMonthOptimal70px,
-                2.33, // Perfect: 2.33px day width = 70px month cells (2.33px × 30 days)
-                "ZoomLevel.QuarterMonthOptimal70px",
-                "ZoomLevel.QuarterMonthOptimal70px.Description"
-            ),
+            // Quarter-Month Pattern (4 levels): 30px-60px month cells - Perfect for monthly planning
             [TimelineZoomLevel.QuarterMonthOptimal60px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.QuarterMonthOptimal60px,
-                2.0, // Perfect: 2.0px day width = 60px month cells (2.0px × 30 days)
+                2.33, // Perfect: 2.33px day width = 70px month cells (2.33px × 30 days)
                 "ZoomLevel.QuarterMonthOptimal60px",
                 "ZoomLevel.QuarterMonthOptimal60px.Description"
             ),

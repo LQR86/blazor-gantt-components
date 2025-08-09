@@ -433,6 +433,111 @@
     <value>Long-term strategic view with minimum day width (3px/day)</value>
   </data>
 
+  <!-- NEW: Optimal Cell Size Zoom Levels (4-4-4-4 Structure) -->
+  
+  <!-- Year-Quarter Optimal Pattern (4 levels): 30px-70px quarter cells -->
+  <data name="ZoomLevel.YearQuarterOptimal30px" xml:space="preserve">
+    <value>Year-Quarter 30px</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal30px.Description" xml:space="preserve">
+    <value>Strategic overview with optimal 30px quarter cells</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal40px" xml:space="preserve">
+    <value>Year-Quarter 40px</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal40px.Description" xml:space="preserve">
+    <value>Strategic overview with optimal 40px quarter cells</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal50px" xml:space="preserve">
+    <value>Year-Quarter 50px</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal50px.Description" xml:space="preserve">
+    <value>Strategic overview with optimal 50px quarter cells</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal70px" xml:space="preserve">
+    <value>Year-Quarter 70px</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal70px.Description" xml:space="preserve">
+    <value>Strategic overview with optimal 70px quarter cells</value>
+  </data>
+
+  <!-- Quarter-Month Optimal Pattern (4 levels): 30px-60px month cells -->
+  <data name="ZoomLevel.QuarterMonthOptimal30px" xml:space="preserve">
+    <value>Quarter-Month 30px</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal30px.Description" xml:space="preserve">
+    <value>Quarterly planning with optimal 30px month cells</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal40px" xml:space="preserve">
+    <value>Quarter-Month 40px</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal40px.Description" xml:space="preserve">
+    <value>Quarterly planning with optimal 40px month cells</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal50px" xml:space="preserve">
+    <value>Quarter-Month 50px</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal50px.Description" xml:space="preserve">
+    <value>Quarterly planning with optimal 50px month cells</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal60px" xml:space="preserve">
+    <value>Quarter-Month 60px</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal60px.Description" xml:space="preserve">
+    <value>Quarterly planning with optimal 60px month cells</value>
+  </data>
+
+  <!-- Month-Week Optimal Pattern (4 levels): 30px-60px week cells -->
+  <data name="ZoomLevel.MonthWeekOptimal30px" xml:space="preserve">
+    <value>Month-Week 30px</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal30px.Description" xml:space="preserve">
+    <value>Monthly planning with optimal 30px week cells</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal40px" xml:space="preserve">
+    <value>Month-Week 40px</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal40px.Description" xml:space="preserve">
+    <value>Monthly planning with optimal 40px week cells</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal50px" xml:space="preserve">
+    <value>Month-Week 50px</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal50px.Description" xml:space="preserve">
+    <value>Monthly planning with optimal 50px week cells</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal60px" xml:space="preserve">
+    <value>Month-Week 60px</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal60px.Description" xml:space="preserve">
+    <value>Monthly planning with optimal 60px week cells</value>
+  </data>
+
+  <!-- Week-Day Optimal Pattern (4 levels): 30px-60px day cells -->
+  <data name="ZoomLevel.WeekDayOptimal30px" xml:space="preserve">
+    <value>Week-Day 30px</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal30px.Description" xml:space="preserve">
+    <value>Daily scheduling with optimal 30px day cells</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal40px" xml:space="preserve">
+    <value>Week-Day 40px</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal40px.Description" xml:space="preserve">
+    <value>Daily scheduling with optimal 40px day cells</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal50px" xml:space="preserve">
+    <value>Week-Day 50px</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal50px.Description" xml:space="preserve">
+    <value>Daily scheduling with optimal 50px day cells</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal60px" xml:space="preserve">
+    <value>Week-Day 60px</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal60px.Description" xml:space="preserve">
+    <value>Daily scheduling with optimal 60px day cells</value>
+  </data>
 
 
   <!-- Timeline Zoom UI Controls -->

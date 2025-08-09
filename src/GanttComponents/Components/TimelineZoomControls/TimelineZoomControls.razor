@@ -150,7 +150,7 @@
     // Zoom level filtering - for different use cases  
     [Parameter] public IReadOnlyList<TimelineZoomLevel>? VisibleZoomLevels { get; set; }
     [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.YearQuarterOptimal30px;  // Most zoomed out (overview) - NEW OPTIMAL
-    [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal70px;      // Most zoomed in (detail) - NEW OPTIMAL
+        [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal60px;      // Most zoomed in (detail) - 4-4-4-4 structure
     
     // Preset-only approach: Manual zoom controls removed for v0.8.5
     // All zoom control is handled via preset level selection only
@@ -213,7 +213,7 @@
             .Where(level => !IsObsoleteZoomLevel(level))  // Filter out obsolete levels
             .OrderBy(x => (int)x);
         
-        // Use min/max range - NEW: YearQuarterOptimal30px=20 (overview) to WeekDayOptimal70px=35 (detail)
+        // Use min/max range - 4-4-4-4: YearQuarterOptimal30px=20 (overview) to WeekDayOptimal60px=35 (detail)
         var filteredLevels = allLevels.Where(level => (int)level >= (int)MinZoomLevel && (int)level <= (int)MaxZoomLevel).ToList();
         
         // Apply preset limit for visible presets

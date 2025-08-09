@@ -140,7 +140,7 @@
     <value>%d日MM月</value>
   </data>
   <data name="date.week-range" xml:space="preserve">
-    <value>yyyy-MM-%d</value>
+    <value>yyyy-MM-%d开始的周</value>
   </data>
   <data name="date.day-name-short" xml:space="preserve">
     <value>ddd</value>
@@ -431,6 +431,112 @@
   </data>
   <data name="ZoomLevel.YearQuarter3px.Description" xml:space="preserve">
     <value>具有最小日宽度的长期战略视图 (3px/天)</value>
+  </data>
+
+  <!-- NEW: 最佳单元格尺寸缩放级别 (4-4-4-4 结构) -->
+  
+  <!-- 年-季度最佳模式 (4个级别): 30px-70px 季度单元格 -->
+  <data name="ZoomLevel.YearQuarterOptimal30px" xml:space="preserve">
+    <value>年-季度 30px</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal30px.Description" xml:space="preserve">
+    <value>具有最佳30px季度单元格的战略概览</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal40px" xml:space="preserve">
+    <value>年-季度 40px</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal40px.Description" xml:space="preserve">
+    <value>具有最佳40px季度单元格的战略概览</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal50px" xml:space="preserve">
+    <value>年-季度 50px</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal50px.Description" xml:space="preserve">
+    <value>具有最佳50px季度单元格的战略概览</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal70px" xml:space="preserve">
+    <value>年-季度 70px</value>
+  </data>
+  <data name="ZoomLevel.YearQuarterOptimal70px.Description" xml:space="preserve">
+    <value>具有最佳70px季度单元格的战略概览</value>
+  </data>
+
+  <!-- 季度-月份最佳模式 (4个级别): 30px-60px 月份单元格 -->
+  <data name="ZoomLevel.QuarterMonthOptimal30px" xml:space="preserve">
+    <value>季度-月份 30px</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal30px.Description" xml:space="preserve">
+    <value>具有最佳30px月份单元格的季度规划</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal40px" xml:space="preserve">
+    <value>季度-月份 40px</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal40px.Description" xml:space="preserve">
+    <value>具有最佳40px月份单元格的季度规划</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal50px" xml:space="preserve">
+    <value>季度-月份 50px</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal50px.Description" xml:space="preserve">
+    <value>具有最佳50px月份单元格的季度规划</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal60px" xml:space="preserve">
+    <value>季度-月份 60px</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonthOptimal60px.Description" xml:space="preserve">
+    <value>具有最佳60px月份单元格的季度规划</value>
+  </data>
+
+  <!-- 月份-周最佳模式 (4个级别): 30px-60px 周单元格 -->
+  <data name="ZoomLevel.MonthWeekOptimal30px" xml:space="preserve">
+    <value>月份-周 30px</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal30px.Description" xml:space="preserve">
+    <value>具有最佳30px周单元格的月度规划</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal40px" xml:space="preserve">
+    <value>月份-周 40px</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal40px.Description" xml:space="preserve">
+    <value>具有最佳40px周单元格的月度规划</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal50px" xml:space="preserve">
+    <value>月份-周 50px</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal50px.Description" xml:space="preserve">
+    <value>具有最佳50px周单元格的月度规划</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal60px" xml:space="preserve">
+    <value>月份-周 60px</value>
+  </data>
+  <data name="ZoomLevel.MonthWeekOptimal60px.Description" xml:space="preserve">
+    <value>具有最佳60px周单元格的月度规划</value>
+  </data>
+
+  <!-- 周-日最佳模式 (4个级别): 30px-60px 日单元格 -->
+  <data name="ZoomLevel.WeekDayOptimal30px" xml:space="preserve">
+    <value>周-日 30px</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal30px.Description" xml:space="preserve">
+    <value>具有最佳30px日单元格的日程安排</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal40px" xml:space="preserve">
+    <value>周-日 40px</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal40px.Description" xml:space="preserve">
+    <value>具有最佳40px日单元格的日程安排</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal50px" xml:space="preserve">
+    <value>周-日 50px</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal50px.Description" xml:space="preserve">
+    <value>具有最佳50px日单元格的日程安排</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal60px" xml:space="preserve">
+    <value>周-日 60px</value>
+  </data>
+  <data name="ZoomLevel.WeekDayOptimal60px.Description" xml:space="preserve">
+    <value>具有最佳60px日单元格的日程安排</value>
   </data>
 
   <!-- Timeline Zoom UI Controls -->

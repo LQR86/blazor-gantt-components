@@ -1,14 +1,14 @@
 namespace GanttComponents.Models;
 
 /// <summary>
-/// Defines the optimal 15-level cell-size-first zoom system for timeline visualization.
+/// Defines the optimal 16-level cell-size-first zoom system for timeline visualization.
 /// REVOLUTIONARY APPROACH: Optimizes for 30-70px bottom-tier cell sizes instead of taskbar visibility.
 /// This creates professional, balanced visual density across ALL zoom levels.
 /// 
 /// Previous approach: [3, 4, 6, 8, 12, 17, 24, 34, 48, 68, 97] px → Sparse, empty-looking headers
 /// New approach: [0.33→70] px day widths → ALL levels have perfect 30-70px cell density!
 /// 
-/// 4 pattern groups with smooth transitions: YearQuarter(4) → QuarterMonth(5) → MonthWeek(3) → WeekDay(4)
+/// 4 pattern groups with perfect symmetry: YearQuarter(4) → QuarterMonth(4) → MonthWeek(4) → WeekDay(4)
 /// All bottom-tier cells maintain 30-70px for maximum visual impact and professional appearance.
 /// </summary>
 public enum TimelineZoomLevel
@@ -140,7 +140,7 @@ public enum TimelineZoomLevel
     /// </summary>
     YearQuarterOptimal70px = 23,
 
-    // Quarter-Month Pattern (5 levels): 30px-70px month cells
+    // Quarter-Month Pattern (4 levels): 30px-70px month cells
     // Day widths: 1.0px-2.33px → Use thin lines and mini indicators
 
     /// <summary>
@@ -171,38 +171,38 @@ public enum TimelineZoomLevel
     QuarterMonthOptimal50px = 26,
 
     /// <summary>
-    /// Quarter-Month Optimal 60px: 2.0px per day (Level 8)
-    /// Best for: Rich quarterly view with enhanced monthly detail
-    /// Pattern: Quarter → Month (60px month cells)
-    /// Task Strategy: 2px bars with basic text labels
-    /// Visual Quality: Perfect density, rich monthly information
-    /// </summary>
-    QuarterMonthOptimal60px = 27,
-
-    /// <summary>
-    /// Quarter-Month Optimal 70px: 2.33px per day (Level 9)
+    /// Quarter-Month Optimal 60px: 2.33px per day (Level 8)
     /// Best for: Maximum monthly visibility with quarter context
-    /// Pattern: Quarter → Month (70px month cells)
+    /// Pattern: Quarter → Month (60px month cells)
     /// Task Strategy: 2-3px bars with progress indicators
     /// Visual Quality: Perfect density, maximum monthly readability
     /// </summary>
-    QuarterMonthOptimal70px = 28,
+    QuarterMonthOptimal60px = 27,
 
-    // Month-Week Pattern (3 levels): 30px-70px week cells
+    // Month-Week Pattern (4 levels): 30px-70px week cells
     // Day widths: 4.29px-10px → Use mini taskbars with labels
 
     /// <summary>
-    /// Month-Week Optimal 30px: 4.29px per day (Level 10)
+    /// Month-Week Optimal 30px: 4.29px per day (Level 9)
     /// Best for: Monthly planning with weekly breakdown
     /// Pattern: Month → Week (30px week cells)
     /// Task Strategy: 4px mini taskbars with simple labels
     /// Visual Quality: Perfect density, clear weekly overview
     /// </summary>
-    MonthWeekOptimal30px = 29,
+    MonthWeekOptimal30px = 28,
+
+    /// <summary>
+    /// Month-Week Optimal 40px: 5.71px per day (Level 10)
+    /// Best for: Enhanced monthly view with week details
+    /// Pattern: Month → Week (40px week cells)
+    /// Task Strategy: 5px taskbars with text labels
+    /// Visual Quality: Perfect density, good weekly readability
+    /// </summary>
+    MonthWeekOptimal40px = 29,
 
     /// <summary>
     /// Month-Week Optimal 50px: 7.14px per day (Level 11)
-    /// Best for: Enhanced monthly view with week details
+    /// Best for: Detailed monthly planning with week focus
     /// Pattern: Month → Week (50px week cells)
     /// Task Strategy: 7px taskbars with text and progress
     /// Visual Quality: Perfect density, excellent weekly readability
@@ -210,13 +210,13 @@ public enum TimelineZoomLevel
     MonthWeekOptimal50px = 30,
 
     /// <summary>
-    /// Month-Week Optimal 70px: 10px per day (Level 12)
+    /// Month-Week Optimal 60px: 8.57px per day (Level 12)
     /// Best for: Maximum weekly visibility with month context
-    /// Pattern: Month → Week (70px week cells)
-    /// Task Strategy: 10px taskbars with full labeling
+    /// Pattern: Month → Week (60px week cells)
+    /// Task Strategy: 8px taskbars with full labeling
     /// Visual Quality: Perfect density, maximum weekly readability
     /// </summary>
-    MonthWeekOptimal70px = 31,
+    MonthWeekOptimal60px = 31,
 
     // Week-Day Pattern (4 levels): 30px-70px day cells
     // Day widths: 30px-70px → Use full taskbars with rich details
@@ -231,29 +231,29 @@ public enum TimelineZoomLevel
     WeekDayOptimal30px = 32,
 
     /// <summary>
-    /// Week-Day Optimal 45px: 45px per day (Level 14)
+    /// Week-Day Optimal 40px: 40px per day (Level 14)
     /// Best for: Enhanced weekly view with day details
-    /// Pattern: Week → Day (45px day cells)
-    /// Task Strategy: Rich taskbars with icons and detailed progress
-    /// Visual Quality: Perfect density, superior daily readability
+    /// Pattern: Week → Day (40px day cells)
+    /// Task Strategy: Rich taskbars with icons and progress
+    /// Visual Quality: Perfect density, good daily readability
     /// </summary>
-    WeekDayOptimal45px = 33,
+    WeekDayOptimal40px = 33,
 
     /// <summary>
-    /// Week-Day Optimal 60px: 60px per day (Level 15)
+    /// Week-Day Optimal 50px: 50px per day (Level 15)
     /// Best for: Detailed weekly planning with full day information
-    /// Pattern: Week → Day (60px day cells)
+    /// Pattern: Week → Day (50px day cells)
     /// Task Strategy: Full taskbars with team, progress, and status
-    /// Visual Quality: Perfect density, rich daily information
+    /// Visual Quality: Perfect density, excellent daily readability
     /// </summary>
-    WeekDayOptimal60px = 34,
+    WeekDayOptimal50px = 34,
 
     /// <summary>
-    /// Week-Day Optimal 70px: 70px per day (Level 16)
+    /// Week-Day Optimal 60px: 60px per day (Level 16)
     /// Best for: Maximum daily visibility with complete information
-    /// Pattern: Week → Day (70px day cells)
+    /// Pattern: Week → Day (60px day cells)
     /// Task Strategy: Complete taskbars with all details and interactions
     /// Visual Quality: Perfect density, maximum daily readability
     /// </summary>
-    WeekDayOptimal70px = 35
+    WeekDayOptimal60px = 35
 }

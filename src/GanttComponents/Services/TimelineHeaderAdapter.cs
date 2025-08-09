@@ -45,6 +45,7 @@ public static class TimelineHeaderAdapter
     /// <param name="zoomLevel">Current zoom level</param>
     /// <param name="effectiveDayWidth">Current effective day width in pixels</param>
     /// <returns>Header configuration with timescale and format recommendations</returns>
+#pragma warning disable CS0618 // Type or member is obsolete - Legacy zoom levels preserved for backward compatibility
     public static TimelineHeaderConfiguration GetHeaderConfiguration(TimelineZoomLevel zoomLevel, double effectiveDayWidth)
     {
         return zoomLevel switch
@@ -186,9 +187,216 @@ public static class TimelineHeaderAdapter
                 MinSecondaryWidth = 30
             },
 
+            // ========================================
+            // NEW OPTIMAL ZOOM LEVELS (Phase 3.1)
+            // ========================================
+            // Revolutionary cell-size-first approach with perfect 30-70px visual density!
+
+            // Year-Quarter Optimal Pattern (4 levels): 30px-70px quarter cells
+            // All levels use same pattern but optimize for specific cell size
+
+            TimelineZoomLevel.YearQuarterOptimal30px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Year,
+                PrimaryFormat = "date.year",
+                SecondaryUnit = TimelineHeaderUnit.Quarter,
+                SecondaryFormat = "date.quarter-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 120,  // Optimized for 30px quarters (4 quarters = 120px)
+                MinSecondaryWidth = 30  // Perfect 30px quarter cells
+            },
+
+            TimelineZoomLevel.YearQuarterOptimal40px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Year,
+                PrimaryFormat = "date.year",
+                SecondaryUnit = TimelineHeaderUnit.Quarter,
+                SecondaryFormat = "date.quarter-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 160,  // Optimized for 40px quarters (4 quarters = 160px)
+                MinSecondaryWidth = 40  // Perfect 40px quarter cells
+            },
+
+            TimelineZoomLevel.YearQuarterOptimal50px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Year,
+                PrimaryFormat = "date.year",
+                SecondaryUnit = TimelineHeaderUnit.Quarter,
+                SecondaryFormat = "date.quarter-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 200,  // Optimized for 50px quarters (4 quarters = 200px)
+                MinSecondaryWidth = 50  // Perfect 50px quarter cells
+            },
+
+            TimelineZoomLevel.YearQuarterOptimal70px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Year,
+                PrimaryFormat = "date.year",
+                SecondaryUnit = TimelineHeaderUnit.Quarter,
+                SecondaryFormat = "date.quarter-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 280,  // Optimized for 70px quarters (4 quarters = 280px)
+                MinSecondaryWidth = 70  // Perfect 70px quarter cells
+            },
+
+            // Quarter-Month Optimal Pattern (5 levels): 30px-70px month cells
+
+            TimelineZoomLevel.QuarterMonthOptimal30px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Quarter,
+                PrimaryFormat = "date.quarter-year",
+                SecondaryUnit = TimelineHeaderUnit.Month,
+                SecondaryFormat = "date.month-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 90,   // Optimized for 30px months (3 months = 90px)
+                MinSecondaryWidth = 30  // Perfect 30px month cells
+            },
+
+            TimelineZoomLevel.QuarterMonthOptimal40px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Quarter,
+                PrimaryFormat = "date.quarter-year",
+                SecondaryUnit = TimelineHeaderUnit.Month,
+                SecondaryFormat = "date.month-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 120,  // Optimized for 40px months (3 months = 120px)
+                MinSecondaryWidth = 40  // Perfect 40px month cells
+            },
+
+            TimelineZoomLevel.QuarterMonthOptimal50px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Quarter,
+                PrimaryFormat = "date.quarter-year",
+                SecondaryUnit = TimelineHeaderUnit.Month,
+                SecondaryFormat = "date.month-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 150,  // Optimized for 50px months (3 months = 150px)
+                MinSecondaryWidth = 50  // Perfect 50px month cells
+            },
+
+            TimelineZoomLevel.QuarterMonthOptimal60px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Quarter,
+                PrimaryFormat = "date.quarter-year",
+                SecondaryUnit = TimelineHeaderUnit.Month,
+                SecondaryFormat = "date.month-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 180,  // Optimized for 60px months (3 months = 180px)
+                MinSecondaryWidth = 60  // Perfect 60px month cells
+            },
+
+            TimelineZoomLevel.QuarterMonthOptimal70px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Quarter,
+                PrimaryFormat = "date.quarter-year",
+                SecondaryUnit = TimelineHeaderUnit.Month,
+                SecondaryFormat = "date.month-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 210,  // Optimized for 70px months (3 months = 210px)
+                MinSecondaryWidth = 70  // Perfect 70px month cells
+            },
+
+            // Month-Week Optimal Pattern (3 levels): 30px-70px week cells
+
+            TimelineZoomLevel.MonthWeekOptimal30px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Month,
+                PrimaryFormat = "date.month-year",
+                SecondaryUnit = TimelineHeaderUnit.Week,
+                SecondaryFormat = "date.week-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 120,  // Optimized for 30px weeks (~4 weeks = 120px)
+                MinSecondaryWidth = 30  // Perfect 30px week cells
+            },
+
+            TimelineZoomLevel.MonthWeekOptimal50px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Month,
+                PrimaryFormat = "date.month-year",
+                SecondaryUnit = TimelineHeaderUnit.Week,
+                SecondaryFormat = "date.week-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 200,  // Optimized for 50px weeks (~4 weeks = 200px)
+                MinSecondaryWidth = 50  // Perfect 50px week cells
+            },
+
+            TimelineZoomLevel.MonthWeekOptimal70px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Month,
+                PrimaryFormat = "date.month-year",
+                SecondaryUnit = TimelineHeaderUnit.Week,
+                SecondaryFormat = "date.week-short",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 280,  // Optimized for 70px weeks (~4 weeks = 280px)
+                MinSecondaryWidth = 70  // Perfect 70px week cells
+            },
+
+            // Week-Day Optimal Pattern (4 levels): 30px-70px day cells
+
+            TimelineZoomLevel.WeekDayOptimal30px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Week,
+                PrimaryFormat = "date.week-year",
+                SecondaryUnit = TimelineHeaderUnit.Day,
+                SecondaryFormat = "date.day-number",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 210,  // Optimized for 30px days (7 days = 210px)
+                MinSecondaryWidth = 30  // Perfect 30px day cells
+            },
+
+            TimelineZoomLevel.WeekDayOptimal45px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Week,
+                PrimaryFormat = "date.week-year",
+                SecondaryUnit = TimelineHeaderUnit.Day,
+                SecondaryFormat = "date.day-number",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 315,  // Optimized for 45px days (7 days = 315px)
+                MinSecondaryWidth = 45  // Perfect 45px day cells
+            },
+
+            TimelineZoomLevel.WeekDayOptimal60px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Week,
+                PrimaryFormat = "date.week-year",
+                SecondaryUnit = TimelineHeaderUnit.Day,
+                SecondaryFormat = "date.day-number",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 420,  // Optimized for 60px days (7 days = 420px)
+                MinSecondaryWidth = 60  // Perfect 60px day cells
+            },
+
+            TimelineZoomLevel.WeekDayOptimal70px => new TimelineHeaderConfiguration
+            {
+                PrimaryUnit = TimelineHeaderUnit.Week,
+                PrimaryFormat = "date.week-year",
+                SecondaryUnit = TimelineHeaderUnit.Day,
+                SecondaryFormat = "date.day-number",
+                ShowPrimary = true,
+                ShowSecondary = true,
+                MinPrimaryWidth = 490,  // Optimized for 70px days (7 days = 490px)
+                MinSecondaryWidth = 70  // Perfect 70px day cells
+            },
+
             _ => throw new ArgumentOutOfRangeException(nameof(zoomLevel))
         };
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Determines if headers should be collapsed based on available space.
@@ -296,6 +504,7 @@ public static class TimelineHeaderAdapter
     /// Gets the minimum primary header width for a zoom level.
     /// Based on typical text content for each level.
     /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete - Legacy zoom levels preserved for backward compatibility
     private static double GetMinimumPrimaryWidth(TimelineZoomLevel zoomLevel)
     {
         return zoomLevel switch
@@ -321,14 +530,42 @@ public static class TimelineHeaderAdapter
             TimelineZoomLevel.YearQuarter4px => 60,       // "20s"
             TimelineZoomLevel.YearQuarter6px => 40,        // "20", "30" (minimal)
 
+            // NEW OPTIMAL ZOOM LEVELS - Optimized cell size approach
+            
+            // Year-Quarter Optimal: Calculated based on target quarter cell sizes
+            TimelineZoomLevel.YearQuarterOptimal30px => 120,  // 4 quarters × 30px = 120px
+            TimelineZoomLevel.YearQuarterOptimal40px => 160,  // 4 quarters × 40px = 160px  
+            TimelineZoomLevel.YearQuarterOptimal50px => 200,  // 4 quarters × 50px = 200px
+            TimelineZoomLevel.YearQuarterOptimal70px => 280,  // 4 quarters × 70px = 280px
+
+            // Quarter-Month Optimal: Calculated based on target month cell sizes
+            TimelineZoomLevel.QuarterMonthOptimal30px => 90,   // 3 months × 30px = 90px
+            TimelineZoomLevel.QuarterMonthOptimal40px => 120,  // 3 months × 40px = 120px
+            TimelineZoomLevel.QuarterMonthOptimal50px => 150,  // 3 months × 50px = 150px
+            TimelineZoomLevel.QuarterMonthOptimal60px => 180,  // 3 months × 60px = 180px
+            TimelineZoomLevel.QuarterMonthOptimal70px => 210,  // 3 months × 70px = 210px
+
+            // Month-Week Optimal: Calculated based on target week cell sizes
+            TimelineZoomLevel.MonthWeekOptimal30px => 120,  // ~4 weeks × 30px = 120px
+            TimelineZoomLevel.MonthWeekOptimal50px => 200,  // ~4 weeks × 50px = 200px
+            TimelineZoomLevel.MonthWeekOptimal70px => 280,  // ~4 weeks × 70px = 280px
+
+            // Week-Day Optimal: Calculated based on target day cell sizes
+            TimelineZoomLevel.WeekDayOptimal30px => 210,  // 7 days × 30px = 210px
+            TimelineZoomLevel.WeekDayOptimal45px => 315,  // 7 days × 45px = 315px
+            TimelineZoomLevel.WeekDayOptimal60px => 420,  // 7 days × 60px = 420px
+            TimelineZoomLevel.WeekDayOptimal70px => 490,  // 7 days × 70px = 490px
+
             _ => 60 // Default fallback
         };
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Gets the minimum secondary header width for a zoom level.
     /// Based on typical text content for each level.
     /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete - Legacy zoom levels preserved for backward compatibility
     private static double GetMinimumSecondaryWidth(TimelineZoomLevel zoomLevel)
     {
         return zoomLevel switch
@@ -354,9 +591,36 @@ public static class TimelineHeaderAdapter
             TimelineZoomLevel.YearQuarter4px => 25,  // "25", "26", "27"
             TimelineZoomLevel.YearQuarter6px => 25,       // "25", "26", "27"
 
+            // NEW OPTIMAL ZOOM LEVELS - Perfect cell size approach
+            
+            // Year-Quarter Optimal: Quarter cells (perfect target sizes)
+            TimelineZoomLevel.YearQuarterOptimal30px => 30,  // Perfect 30px quarter cells
+            TimelineZoomLevel.YearQuarterOptimal40px => 40,  // Perfect 40px quarter cells
+            TimelineZoomLevel.YearQuarterOptimal50px => 50,  // Perfect 50px quarter cells
+            TimelineZoomLevel.YearQuarterOptimal70px => 70,  // Perfect 70px quarter cells
+
+            // Quarter-Month Optimal: Month cells (perfect target sizes)
+            TimelineZoomLevel.QuarterMonthOptimal30px => 30,  // Perfect 30px month cells
+            TimelineZoomLevel.QuarterMonthOptimal40px => 40,  // Perfect 40px month cells
+            TimelineZoomLevel.QuarterMonthOptimal50px => 50,  // Perfect 50px month cells
+            TimelineZoomLevel.QuarterMonthOptimal60px => 60,  // Perfect 60px month cells
+            TimelineZoomLevel.QuarterMonthOptimal70px => 70,  // Perfect 70px month cells
+
+            // Month-Week Optimal: Week cells (perfect target sizes)
+            TimelineZoomLevel.MonthWeekOptimal30px => 30,  // Perfect 30px week cells
+            TimelineZoomLevel.MonthWeekOptimal50px => 50,  // Perfect 50px week cells
+            TimelineZoomLevel.MonthWeekOptimal70px => 70,  // Perfect 70px week cells
+
+            // Week-Day Optimal: Day cells (perfect target sizes)
+            TimelineZoomLevel.WeekDayOptimal30px => 30,  // Perfect 30px day cells
+            TimelineZoomLevel.WeekDayOptimal45px => 45,  // Perfect 45px day cells
+            TimelineZoomLevel.WeekDayOptimal60px => 60,  // Perfect 60px day cells
+            TimelineZoomLevel.WeekDayOptimal70px => 70,  // Perfect 70px day cells
+
             _ => 20 // Default fallback
         };
     }
+#pragma warning restore CS0618 // Type or member is obsolete
 }
 
 /// <summary>

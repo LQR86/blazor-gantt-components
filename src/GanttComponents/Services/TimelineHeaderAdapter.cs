@@ -348,7 +348,7 @@ public static class TimelineHeaderAdapter
             TimelineZoomLevel.WeekDayOptimal30px => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Week,
-                PrimaryFormat = "date.week-year",
+                PrimaryFormat = "date.week-start-day",  // Fixed: Use "date.week-start-day" for compact format
                 SecondaryUnit = TimelineHeaderUnit.Day,
                 SecondaryFormat = "date.day-number",
                 ShowPrimary = true,
@@ -360,7 +360,7 @@ public static class TimelineHeaderAdapter
             TimelineZoomLevel.WeekDayOptimal45px => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Week,
-                PrimaryFormat = "date.week-year",
+                PrimaryFormat = "date.week-start-day",  // Fixed: Use "date.week-start-day" for compact format
                 SecondaryUnit = TimelineHeaderUnit.Day,
                 SecondaryFormat = "date.day-number",
                 ShowPrimary = true,
@@ -372,7 +372,7 @@ public static class TimelineHeaderAdapter
             TimelineZoomLevel.WeekDayOptimal60px => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Week,
-                PrimaryFormat = "date.week-year",
+                PrimaryFormat = "date.week-range",  // Fixed: Use "date.week-range" like template
                 SecondaryUnit = TimelineHeaderUnit.Day,
                 SecondaryFormat = "date.day-number",
                 ShowPrimary = true,
@@ -384,7 +384,7 @@ public static class TimelineHeaderAdapter
             TimelineZoomLevel.WeekDayOptimal70px => new TimelineHeaderConfiguration
             {
                 PrimaryUnit = TimelineHeaderUnit.Week,
-                PrimaryFormat = "date.week-year",
+                PrimaryFormat = "date.week-range",  // Fixed: Use "date.week-range" like template
                 SecondaryUnit = TimelineHeaderUnit.Day,
                 SecondaryFormat = "date.day-number",
                 ShowPrimary = true,
@@ -531,7 +531,7 @@ public static class TimelineHeaderAdapter
             TimelineZoomLevel.YearQuarter6px => 40,        // "20", "30" (minimal)
 
             // NEW OPTIMAL ZOOM LEVELS - Optimized cell size approach
-            
+
             // Year-Quarter Optimal: Calculated based on target quarter cell sizes
             TimelineZoomLevel.YearQuarterOptimal30px => 120,  // 4 quarters × 30px = 120px
             TimelineZoomLevel.YearQuarterOptimal40px => 160,  // 4 quarters × 40px = 160px  
@@ -592,7 +592,7 @@ public static class TimelineHeaderAdapter
             TimelineZoomLevel.YearQuarter6px => 25,       // "25", "26", "27"
 
             // NEW OPTIMAL ZOOM LEVELS - Perfect cell size approach
-            
+
             // Year-Quarter Optimal: Quarter cells (perfect target sizes)
             TimelineZoomLevel.YearQuarterOptimal30px => 30,  // Perfect 30px quarter cells
             TimelineZoomLevel.YearQuarterOptimal40px => 40,  // Perfect 40px quarter cells

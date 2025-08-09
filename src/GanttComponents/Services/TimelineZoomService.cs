@@ -16,8 +16,8 @@ public class TimelineZoomService
             // ========================================
             // These configurations support the deprecated enum values for backward compatibility.
             // They will be removed in a future version. Use the new optimal configurations instead.
-            
-            #pragma warning disable CS0618 // Type or member is obsolete
+
+#pragma warning disable CS0618 // Type or member is obsolete
             // Suppress warnings for intentional use of obsolete values during transition period
 
             // Week→Day Pattern (68px, 97px): Legacy configurations with sparse header cells
@@ -95,8 +95,8 @@ public class TimelineZoomService
                 "ZoomLevel.YearQuarter3px",
                 "ZoomLevel.YearQuarter3px.Description"
             ),
-            
-            #pragma warning restore CS0618 // Type or member is obsolete
+
+#pragma warning restore CS0618 // Type or member is obsolete
 
             // ========================================
             // OPTIMAL CONFIGURATIONS (Phase 2 - RECOMMENDED)

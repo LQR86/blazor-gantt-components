@@ -53,7 +53,7 @@
     [Parameter] public int ContainerHeight { get; set; } = 600; // Container height (configurable)
     
     // Timeline Zoom Parameters
-    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.QuarterMonth24px;
+    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px;
     [Parameter] public double ZoomFactor { get; set; } = 1.6;
     [Parameter] public EventCallback<TimelineZoomLevel> OnZoomLevelChanged { get; set; }
     [Parameter] public EventCallback<double> OnZoomFactorChanged { get; set; }

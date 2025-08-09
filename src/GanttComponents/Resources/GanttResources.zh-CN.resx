@@ -140,7 +140,7 @@
     <value>%d日MM月</value>
   </data>
   <data name="date.week-range" xml:space="preserve">
-    <value>yyyy年MM月%d日</value>
+    <value>yyyy-MM-%d</value>
   </data>
   <data name="date.day-name-short" xml:space="preserve">
     <value>ddd</value>

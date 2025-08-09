@@ -112,7 +112,7 @@
     [Parameter] public int? HoveredTaskId { get; set; }
     
     // Zoom parameters - maintain backward compatibility with current 40px day width
-    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.QuarterMonth24px;
+    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px;
     
     // Viewport tracking for tooltip edge detection
     private double ViewportScrollLeft { get; set; } = 0;

@@ -17,13 +17,18 @@ namespace GanttComponents.Services;
 public static class TimelineHeaderTemplateService
 {
     /// <summary>
-    /// Predefined header templates for all 11 zoom levels.
+    /// Predefined header templates for all zoom levels.
     /// Each template is optimized for its specific day width and use case.
     /// Based on GanttResources.resx specifications with integral pixel widths.
+    /// Updated for optimal cell size approach with revolutionary 30-70px cell density.
     /// </summary>
     private static readonly Dictionary<TimelineZoomLevel, TimelineHeaderTemplate> _templates =
         new Dictionary<TimelineZoomLevel, TimelineHeaderTemplate>
         {
+            // ========================================
+            // LEGACY TEMPLATES (Backward Compatibility)
+            // ========================================
+#pragma warning disable CS0618 // Suppress obsolete warnings for backward compatibility templates
             // Week→Day Pattern Levels (Week → Day) - 97px, 68px
             [TimelineZoomLevel.WeekDay97px] = TimelineHeaderTemplate.Create(
                 TimelineHeaderUnit.Week,
@@ -116,6 +121,175 @@ public static class TimelineHeaderTemplateService
                 "date.quarter-minimal",     // "1", "2", "3", "4" - bottom tier: quarter numbers
                 "Long-term strategic view with minimum day width",
                 showPrimary: true,          // Keep both headers for minimal visibility
+                showSecondary: true
+            ),
+#pragma warning restore CS0618
+
+            // ========================================
+            // OPTIMAL TEMPLATES (Revolutionary Cell Density)
+            // ========================================
+
+            // YearQuarter Pattern (4 levels): 30px → 40px → 50px → 70px quarter cells
+            [TimelineZoomLevel.YearQuarterOptimal30px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Year,
+                "date.year-full",           // "2024", "2025" - top tier: full year
+                TimelineHeaderUnit.Quarter,
+                "date.quarter-full",        // "Q1", "Q2", "Q3", "Q4" - bottom tier: quarters
+                "Strategic view with optimal 30px quarter cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            [TimelineZoomLevel.YearQuarterOptimal40px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Year,
+                "date.year-full",           // "2024", "2025" - top tier: full year
+                TimelineHeaderUnit.Quarter,
+                "date.quarter-full",        // "Q1", "Q2", "Q3", "Q4" - bottom tier: quarters
+                "Strategic view with optimal 40px quarter cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            [TimelineZoomLevel.YearQuarterOptimal50px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Year,
+                "date.year-full",           // "2024", "2025" - top tier: full year
+                TimelineHeaderUnit.Quarter,
+                "date.quarter-full",        // "Q1", "Q2", "Q3", "Q4" - bottom tier: quarters
+                "Strategic view with optimal 50px quarter cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            [TimelineZoomLevel.YearQuarterOptimal70px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Year,
+                "date.year-full",           // "2024", "2025" - top tier: full year
+                TimelineHeaderUnit.Quarter,
+                "date.quarter-full",        // "Q1", "Q2", "Q3", "Q4" - bottom tier: quarters
+                "Strategic view with optimal 70px quarter cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            // QuarterMonth Pattern (5 levels): 30px → 40px → 50px → 60px → 70px month cells
+            [TimelineZoomLevel.QuarterMonthOptimal30px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Quarter,
+                "date.quarter-year",        // "Q1 2024", "Q2 2024" - top tier: quarter with year
+                TimelineHeaderUnit.Month,
+                "date.month-short",         // "Jan", "Feb", "Mar" - bottom tier: month abbreviations
+                "Quarterly planning with optimal 30px month cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            [TimelineZoomLevel.QuarterMonthOptimal40px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Quarter,
+                "date.quarter-year",        // "Q1 2024", "Q2 2024" - top tier: quarter with year
+                TimelineHeaderUnit.Month,
+                "date.month-short",         // "Jan", "Feb", "Mar" - bottom tier: month abbreviations
+                "Quarterly planning with optimal 40px month cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            [TimelineZoomLevel.QuarterMonthOptimal50px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Quarter,
+                "date.quarter-year",        // "Q1 2024", "Q2 2024" - top tier: quarter with year
+                TimelineHeaderUnit.Month,
+                "date.month-short",         // "Jan", "Feb", "Mar" - bottom tier: month abbreviations
+                "Quarterly planning with optimal 50px month cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            [TimelineZoomLevel.QuarterMonthOptimal60px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Quarter,
+                "date.quarter-year",        // "Q1 2024", "Q2 2024" - top tier: quarter with year
+                TimelineHeaderUnit.Month,
+                "date.month-short",         // "Jan", "Feb", "Mar" - bottom tier: month abbreviations
+                "Quarterly planning with optimal 60px month cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            [TimelineZoomLevel.QuarterMonthOptimal70px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Quarter,
+                "date.quarter-year",        // "Q1 2024", "Q2 2024" - top tier: quarter with year
+                TimelineHeaderUnit.Month,
+                "date.month-short",         // "Jan", "Feb", "Mar" - bottom tier: month abbreviations
+                "Quarterly planning with optimal 70px month cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            // MonthWeek Pattern (3 levels): 30px → 50px → 70px week cells
+            [TimelineZoomLevel.MonthWeekOptimal30px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Month,
+                "date.month-year",          // "Jan 2024", "Feb 2024" - top tier: month with year
+                TimelineHeaderUnit.Week,
+                "date.week-number",         // "W1", "W2", "W3" - bottom tier: week numbers
+                "Monthly planning with optimal 30px week cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            [TimelineZoomLevel.MonthWeekOptimal50px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Month,
+                "date.month-year",          // "Jan 2024", "Feb 2024" - top tier: month with year
+                TimelineHeaderUnit.Week,
+                "date.week-number",         // "W1", "W2", "W3" - bottom tier: week numbers
+                "Monthly planning with optimal 50px week cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            [TimelineZoomLevel.MonthWeekOptimal70px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Month,
+                "date.month-year",          // "Jan 2024", "Feb 2024" - top tier: month with year
+                TimelineHeaderUnit.Week,
+                "date.week-number",         // "W1", "W2", "W3" - bottom tier: week numbers
+                "Monthly planning with optimal 70px week cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            // WeekDay Pattern (4 levels): 30px → 45px → 60px → 70px day cells
+            [TimelineZoomLevel.WeekDayOptimal30px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Week,
+                "date.week-start-day",      // "%d MMM" / "%d日MM月" - top tier: week start with month
+                TimelineHeaderUnit.Day,
+                "date.day-number",          // "1", "2", "3" - bottom tier: day numbers
+                "Daily scheduling with optimal 30px day cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            [TimelineZoomLevel.WeekDayOptimal45px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Week,
+                "date.week-start-day",      // "%d MMM" / "%d日MM月" - top tier: week start with month
+                TimelineHeaderUnit.Day,
+                "date.day-number",          // "1", "2", "3" - bottom tier: day numbers
+                "Daily scheduling with optimal 45px day cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            [TimelineZoomLevel.WeekDayOptimal60px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Week,
+                "date.week-range",          // "MMM %d, yyyy" / "yyyy年MM月%d日" - top tier: full week start date
+                TimelineHeaderUnit.Day,
+                "date.day-number",          // "1", "2", "3" - bottom tier: day numbers
+                "Daily scheduling with optimal 60px day cells",
+                showPrimary: true,
+                showSecondary: true
+            ),
+
+            [TimelineZoomLevel.WeekDayOptimal70px] = TimelineHeaderTemplate.Create(
+                TimelineHeaderUnit.Week,
+                "date.week-range",          // "MMM %d, yyyy" / "yyyy年MM月%d日" - top tier: full week start date
+                TimelineHeaderUnit.Day,
+                "date.day-number",          // "1", "2", "3" - bottom tier: day numbers
+                "Daily scheduling with optimal 70px day cells",
+                showPrimary: true,
                 showSecondary: true
             )
         };

@@ -18,7 +18,7 @@ public enum TimelineZoomLevel
     // ========================================
     // These values are kept for backward compatibility but marked obsolete.
     // Will be removed in a future version. Use the new optimal values instead.
-    
+
     /// <summary>
     /// [DEPRECATED] Legacy Year-Quarter level: 3px per day
     /// REPLACED BY: YearQuarterOptimal30px (better visual density)
@@ -100,10 +100,10 @@ public enum TimelineZoomLevel
     // NEW VALUES (Phase 2 - OPTIMAL APPROACH)
     // ========================================
     // Revolutionary cell-size-first approach: ALL levels have perfect 30-70px visual density!
-    
+
     // Year-Quarter Pattern (4 levels): 30px-70px quarter cells
     // Day widths: 0.33px-0.78px (sub-pixel) → Use color hints for task visibility
-    
+
     /// <summary>
     /// Year-Quarter Optimal 30px: 0.33px per day (Level 1)
     /// Best for: Maximum timeline overview with minimal detail
@@ -142,7 +142,7 @@ public enum TimelineZoomLevel
 
     // Quarter-Month Pattern (5 levels): 30px-70px month cells
     // Day widths: 1.0px-2.33px → Use thin lines and mini indicators
-    
+
     /// <summary>
     /// Quarter-Month Optimal 30px: 1.0px per day (Level 5)
     /// Best for: Quarterly planning with monthly breakdown
@@ -190,7 +190,7 @@ public enum TimelineZoomLevel
 
     // Month-Week Pattern (3 levels): 30px-70px week cells
     // Day widths: 4.29px-10px → Use mini taskbars with labels
-    
+
     /// <summary>
     /// Month-Week Optimal 30px: 4.29px per day (Level 10)
     /// Best for: Monthly planning with weekly breakdown
@@ -220,7 +220,7 @@ public enum TimelineZoomLevel
 
     // Week-Day Pattern (4 levels): 30px-70px day cells
     // Day widths: 30px-70px → Use full taskbars with rich details
-    
+
     /// <summary>
     /// Week-Day Optimal 30px: 30px per day (Level 13)
     /// Best for: Weekly planning with daily breakdown

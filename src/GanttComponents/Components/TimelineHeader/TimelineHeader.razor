@@ -4,6 +4,7 @@
 @inject IGanttI18N I18N
 @inject DateFormatHelper DateFormatter
 @inject ITimelineHeaderService HeaderService
+@implements IDisposable
 
 @* TimelineHeader Component - Phase 3 Implementation *@
 <div class="timeline-header" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
@@ -49,6 +50,15 @@
         Logger.LogComponentLifecycle("TimelineHeader", "OnInitialized - Phase 3 Implementation", new { 
             StartDate, EndDate, ZoomLevel, EffectiveDayWidth, HeaderMonthHeight, HeaderDayHeight
         });
+        
+        // Subscribe to language changes to force re-render when locale changes
+        I18N.LanguageChanged += OnLanguageChangedFromService;
+    }
+    
+    private void OnLanguageChangedFromService()
+    {
+        // Force re-render when language changes to update localized header content
+        InvokeAsync(StateHasChanged);
     }
     
     protected override void OnParametersSet()
@@ -96,6 +106,12 @@
         
         // Fallback to service-generated label (already I18N-enhanced)
         return serviceLabel;
+    }
+    
+    public void Dispose()
+    {
+        // Unsubscribe from language changes to prevent memory leaks
+        I18N.LanguageChanged -= OnLanguageChangedFromService;
     }
 }
 

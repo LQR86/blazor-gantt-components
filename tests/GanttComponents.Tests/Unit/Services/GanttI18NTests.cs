@@ -2,6 +2,8 @@ using Xunit;
 using GanttComponents.Services;
 using GanttComponents.Models;
 
+#pragma warning disable CS0618 // Suppress obsolete warnings for legacy zoom level testing
+
 namespace GanttComponents.Tests.Unit.Services
 {
     public class GanttI18NTests

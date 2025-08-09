@@ -320,7 +320,7 @@ else
 
 @code {
     private List<GanttTask> Tasks { get; set; } = new();
-    private TimelineZoomLevel CurrentZoomLevel { get; set; } = TimelineZoomLevel.WeekDay68px;
+    private TimelineZoomLevel CurrentZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal60px;
     private double CurrentZoomFactor { get; set; } = 1.0;
     private bool ShowDebugAlignment { get; set; } = false;
     private int? SelectedTaskId { get; set; }
@@ -533,7 +533,7 @@ else
             
             // Test zoom change performance
             var zoomStart = DateTime.UtcNow;
-            CurrentZoomLevel = TimelineZoomLevel.QuarterMonth24px;
+            CurrentZoomLevel = TimelineZoomLevel.MonthWeekOptimal50px;
             StateHasChanged();
             await Task.Delay(100);
             var zoomTime = (int)(DateTime.UtcNow - zoomStart).TotalMilliseconds;
@@ -585,10 +585,10 @@ else
             
             // Test that zoom controls affect GanttComposer
             var originalLevel = CurrentZoomLevel;
-            HandleZoomLevelChanged(TimelineZoomLevel.YearQuarter6px);
+            HandleZoomLevelChanged(TimelineZoomLevel.YearQuarterOptimal50px);
             await Task.Delay(100);
             
-            if (CurrentZoomLevel != TimelineZoomLevel.YearQuarter6px)
+            if (CurrentZoomLevel != TimelineZoomLevel.YearQuarterOptimal50px)
             {
                 integrationWorking = false;
             }

@@ -7,6 +7,7 @@
 
 @* TimelineHeader Component - Phase 3 Implementation *@
 <div class="timeline-header" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
+    
     @{
         // Generate header periods using the service (Phase 3.2 - Data-driven rendering)
         var headerResult = HeaderService.GenerateHeaderPeriods(StartDate, EndDate, EffectiveDayWidth, ZoomLevel, Logger);
@@ -155,5 +156,49 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+    
+    /* ============================================
+       EDGE TOOLTIP STYLES (Phase 1 - Foundation)
+       ============================================ */
+    
+    .timeline-edge-tooltip {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--gantt-surface-variant, #f8f9fa);
+        border: 1px solid var(--gantt-outline, #e0e0e0);
+        border-radius: 16px;
+        padding: 4px 8px;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: var(--gantt-monospace-font, 'Consolas', 'Monaco', 'Courier New', monospace);
+        color: var(--gantt-primary, #1976d2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        z-index: 15;
+        opacity: 0.9;
+        transition: opacity 0.2s ease-out;
+        pointer-events: none;
+        user-select: none;
+        white-space: nowrap;
+    }
+    
+    .timeline-edge-tooltip:hover {
+        opacity: 1;
+    }
+    
+    .timeline-edge-tooltip-left {
+        left: 8px;
+    }
+    
+    .timeline-edge-tooltip-right {
+        right: 8px;
+    }
+    
+    /* Hide tooltips on very small screens */
+    @@media (max-width: 640px) {
+        .timeline-edge-tooltip {
+            display: none;
+        }
     }
 </style>

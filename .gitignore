@@ -202,6 +202,12 @@ ClientBin/
 *~
 *.dbmdl
 *.dbproj.schemaview
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+
 *.jfm
 *.pfx
 *.publishsettings

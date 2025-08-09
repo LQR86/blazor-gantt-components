@@ -1,12 +1,37 @@
 @using GanttComponents.Models
 @using GanttComponents.Services
 @using GanttComponents.Components.TimelineHeader
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components
 @inject IUniversalLogger Logger
 @inject IGanttI18N I18N
 @inject DateFormatHelper DateFormatter
+@inject IJSRuntime JSRuntime
+@inject ITimelineHeaderService HeaderService
+@inject ITimelineTooltipService TooltipService
 @implements IDisposable
 
 <div class="timeline-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
+    
+    @* Floating edge tooltips - stay fixed at viewport corners during horizontal scroll *@
+    @{
+        var tooltipResult = GetTooltipResult();
+    }
+    
+    @if (tooltipResult.HasLeftTooltip)
+    {
+        <div class="timeline-viewport-tooltip timeline-viewport-tooltip-left" title="Hidden periods to the left">
+            @tooltipResult.LeftTooltip
+        </div>
+    }
+    
+    @if (tooltipResult.HasRightTooltip)
+    {
+        <div class="timeline-viewport-tooltip timeline-viewport-tooltip-right" title="Hidden periods to the right">
+            @tooltipResult.RightTooltip
+        </div>
+    }
+    
     <div class="timeline-scroll-container" @onscroll="OnScroll">
         @* 
         === TIMELINE HEADER ARCHITECTURE ===
@@ -76,18 +101,22 @@
 </div>
 
 @code {
-    [Parameter] public List<GanttTask>? Tasks { get; set; }
+    [Parameter, EditorRequired] public List<GanttTask> Tasks { get; set; } = new();
     [Parameter] public EventCallback<int> OnTaskSelected { get; set; }
     [Parameter] public EventCallback<EventArgs> OnScrollChanged { get; set; }
     [Parameter] public int? SelectedTaskId { get; set; }
-    [Parameter] public int RowHeight { get; set; } = 32; // Default row height for alignment
-    [Parameter] public int HeaderMonthHeight { get; set; } = 32; // Month row height
-    [Parameter] public int HeaderDayHeight { get; set; } = 24; // Day row height
+    [Parameter, EditorRequired] public int RowHeight { get; set; } = 32; // Default row height for alignment
+    [Parameter, EditorRequired] public int HeaderMonthHeight { get; set; } = 32; // Month row height
+    [Parameter, EditorRequired] public int HeaderDayHeight { get; set; } = 24; // Day row height
     [Parameter] public EventCallback<int?> OnTaskHovered { get; set; }
     [Parameter] public int? HoveredTaskId { get; set; }
     
     // Zoom parameters - maintain backward compatibility with current 40px day width
     [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.QuarterMonth24px;
+    
+    // Viewport tracking for tooltip edge detection
+    private double ViewportScrollLeft { get; set; } = 0;
+    private double ViewportWidth { get; set; } = 1000;
     [Parameter] public double ZoomFactor { get; set; } = 1.6; // 25px * 1.6 = 40px (maintains current behavior)
     
     // Zoom state change events
@@ -121,7 +150,7 @@
 
     protected override void OnInitialized()
     {
-        Logger.LogComponentLifecycle("TimelineView", "OnInitialized", new { TaskCount = Tasks?.Count ?? 0 });
+        Logger.LogComponentLifecycle("TimelineView", "OnInitialized", new { TaskCount = Tasks.Count });
         
         // Subscribe to language changes
         I18N.LanguageChanged += OnLanguageChanged;
@@ -131,15 +160,36 @@
 
     protected override void OnParametersSet()
     {
+        // Validate required parameters for tooltip functionality
+        ValidateRequiredParameters();
+        
         CalculateTimelineRange();
         StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                // Initialize viewport width after first render
+                ViewportWidth = await JSRuntime.InvokeAsync<double>("eval", "document.querySelector('.timeline-scroll-container')?.clientWidth || 1000");
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"Error initializing viewport width: {ex.Message}");
+                ViewportWidth = 1000; // Fallback default
+            }
+        }
     }
 
     private void CalculateTimelineRange()
     {
         DateTime taskStartDate, taskEndDate;
         
-        if (Tasks == null || !Tasks.Any())
+        if (!Tasks.Any())
         {
             // Default range if no tasks
             taskStartDate = DateTime.UtcNow.Date.AddDays(-30);
@@ -164,7 +214,7 @@
         
         var totalDays = (EndDate - StartDate).Days + 1;
         TotalWidth = (int)(totalDays * EffectiveDayWidth);
-        TotalHeight = (Tasks?.Count ?? 0) * RowHeight;
+        TotalHeight = Tasks.Count * RowHeight;
     }
 
     private double DayToPixel(DateTime date)
@@ -209,6 +259,20 @@
 
     private async Task OnScroll(EventArgs e)
     {
+        try
+        {
+            // Update viewport properties for tooltip edge detection
+            ViewportScrollLeft = await JSRuntime.InvokeAsync<double>("eval", "document.querySelector('.timeline-scroll-container').scrollLeft");
+            ViewportWidth = await JSRuntime.InvokeAsync<double>("eval", "document.querySelector('.timeline-scroll-container').clientWidth");
+            
+            // Force re-render to update tooltips
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error updating viewport data during scroll: {ex.Message}");
+        }
+
         if (OnScrollChanged.HasDelegate)
         {
             await OnScrollChanged.InvokeAsync(e);
@@ -291,6 +355,85 @@
     public double CurrentEffectiveDayWidth => EffectiveDayWidth;
     public string CurrentZoomDescription => $"{ZoomLevel} @ {ZoomFactor:F1}x";
 
+    // Tooltip calculation using dedicated service
+    private TimelineTooltipResult GetTooltipResult()
+    {
+        try
+        {
+            var request = new TimelineTooltipRequest
+            {
+                StartDate = StartDate,
+                EndDate = EndDate,
+                EffectiveDayWidth = EffectiveDayWidth,
+                ZoomLevel = ZoomLevel,
+                ViewportScrollLeft = ViewportScrollLeft,
+                ViewportWidth = ViewportWidth,
+                Options = new TimelineTooltipOptions
+                {
+                    HiddenThreshold = 0.5, // Show when >50% hidden
+                    LeftArrow = "←",
+                    RightArrow = "→",
+                    UsePrimaryPeriods = true
+                }
+            };
+
+            return TooltipService.CalculateTooltips(request);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error getting tooltip result: {ex.Message}");
+            return new TimelineTooltipResult();
+        }
+    }
+
+    private int GetWeekOfYear(DateTime date)
+    {
+        var culture = System.Globalization.CultureInfo.CurrentCulture;
+        var dayOfWeek = culture.DateTimeFormat.FirstDayOfWeek;
+        var weekRule = culture.DateTimeFormat.CalendarWeekRule;
+        return culture.Calendar.GetWeekOfYear(date, weekRule, dayOfWeek);
+    }
+
+    /// <summary>
+    /// Validates that all required parameters are properly set for tooltip functionality.
+    /// Throws meaningful exceptions if critical parameters are missing.
+    /// </summary>
+    private void ValidateRequiredParameters()
+    {
+        if (RowHeight <= 0)
+        {
+            throw new InvalidOperationException(
+                "TimelineView requires RowHeight > 0. " +
+                "This parameter is critical for proper row alignment and tooltip positioning. " +
+                "Example: <TimelineView RowHeight=\"32\" ... />");
+        }
+
+        if (HeaderMonthHeight <= 0)
+        {
+            throw new InvalidOperationException(
+                "TimelineView requires HeaderMonthHeight > 0. " +
+                "This parameter is critical for tooltip positioning (CSS calc). " +
+                "Example: <TimelineView HeaderMonthHeight=\"32\" ... />");
+        }
+
+        if (HeaderDayHeight <= 0)
+        {
+            throw new InvalidOperationException(
+                "TimelineView requires HeaderDayHeight > 0. " +
+                "This parameter is critical for header rendering and alignment. " +
+                "Example: <TimelineView HeaderDayHeight=\"24\" ... />");
+        }
+
+        // Validate Tasks parameter
+        if (Tasks == null)
+        {
+            throw new InvalidOperationException(
+                "TimelineView requires a non-null Tasks parameter. " +
+                "Pass an empty list if no tasks are available. " +
+                "Example: <TimelineView Tasks=\"@(new List<GanttTask>())\" ... />");
+        }
+    }
+
     public void Dispose()
     {
         try
@@ -324,6 +467,7 @@
 
 <style>
     .timeline-container {
+        position: relative;  /* Force consistent positioning context for tooltips */
         display: flex;
         flex-direction: column;
         height: 100%;
@@ -485,5 +629,31 @@
         font-family: var(--gantt-font-family, system-ui);
         pointer-events: none;
         user-select: none;
+    }
+
+    /* Viewport-fixed tooltips */
+    .timeline-viewport-tooltip {
+        position: absolute;
+        top: calc(var(--header-month-height) / 2);
+        transform: translateY(-50%);
+        background: var(--gantt-inverse-surface, rgba(32, 33, 36, 0.9));
+        color: var(--gantt-inverse-on-surface, #ffffff);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-family: var(--gantt-monospace-font, 'Consolas', 'Monaco', 'Courier New', monospace);
+        font-weight: 500;
+        z-index: 100;
+        pointer-events: none;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .timeline-viewport-tooltip-left {
+        left: 8px;
+    }
+
+    .timeline-viewport-tooltip-right {
+        right: 8px;
     }
 </style>

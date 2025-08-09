@@ -29,6 +29,17 @@ This folder contains comprehensive documentation for the TimelineView component 
 - CSS implementation and styling approaches
 - Testing strategies and examples
 
+### **🏷️ [Tooltip Positioning Design](./TOOLTIP_POSITIONING_DESIGN.md)**
+**Purpose**: Design and implementation of viewport-fixed edge tooltips  
+**Audience**: Developers, UX designers, maintainers  
+**Contents**:
+- Tooltip positioning strategy and CSS architecture
+- Cross-layout compatibility (standalone vs embedded)
+- Service-based tooltip calculation logic
+- Edge detection and viewport tracking
+- Performance considerations and optimization
+- Future enhancement roadmap
+
 ### **🎨 [Header Customization Guide](./TIMELINEHEADER_CUSTOMIZATION_GUIDE.md)**
 **Purpose**: Comprehensive guide for customizing timeline headers  
 **Audience**: Developers implementing custom header behavior  

@@ -4,6 +4,7 @@
 @using System.Reflection
 @inject IGanttI18N I18N
 @inject IUniversalLogger Logger
+@implements IDisposable
 
 <div class="timeline-zoom-controls @GetEffectiveCssClass()" style="@Style">
     @if (EffectiveConfig.ShowLevelPresets)
@@ -244,6 +245,24 @@
         return field?.GetCustomAttributes(typeof(ObsoleteAttribute), false).Length > 0;
     }
     
+    // Component lifecycle - reactive i18n support
+    protected override void OnInitialized()
+    {
+        Logger.LogComponentLifecycle("TimelineZoomControls", "OnInitialized - Reactive i18n enabled", new { 
+            CurrentZoomLevel, Preset, MinZoomLevel, MaxZoomLevel
+        });
+        
+        // Subscribe to language changes to force re-render when locale changes
+        I18N.LanguageChanged += OnLanguageChangedFromService;
+    }
+    
+    private void OnLanguageChangedFromService()
+    {
+        // Force re-render when language changes to update localized zoom level names
+        Logger.LogComponentLifecycle("TimelineZoomControls", "Language changed - forcing re-render", null);
+        InvokeAsync(StateHasChanged);
+    }
+    
     // Event handlers
     private async Task OnZoomLevelSelected(TimelineZoomLevel level)
     {
@@ -320,5 +339,11 @@
         var levels = GetVisibleZoomLevels().OrderBy(x => (int)x).ToList();
         var result = levels.Count > 0 && CurrentZoomLevel == levels.First(); // Minimum zoom = lowest enum value (least detail)
         return result;
+    }
+    
+    public void Dispose()
+    {
+        // Unsubscribe from language changes to prevent memory leaks
+        I18N.LanguageChanged -= OnLanguageChangedFromService;
     }
 }

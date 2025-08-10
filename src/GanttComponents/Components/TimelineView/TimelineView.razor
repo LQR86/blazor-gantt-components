@@ -24,19 +24,28 @@
             @tooltipResult.RightTooltip
         </div>
     }
-    
-    <div class="timeline-scroll-container" @onscroll="OnScroll">
-        <svg class="timeline-svg" 
-             viewBox="@GetSVGViewBox()"
+
+    @* Fixed Header SVG - Stays at top *@
+    <div class="timeline-header-container">
+        <svg class="timeline-header-svg" 
+             viewBox="@GetHeaderViewBox()"
              width="@TotalWidth" 
-             height="@(TotalHeight + TotalHeaderHeight)">
+             height="@TotalHeaderHeight">
             <!-- SVG Headers Group -->
             <g class="svg-headers">
                 @((MarkupString)RenderSVGHeaders())
             </g>
-            
+        </svg>
+    </div>
+
+    @* Scrollable Content SVG *@
+    <div class="timeline-scroll-container" @onscroll="OnScrollAsync">
+        <svg class="timeline-body-svg" 
+             viewBox="@GetBodyViewBox()"
+             width="@TotalWidth" 
+             height="@TotalHeight">
             <!-- Timeline Body Group -->
-            <g class="svg-timeline-body" transform="translate(0, @TotalHeaderHeight)">
+            <g class="svg-timeline-body">
                 <!-- Grid lines for days -->
                 @for (var day = StartDate; day <= EndDate; day = day.AddDays(1))
                 {
@@ -96,15 +105,36 @@
         background: var(--gantt-surface, #ffffff);
     }
 
+    /* Fixed Header Container */
+    .timeline-header-container {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--gantt-surface, #ffffff);
+        border-bottom: 1px solid var(--gantt-outline, #e0e0e0);
+        overflow: hidden; /* Prevent horizontal scrollbar on header */
+    }
+
+    .timeline-header-svg {
+        display: block;
+        flex-shrink: 0;
+    }
+
+    /* Scrollable Content Container */
     .timeline-scroll-container {
         flex: 1;
         overflow: auto;
         position: relative;
     }
 
+    .timeline-body-svg {
+        display: block;
+        flex-shrink: 0;
+    }
+
+    /* Legacy timeline-svg for backward compatibility */
     .timeline-svg {
         display: block;
-        /* Explicit dimensions for 1:1 coordinate mapping */
         flex-shrink: 0;
     }
 

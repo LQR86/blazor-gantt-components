@@ -252,6 +252,38 @@ public partial class TimelineView : ComponentBase, IDisposable
         }
     }
 
+    private async Task OnScrollAsync(EventArgs e)
+    {
+        try
+        {
+            // Update viewport data
+            ViewportScrollLeft = await JSRuntime.InvokeAsync<double>("eval",
+                "document.querySelector('.timeline-scroll-container').scrollLeft");
+            ViewportWidth = await JSRuntime.InvokeAsync<double>("eval",
+                "document.querySelector('.timeline-scroll-container').clientWidth");
+
+            // Sync header horizontal scroll with body scroll
+            await JSRuntime.InvokeVoidAsync("eval", $@"
+                const headerContainer = document.querySelector('.timeline-header-container');
+                const bodyContainer = document.querySelector('.timeline-scroll-container');
+                if (headerContainer && bodyContainer) {{
+                    headerContainer.scrollLeft = bodyContainer.scrollLeft;
+                }}
+            ");
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error synchronizing header scroll: {ex.Message}");
+        }
+
+        if (OnScrollChanged.HasDelegate)
+        {
+            await OnScrollChanged.InvokeAsync(e);
+        }
+    }
+
     private void OnLanguageChanged()
     {
         try

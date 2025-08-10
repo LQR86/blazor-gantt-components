@@ -30,6 +30,18 @@ public partial class TimelineView
     protected string GetSVGViewBox() => $"0 0 {TotalWidth} {TotalHeight + TotalHeaderHeight}";
 
     /// <summary>
+    /// Gets the SVG viewBox string for the header only.
+    /// </summary>
+    /// <returns>ViewBox string for header</returns>
+    protected string GetHeaderViewBox() => $"0 0 {TotalWidth} {TotalHeaderHeight}";
+
+    /// <summary>
+    /// Gets the SVG viewBox string for the body content only.
+    /// </summary>
+    /// <returns>ViewBox string for body</returns>
+    protected string GetBodyViewBox() => $"0 0 {TotalWidth} {TotalHeight}";
+
+    /// <summary>
     /// Total width of the timeline SVG in pixels.
     /// </summary>
     protected double TotalSVGWidth => TotalWidth;

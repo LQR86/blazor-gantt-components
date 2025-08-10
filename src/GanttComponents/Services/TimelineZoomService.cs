@@ -129,28 +129,28 @@ public class TimelineZoomService
                 "ZoomLevel.WeekDayOptimal30px.Description"
             ),
 
-            // Month-Week Pattern (4 levels): 30px-60px week cells - Perfect for weekly planning
+            // Month-Week Pattern (4 levels): 35px-70px week cells - Perfect for weekly planning
             [TimelineZoomLevel.MonthWeekOptimal60px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.MonthWeekOptimal60px,
-                8.57, // Perfect: 8.57px day width = 60px week cells (8.57px × 7 days)
+                10.0, // Perfect: 10px day width = 70px week cells (10px × 7 days) - INTEGRAL
                 "ZoomLevel.MonthWeekOptimal60px",
                 "ZoomLevel.MonthWeekOptimal60px.Description"
             ),
             [TimelineZoomLevel.MonthWeekOptimal50px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.MonthWeekOptimal50px,
-                7.14, // Perfect: 7.14px day width = 50px week cells (7.14px × 7 days)
+                8.0, // Perfect: 8px day width = 56px week cells (8px × 7 days) - INTEGRAL
                 "ZoomLevel.MonthWeekOptimal50px",
                 "ZoomLevel.MonthWeekOptimal50px.Description"
             ),
             [TimelineZoomLevel.MonthWeekOptimal40px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.MonthWeekOptimal40px,
-                5.71, // Perfect: 5.71px day width = 40px week cells (5.71px × 7 days)
+                6.0, // Perfect: 6px day width = 42px week cells (6px × 7 days) - INTEGRAL
                 "ZoomLevel.MonthWeekOptimal40px",
                 "ZoomLevel.MonthWeekOptimal40px.Description"
             ),
             [TimelineZoomLevel.MonthWeekOptimal30px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.MonthWeekOptimal30px,
-                4.29, // Perfect: 4.29px day width = 30px week cells (4.29px × 7 days)
+                5.0, // Perfect: 5px day width = 35px week cells (5px × 7 days) - INTEGRAL
                 "ZoomLevel.MonthWeekOptimal30px",
                 "ZoomLevel.MonthWeekOptimal30px.Description"
             ),

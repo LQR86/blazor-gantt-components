@@ -179,41 +179,41 @@ public enum TimelineZoomLevel
     /// </summary>
     QuarterMonthOptimal60px = 27,
 
-    // Month-Week Pattern (4 levels): 30px-70px week cells
-    // Day widths: 4.29px-10px → Use mini taskbars with labels
+    // Month-Week Pattern (4 levels): 35px-70px week cells - INTEGRAL DAY WIDTHS
+    // Day widths: 5px-10px → Use mini taskbars with labels
 
     /// <summary>
-    /// Month-Week Optimal 30px: 4.29px per day (Level 9)
+    /// Month-Week Optimal 30px: 5px per day (Level 9)
     /// Best for: Monthly planning with weekly breakdown
-    /// Pattern: Month → Week (30px week cells)
-    /// Task Strategy: 4px mini taskbars with simple labels
+    /// Pattern: Month → Week (35px week cells) - INTEGRAL
+    /// Task Strategy: 5px mini taskbars with simple labels
     /// Visual Quality: Perfect density, clear weekly overview
     /// </summary>
     MonthWeekOptimal30px = 28,
 
     /// <summary>
-    /// Month-Week Optimal 40px: 5.71px per day (Level 10)
+    /// Month-Week Optimal 40px: 6px per day (Level 10)
     /// Best for: Enhanced monthly view with week details
-    /// Pattern: Month → Week (40px week cells)
-    /// Task Strategy: 5px taskbars with text labels
+    /// Pattern: Month → Week (42px week cells) - INTEGRAL
+    /// Task Strategy: 6px taskbars with text labels
     /// Visual Quality: Perfect density, good weekly readability
     /// </summary>
     MonthWeekOptimal40px = 29,
 
     /// <summary>
-    /// Month-Week Optimal 50px: 7.14px per day (Level 11)
+    /// Month-Week Optimal 50px: 8px per day (Level 11)
     /// Best for: Detailed monthly planning with week focus
-    /// Pattern: Month → Week (50px week cells)
-    /// Task Strategy: 7px taskbars with text and progress
+    /// Pattern: Month → Week (56px week cells) - INTEGRAL
+    /// Task Strategy: 8px taskbars with text and progress
     /// Visual Quality: Perfect density, excellent weekly readability
     /// </summary>
     MonthWeekOptimal50px = 30,
 
     /// <summary>
-    /// Month-Week Optimal 60px: 8.57px per day (Level 12)
+    /// Month-Week Optimal 60px: 10px per day (Level 12)
     /// Best for: Maximum weekly visibility with month context
-    /// Pattern: Month → Week (60px week cells)
-    /// Task Strategy: 8px taskbars with full labeling
+    /// Pattern: Month → Week (70px week cells) - INTEGRAL
+    /// Task Strategy: 10px taskbars with full labeling
     /// Visual Quality: Perfect density, maximum weekly readability
     /// </summary>
     MonthWeekOptimal60px = 31,

@@ -162,34 +162,21 @@ public partial class TimelineView : ComponentBase, IDisposable
     // === TIMELINE CALCULATIONS ===
     private void CalculateTimelineRange()
     {
-        // === VIEWPORT BUFFER CALCULATION ===
-        // Add substantial buffer space (50% of content width) on both sides for better UX
-        // This allows users to scroll beyond content boundaries like in Visio or other timeline tools
-        DateTime taskStartDate, taskEndDate;
-
+        // Simple timeline range based directly on task dates - no buffer complexity
         if (!Tasks.Any())
         {
-            taskStartDate = DateTime.UtcNow.Date.AddDays(-30);
-            taskEndDate = DateTime.UtcNow.Date.AddDays(90);
+            // Default range for empty task list
+            StartDate = DateTime.UtcNow.Date.AddDays(-30);
+            EndDate = DateTime.UtcNow.Date.AddDays(90);
         }
         else
         {
-            var contentStartDate = Tasks.Min(t => t.StartDate).Date;
-            var contentEndDate = Tasks.Max(t => t.EndDate).Date;
-            var contentSpanDays = (contentEndDate - contentStartDate).Days + 1;
-
-            // Add 50% buffer on each side for scrolling beyond content
-            var bufferDays = Math.Max(30, (int)(contentSpanDays * 0.5)); // Minimum 30 days, or 50% of content
-
-            taskStartDate = contentStartDate.AddDays(-bufferDays);
-            taskEndDate = contentEndDate.AddDays(bufferDays);
-
-            Logger.LogDebugInfo($"Timeline viewport: Content span {contentSpanDays} days, Buffer {bufferDays} days each side");
+            // Use exact task date range
+            StartDate = Tasks.Min(t => t.StartDate).Date;
+            EndDate = Tasks.Max(t => t.EndDate).Date;
         }
 
-        // Direct calculation without legacy TimelineHeaderAdapter
-        StartDate = taskStartDate;
-        EndDate = taskEndDate;
+        Logger.LogDebugInfo($"Simple timeline range: {StartDate:yyyy-MM-dd} to {EndDate:yyyy-MM-dd}");
 
         var totalDays = (EndDate - StartDate).Days + 1;
         TotalWidth = (int)(totalDays * EffectiveDayWidth);

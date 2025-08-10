@@ -44,17 +44,9 @@ public partial class TimelineView : ComponentBase, IDisposable
     private int TotalWidth { get; set; }
     private int TotalHeight { get; set; }
 
-    // === PATTERN DETECTION (Used by partial classes) ===
-    protected bool IsWeekDayPattern => ZoomLevel >= TimelineZoomLevel.WeekDayOptimal30px &&
-                                      ZoomLevel <= TimelineZoomLevel.WeekDayOptimal60px;
-
-    protected bool IsMonthWeekPattern => ZoomLevel >= TimelineZoomLevel.MonthWeekOptimal30px &&
-                                        ZoomLevel <= TimelineZoomLevel.MonthWeekOptimal60px;
-
-    protected bool IsQuarterMonthPattern => ZoomLevel >= TimelineZoomLevel.QuarterMonthOptimal30px &&
-                                           ZoomLevel <= TimelineZoomLevel.QuarterMonthOptimal40px;
-
-    protected bool IsYearQuarterPattern => ZoomLevel == TimelineZoomLevel.YearQuarterOptimal30px;
+    // === LEVEL-BASED ARCHITECTURE ===
+    // Individual zoom levels implemented in dedicated partial class files
+    // No pattern detection needed - each level has direct routing
 
     // === ZOOM CALCULATIONS ===
     private double EffectiveDayWidth
@@ -88,7 +80,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     {
         try
         {
-            Logger.LogDebugInfo($"RenderSVGHeaders - ZoomLevel: {ZoomLevel}, IsWeekDayPattern: {IsWeekDayPattern}");
+            Logger.LogDebugInfo($"RenderSVGHeaders - ZoomLevel: {ZoomLevel}");
 
             // Level-specific routing for maximum independence
             return ZoomLevel switch
@@ -105,11 +97,8 @@ public partial class TimelineView : ComponentBase, IDisposable
                 TimelineZoomLevel.MonthWeekOptimal50px => RenderMonthWeek50pxHeaders(),
                 TimelineZoomLevel.MonthWeekOptimal60px => RenderMonthWeek60pxHeaders(),
 
-                // Future patterns
-                _ when IsQuarterMonthPattern => RenderQuarterMonthHeaders(),
-                _ when IsYearQuarterPattern => RenderYearQuarterHeaders(),
-
-                _ => throw new InvalidOperationException($"Unsupported zoom level: {ZoomLevel}")
+                // Unsupported levels (future implementations)
+                _ => throw new InvalidOperationException($"Unsupported zoom level: {ZoomLevel}. Only WeekDay and MonthWeek optimal levels are currently implemented.")
             };
         }
         catch (Exception ex)
@@ -134,10 +123,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     // Future Patterns:
     // - TimelineView.QuarterMonth##px.cs: Individual level files (planned)
     // - TimelineView.YearQuarter##px.cs: Individual level files (planned)
-
-    // Temporary placeholder methods for future patterns
-    private string RenderQuarterMonthHeaders() => "<!-- QuarterMonth pattern not implemented yet -->";
-    private string RenderYearQuarterHeaders() => "<!-- YearQuarter pattern not implemented yet -->";
+    // Each future pattern will have dedicated partial class files for level-level independence
 
     // === COMPONENT LIFECYCLE ===
     protected override void OnInitialized()

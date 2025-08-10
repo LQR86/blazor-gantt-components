@@ -59,12 +59,26 @@ public partial class TimelineView
     }
 
     /// <summary>
-    /// Gets CSS class for header text based on level.
+    /// Gets CSS class for header text based on current pattern and level.
+    /// Each pattern uses its own font sizes optimized for cell widths.
     /// </summary>
     /// <param name="isPrimary">True for primary header text, false for secondary</param>
-    /// <returns>CSS class string</returns>
-    protected string GetHeaderTextClass(bool isPrimary)
+    /// <returns>CSS class string appropriate for current zoom pattern</returns>
+    protected virtual string GetHeaderTextClass(bool isPrimary)
     {
+        // MonthWeek patterns use smaller fonts for narrow cells (35-70px)
+        if (IsMonthWeekPattern)
+        {
+            return isPrimary ? "svg-monthweek-primary-text" : "svg-monthweek-secondary-text";
+        }
+
+        // WeekDay patterns use standard fonts for wide cells (210-420px)
+        if (IsWeekDayPattern)
+        {
+            return isPrimary ? "svg-weekday-primary-text" : "svg-weekday-secondary-text";
+        }
+
+        // Default/fallback for any other patterns
         return isPrimary ? "svg-primary-text" : "svg-secondary-text";
     }
 

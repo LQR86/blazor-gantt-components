@@ -103,7 +103,6 @@ public partial class TimelineView : ComponentBase, IDisposable
 
     // Temporary placeholder methods to prevent compilation errors
     // These will be removed as pattern files are created
-    private string RenderMonthWeekHeaders() => "<!-- MonthWeek pattern not implemented yet -->";
     private string RenderQuarterMonthHeaders() => "<!-- QuarterMonth pattern not implemented yet -->";
     private string RenderYearQuarterHeaders() => "<!-- YearQuarter pattern not implemented yet -->";
 

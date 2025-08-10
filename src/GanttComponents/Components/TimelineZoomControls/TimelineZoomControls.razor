@@ -150,8 +150,8 @@
     
     // Zoom level filtering - for different use cases  
     [Parameter] public IReadOnlyList<TimelineZoomLevel>? VisibleZoomLevels { get; set; }
-    [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal30px;  // For testing WeekDay pattern
-    [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal60px;  // For testing WeekDay pattern
+    [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal30px;  // Include MonthWeek and WeekDay patterns
+    [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal60px;    // Include MonthWeek and WeekDay patterns
     
     // Preset-only approach: Manual zoom controls removed for v0.8.5
     // All zoom control is handled via preset level selection only
@@ -209,13 +209,20 @@
             return VisibleZoomLevels;
         }
         
-        // FOR COMMIT 2 TESTING: Only show WeekDay levels that are implemented
+        // FOR COMMIT 3 TESTING: Show WeekDay and MonthWeek levels that are implemented
         var implementedLevels = new List<TimelineZoomLevel>
         {
+            // WeekDay pattern (Commit 2)
             TimelineZoomLevel.WeekDayOptimal30px,
             TimelineZoomLevel.WeekDayOptimal40px,
             TimelineZoomLevel.WeekDayOptimal50px,
-            TimelineZoomLevel.WeekDayOptimal60px
+            TimelineZoomLevel.WeekDayOptimal60px,
+            
+            // MonthWeek pattern (Commit 3)
+            TimelineZoomLevel.MonthWeekOptimal30px,
+            TimelineZoomLevel.MonthWeekOptimal40px,
+            TimelineZoomLevel.MonthWeekOptimal50px,
+            TimelineZoomLevel.MonthWeekOptimal60px
         };
         
         // Apply min/max range filtering if needed

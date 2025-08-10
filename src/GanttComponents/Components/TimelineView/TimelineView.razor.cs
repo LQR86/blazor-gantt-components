@@ -81,13 +81,24 @@ public partial class TimelineView : ComponentBase, IDisposable
         {
             Logger.LogDebugInfo($"RenderSVGHeaders - ZoomLevel: {ZoomLevel}, IsWeekDayPattern: {IsWeekDayPattern}");
 
-            // Delegate to appropriate pattern - each implemented in separate partial class
-            if (IsWeekDayPattern) return RenderWeekDayHeaders();
-            if (IsMonthWeekPattern) return RenderMonthWeekHeaders();
-            if (IsQuarterMonthPattern) return RenderQuarterMonthHeaders();
-            if (IsYearQuarterPattern) return RenderYearQuarterHeaders();
-
-            throw new InvalidOperationException($"Unsupported zoom level: {ZoomLevel}");
+            // Level-specific routing for maximum independence
+            return ZoomLevel switch
+            {
+                // WeekDay Levels (Individual partial classes)
+                TimelineZoomLevel.WeekDayOptimal30px => RenderWeekDay30pxHeaders(),
+                TimelineZoomLevel.WeekDayOptimal40px => RenderWeekDay40pxHeaders(),
+                TimelineZoomLevel.WeekDayOptimal50px => RenderWeekDay50pxHeaders(),
+                TimelineZoomLevel.WeekDayOptimal60px => RenderWeekDay60pxHeaders(),
+                
+                // MonthWeek Pattern (Will be split in Commit 6)
+                _ when IsMonthWeekPattern => RenderMonthWeekHeaders(),
+                
+                // Future patterns
+                _ when IsQuarterMonthPattern => RenderQuarterMonthHeaders(),
+                _ when IsYearQuarterPattern => RenderYearQuarterHeaders(),
+                
+                _ => throw new InvalidOperationException($"Unsupported zoom level: {ZoomLevel}")
+            };
         }
         catch (Exception ex)
         {

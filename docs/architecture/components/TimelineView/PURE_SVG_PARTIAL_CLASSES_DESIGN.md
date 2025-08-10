@@ -268,6 +268,37 @@ public partial class TimelineView
 - Integral positioning for clean visual effects
 - Consistent spacing and proportions
 
+### 🚨 CRITICAL: SVG Coordinate System vs CSS Pixels
+**Issue Discovered**: SVG coordinate system mismatch causes header/row misalignment in GanttComposer.
+
+**Root Cause**: 
+- SVG uses logical units based on `viewBox` (e.g., `viewBox="0 0 6000 1656"`)
+- CSS uses actual pixels (e.g., `HeaderHeight = 56px`)
+- When SVG is scaled, `56 SVG units ≠ 56 CSS pixels`
+- This breaks perfect row alignment between TaskGrid and TimelineView
+
+**Solution**: Force 1:1 ratio between SVG coordinates and CSS pixels:
+```xml
+<svg viewBox="0 0 {TotalWidth} {TotalHeight + TotalHeaderHeight}"
+     width="{TotalWidth}" 
+     height="{TotalHeight + TotalHeaderHeight}">
+```
+
+**CSS Requirements**:
+```css
+.timeline-svg {
+    display: block;
+    flex-shrink: 0;  /* Prevent stretching */
+    /* NO min-width: 100% - breaks coordinate mapping */
+}
+```
+
+**Why This Matters**: 
+- GanttComposer's primary purpose is perfect row alignment
+- Even 1px misalignment breaks the user experience
+- This ensures `translate(0, @TotalHeaderHeight)` works correctly
+- Critical for TaskGrid ↔ TimelineView visual continuity
+
 ### Backward Compatibility
 - Existing GanttComposer interface preserved
 - All parameters and events maintained

@@ -15,37 +15,37 @@ public partial class TimelineView
     /// <param name="date">Date to convert</param>
     /// <returns>SVG X coordinate</returns>
     protected double DayToSVGX(DateTime date) => (date - StartDate).Days * DayWidth;
-    
+
     /// <summary>
     /// Converts a task index to SVG Y coordinate in the timeline body.
     /// </summary>
     /// <param name="taskIndex">Zero-based task index</param>
     /// <returns>SVG Y coordinate relative to timeline body</returns>
     protected double TaskToSVGY(int taskIndex) => taskIndex * RowHeight;
-    
+
     /// <summary>
     /// Gets the SVG viewBox string for the entire timeline.
     /// </summary>
     /// <returns>ViewBox string in format "0 0 width height"</returns>
     protected string GetSVGViewBox() => $"0 0 {TotalWidth} {TotalHeight + TotalHeaderHeight}";
-    
+
     /// <summary>
     /// Total width of the timeline SVG in pixels.
     /// </summary>
     protected double TotalSVGWidth => TotalWidth;
-    
+
     /// <summary>
     /// Total height of the timeline SVG including headers and body.
     /// </summary>
     protected double TotalSVGHeight => TotalHeaderHeight + TotalHeight;
-    
+
     /// <summary>
     /// Formats a coordinate value for SVG, ensuring integral positioning.
     /// </summary>
     /// <param name="value">Coordinate value</param>
     /// <returns>Formatted coordinate string</returns>
     protected string FormatSVGCoordinate(double value) => Math.Round(value, 0).ToString();
-    
+
     /// <summary>
     /// Gets CSS class for header cells based on type and state.
     /// </summary>
@@ -57,7 +57,7 @@ public partial class TimelineView
         var baseClass = isPrimary ? "svg-primary-cell" : "svg-secondary-cell";
         return isSelected ? $"{baseClass} svg-cell-selected" : baseClass;
     }
-    
+
     /// <summary>
     /// Gets CSS class for header text based on level.
     /// </summary>
@@ -67,7 +67,7 @@ public partial class TimelineView
     {
         return isPrimary ? "svg-primary-text" : "svg-secondary-text";
     }
-    
+
     /// <summary>
     /// Creates an SVG rect element for header cells.
     /// </summary>
@@ -83,7 +83,7 @@ public partial class TimelineView
                        width=""{FormatSVGCoordinate(width)}"" height=""{FormatSVGCoordinate(height)}"" 
                        class=""{cssClass}"" />";
     }
-    
+
     /// <summary>
     /// Creates an SVG text element for header labels.
     /// </summary>
@@ -98,7 +98,7 @@ public partial class TimelineView
                        text-anchor=""middle"" dominant-baseline=""middle"" 
                        class=""{cssClass}"">{System.Net.WebUtility.HtmlEncode(text)}</text>";
     }
-    
+
     /// <summary>
     /// Creates a complete SVG header cell (rect + text).
     /// </summary>
@@ -115,13 +115,13 @@ public partial class TimelineView
         var textClass = GetHeaderTextClass(isPrimary);
         var centerX = x + (width / 2);
         var centerY = y + (height / 2);
-        
+
         return $@"<g class=""svg-header-cell-group"">
                     {CreateSVGRect(x, y, width, height, cellClass)}
                     {CreateSVGText(centerX, centerY, text, textClass)}
                   </g>";
     }
-    
+
     /// <summary>
     /// Calculates the number of days between two dates (inclusive).
     /// </summary>
@@ -132,7 +132,7 @@ public partial class TimelineView
     {
         return (endDate.Date - startDate.Date).Days + 1;
     }
-    
+
     /// <summary>
     /// Gets the start of the week for a given date (Monday-based).
     /// </summary>
@@ -143,7 +143,7 @@ public partial class TimelineView
         var daysFromMonday = ((int)date.DayOfWeek - 1 + 7) % 7;
         return date.Date.AddDays(-daysFromMonday);
     }
-    
+
     /// <summary>
     /// Gets the end of the week for a given date (Sunday-based).
     /// </summary>
@@ -153,7 +153,7 @@ public partial class TimelineView
     {
         return GetWeekStart(date).AddDays(6);
     }
-    
+
     /// <summary>
     /// Gets the start of the month for a given date.
     /// </summary>
@@ -163,7 +163,7 @@ public partial class TimelineView
     {
         return new DateTime(date.Year, date.Month, 1);
     }
-    
+
     /// <summary>
     /// Gets the end of the month for a given date.
     /// </summary>
@@ -173,7 +173,7 @@ public partial class TimelineView
     {
         return GetMonthStart(date).AddMonths(1).AddDays(-1);
     }
-    
+
     /// <summary>
     /// Gets the start of the quarter for a given date.
     /// </summary>
@@ -184,7 +184,7 @@ public partial class TimelineView
         var quarterStartMonth = ((date.Month - 1) / 3) * 3 + 1;
         return new DateTime(date.Year, quarterStartMonth, 1);
     }
-    
+
     /// <summary>
     /// Gets the end of the quarter for a given date.
     /// </summary>

@@ -26,7 +26,10 @@
     }
     
     <div class="timeline-scroll-container" @onscroll="OnScroll">
-        <svg class="timeline-svg" viewBox="@GetSVGViewBox()">
+        <svg class="timeline-svg" 
+             viewBox="@GetSVGViewBox()"
+             width="@TotalWidth" 
+             height="@(TotalHeight + TotalHeaderHeight)">
             <!-- SVG Headers Group -->
             <g class="svg-headers">
                 @((MarkupString)RenderSVGHeaders())
@@ -101,7 +104,8 @@
 
     .timeline-svg {
         display: block;
-        min-width: 100%;
+        /* Explicit dimensions for 1:1 coordinate mapping */
+        flex-shrink: 0;
     }
 
     /* === SVG HEADER STYLES === */

@@ -16,8 +16,6 @@ public partial class TimelineView : ComponentBase, IDisposable
     [Inject] private IGanttI18N I18N { get; set; } = default!;
     [Inject] private DateFormatHelper DateFormatter { get; set; } = default!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
-    [Inject] private ITimelineHeaderService HeaderService { get; set; } = default!;
-    [Inject] private ITimelineTooltipService TooltipService { get; set; } = default!;
 
     // === COMPONENT PARAMETERS ===
     [Parameter, EditorRequired] public List<GanttTask> Tasks { get; set; } = new();
@@ -47,15 +45,15 @@ public partial class TimelineView : ComponentBase, IDisposable
     private int TotalHeight { get; set; }
 
     // === PATTERN DETECTION (Used by partial classes) ===
-    protected bool IsWeekDayPattern => ZoomLevel >= TimelineZoomLevel.WeekDayOptimal30px && 
+    protected bool IsWeekDayPattern => ZoomLevel >= TimelineZoomLevel.WeekDayOptimal30px &&
                                       ZoomLevel <= TimelineZoomLevel.WeekDayOptimal60px;
-    
-    protected bool IsMonthWeekPattern => ZoomLevel >= TimelineZoomLevel.MonthWeekOptimal30px && 
+
+    protected bool IsMonthWeekPattern => ZoomLevel >= TimelineZoomLevel.MonthWeekOptimal30px &&
                                         ZoomLevel <= TimelineZoomLevel.MonthWeekOptimal60px;
-    
-    protected bool IsQuarterMonthPattern => ZoomLevel >= TimelineZoomLevel.QuarterMonthOptimal30px && 
+
+    protected bool IsQuarterMonthPattern => ZoomLevel >= TimelineZoomLevel.QuarterMonthOptimal30px &&
                                            ZoomLevel <= TimelineZoomLevel.QuarterMonthOptimal40px;
-    
+
     protected bool IsYearQuarterPattern => ZoomLevel == TimelineZoomLevel.YearQuarterOptimal30px;
 
     // === ZOOM CALCULATIONS ===
@@ -81,12 +79,14 @@ public partial class TimelineView : ComponentBase, IDisposable
     {
         try
         {
+            Logger.LogDebugInfo($"RenderSVGHeaders - ZoomLevel: {ZoomLevel}, IsWeekDayPattern: {IsWeekDayPattern}");
+
             // Delegate to appropriate pattern - each implemented in separate partial class
             if (IsWeekDayPattern) return RenderWeekDayHeaders();
             if (IsMonthWeekPattern) return RenderMonthWeekHeaders();
             if (IsQuarterMonthPattern) return RenderQuarterMonthHeaders();
             if (IsYearQuarterPattern) return RenderYearQuarterHeaders();
-            
+
             throw new InvalidOperationException($"Unsupported zoom level: {ZoomLevel}");
         }
         catch (Exception ex)
@@ -94,18 +94,15 @@ public partial class TimelineView : ComponentBase, IDisposable
             Logger.LogError($"Error rendering SVG headers for zoom level {ZoomLevel}: {ex.Message}");
             return $"<!-- Error rendering headers: {ex.Message} -->";
         }
-    }
-
-    // === PATTERN METHODS (Implemented in partial classes) ===
+    }    // === PATTERN METHODS (Implemented in partial classes) ===
     // These methods will be implemented in separate partial class files:
-    // - TimelineView.WeekDay.cs: RenderWeekDayHeaders()
+    // - TimelineView.WeekDay.cs: RenderWeekDayHeaders() ✅ IMPLEMENTED
     // - TimelineView.MonthWeek.cs: RenderMonthWeekHeaders()  
     // - TimelineView.QuarterMonth.cs: RenderQuarterMonthHeaders()
     // - TimelineView.YearQuarter.cs: RenderYearQuarterHeaders()
 
     // Temporary placeholder methods to prevent compilation errors
     // These will be removed as pattern files are created
-    private string RenderWeekDayHeaders() => "<!-- WeekDay pattern not implemented yet -->";
     private string RenderMonthWeekHeaders() => "<!-- MonthWeek pattern not implemented yet -->";
     private string RenderQuarterMonthHeaders() => "<!-- QuarterMonth pattern not implemented yet -->";
     private string RenderYearQuarterHeaders() => "<!-- YearQuarter pattern not implemented yet -->";
@@ -121,6 +118,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     protected override void OnParametersSet()
     {
         ValidateRequiredParameters();
+        Logger.LogDebugInfo($"TimelineView header heights - Month: {HeaderMonthHeight}, Day: {HeaderDayHeight}, Total: {TotalHeaderHeight}");
         CalculateTimelineRange();
         StateHasChanged();
     }
@@ -131,7 +129,7 @@ public partial class TimelineView : ComponentBase, IDisposable
         {
             try
             {
-                ViewportWidth = await JSRuntime.InvokeAsync<double>("eval", 
+                ViewportWidth = await JSRuntime.InvokeAsync<double>("eval",
                     "document.querySelector('.timeline-scroll-container')?.clientWidth || 1000");
                 StateHasChanged();
             }
@@ -146,8 +144,9 @@ public partial class TimelineView : ComponentBase, IDisposable
     // === TIMELINE CALCULATIONS ===
     private void CalculateTimelineRange()
     {
+        // Simple approach for SVG architecture
         DateTime taskStartDate, taskEndDate;
-        
+
         if (!Tasks.Any())
         {
             taskStartDate = DateTime.UtcNow.Date.AddDays(-30);
@@ -158,13 +157,11 @@ public partial class TimelineView : ComponentBase, IDisposable
             taskStartDate = Tasks.Min(t => t.StartDate).Date.AddDays(-7);
             taskEndDate = Tasks.Max(t => t.EndDate).Date.AddDays(7);
         }
-        
-        var headerConfig = TimelineHeaderAdapter.GetHeaderConfigurationFromTemplate(ZoomLevel, Logger);
-        StartDate = TimelineHeaderAdapter.GetPeriodStart(taskStartDate, headerConfig.PrimaryUnit, Logger);
-        var endPeriodStart = TimelineHeaderAdapter.GetPeriodStart(taskEndDate, headerConfig.PrimaryUnit, Logger);
-        var increment = TimelineHeaderAdapter.GetDateIncrement(headerConfig.PrimaryUnit);
-        EndDate = increment(endPeriodStart).AddDays(-1);
-        
+
+        // Direct calculation without legacy TimelineHeaderAdapter
+        StartDate = taskStartDate;
+        EndDate = taskEndDate;
+
         var totalDays = (EndDate - StartDate).Days + 1;
         TotalWidth = (int)(totalDays * EffectiveDayWidth);
         TotalHeight = Tasks.Count * RowHeight;
@@ -193,12 +190,12 @@ public partial class TimelineView : ComponentBase, IDisposable
     {
         SelectedTaskId = taskId;
         Logger.LogUserAction("TimelineView_TaskSelected", new { TaskId = taskId });
-        
+
         if (OnTaskSelected.HasDelegate)
         {
             await OnTaskSelected.InvokeAsync(taskId);
         }
-        
+
         StateHasChanged();
     }
 
@@ -215,9 +212,9 @@ public partial class TimelineView : ComponentBase, IDisposable
     {
         try
         {
-            ViewportScrollLeft = await JSRuntime.InvokeAsync<double>("eval", 
+            ViewportScrollLeft = await JSRuntime.InvokeAsync<double>("eval",
                 "document.querySelector('.timeline-scroll-container').scrollLeft");
-            ViewportWidth = await JSRuntime.InvokeAsync<double>("eval", 
+            ViewportWidth = await JSRuntime.InvokeAsync<double>("eval",
                 "document.querySelector('.timeline-scroll-container').clientWidth");
             StateHasChanged();
         }
@@ -249,14 +246,14 @@ public partial class TimelineView : ComponentBase, IDisposable
         {
             ZoomLevel = newZoomLevel;
             CalculateTimelineRange();
-            Logger.LogUserAction("TimelineView_ZoomLevelChanged", 
+            Logger.LogUserAction("TimelineView_ZoomLevelChanged",
                 new { OldLevel = ZoomLevel, NewLevel = newZoomLevel });
-            
+
             if (OnZoomLevelChanged.HasDelegate)
             {
                 await OnZoomLevelChanged.InvokeAsync(newZoomLevel);
             }
-            
+
             StateHasChanged();
         }
     }
@@ -264,20 +261,20 @@ public partial class TimelineView : ComponentBase, IDisposable
     public async Task SetZoomFactorAsync(double newZoomFactor)
     {
         var clampedFactor = Math.Max(0.5, Math.Min(3.0, newZoomFactor));
-        
+
         if (Math.Abs(ZoomFactor - clampedFactor) > 0.01)
         {
             var oldFactor = ZoomFactor;
             ZoomFactor = clampedFactor;
             CalculateTimelineRange();
-            Logger.LogUserAction("TimelineView_ZoomFactorChanged", 
+            Logger.LogUserAction("TimelineView_ZoomFactorChanged",
                 new { OldFactor = oldFactor, NewFactor = clampedFactor });
-            
+
             if (OnZoomFactorChanged.HasDelegate)
             {
                 await OnZoomFactorChanged.InvokeAsync(clampedFactor);
             }
-            
+
             StateHasChanged();
         }
     }
@@ -293,32 +290,12 @@ public partial class TimelineView : ComponentBase, IDisposable
     // === TOOLTIP FUNCTIONALITY ===
     private TimelineTooltipResult GetTooltipResult()
     {
-        try
+        // Simple placeholder for SVG architecture - will be implemented later
+        return new TimelineTooltipResult
         {
-            var request = new TimelineTooltipRequest
-            {
-                StartDate = StartDate,
-                EndDate = EndDate,
-                EffectiveDayWidth = EffectiveDayWidth,
-                ZoomLevel = ZoomLevel,
-                ViewportScrollLeft = ViewportScrollLeft,
-                ViewportWidth = ViewportWidth,
-                Options = new TimelineTooltipOptions
-                {
-                    HiddenThreshold = 0.5,
-                    LeftArrow = "←",
-                    RightArrow = "→",
-                    UsePrimaryPeriods = true
-                }
-            };
-
-            return TooltipService.CalculateTooltips(request);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError($"Error getting tooltip result: {ex.Message}");
-            return new TimelineTooltipResult();
-        }
+            LeftTooltip = "",
+            RightTooltip = ""
+        };
     }
 
     private int GetWeekOfYear(DateTime date)
@@ -369,7 +346,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     private string GetTaskTooltip(GanttTask task)
     {
         if (task == null) return string.Empty;
-        
+
         try
         {
             return $"{task.Name} ({task.StartDate:MM/dd/yyyy} - {task.EndDate:MM/dd/yyyy})";

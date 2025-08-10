@@ -150,8 +150,8 @@
     
     // Zoom level filtering - for different use cases  
     [Parameter] public IReadOnlyList<TimelineZoomLevel>? VisibleZoomLevels { get; set; }
-    [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.YearQuarterOptimal30px;  // Most zoomed out (overview) - NEW OPTIMAL
-        [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal60px;      // Most zoomed in (detail) - 4-4-4-4 structure
+    [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal30px;  // For testing WeekDay pattern
+    [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal60px;  // For testing WeekDay pattern
     
     // Preset-only approach: Manual zoom controls removed for v0.8.5
     // All zoom control is handled via preset level selection only
@@ -209,30 +209,20 @@
             return VisibleZoomLevels;
         }
         
-        // Get all zoom levels and filter out obsolete ones by default
-        var allLevels = Enum.GetValues<TimelineZoomLevel>()
-            .Where(level => !IsObsoleteZoomLevel(level))  // Filter out obsolete levels
-            .OrderBy(x => (int)x);
-        
-        // Use min/max range - 4-4-4-4: YearQuarterOptimal30px=20 (overview) to WeekDayOptimal60px=35 (detail)
-        var filteredLevels = allLevels.Where(level => (int)level >= (int)MinZoomLevel && (int)level <= (int)MaxZoomLevel).ToList();
-        
-        // Apply preset limit for visible presets
-        if (EffectiveConfig.MaxVisiblePresets > 0 && filteredLevels.Count > EffectiveConfig.MaxVisiblePresets)
+        // FOR COMMIT 2 TESTING: Only show WeekDay levels that are implemented
+        var implementedLevels = new List<TimelineZoomLevel>
         {
-            // Take evenly distributed levels across the range
-            var step = (double)filteredLevels.Count / EffectiveConfig.MaxVisiblePresets;
-            var selectedLevels = new List<TimelineZoomLevel>();
-            for (int i = 0; i < EffectiveConfig.MaxVisiblePresets; i++)
-            {
-                var index = (int)(i * step);
-                if (index < filteredLevels.Count)
-                {
-                    selectedLevels.Add(filteredLevels[index]);
-                }
-            }
-            return selectedLevels;
-        }
+            TimelineZoomLevel.WeekDayOptimal30px,
+            TimelineZoomLevel.WeekDayOptimal40px,
+            TimelineZoomLevel.WeekDayOptimal50px,
+            TimelineZoomLevel.WeekDayOptimal60px
+        };
+        
+        // Apply min/max range filtering if needed
+        var filteredLevels = implementedLevels
+            .Where(level => (int)level >= (int)MinZoomLevel && (int)level <= (int)MaxZoomLevel)
+            .OrderBy(x => (int)x)
+            .ToList();
         
         return filteredLevels;
     }

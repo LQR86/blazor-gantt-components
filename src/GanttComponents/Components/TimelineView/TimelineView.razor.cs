@@ -108,15 +108,25 @@ public partial class TimelineView : ComponentBase, IDisposable
             Logger.LogError($"Error rendering SVG headers for zoom level {ZoomLevel}: {ex.Message}");
             return $"<!-- Error rendering headers: {ex.Message} -->";
         }
-    }    // === PATTERN METHODS (Implemented in partial classes) ===
-    // These methods will be implemented in separate partial class files:
-    // - TimelineView.WeekDay.cs: RenderWeekDayHeaders() ✅ IMPLEMENTED
-    // - TimelineView.MonthWeek.cs: RenderMonthWeekHeaders()  
-    // - TimelineView.QuarterMonth.cs: RenderQuarterMonthHeaders()
-    // - TimelineView.YearQuarter.cs: RenderYearQuarterHeaders()
+    }
 
-    // Temporary placeholder methods to prevent compilation errors
-    // These will be removed as pattern files are created
+    // === LEVEL-SPECIFIC METHODS (Implemented in individual partial classes) ===
+    // True level-level independence achieved through dedicated files:
+    // MonthWeek Levels:
+    // - TimelineView.MonthWeek30px.cs: RenderMonthWeek30pxHeaders() ✅ IMPLEMENTED
+    // - TimelineView.MonthWeek40px.cs: RenderMonthWeek40pxHeaders() ✅ IMPLEMENTED  
+    // - TimelineView.MonthWeek50px.cs: RenderMonthWeek50pxHeaders() ✅ IMPLEMENTED
+    // - TimelineView.MonthWeek60px.cs: RenderMonthWeek60pxHeaders() ✅ IMPLEMENTED
+    // WeekDay Levels:
+    // - TimelineView.WeekDay30px.cs: RenderWeekDay30pxHeaders() ✅ IMPLEMENTED
+    // - TimelineView.WeekDay40px.cs: RenderWeekDay40pxHeaders() ✅ IMPLEMENTED
+    // - TimelineView.WeekDay50px.cs: RenderWeekDay50pxHeaders() ✅ IMPLEMENTED
+    // - TimelineView.WeekDay60px.cs: RenderWeekDay60pxHeaders() ✅ IMPLEMENTED
+    // Future Patterns:
+    // - TimelineView.QuarterMonth##px.cs: Individual level files (planned)
+    // - TimelineView.YearQuarter##px.cs: Individual level files (planned)
+
+    // Temporary placeholder methods for future patterns
     private string RenderQuarterMonthHeaders() => "<!-- QuarterMonth pattern not implemented yet -->";
     private string RenderYearQuarterHeaders() => "<!-- YearQuarter pattern not implemented yet -->";
 

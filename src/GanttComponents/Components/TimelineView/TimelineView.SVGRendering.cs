@@ -54,7 +54,7 @@ public partial class TimelineView
     /// <returns>CSS class string</returns>
     protected string GetHeaderCellClass(bool isPrimary, bool isSelected = false)
     {
-        var baseClass = isPrimary ? "svg-primary-cell" : "svg-secondary-cell";
+        var baseClass = isPrimary ? "svg-header-cell-primary" : "svg-header-cell-secondary";
         return isSelected ? $"{baseClass} svg-cell-selected" : baseClass;
     }
 

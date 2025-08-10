@@ -62,7 +62,16 @@ public partial class TimelineView : ComponentBase, IDisposable
         get
         {
             var config = TimelineZoomService.GetConfiguration(ZoomLevel);
-            return config.GetEffectiveDayWidth(ZoomFactor);
+
+            // VALIDATION 1: Base Day Width must be integral
+            ValidateBaseDayWidth(config.BaseDayWidth);
+
+            var effectiveWidth = config.GetEffectiveDayWidth(ZoomFactor);
+
+            // VALIDATION 2: Effective Day Width must be integral  
+            ValidateEffectiveDayWidth(effectiveWidth);
+
+            return effectiveWidth;
         }
     }
 
@@ -405,6 +414,56 @@ public partial class TimelineView : ComponentBase, IDisposable
                 "TimelineView requires a non-null Tasks parameter. " +
                 "Pass an empty list if no tasks are available. " +
                 "Example: <TimelineView Tasks=\"@(new List<GanttTask>())\" ... />");
+        }
+    }
+
+    /// <summary>
+    /// INTEGRAL DAY WIDTH VALIDATION 1: Validates that the base day width is integral.
+    /// This enforces the "Integral Day Widths" architectural requirement at the configuration level.
+    /// </summary>
+    /// <param name="baseDayWidth">The base day width from zoom configuration</param>
+    /// <exception cref="InvalidOperationException">Thrown when base day width is not integral</exception>
+    private void ValidateBaseDayWidth(double baseDayWidth)
+    {
+        if (Math.Abs(baseDayWidth - Math.Round(baseDayWidth)) > 0.001)
+        {
+            throw new InvalidOperationException(
+                $"INTEGRAL DAY WIDTH VIOLATION (Base): {ZoomLevel} has fractional BaseDayWidth = {baseDayWidth:F3}px. " +
+                $"Pure SVG TimelineView requires integral base day widths for clean coordinate calculations. " +
+                $"Configuration should use whole numbers like {Math.Round(baseDayWidth):F0}px instead. " +
+                $"This ensures predictable effective day widths across all zoom factors.");
+        }
+
+        if (baseDayWidth <= 0)
+        {
+            throw new InvalidOperationException(
+                $"DAY WIDTH VALIDATION: {ZoomLevel} has invalid BaseDayWidth = {baseDayWidth}px. " +
+                $"Day width must be positive.");
+        }
+    }
+
+    /// <summary>
+    /// INTEGRAL DAY WIDTH VALIDATION 2: Validates that the effective day width is integral.
+    /// This provides a safety net for the computed width (BaseDayWidth × ZoomFactor).
+    /// </summary>
+    /// <param name="effectiveDayWidth">The computed effective day width</param>
+    /// <exception cref="InvalidOperationException">Thrown when effective day width is not integral</exception>
+    private void ValidateEffectiveDayWidth(double effectiveDayWidth)
+    {
+        if (Math.Abs(effectiveDayWidth - Math.Round(effectiveDayWidth)) > 0.001)
+        {
+            throw new InvalidOperationException(
+                $"INTEGRAL DAY WIDTH VIOLATION (Effective): {ZoomLevel} @ {ZoomFactor:F1}x = {effectiveDayWidth:F3}px effective day width. " +
+                $"Pure SVG TimelineView requires integral effective day widths for clean SVG coordinate calculations. " +
+                $"Try adjusting ZoomFactor to achieve a whole number result, such as {Math.Round(effectiveDayWidth):F0}px. " +
+                $"BaseDayWidth × ZoomFactor must result in integral pixel values.");
+        }
+
+        if (effectiveDayWidth <= 0)
+        {
+            throw new InvalidOperationException(
+                $"EFFECTIVE DAY WIDTH VALIDATION: {ZoomLevel} @ {ZoomFactor:F1}x = {effectiveDayWidth}px. " +
+                $"Effective day width must be positive.");
         }
     }
 

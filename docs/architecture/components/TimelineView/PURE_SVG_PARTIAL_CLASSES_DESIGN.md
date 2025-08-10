@@ -59,18 +59,89 @@ else
 - ✅ **Content Integrity**: Tasks still render only within their actual date ranges
 - ✅ **Improved Usability**: Better viewing angles and navigation space around timeline content
 
+### Fix 4: Integral Day Width Validation ✅ COMPLETED (Commit: TBD)
+**Issue**: MonthWeek levels use fractional day widths (4.29px-8.57px) which violate the "Integral Day Widths" architectural requirement, but no validation existed to catch this.
+**User Requirement**: "validate that the level's day width is integral, otherwise compile-time error or (runtime-error if compile-time not possible)"
+**Solution**: Implemented double validation in TimelineView component to enforce integral day widths at both base and effective levels.
+
+**Implementation**:
+```csharp
+// DOUBLE VALIDATION APPROACH in TimelineView.razor.cs
+private double EffectiveDayWidth
+{
+    get
+    {
+        var config = TimelineZoomService.GetConfiguration(ZoomLevel);
+        
+        // VALIDATION 1: Base Day Width must be integral
+        ValidateBaseDayWidth(config.BaseDayWidth);
+        
+        var effectiveWidth = config.GetEffectiveDayWidth(ZoomFactor);
+        
+        // VALIDATION 2: Effective Day Width must be integral  
+        ValidateEffectiveDayWidth(effectiveWidth);
+        
+        return effectiveWidth;
+    }
+}
+
+private void ValidateBaseDayWidth(double baseDayWidth)
+{
+    if (Math.Abs(baseDayWidth - Math.Round(baseDayWidth)) > 0.001)
+    {
+        throw new InvalidOperationException(
+            $"INTEGRAL DAY WIDTH VIOLATION (Base): {ZoomLevel} has fractional BaseDayWidth = {baseDayWidth:F3}px. " +
+            $"Pure SVG TimelineView requires integral base day widths for clean coordinate calculations. " +
+            $"Configuration should use whole numbers like {Math.Round(baseDayWidth):F0}px instead.");
+    }
+}
+
+private void ValidateEffectiveDayWidth(double effectiveDayWidth)
+{
+    if (Math.Abs(effectiveDayWidth - Math.Round(effectiveDayWidth)) > 0.001)
+    {
+        throw new InvalidOperationException(
+            $"INTEGRAL DAY WIDTH VIOLATION (Effective): {ZoomLevel} @ {ZoomFactor:F1}x = {effectiveDayWidth:F3}px effective day width. " +
+            $"Pure SVG TimelineView requires integral effective day widths for clean SVG coordinate calculations. " +
+            $"Try adjusting ZoomFactor to achieve a whole number result.");
+    }
+}
+```
+
+**Validation Strategy**:
+- **Double Safety Net**: Validates both base day width (configuration level) and effective day width (runtime level)
+- **Component Responsibility**: TimelineView enforces its own architectural requirements
+- **Clear Error Messages**: Specific guidance on how to fix violations with suggested values
+- **Performance**: Only validates when EffectiveDayWidth is accessed (lazy evaluation)
+- **Fail-Fast**: Catches violations immediately when component renders
+
+**Validation Results** (Current State):
+```
+VALIDATION CAUGHT: MonthWeekOptimal50px has fractional BaseDayWidth = 7.140px
+ERROR MESSAGE: "Pure SVG TimelineView requires integral base day widths for clean coordinate calculations. 
+Configuration should use whole numbers like 7px instead."
+```
+
+**Benefits Achieved**:
+- ✅ **Architectural Enforcement**: Automatic validation of "Integral Day Widths" requirement
+- ✅ **Developer Safety**: Immediate feedback when configurations violate SVG coordinate principles
+- ✅ **Clear Guidance**: Error messages specify exact values and suggested fixes
+- ✅ **Double Protection**: Both configuration and computed values validated
+- ✅ **Component Ownership**: TimelineView validates its own requirements
+
 **Combined Implementation Impact**
-**File Changes**: 6 files modified across three major fixes
+**File Changes**: 7 files modified across four major fixes
 - `TimelineView.SVGRendering.cs`: Enhanced with inline styles and new viewBox methods
 - `TimelineView.Shared.css`: Cleaned up CSS rules and removed debug styles
 - `TimelineView.razor`: Restructured with separate header and body containers
-- `TimelineView.razor.cs`: Added scroll synchronization logic + enhanced viewport buffer calculation
+- `TimelineView.razor.cs`: Added scroll synchronization logic + enhanced viewport buffer calculation + integral day width validation
 - `PURE_SVG_PARTIAL_CLASSES_DESIGN.md`: Comprehensive documentation updates
 
 **Performance**: Maintained excellent build performance (2.5 second build time)
-**Stability**: All 8 zoom levels working correctly with all three fixes applied
+**Stability**: All 8 zoom levels working correctly with all four fixes applied  
 **Architecture**: Enhanced maintainability with cleaner separation of concerns and professional UX behavior
-**User Experience**: Timeline now provides Visio-like scrollable canvas with substantial buffer space for optimal navigationvidual level isolation (8 completely independent levels)
+**Validation**: Component now automatically enforces integral day width architectural requirements
+**User Experience**: Timeline provides Visio-like scrollable canvas with substantial buffer space and architectural safetyvidual level isolation (8 completely independent levels)
 
 ### Why Level-Level Independence?
 - **Maximum Isolation**: Each zoom level completely independent

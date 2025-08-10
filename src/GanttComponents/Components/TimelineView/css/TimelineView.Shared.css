@@ -1,17 +1,22 @@
 /* TimelineView Shared Utilities */
 /* Common styles used across all timeline zoom levels */
 
+/* SVG Container - ensure proper CSS inheritance */
+.timeline-svg {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
 /* Header Cell Background Classes - Shared across all levels */
 .svg-header-cell-primary {
     fill: #f8f9fa;
     stroke: #dee2e6;
-    stroke-width: 1;
+    stroke-width: 1px;
 }
 
 .svg-header-cell-secondary {
     fill: #ffffff;
     stroke: #dee2e6;
-    stroke-width: 1;
+    stroke-width: 1px;
 }
 
 /* Common SVG text properties - applied to all levels */

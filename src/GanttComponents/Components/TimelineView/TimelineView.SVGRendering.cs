@@ -99,9 +99,14 @@ public partial class TimelineView
     /// <returns>SVG rect element string</returns>
     protected string CreateSVGRect(double x, double y, double width, double height, string cssClass)
     {
+        // Add inline styles as fallback for CSS class issues
+        var inlineStyle = cssClass.Contains("primary")
+            ? "fill: #f8f9fa; stroke: #dee2e6; stroke-width: 1px;"
+            : "fill: #ffffff; stroke: #dee2e6; stroke-width: 1px;";
+
         return $@"<rect x=""{FormatSVGCoordinate(x)}"" y=""{FormatSVGCoordinate(y)}"" 
                        width=""{FormatSVGCoordinate(width)}"" height=""{FormatSVGCoordinate(height)}"" 
-                       class=""{cssClass}"" />";
+                       class=""{cssClass}"" style=""{inlineStyle}"" />";
     }
 
     /// <summary>
@@ -114,9 +119,12 @@ public partial class TimelineView
     /// <returns>SVG text element string</returns>
     protected string CreateSVGText(double x, double y, string text, string cssClass)
     {
+        // Add inline styles as fallback for CSS class issues
+        var inlineStyle = "fill: #333; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;";
+
         return $@"<text x=""{FormatSVGCoordinate(x)}"" y=""{FormatSVGCoordinate(y)}"" 
                        text-anchor=""middle"" dominant-baseline=""middle"" 
-                       class=""{cssClass}"">{System.Net.WebUtility.HtmlEncode(text)}</text>";
+                       class=""{cssClass}"" style=""{inlineStyle}"">{System.Net.WebUtility.HtmlEncode(text)}</text>";
     }
 
     /// <summary>

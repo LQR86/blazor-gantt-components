@@ -42,21 +42,6 @@ namespace GanttComponents.Services
                 TimelineZoomLevel.WeekDayOptimal50px => i18n.T("ZoomLevel.WeekDayOptimal50px"),
                 TimelineZoomLevel.WeekDayOptimal60px => i18n.T("ZoomLevel.WeekDayOptimal60px"),
 
-                // Legacy levels (backward compatibility) - Suppressing obsolete warnings for compatibility
-#pragma warning disable CS0618
-                TimelineZoomLevel.WeekDay97px => i18n.T("ZoomLevel.WeekDay97px"),
-                TimelineZoomLevel.WeekDay68px => i18n.T("ZoomLevel.WeekDay68px"),
-                TimelineZoomLevel.MonthDay48px => i18n.T("ZoomLevel.MonthDay48px"),
-                TimelineZoomLevel.MonthDay34px => i18n.T("ZoomLevel.MonthDay34px"),
-                TimelineZoomLevel.QuarterMonth24px => i18n.T("ZoomLevel.QuarterMonth24px"),
-                TimelineZoomLevel.QuarterMonth17px => i18n.T("ZoomLevel.QuarterMonth17px"),
-                TimelineZoomLevel.Month12px => i18n.T("ZoomLevel.Month12px"),
-                TimelineZoomLevel.Month8px => i18n.T("ZoomLevel.Month8px"),
-                TimelineZoomLevel.YearQuarter6px => i18n.T("ZoomLevel.YearQuarter6px"),
-                TimelineZoomLevel.YearQuarter4px => i18n.T("ZoomLevel.YearQuarter4px"),
-                TimelineZoomLevel.YearQuarter3px => i18n.T("ZoomLevel.YearQuarter3px"),
-#pragma warning restore CS0618
-
                 _ => zoomLevel.ToString()
             };
         }
@@ -94,21 +79,6 @@ namespace GanttComponents.Services
                 TimelineZoomLevel.WeekDayOptimal40px => i18n.T("ZoomLevel.WeekDayOptimal40px.Description"),
                 TimelineZoomLevel.WeekDayOptimal50px => i18n.T("ZoomLevel.WeekDayOptimal50px.Description"),
                 TimelineZoomLevel.WeekDayOptimal60px => i18n.T("ZoomLevel.WeekDayOptimal60px.Description"),
-
-                // Legacy levels (backward compatibility) - Suppressing obsolete warnings for compatibility
-#pragma warning disable CS0618
-                TimelineZoomLevel.WeekDay97px => i18n.T("ZoomLevel.WeekDay97px.Description"),
-                TimelineZoomLevel.WeekDay68px => i18n.T("ZoomLevel.WeekDay68px.Description"),
-                TimelineZoomLevel.MonthDay48px => i18n.T("ZoomLevel.MonthDay48px.Description"),
-                TimelineZoomLevel.MonthDay34px => i18n.T("ZoomLevel.MonthDay34px.Description"),
-                TimelineZoomLevel.QuarterMonth24px => i18n.T("ZoomLevel.QuarterMonth24px.Description"),
-                TimelineZoomLevel.QuarterMonth17px => i18n.T("ZoomLevel.QuarterMonth17px.Description"),
-                TimelineZoomLevel.Month12px => i18n.T("ZoomLevel.Month12px.Description"),
-                TimelineZoomLevel.Month8px => i18n.T("ZoomLevel.Month8px.Description"),
-                TimelineZoomLevel.YearQuarter6px => i18n.T("ZoomLevel.YearQuarter6px.Description"),
-                TimelineZoomLevel.YearQuarter4px => i18n.T("ZoomLevel.YearQuarter4px.Description"),
-                TimelineZoomLevel.YearQuarter3px => i18n.T("ZoomLevel.YearQuarter3px.Description"),
-#pragma warning restore CS0618
 
                 _ => string.Empty
             };

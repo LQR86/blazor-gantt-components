@@ -74,13 +74,13 @@ public partial class TimelineView
             TimelineZoomLevel.MonthWeekOptimal40px => isPrimary ? "svg-monthweek-40px-primary-text" : "svg-monthweek-40px-secondary-text",
             TimelineZoomLevel.MonthWeekOptimal50px => isPrimary ? "svg-monthweek-50px-primary-text" : "svg-monthweek-50px-secondary-text",
             TimelineZoomLevel.MonthWeekOptimal60px => isPrimary ? "svg-monthweek-60px-primary-text" : "svg-monthweek-60px-secondary-text",
-            
+
             // WeekDay Levels (Wide Cells)
             TimelineZoomLevel.WeekDayOptimal30px => isPrimary ? "svg-weekday-30px-primary-text" : "svg-weekday-30px-secondary-text",
             TimelineZoomLevel.WeekDayOptimal40px => isPrimary ? "svg-weekday-40px-primary-text" : "svg-weekday-40px-secondary-text",
             TimelineZoomLevel.WeekDayOptimal50px => isPrimary ? "svg-weekday-50px-primary-text" : "svg-weekday-50px-secondary-text",
             TimelineZoomLevel.WeekDayOptimal60px => isPrimary ? "svg-weekday-60px-primary-text" : "svg-weekday-60px-secondary-text",
-            
+
             // Fallback for any future patterns
             _ => isPrimary ? "svg-primary-text" : "svg-secondary-text"
         };

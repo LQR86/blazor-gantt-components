@@ -89,17 +89,17 @@ public partial class TimelineView : ComponentBase, IDisposable
                 TimelineZoomLevel.WeekDayOptimal40px => RenderWeekDay40pxHeaders(),
                 TimelineZoomLevel.WeekDayOptimal50px => RenderWeekDay50pxHeaders(),
                 TimelineZoomLevel.WeekDayOptimal60px => RenderWeekDay60pxHeaders(),
-                
+
                 // MonthWeek Levels (Individual partial classes)
                 TimelineZoomLevel.MonthWeekOptimal30px => RenderMonthWeek30pxHeaders(),
                 TimelineZoomLevel.MonthWeekOptimal40px => RenderMonthWeek40pxHeaders(),
                 TimelineZoomLevel.MonthWeekOptimal50px => RenderMonthWeek50pxHeaders(),
                 TimelineZoomLevel.MonthWeekOptimal60px => RenderMonthWeek60pxHeaders(),
-                
+
                 // Future patterns
                 _ when IsQuarterMonthPattern => RenderQuarterMonthHeaders(),
                 _ when IsYearQuarterPattern => RenderYearQuarterHeaders(),
-                
+
                 _ => throw new InvalidOperationException($"Unsupported zoom level: {ZoomLevel}")
             };
         }

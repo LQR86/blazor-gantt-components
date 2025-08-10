@@ -348,17 +348,6 @@ public partial class TimelineView : ComponentBase, IDisposable
     public double CurrentEffectiveDayWidth => EffectiveDayWidth;
     public string CurrentZoomDescription => $"{ZoomLevel} @ {ZoomFactor:F1}x";
 
-    // === TOOLTIP FUNCTIONALITY ===
-    private TimelineTooltipResult GetTooltipResult()
-    {
-        // Simple placeholder for SVG architecture - will be implemented later
-        return new TimelineTooltipResult
-        {
-            LeftTooltip = "",
-            RightTooltip = ""
-        };
-    }
-
     private int GetWeekOfYear(DateTime date)
     {
         var culture = System.Globalization.CultureInfo.CurrentCulture;

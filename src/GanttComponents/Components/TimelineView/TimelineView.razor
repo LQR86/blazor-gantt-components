@@ -1,30 +1,10 @@
 @using GanttComponents.Models
 @using GanttComponents.Services
-@using GanttComponents.Components.TimelineHeader
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components
 
 <div class="timeline-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
     
-    @* Floating edge tooltips - stay fixed at viewport corners during horizontal scroll *@
-    @{
-        var tooltipResult = GetTooltipResult();
-    }
-    
-    @if (tooltipResult.HasLeftTooltip)
-    {
-        <div class="timeline-viewport-tooltip timeline-viewport-tooltip-left" title="Hidden periods to the left">
-            @tooltipResult.LeftTooltip
-        </div>
-    }
-    
-    @if (tooltipResult.HasRightTooltip)
-    {
-        <div class="timeline-viewport-tooltip timeline-viewport-tooltip-right" title="Hidden periods to the right">
-            @tooltipResult.RightTooltip
-        </div>
-    }
-
     @* Fixed Header SVG - Stays at top *@
     <div class="timeline-header-container">
         <svg class="timeline-header-svg" 

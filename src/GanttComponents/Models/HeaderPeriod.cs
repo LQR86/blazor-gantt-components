@@ -68,8 +68,4 @@ public class TimelineHeaderResult
     /// </summary>
     public bool ShouldCollapse { get; set; }
 
-    /// <summary>
-    /// Header configuration used for generation (for debugging/validation)
-    /// </summary>
-    public TimelineHeaderConfiguration? HeaderConfig { get; set; }
 }

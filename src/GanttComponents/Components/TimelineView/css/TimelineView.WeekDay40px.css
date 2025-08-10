@@ -1,0 +1,31 @@
+/* TimelineView WeekDay 40px Level - Comfortable Wide */
+/* Cell Width: 280px (40px day width × 7 days) - Comfortable WeekDay level */
+
+.svg-weekday-40px-primary-text {
+    font-size: 14px;
+    font-weight: 600;
+    fill: #333;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.svg-weekday-40px-secondary-text {
+    font-size: 12px;
+    font-weight: 400;
+    fill: #666;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+/* Level-specific cell styling for comfortable wide cells */
+.svg-weekday-40px-cell-primary {
+    fill: #f8f9fa;
+    stroke: #dee2e6;
+    stroke-width: 1px;
+}
+
+.svg-weekday-40px-cell-secondary {
+    fill: #ffffff;
+    stroke: #dee2e6;
+    stroke-width: 1px;
+}

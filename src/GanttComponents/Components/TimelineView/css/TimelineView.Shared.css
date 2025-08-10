@@ -1,0 +1,41 @@
+/* TimelineView Shared Utilities */
+/* Common styles used across all timeline zoom levels */
+
+/* Header Cell Background Classes - Shared across all levels */
+.svg-header-cell-primary {
+    fill: #f8f9fa;
+    stroke: #dee2e6;
+    stroke-width: 1;
+}
+
+.svg-header-cell-secondary {
+    fill: #ffffff;
+    stroke: #dee2e6;
+    stroke-width: 1;
+}
+
+/* Common SVG text properties - applied to all levels */
+.svg-text-base {
+    text-anchor: middle;
+    dominant-baseline: central;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Fallback classes for unknown/future zoom levels */
+.svg-primary-text {
+    font-size: 14px;
+    font-weight: 600;
+    fill: #333;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.svg-secondary-text {
+    font-size: 12px;
+    font-weight: 400;
+    fill: #666;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+/* Future: Timeline header group containers for specialized styling */

@@ -59,27 +59,33 @@ public partial class TimelineView
     }
 
     /// <summary>
-    /// Gets CSS class for header text based on current pattern and level.
-    /// Each pattern uses its own font sizes optimized for cell widths.
+    /// Gets CSS class for header text based on exact zoom level.
+    /// Each level gets its own optimized font sizes for maximum readability.
     /// </summary>
     /// <param name="isPrimary">True for primary header text, false for secondary</param>
-    /// <returns>CSS class string appropriate for current zoom pattern</returns>
+    /// <returns>Level-specific CSS class string</returns>
     protected virtual string GetHeaderTextClass(bool isPrimary)
     {
-        // MonthWeek patterns use smaller fonts for narrow cells (35-70px)
-        if (IsMonthWeekPattern)
+        // Level-specific CSS classes for maximum isolation and fine-tuning
+        var cssClass = ZoomLevel switch
         {
-            return isPrimary ? "svg-monthweek-primary-text" : "svg-monthweek-secondary-text";
-        }
+            // MonthWeek Levels (Narrow Cells)
+            TimelineZoomLevel.MonthWeekOptimal30px => isPrimary ? "svg-monthweek-30px-primary-text" : "svg-monthweek-30px-secondary-text",
+            TimelineZoomLevel.MonthWeekOptimal40px => isPrimary ? "svg-monthweek-40px-primary-text" : "svg-monthweek-40px-secondary-text",
+            TimelineZoomLevel.MonthWeekOptimal50px => isPrimary ? "svg-monthweek-50px-primary-text" : "svg-monthweek-50px-secondary-text",
+            TimelineZoomLevel.MonthWeekOptimal60px => isPrimary ? "svg-monthweek-60px-primary-text" : "svg-monthweek-60px-secondary-text",
+            
+            // WeekDay Levels (Wide Cells)
+            TimelineZoomLevel.WeekDayOptimal30px => isPrimary ? "svg-weekday-30px-primary-text" : "svg-weekday-30px-secondary-text",
+            TimelineZoomLevel.WeekDayOptimal40px => isPrimary ? "svg-weekday-40px-primary-text" : "svg-weekday-40px-secondary-text",
+            TimelineZoomLevel.WeekDayOptimal50px => isPrimary ? "svg-weekday-50px-primary-text" : "svg-weekday-50px-secondary-text",
+            TimelineZoomLevel.WeekDayOptimal60px => isPrimary ? "svg-weekday-60px-primary-text" : "svg-weekday-60px-secondary-text",
+            
+            // Fallback for any future patterns
+            _ => isPrimary ? "svg-primary-text" : "svg-secondary-text"
+        };
 
-        // WeekDay patterns use standard fonts for wide cells (210-420px)
-        if (IsWeekDayPattern)
-        {
-            return isPrimary ? "svg-weekday-primary-text" : "svg-weekday-secondary-text";
-        }
-
-        // Default/fallback for any other patterns
-        return isPrimary ? "svg-primary-text" : "svg-secondary-text";
+        return cssClass;
     }
 
     /// <summary>

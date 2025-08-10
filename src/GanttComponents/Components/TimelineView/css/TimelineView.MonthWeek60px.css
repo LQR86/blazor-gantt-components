@@ -1,0 +1,31 @@
+/* TimelineView MonthWeek 60px Level - Comfortable Compact */
+/* Cell Width: 70px (10px day width × 7 days) - Widest MonthWeek level */
+
+.svg-monthweek-60px-primary-text {
+    font-size: 12px;
+    font-weight: 600;
+    fill: #333;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.svg-monthweek-60px-secondary-text {
+    font-size: 9px;
+    font-weight: 400;
+    fill: #666;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+/* Level-specific cell styling for comfortable compact cells */
+.svg-monthweek-60px-cell-primary {
+    fill: #f8f9fa;
+    stroke: #dee2e6;
+    stroke-width: 1px; /* Standard border width */
+}
+
+.svg-monthweek-60px-cell-secondary {
+    fill: #ffffff;
+    stroke: #dee2e6;
+    stroke-width: 1px; /* Standard border width */
+}

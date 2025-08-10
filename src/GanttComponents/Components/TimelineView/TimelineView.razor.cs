@@ -90,8 +90,11 @@ public partial class TimelineView : ComponentBase, IDisposable
                 TimelineZoomLevel.WeekDayOptimal50px => RenderWeekDay50pxHeaders(),
                 TimelineZoomLevel.WeekDayOptimal60px => RenderWeekDay60pxHeaders(),
                 
-                // MonthWeek Pattern (Will be split in Commit 6)
-                _ when IsMonthWeekPattern => RenderMonthWeekHeaders(),
+                // MonthWeek Levels (Individual partial classes)
+                TimelineZoomLevel.MonthWeekOptimal30px => RenderMonthWeek30pxHeaders(),
+                TimelineZoomLevel.MonthWeekOptimal40px => RenderMonthWeek40pxHeaders(),
+                TimelineZoomLevel.MonthWeekOptimal50px => RenderMonthWeek50pxHeaders(),
+                TimelineZoomLevel.MonthWeekOptimal60px => RenderMonthWeek60pxHeaders(),
                 
                 // Future patterns
                 _ when IsQuarterMonthPattern => RenderQuarterMonthHeaders(),

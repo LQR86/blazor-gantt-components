@@ -3,51 +3,51 @@ using GanttComponents.Models;
 namespace GanttComponents.Components.TimelineView;
 
 /// <summary>
-/// MonthWeek pattern implementation for TimelineView partial classes.
-/// Handles zoom levels: MonthWeekOptimal30px through MonthWeekOptimal60px (levels 28-31).
+/// MonthWeek60px pattern implementation for TimelineView.
+/// Handles zoom level: MonthWeekOptimal60px (level 31).
 /// Primary Header: Month-Year ("February 2025", "March 2025")
 /// Secondary Header: Week start dates ("2/17", "2/24", "3/3") - Monday dates
-/// Cell Widths: 35-70px week cells (5-10px day width × 7 days/week)
+/// Cell Width: 70px week cells (10px day width × 7 days/week)
 /// INTEGRAL DAY WIDTHS ONLY - no fractional calculations for better visuals
 /// </summary>
 public partial class TimelineView
 {
     /// <summary>
-    /// Main rendering method for MonthWeek pattern.
+    /// Main rendering method for MonthWeek60px pattern.
     /// Combines primary (month-year) and secondary (week start dates) headers.
     /// </summary>
-    /// <returns>Complete SVG markup for MonthWeek headers</returns>
-    private string RenderMonthWeekHeaders()
+    /// <returns>Complete SVG markup for MonthWeek60px headers</returns>
+    private string RenderMonthWeek60pxHeaders()
     {
         try
         {
-            Logger.LogDebugInfo($"MonthWeek pattern rendering - StartDate: {StartDate}, EndDate: {EndDate}, DayWidth: {DayWidth}");
+            Logger.LogDebugInfo($"MonthWeek60px pattern rendering - StartDate: {StartDate}, EndDate: {EndDate}, DayWidth: {DayWidth}");
 
-            var primaryHeader = RenderMonthWeekPrimaryHeader();
-            var secondaryHeader = RenderMonthWeekSecondaryHeader();
+            var primaryHeader = RenderMonthWeek60pxPrimaryHeader();
+            var secondaryHeader = RenderMonthWeek60pxSecondaryHeader();
 
             return $@"
-                <!-- MonthWeek Pattern Headers -->
-                <g class=""monthweek-headers"">
+                <!-- MonthWeek60px Pattern Headers -->
+                <g class=""monthweek-60px-headers"">
                     {primaryHeader}
                     {secondaryHeader}
                 </g>";
         }
         catch (Exception ex)
         {
-            Logger.LogError($"Error rendering MonthWeek headers: {ex.Message}");
-            return $"<!-- Error in MonthWeek pattern: {ex.Message} -->";
+            Logger.LogError($"Error rendering MonthWeek60px headers: {ex.Message}");
+            return $"<!-- Error in MonthWeek60px pattern: {ex.Message} -->";
         }
     }
 
     /// <summary>
-    /// Renders the primary header with month-year displays.
+    /// Renders the primary header with month-year displays for MonthWeek60px.
     /// Shows month boundaries like "February 2025", "March 2025" for each month in the timeline.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
-    private string RenderMonthWeekPrimaryHeader()
+    private string RenderMonthWeek60pxPrimaryHeader()
     {
-        var monthPeriods = GenerateMonthPeriods();
+        var monthPeriods = GenerateMonthWeek60pxMonthPeriods();
         var headerElements = new List<string>();
 
         foreach (var period in monthPeriods)
@@ -76,21 +76,21 @@ public partial class TimelineView
         }
 
         return $@"
-            <!-- Primary Header: Month-Year -->
-            <g class=""monthweek-primary-header"">
+            <!-- Primary Header: Month-Year (MonthWeek60px) -->
+            <g class=""monthweek-60px-primary-header"">
                 {string.Join("\n                ", headerElements)}
             </g>";
     }
 
     /// <summary>
-    /// Renders the secondary header with week start dates.
+    /// Renders the secondary header with week start dates for MonthWeek60px.
     /// Shows Monday dates ("2/17", "2/24", "3/3") for each week start in the timeline.
     /// Uses M/d format for compact display.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
-    private string RenderMonthWeekSecondaryHeader()
+    private string RenderMonthWeek60pxSecondaryHeader()
     {
-        var weekPeriods = GenerateMonthWeekPeriods();
+        var weekPeriods = GenerateMonthWeek60pxWeekPeriods();
         var headerElements = new List<string>();
 
         foreach (var period in weekPeriods)
@@ -119,19 +119,19 @@ public partial class TimelineView
         }
 
         return $@"
-            <!-- Secondary Header: Week Start Dates -->
-            <g class=""monthweek-secondary-header"">
+            <!-- Secondary Header: Week Start Dates (MonthWeek60px) -->
+            <g class=""monthweek-60px-secondary-header"">
                 {string.Join("\n                ", headerElements)}
             </g>";
     }
 
     /// <summary>
-    /// Generates month periods for the current timeline range.
+    /// Generates month periods for MonthWeek60px timeline range.
     /// Each period represents one month with start/end dates, width, and formatted label.
     /// Uses integral day width calculations only.
     /// </summary>
     /// <returns>List of HeaderPeriod objects representing months</returns>
-    private List<HeaderPeriod> GenerateMonthPeriods()
+    private List<HeaderPeriod> GenerateMonthWeek60pxMonthPeriods()
     {
         var periods = new List<HeaderPeriod>();
 
@@ -158,7 +158,7 @@ public partial class TimelineView
                     XPosition = DayToSVGX(visibleStart),
                     Width = (visibleEnd - visibleStart).Days * DayWidth + DayWidth, // +1 day for inclusive end
                     Level = HeaderLevel.Primary,
-                    Label = FormatMonthYear(monthStart)
+                    Label = FormatMonthWeek60pxMonthYear(monthStart)
                 };
 
                 periods.Add(period);
@@ -172,12 +172,12 @@ public partial class TimelineView
     }
 
     /// <summary>
-    /// Generates week periods for MonthWeek pattern.
+    /// Generates week periods for MonthWeek60px pattern.
     /// Each period represents one week with Monday start date and proper width.
     /// Uses integral day width calculations for week boundaries.
     /// </summary>
     /// <returns>List of HeaderPeriod objects representing weeks</returns>
-    private List<HeaderPeriod> GenerateMonthWeekPeriods()
+    private List<HeaderPeriod> GenerateMonthWeek60pxWeekPeriods()
     {
         var periods = new List<HeaderPeriod>();
 
@@ -208,7 +208,7 @@ public partial class TimelineView
                     XPosition = DayToSVGX(visibleStart),
                     Width = (visibleEnd - visibleStart).Days * DayWidth + DayWidth, // +1 day for inclusive end
                     Level = HeaderLevel.Secondary,
-                    Label = FormatWeekStartDate(weekStart)
+                    Label = FormatMonthWeek60pxWeekStartDate(weekStart)
                 };
 
                 periods.Add(period);
@@ -222,12 +222,12 @@ public partial class TimelineView
     }
 
     /// <summary>
-    /// Formats a month-year for display in the primary header.
+    /// Formats a month-year for display in the MonthWeek60px primary header.
     /// Simple format: "February 2025", "March 2025"
     /// </summary>
     /// <param name="date">Date within the month</param>
     /// <returns>Formatted month-year string</returns>
-    private string FormatMonthYear(DateTime date)
+    private string FormatMonthWeek60pxMonthYear(DateTime date)
     {
         try
         {
@@ -236,18 +236,18 @@ public partial class TimelineView
         }
         catch (Exception ex)
         {
-            Logger.LogError($"Error formatting month-year {date:yyyy-MM-dd}: {ex.Message}");
+            Logger.LogError($"Error formatting MonthWeek60px month-year {date:yyyy-MM-dd}: {ex.Message}");
             return $"{date:MMM yyyy}";
         }
     }
 
     /// <summary>
-    /// Formats a week start date for display in the secondary header.
+    /// Formats a week start date for display in the MonthWeek60px secondary header.
     /// Uses M/d format for compact display: "2/17", "2/24", "3/3"
     /// </summary>
     /// <param name="weekStart">Monday date for the week</param>
     /// <returns>Formatted week start date string</returns>
-    private string FormatWeekStartDate(DateTime weekStart)
+    private string FormatMonthWeek60pxWeekStartDate(DateTime weekStart)
     {
         try
         {
@@ -256,7 +256,7 @@ public partial class TimelineView
         }
         catch (Exception ex)
         {
-            Logger.LogError($"Error formatting week start date {weekStart:yyyy-MM-dd}: {ex.Message}");
+            Logger.LogError($"Error formatting MonthWeek60px week start date {weekStart:yyyy-MM-dd}: {ex.Message}");
             return $"{weekStart.Month}/{weekStart.Day}";
         }
     }

@@ -29,7 +29,7 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
         int headerDayHeight,
         TimelineZoomLevel zoomLevel,
         double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, 
+        : base(logger, i18n, dateFormatter, startDate, endDate,
                2.0, // INTEGRAL DAY WIDTH: 2.0px day width = 60px month cells (2.0px × 30 days)
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
@@ -162,19 +162,19 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
         {
             var quarterStart = GetQuarterStart(currentDate);
             var quarterEnd = GetQuarterEnd(currentDate);
-            
+
             // Calculate quarter width in pixels
             var quarterDays = (quarterEnd - quarterStart).Days + 1;
             var quarterWidth = quarterDays * DayWidth;
-            
+
             // Quarter display: "Q1 2025", "Q2 2025", etc.
             var quarter = (quarterStart.Month - 1) / 3 + 1;
             var quarterText = $"Q{quarter} {quarterStart.Year}";
-            
+
             // Render quarter header cell
             svg.Append(CreateSVGRect(xPosition, 0, quarterWidth, HeaderMonthHeight, GetCSSClass() + "-quarter"));
             svg.Append(CreateSVGText(xPosition + quarterWidth / 2, HeaderMonthHeight / 2, quarterText, GetCSSClass() + "-quarter-text"));
-            
+
             xPosition += quarterWidth;
             currentDate = quarterEnd.AddDays(1);
         }
@@ -198,18 +198,18 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
         {
             var monthStart = new DateTime(currentDate.Year, currentDate.Month, 1);
             var monthEnd = monthStart.AddMonths(1).AddDays(-1);
-            
+
             // Calculate month width (approximately 60px for 30-day months with 2.0px day width)
             var monthDays = (monthEnd - monthStart).Days + 1;
             var monthWidth = monthDays * DayWidth;
-            
+
             // Month display: "Jan", "Feb", "Mar", etc.
             var monthText = monthStart.ToString("MMM");
-            
+
             // Render month header cell
             svg.Append(CreateSVGRect(xPosition, HeaderMonthHeight, monthWidth, HeaderDayHeight, GetCSSClass() + "-month"));
             svg.Append(CreateSVGText(xPosition + monthWidth / 2, HeaderMonthHeight + HeaderDayHeight / 2, monthText, GetCSSClass() + "-month-text"));
-            
+
             xPosition += monthWidth;
             currentDate = monthEnd.AddDays(1);
         }

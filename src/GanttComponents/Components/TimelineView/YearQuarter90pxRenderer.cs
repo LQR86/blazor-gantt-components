@@ -29,7 +29,7 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
         int headerDayHeight,
         TimelineZoomLevel zoomLevel,
         double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, 
+        : base(logger, i18n, dateFormatter, startDate, endDate,
                1.0, // INTEGRAL DAY WIDTH: 1.0px day width = 90px quarter cells (1.0px × 90 days)
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
@@ -160,18 +160,18 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
         {
             var yearStart = new DateTime(currentYear, 1, 1);
             var yearEnd = new DateTime(currentYear, 12, 31);
-            
+
             // Calculate year width in pixels (365 or 366 days × 1.0px = 365-366px)
             var yearDays = (yearEnd - yearStart).Days + 1;
             var yearWidth = yearDays * DayWidth;
-            
+
             // Year display: "2025", "2026", etc.
             var yearText = currentYear.ToString();
-            
+
             // Render year header cell
             svg.Append(CreateSVGRect(xPosition, 0, yearWidth, HeaderMonthHeight, GetCSSClass() + "-year"));
             svg.Append(CreateSVGText(xPosition + yearWidth / 2, HeaderMonthHeight / 2, yearText, GetCSSClass() + "-year-text"));
-            
+
             xPosition += yearWidth;
             currentYear++;
         }
@@ -195,19 +195,19 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
         {
             var quarterStart = GetQuarterStart(currentDate);
             var quarterEnd = GetQuarterEnd(currentDate);
-            
+
             // Calculate quarter width (approximately 90px for 90-day quarters with 1.0px day width)
             var quarterDays = (quarterEnd - quarterStart).Days + 1;
             var quarterWidth = quarterDays * DayWidth;
-            
+
             // Quarter display: "Q1", "Q2", "Q3", "Q4"
             var quarter = (quarterStart.Month - 1) / 3 + 1;
             var quarterText = $"Q{quarter}";
-            
+
             // Render quarter header cell
             svg.Append(CreateSVGRect(xPosition, HeaderMonthHeight, quarterWidth, HeaderDayHeight, GetCSSClass() + "-quarter"));
             svg.Append(CreateSVGText(xPosition + quarterWidth / 2, HeaderMonthHeight + HeaderDayHeight / 2, quarterText, GetCSSClass() + "-quarter-text"));
-            
+
             xPosition += quarterWidth;
             currentDate = quarterEnd.AddDays(1);
         }

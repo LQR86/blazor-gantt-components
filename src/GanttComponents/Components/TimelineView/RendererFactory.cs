@@ -47,7 +47,7 @@ public static class RendererFactory
                 logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                 headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
 
-            TimelineZoomLevel.WeekDayOptimal50px => new WeekDay50pxRendererStub(
+            TimelineZoomLevel.WeekDayOptimal50px => new WeekDay50pxRenderer(
                 logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                 headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
 

@@ -117,8 +117,8 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
             var monthStart = monthBounds.start;
             var monthEnd = monthBounds.end;
 
-            // CRITICAL FIX: Calculate proper X position using date-to-pixel conversion
-            var xPosition = SVGRenderingHelpers.DayToSVGX(monthStart, start, DayWidth);
+            // CRITICAL FIX: Use fixed coordinate system to match taskbar positioning
+            var xPosition = SVGRenderingHelpers.DayToSVGX(monthStart, CoordinateSystemStart, DayWidth);
 
             // Calculate month width in pixels
             var monthDays = (monthEnd - monthStart).Days + 1;
@@ -166,9 +166,8 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
             var weekStart = currentDate;
             var weekEnd = currentDate.AddDays(6); // Sunday
 
-            // CRITICAL FIX: Calculate proper X position using date-to-pixel conversion
-            // This ensures weeks align correctly under their corresponding months
-            var xPosition = SVGRenderingHelpers.DayToSVGX(weekStart, start, DayWidth);
+            // CRITICAL FIX: Use fixed coordinate system to match taskbar positioning
+            var xPosition = SVGRenderingHelpers.DayToSVGX(weekStart, CoordinateSystemStart, DayWidth);
 
             // Calculate week width (7 days)
             var weekWidth = 7 * DayWidth;

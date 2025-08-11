@@ -19,6 +19,14 @@ public abstract class BaseTimelineRenderer
     // === TIMELINE PROPERTIES ===
     protected DateTime StartDate { get; set; }
     protected DateTime EndDate { get; set; }
+
+    /// <summary>
+    /// Fixed coordinate system reference date - always matches TimelineView's StartDate.
+    /// Used for consistent SVG positioning calculations between headers and taskbars.
+    /// This prevents coordinate system drift during boundary expansions.
+    /// </summary>
+    protected DateTime CoordinateSystemStart { get; private set; }
+
     protected double DayWidth { get; set; }
     protected int HeaderMonthHeight { get; set; }
     protected int HeaderDayHeight { get; set; }
@@ -60,6 +68,11 @@ public abstract class BaseTimelineRenderer
 
         StartDate = startDate;
         EndDate = endDate;
+
+        // CRITICAL FIX: Lock in the coordinate system reference to prevent drift
+        // This ensures headers and taskbars use the same pixel-to-date conversion
+        CoordinateSystemStart = startDate;
+
         HeaderMonthHeight = headerMonthHeight;
         HeaderDayHeight = headerDayHeight;
         ZoomLevel = zoomLevel;

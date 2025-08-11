@@ -117,7 +117,7 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
             var weekEnd = weekBounds.end;
 
             // CRITICAL FIX: Calculate proper X position using date-to-pixel conversion
-            var xPosition = SVGRenderingHelpers.DayToSVGX(weekStart, start, DayWidth);
+            var xPosition = SVGRenderingHelpers.DayToSVGX(weekStart, CoordinateSystemStart, DayWidth);
 
             // Calculate week width (7 days * 50px = 350px)
             var weekDays = (weekEnd - weekStart).Days + 1;
@@ -151,7 +151,7 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
         while (currentDate <= end)
         {
             // CRITICAL FIX: Calculate proper X position using date-to-pixel conversion
-            var xPosition = SVGRenderingHelpers.DayToSVGX(currentDate, start, DayWidth);
+            var xPosition = SVGRenderingHelpers.DayToSVGX(currentDate, CoordinateSystemStart, DayWidth);
 
             // Day display: "Mon 17", "Tue 18", etc.
             var dayText = $"{currentDate:ddd} {currentDate.Day}";

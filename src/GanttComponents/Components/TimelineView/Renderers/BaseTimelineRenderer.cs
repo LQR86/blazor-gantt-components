@@ -172,7 +172,13 @@ public abstract class BaseTimelineRenderer
     /// <returns>SVG rect element</returns>
     protected string CreateSVGRect(double x, double y, double width, double height, string cssClass)
     {
-        return $@"<rect x=""{x}"" y=""{y}"" width=""{width}"" height=""{height}"" class=""{cssClass}"" />";
+        // Add inline styles as fallback for when CSS fails to load
+        var inlineStyle = cssClass.Contains("primary") || cssClass.Contains("year") || cssClass.Contains("quarter")
+            ? "fill: #f8f9fa; stroke: #dee2e6; stroke-width: 1;"
+            : "fill: #ffffff; stroke: #dee2e6; stroke-width: 1;";
+
+        return $@"<rect x=""{x}"" y=""{y}"" width=""{width}"" height=""{height}"" 
+                       class=""{cssClass}"" style=""{inlineStyle}"" />";
     }
 
     /// <summary>
@@ -185,7 +191,16 @@ public abstract class BaseTimelineRenderer
     /// <returns>SVG text element</returns>
     protected string CreateSVGText(double x, double y, string text, string cssClass)
     {
-        return $@"<text x=""{x}"" y=""{y}"" class=""{cssClass}"" text-anchor=""middle"" dominant-baseline=""middle"">{text}</text>";
+        // Add inline styles as fallback for when CSS fails to load
+        var fontSize = cssClass.Contains("primary") || cssClass.Contains("year") || cssClass.Contains("quarter")
+            ? "12px" : "10px";
+        var fontWeight = cssClass.Contains("primary") || cssClass.Contains("year") || cssClass.Contains("quarter")
+            ? "600" : "500";
+        var inlineStyle = $"fill: #333333; font-family: 'Segoe UI', Arial, sans-serif; font-size: {fontSize}; font-weight: {fontWeight};";
+
+        return $@"<text x=""{x}"" y=""{y}"" class=""{cssClass}"" 
+                       text-anchor=""middle"" dominant-baseline=""middle""
+                       style=""{inlineStyle}"">{System.Net.WebUtility.HtmlEncode(text)}</text>";
     }
 
     /// <summary>

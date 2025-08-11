@@ -29,7 +29,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     [Parameter] public EventCallback<int?> OnTaskHovered { get; set; }
     [Parameter] public int? HoveredTaskId { get; set; }
     [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px;
-    [Parameter] public double ZoomFactor { get; set; } = 1.6;
+    [Parameter] public double ZoomFactor { get; set; } = 1.0;  // ABC composition uses fixed 1.0 factor
     [Parameter] public EventCallback<TimelineZoomLevel> OnZoomLevelChanged { get; set; }
     [Parameter] public EventCallback<double> OnZoomFactorChanged { get; set; }
 
@@ -118,8 +118,23 @@ public partial class TimelineView : ComponentBase, IDisposable
                 ZoomFactor
             );
 
+            if (currentRenderer == null)
+            {
+                Logger.LogError($"RendererFactory returned null for zoom level {ZoomLevel}");
+                return "<!-- Renderer creation failed -->";
+            }
+
             Logger.LogDebugInfo($"Using composition renderer: {currentRenderer.GetType().Name}");
-            return currentRenderer.RenderHeaders();
+            var headerResult = currentRenderer.RenderHeaders();
+
+            // Defensive programming: ensure we never return null
+            if (string.IsNullOrEmpty(headerResult))
+            {
+                Logger.LogWarning($"Renderer {currentRenderer.GetType().Name} returned null/empty headers");
+                return "<!-- No headers rendered -->";
+            }
+
+            return headerResult;
         }
         catch (Exception ex)
         {
@@ -199,8 +214,10 @@ public partial class TimelineView : ComponentBase, IDisposable
         Logger.LogDebugInfo($"Simple timeline range: {StartDate:yyyy-MM-dd} to {EndDate:yyyy-MM-dd}");
 
         var totalDays = (EndDate - StartDate).Days + 1;
-        TotalWidth = (int)(totalDays * EffectiveDayWidth);
-        TotalHeight = Tasks.Count * RowHeight;
+        TotalWidth = Math.Max(100, (int)(totalDays * EffectiveDayWidth)); // Minimum 100px width
+        TotalHeight = Math.Max(50, Tasks.Count * RowHeight); // Minimum 50px height
+
+        Logger.LogDebugInfo($"Timeline dimensions: {TotalWidth}x{TotalHeight} (days: {totalDays}, dayWidth: {EffectiveDayWidth:F2})");
     }
 
     private double DayToPixel(DateTime date)

@@ -218,10 +218,16 @@ public partial class TimelineView : ComponentBase, IDisposable
         var expandedBounds = GetExpandedTimelineBounds();
         var expandedDays = (expandedBounds.end - expandedBounds.start).Days + 1;
 
+        // CRITICAL FIX: Use expanded boundaries as the unified coordinate system reference
+        // This ensures headers and taskbars use the same coordinate system
+        StartDate = expandedBounds.start;
+        EndDate = expandedBounds.end;
+
         TotalWidth = Math.Max(100, (int)(expandedDays * EffectiveDayWidth)); // Minimum 100px width
         TotalHeight = Math.Max(50, Tasks.Count * RowHeight); // Minimum 50px height
 
         Logger.LogDebugInfo($"Timeline dimensions: {TotalWidth}x{TotalHeight} (expanded days: {expandedDays}, dayWidth: {EffectiveDayWidth:F2})");
+        Logger.LogDebugInfo($"Coordinate system unified: {StartDate:yyyy-MM-dd} to {EndDate:yyyy-MM-dd}");
     }
 
     /// <summary>

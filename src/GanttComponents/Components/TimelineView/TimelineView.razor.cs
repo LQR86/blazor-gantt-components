@@ -39,6 +39,9 @@ public partial class TimelineView : ComponentBase, IDisposable
     private const int TaskBarHeight = 20;
     private const int TaskBarMargin = 6;
 
+    // === COMPONENT ID ===
+    private string ComponentId { get; set; } = Guid.NewGuid().ToString("N")[..8];
+
     // === COMPOSITION ARCHITECTURE ===
     /// <summary>
     /// Current renderer instance for composition architecture.
@@ -182,13 +185,18 @@ public partial class TimelineView : ComponentBase, IDisposable
         {
             try
             {
+                // Initialize viewport width
                 ViewportWidth = await JSRuntime.InvokeAsync<double>("eval",
                     "document.querySelector('.timeline-scroll-container')?.clientWidth || 1000");
+
+                // Initialize immediate scroll synchronization to eliminate header "tear apart"
+                await JSRuntime.InvokeVoidAsync("timelineView.initializeScrollSync", $"timeline-{ComponentId}");
+
                 StateHasChanged();
             }
             catch (Exception ex)
             {
-                Logger.LogError($"Error initializing viewport width: {ex.Message}");
+                Logger.LogError($"Error initializing timeline view: {ex.Message}");
                 ViewportWidth = 1000;
             }
         }
@@ -342,38 +350,6 @@ public partial class TimelineView : ComponentBase, IDisposable
         }
     }
 
-    private async Task OnScrollAsync(EventArgs e)
-    {
-        try
-        {
-            // Update viewport data
-            ViewportScrollLeft = await JSRuntime.InvokeAsync<double>("eval",
-                "document.querySelector('.timeline-scroll-container').scrollLeft");
-            ViewportWidth = await JSRuntime.InvokeAsync<double>("eval",
-                "document.querySelector('.timeline-scroll-container').clientWidth");
-
-            // Sync header horizontal scroll with body scroll
-            await JSRuntime.InvokeVoidAsync("eval", $@"
-                const headerContainer = document.querySelector('.timeline-header-container');
-                const bodyContainer = document.querySelector('.timeline-scroll-container');
-                if (headerContainer && bodyContainer) {{
-                    headerContainer.scrollLeft = bodyContainer.scrollLeft;
-                }}
-            ");
-
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError($"Error synchronizing header scroll: {ex.Message}");
-        }
-
-        if (OnScrollChanged.HasDelegate)
-        {
-            await OnScrollChanged.InvokeAsync(e);
-        }
-    }
-
     private void OnLanguageChanged()
     {
         try
@@ -382,6 +358,42 @@ public partial class TimelineView : ComponentBase, IDisposable
         }
         catch (ObjectDisposedException) { }
         catch (InvalidOperationException) { }
+    }
+
+    // === VIEWPORT MANAGEMENT ===
+    /// <summary>
+    /// Updates viewport information from JavaScript (called when needed).
+    /// JavaScript handles immediate scroll sync, this method updates Blazor state.
+    /// </summary>
+    [JSInvokable]
+    public async Task UpdateViewportFromJS(ViewportData viewport)
+    {
+        try
+        {
+            ViewportScrollLeft = viewport.ScrollLeft;
+            ViewportWidth = viewport.ClientWidth;
+            StateHasChanged();
+
+            // Notify parent component of scroll change if needed
+            if (OnScrollChanged.HasDelegate)
+            {
+                await OnScrollChanged.InvokeAsync(EventArgs.Empty);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error updating viewport from JavaScript: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Data structure for viewport information from JavaScript
+    /// </summary>
+    public class ViewportData
+    {
+        public double ScrollLeft { get; set; }
+        public double ClientWidth { get; set; }
+        public double ScrollWidth { get; set; }
     }
 
     // === ZOOM CONTROL METHODS ===

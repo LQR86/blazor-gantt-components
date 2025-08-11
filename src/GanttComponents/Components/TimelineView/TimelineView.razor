@@ -4,7 +4,7 @@
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components
 
-<div class="timeline-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
+<div id="timeline-@ComponentId" class="timeline-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
     
     @* Fixed Header SVG - Stays at top *@
     <div class="timeline-header-container">
@@ -20,7 +20,7 @@
     </div>
 
     @* Scrollable Content SVG *@
-    <div class="timeline-scroll-container" @onscroll="OnScrollAsync">
+    <div class="timeline-scroll-container">
         <svg class="timeline-body-svg" 
              viewBox="@SVGRenderingHelpers.GetBodyViewBox((int)TotalWidth, (int)TotalHeight)"
              width="@TotalWidth" 

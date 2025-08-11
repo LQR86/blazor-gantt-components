@@ -109,13 +109,15 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
     {
         var svg = new System.Text.StringBuilder();
         var currentDate = start;
-        double xPosition = 0;
 
         while (currentDate <= end)
         {
             var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(currentDate, currentDate);
             var weekStart = weekBounds.start;
             var weekEnd = weekBounds.end;
+
+            // CRITICAL FIX: Calculate proper X position using date-to-pixel conversion
+            var xPosition = SVGRenderingHelpers.DayToSVGX(weekStart, start, DayWidth);
 
             // Calculate week width (7 days * 50px = 350px)
             var weekDays = (weekEnd - weekStart).Days + 1;
@@ -128,7 +130,7 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
             svg.Append(CreateSVGRect(xPosition, 0, weekWidth, HeaderMonthHeight, GetCSSClass() + "-cell-primary"));
             svg.Append(CreateSVGText(xPosition + weekWidth / 2, HeaderMonthHeight / 2, weekText, GetCSSClass() + "-primary-text"));
 
-            xPosition += weekWidth;
+            // Move to next week
             currentDate = weekEnd.AddDays(1);
         }
 
@@ -145,10 +147,12 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
     {
         var svg = new System.Text.StringBuilder();
         var currentDate = start;
-        double xPosition = 0;
 
         while (currentDate <= end)
         {
+            // CRITICAL FIX: Calculate proper X position using date-to-pixel conversion
+            var xPosition = SVGRenderingHelpers.DayToSVGX(currentDate, start, DayWidth);
+
             // Day display: "Mon 17", "Tue 18", etc.
             var dayText = $"{currentDate:ddd} {currentDate.Day}";
 
@@ -156,7 +160,7 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
             svg.Append(CreateSVGRect(xPosition, HeaderMonthHeight, DayWidth, HeaderDayHeight, GetCSSClass() + "-cell-secondary"));
             svg.Append(CreateSVGText(xPosition + DayWidth / 2, HeaderMonthHeight + HeaderDayHeight / 2, dayText, GetCSSClass() + "-secondary-text"));
 
-            xPosition += DayWidth;
+            // Move to next day
             currentDate = currentDate.AddDays(1);
         }
 

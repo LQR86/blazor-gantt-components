@@ -110,13 +110,15 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
     {
         var svg = new System.Text.StringBuilder();
         var currentDate = start;
-        double xPosition = 0;
 
         while (currentDate <= end)
         {
             var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(currentDate, currentDate);
             var monthStart = monthBounds.start;
             var monthEnd = monthBounds.end;
+
+            // CRITICAL FIX: Calculate proper X position using date-to-pixel conversion
+            var xPosition = SVGRenderingHelpers.DayToSVGX(monthStart, start, DayWidth);
 
             // Calculate month width in pixels
             var monthDays = (monthEnd - monthStart).Days + 1;
@@ -129,7 +131,7 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
             svg.Append(CreateSVGRect(xPosition, 0, monthWidth, HeaderMonthHeight, GetCSSClass() + "-cell-primary"));
             svg.Append(CreateSVGText(xPosition + monthWidth / 2, HeaderMonthHeight / 2, monthText, GetCSSClass() + "-primary-text"));
 
-            xPosition += monthWidth;
+            // Move to next month
             currentDate = monthEnd.AddDays(1);
         }
 
@@ -147,12 +149,26 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
         var svg = new System.Text.StringBuilder();
         var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(start, end);
         var currentDate = weekBounds.start; // Start from Monday of first week
-        double xPosition = 0;
+
+        // DIAGNOSTIC: Log first few weeks for debugging
+        var weekCount = 0;
+        var tempDate = currentDate;
+        while (tempDate <= end && weekCount < 3)
+        {
+            var weekText = $"{tempDate.Month}/{tempDate.Day}";
+            Logger.LogDebugInfo($"Week header #{weekCount}: {tempDate:yyyy-MM-dd} ({tempDate.DayOfWeek}) -> '{weekText}'");
+            tempDate = tempDate.AddDays(7);
+            weekCount++;
+        }
 
         while (currentDate <= end)
         {
             var weekStart = currentDate;
             var weekEnd = currentDate.AddDays(6); // Sunday
+
+            // CRITICAL FIX: Calculate proper X position using date-to-pixel conversion
+            // This ensures weeks align correctly under their corresponding months
+            var xPosition = SVGRenderingHelpers.DayToSVGX(weekStart, start, DayWidth);
 
             // Calculate week width (7 days)
             var weekWidth = 7 * DayWidth;
@@ -164,7 +180,6 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
             svg.Append(CreateSVGRect(xPosition, HeaderMonthHeight, weekWidth, HeaderDayHeight, GetCSSClass() + "-cell-secondary"));
             svg.Append(CreateSVGText(xPosition + weekWidth / 2, HeaderMonthHeight + HeaderDayHeight / 2, weekText, GetCSSClass() + "-secondary-text"));
 
-            xPosition += weekWidth;
             currentDate = currentDate.AddDays(7); // Next Monday
         }
 

@@ -275,7 +275,15 @@ public partial class TimelineView : ComponentBase, IDisposable
     private double DayToPixel(DateTime date)
     {
         var days = (date.Date - StartDate).TotalDays;
-        return days * EffectiveDayWidth;
+        var pixelPosition = days * EffectiveDayWidth;
+
+        // Only log for task positioning issues - specifically Jan 1st task
+        if (date.Month == 1 && date.Day == 1 && date.Year == 2025)
+        {
+            Logger.LogDebugInfo($"Task positioning: Jan 1st 2025 -> {days} days from {StartDate:yyyy-MM-dd} = {pixelPosition}px");
+        }
+
+        return pixelPosition;
     }
 
     private double CalculateTaskWidth(GanttTask task)

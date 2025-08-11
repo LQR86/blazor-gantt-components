@@ -1,4 +1,5 @@
 using System;
+using GanttComponents.Utilities;
 
 namespace GanttComponents.Components.TimelineView.Renderers
 {
@@ -32,12 +33,7 @@ namespace GanttComponents.Components.TimelineView.Renderers
         /// <returns>Monday of the week</returns>
         public static DateTime GetWeekStart(DateTime date)
         {
-            var current = date;
-            while (current.DayOfWeek != DayOfWeek.Monday)
-            {
-                current = current.AddDays(-1);
-            }
-            return current;
+            return TimelineDateHelper.GetWeekStart(date);
         }
 
         /// <summary>
@@ -74,7 +70,7 @@ namespace GanttComponents.Components.TimelineView.Renderers
         /// <returns>First day of the month</returns>
         public static DateTime GetMonthStart(DateTime date)
         {
-            return new DateTime(date.Year, date.Month, 1);
+            return TimelineDateHelper.GetMonthStart(date);
         }
 
         /// <summary>
@@ -84,7 +80,7 @@ namespace GanttComponents.Components.TimelineView.Renderers
         /// <returns>Last day of the month</returns>
         public static DateTime GetMonthEnd(DateTime date)
         {
-            return new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month));
+            return TimelineDateHelper.GetMonthEnd(date);
         }
 
         // === QUARTER BOUNDARIES ===

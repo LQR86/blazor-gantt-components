@@ -197,7 +197,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     // === TIMELINE CALCULATIONS ===
     private void CalculateTimelineRange()
     {
-        // Simple timeline range based directly on task dates - no buffer complexity
+        // Step 1: Calculate base task date range
         if (!Tasks.Any())
         {
             // Default range for empty task list
@@ -211,13 +211,59 @@ public partial class TimelineView : ComponentBase, IDisposable
             EndDate = Tasks.Max(t => t.EndDate).Date;
         }
 
-        Logger.LogDebugInfo($"Simple timeline range: {StartDate:yyyy-MM-dd} to {EndDate:yyyy-MM-dd}");
+        Logger.LogDebugInfo($"Base timeline range: {StartDate:yyyy-MM-dd} to {EndDate:yyyy-MM-dd}");
 
-        var totalDays = (EndDate - StartDate).Days + 1;
-        TotalWidth = Math.Max(100, (int)(totalDays * EffectiveDayWidth)); // Minimum 100px width
+        // Step 2: Get expanded boundaries for SVG canvas sizing
+        // The headers need expanded boundaries to prevent truncation, so the SVG canvas must be wide enough
+        var expandedBounds = GetExpandedTimelineBounds();
+        var expandedDays = (expandedBounds.end - expandedBounds.start).Days + 1;
+
+        TotalWidth = Math.Max(100, (int)(expandedDays * EffectiveDayWidth)); // Minimum 100px width
         TotalHeight = Math.Max(50, Tasks.Count * RowHeight); // Minimum 50px height
 
-        Logger.LogDebugInfo($"Timeline dimensions: {TotalWidth}x{TotalHeight} (days: {totalDays}, dayWidth: {EffectiveDayWidth:F2})");
+        Logger.LogDebugInfo($"Timeline dimensions: {TotalWidth}x{TotalHeight} (expanded days: {expandedDays}, dayWidth: {EffectiveDayWidth:F2})");
+    }
+
+    /// <summary>
+    /// Gets the expanded timeline boundaries that the renderers will use for header rendering.
+    /// This ensures the SVG canvas is wide enough to contain the expanded headers.
+    /// </summary>
+    /// <returns>Expanded start and end dates for timeline rendering</returns>
+    private (DateTime start, DateTime end) GetExpandedTimelineBounds()
+    {
+        try
+        {
+            // Create a temporary renderer to get the expanded boundaries
+            var tempRenderer = RendererFactory.CreateRenderer(
+                ZoomLevel,
+                Logger,
+                I18N,
+                DateFormatter,
+                StartDate,
+                EndDate,
+                DayWidth,
+                HeaderMonthHeight,
+                HeaderDayHeight,
+                ZoomFactor
+            );
+
+            if (tempRenderer == null)
+            {
+                Logger.LogWarning($"Could not create renderer for boundary calculation, using original dates");
+                return (StartDate, EndDate);
+            }
+
+            // Get the expanded boundaries from the renderer
+            var expandedBounds = tempRenderer.CalculateHeaderBoundaries();
+            Logger.LogDebugInfo($"Expanded boundaries: {expandedBounds.expandedStart} to {expandedBounds.expandedEnd}");
+
+            return (expandedBounds.expandedStart, expandedBounds.expandedEnd);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error calculating expanded timeline bounds: {ex.Message}");
+            return (StartDate, EndDate);
+        }
     }
 
     private double DayToPixel(DateTime date)

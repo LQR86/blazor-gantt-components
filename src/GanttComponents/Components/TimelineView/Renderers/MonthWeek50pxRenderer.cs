@@ -145,7 +145,7 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
     private string RenderWeekHeader(DateTime start, DateTime end)
     {
         var svg = new System.Text.StringBuilder();
-        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(start, start);
+        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(start, end);
         var currentDate = weekBounds.start; // Start from Monday of first week
         double xPosition = 0;
 

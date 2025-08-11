@@ -36,7 +36,7 @@ public class ABCDualBoundaryTests
         // ARRANGE: Timeline spanning partial weeks (Aug 15-20, 2025)
         var startDate = new DateTime(2025, 8, 15); // Friday
         var endDate = new DateTime(2025, 8, 20);   // Wednesday
-        
+
         var renderer = new WeekDay50pxRenderer(
             _mockLogger, _mockI18N, _dateFormatter,
             startDate, endDate, 50, 30, TimelineZoomLevel.WeekDayOptimal50px, 1.0);
@@ -103,7 +103,7 @@ public class ABCDualBoundaryTests
     {
         // ARRANGE: Get CalculateHeaderBoundaries method from BaseTimelineRenderer
         var baseType = typeof(BaseTimelineRenderer);
-        var method = baseType.GetMethod("CalculateHeaderBoundaries", 
+        var method = baseType.GetMethod("CalculateHeaderBoundaries",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
         // ASSERT: Method should exist but not be virtual (cannot be overridden)
@@ -148,23 +148,23 @@ public class ABCDualBoundaryTests
         // ARRANGE: Large timeline spanning multiple months
         var startDate = new DateTime(2025, 1, 1);
         var endDate = new DateTime(2025, 12, 31);
-        
+
         var renderer = new WeekDay50pxRenderer(
             _mockLogger, _mockI18N, _dateFormatter,
             startDate, endDate, 50, 30, TimelineZoomLevel.WeekDayOptimal50px, 1.0);
 
         // ACT & ASSERT: Multiple boundary calculations should be fast
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        
+
         for (int i = 0; i < 1000; i++)
         {
             var bounds = InvokeProtectedMethod<(DateTime, DateTime)>(renderer, "CalculateHeaderBoundaries");
         }
-        
+
         stopwatch.Stop();
-        
+
         // Should complete 1000 calculations in under 100ms
-        Assert.True(stopwatch.ElapsedMilliseconds < 100, 
+        Assert.True(stopwatch.ElapsedMilliseconds < 100,
             $"ABC dual boundary calculation too slow: {stopwatch.ElapsedMilliseconds}ms for 1000 operations");
     }
 
@@ -176,7 +176,7 @@ public class ABCDualBoundaryTests
     {
         // ARRANGE: Single day timeline
         var singleDate = new DateTime(2025, 8, 15); // Friday
-        
+
         var renderer = new WeekDay50pxRenderer(
             _mockLogger, _mockI18N, _dateFormatter,
             singleDate, singleDate, 50, 30, TimelineZoomLevel.WeekDayOptimal50px, 1.0);
@@ -187,7 +187,7 @@ public class ABCDualBoundaryTests
         // ASSERT: Should expand to complete week
         var expectedWeekStart = new DateTime(2025, 8, 11); // Monday
         var expectedWeekEnd = new DateTime(2025, 8, 17);   // Sunday
-        
+
         Assert.Equal(expectedWeekStart, unionBounds.Item1);
         Assert.Equal(expectedWeekEnd, unionBounds.Item2);
     }
@@ -199,15 +199,15 @@ public class ABCDualBoundaryTests
     /// </summary>
     private T InvokeProtectedMethod<T>(object obj, string methodName, params object[] parameters)
     {
-        var method = obj.GetType().GetMethod(methodName, 
+        var method = obj.GetType().GetMethod(methodName,
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         if (method == null)
             throw new InvalidOperationException($"Method {methodName} not found on {obj.GetType().Name}");
-        
+
         var result = method.Invoke(obj, parameters);
         if (result == null)
             throw new InvalidOperationException($"Method {methodName} returned null");
-            
+
         return (T)result;
     }
 }
@@ -257,11 +257,11 @@ public class MockDualBoundaryRenderer : BaseTimelineRenderer
     }
 
     protected override string RenderPrimaryHeader() => "<g>Mock Primary</g>";
-    
+
     protected override string RenderSecondaryHeader() => "<g>Mock Secondary</g>";
-    
+
     protected override string GetRendererDescription() => "Mock Dual Boundary Renderer";
-    
+
     protected override string GetCSSClass() => "mock-renderer";
 }
 
@@ -299,7 +299,7 @@ public class MockGanttI18N : IGanttI18N
     public void SetCulture(string culture) { }
     public IEnumerable<string> GetAvailableCultures() => new[] { "en-US", "zh-CN" };
     public bool HasTranslation(string key) => !string.IsNullOrEmpty(key);
-    
+
 #pragma warning disable CS0067 // Event is never used - this is a mock for testing
     public event Action? LanguageChanged;
 #pragma warning restore CS0067

@@ -255,9 +255,9 @@ namespace GanttComponents.Tests.Unit.Components.TimelineView
             var endDate = new DateTime(2025, 8, 15);
 
             // Act & Assert
-            var exception = Assert.Throws<ArgumentException>(() => 
+            var exception = Assert.Throws<ArgumentException>(() =>
                 BoundaryCalculationHelpers.ValidateDateRange(startDate, endDate));
-            
+
             Assert.Contains("Start date", exception.Message);
             Assert.Contains("cannot be after end date", exception.Message);
         }

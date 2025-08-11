@@ -33,13 +33,13 @@ public class ABCFutureProofingTests
         // Primary: Semester boundaries (Jan 1 - Aug 31, 2025)
         // Secondary: Month boundaries (Mar 1 - Aug 31, 2025)  
         // Union: Should be widest span (Jan 1 - Aug 31, 2025)
-        
+
         Assert.Equal(new DateTime(2025, 1, 1), primaryBounds.start);   // Semester start
         Assert.Equal(new DateTime(2025, 8, 31), primaryBounds.end);    // Semester end
-        
+
         Assert.Equal(new DateTime(2025, 3, 1), secondaryBounds.start); // Month start
         Assert.Equal(new DateTime(2025, 8, 31), secondaryBounds.end);  // Month end
-        
+
         // Union automatically takes widest span
         Assert.Equal(new DateTime(2025, 1, 1), unionBounds.start);     // Semester wins (earlier)
         Assert.Equal(new DateTime(2025, 8, 31), unionBounds.end);      // Same end date
@@ -62,7 +62,7 @@ public class ABCFutureProofingTests
 
         // ACT & ASSERT: WeekDay pattern should work consistently
         var weekDayRenderer = new TestableWeekDayRenderer(startDate, endDate);
-        
+
         var primaryBounds = weekDayRenderer.TestGetPrimaryBoundaries();
         var secondaryBounds = weekDayRenderer.TestGetSecondaryBoundaries();
         var unionBounds = weekDayRenderer.TestGetUnionBoundaries();
@@ -72,7 +72,7 @@ public class ABCFutureProofingTests
         Assert.Equal(primaryBounds.end, secondaryBounds.end);
         Assert.Equal(primaryBounds.start, unionBounds.start);
         Assert.Equal(primaryBounds.end, unionBounds.end);
-        
+
         // Boundaries should align with Monday-Sunday weeks
         Assert.Equal(DayOfWeek.Monday, unionBounds.start.DayOfWeek);
         Assert.Equal(DayOfWeek.Sunday, unionBounds.end.DayOfWeek);
@@ -120,10 +120,10 @@ public class FutureSemesterMonthRenderer
         // Simulate base class union calculation
         var primary = TestGetPrimaryBoundaries();
         var secondary = TestGetSecondaryBoundaries();
-        
+
         var unionStart = primary.start < secondary.start ? primary.start : secondary.start;
         var unionEnd = primary.end > secondary.end ? primary.end : secondary.end;
-        
+
         return (unionStart, unionEnd);
     }
 }
@@ -157,10 +157,10 @@ public class TestableWeekDayRenderer
     {
         var primary = TestGetPrimaryBoundaries();
         var secondary = TestGetSecondaryBoundaries();
-        
+
         var unionStart = primary.start < secondary.start ? primary.start : secondary.start;
         var unionEnd = primary.end > secondary.end ? primary.end : secondary.end;
-        
+
         return (unionStart, unionEnd);
     }
 }

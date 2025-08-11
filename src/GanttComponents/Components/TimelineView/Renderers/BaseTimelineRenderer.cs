@@ -87,7 +87,7 @@ public abstract class BaseTimelineRenderer
             var originalEnd = EndDate;
             var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
 
-            // Apply expanded boundaries
+            // Apply expanded boundaries temporarily
             StartDate = expandedStart;
             EndDate = expandedEnd;
 
@@ -96,7 +96,11 @@ public abstract class BaseTimelineRenderer
             // Render headers with expanded range
             var result = RenderHeadersInternal();
 
-            Logger.LogDebugInfo($"Header rendering completed for {GetRendererDescription()}");
+            // CRITICAL FIX: Restore original dates after rendering
+            StartDate = originalStart;
+            EndDate = originalEnd;
+
+            Logger.LogDebugInfo($"Header rendering completed for {GetRendererDescription()}, original dates restored");
             return result;
         }
         catch (Exception ex)
@@ -139,7 +143,7 @@ public abstract class BaseTimelineRenderer
     /// as final. Future renderers must implement the abstract boundary calculation methods instead.
     /// </summary>
     /// <returns>Union of primary and secondary boundaries for complete header rendering</returns>
-    protected (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
+    public (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
     {
         try
         {
@@ -163,7 +167,7 @@ public abstract class BaseTimelineRenderer
         catch (Exception ex)
         {
             Logger.LogError($"Error in automatic dual boundary calculation for {GetRendererDescription()}: {ex.Message}");
-            
+
             // FALLBACK: Use original date range if boundary calculation fails
             return (StartDate, EndDate);
         }

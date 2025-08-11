@@ -18,29 +18,11 @@ namespace GanttComponents.Services
         {
             return zoomLevel switch
             {
-                // Year→Quarter pattern levels (optimal cell density)
-                TimelineZoomLevel.YearQuarterOptimal30px => i18n.T("ZoomLevel.YearQuarterOptimal30px"),
-                TimelineZoomLevel.YearQuarterOptimal40px => i18n.T("ZoomLevel.YearQuarterOptimal40px"),
-                TimelineZoomLevel.YearQuarterOptimal50px => i18n.T("ZoomLevel.YearQuarterOptimal50px"),
+                // ABC Composition Architecture - Implemented Levels Only
                 TimelineZoomLevel.YearQuarterOptimal70px => i18n.T("ZoomLevel.YearQuarterOptimal70px"),
-
-                // Quarter→Month pattern levels (optimal cell density)
-                TimelineZoomLevel.QuarterMonthOptimal30px => i18n.T("ZoomLevel.QuarterMonthOptimal30px"),
-                TimelineZoomLevel.QuarterMonthOptimal40px => i18n.T("ZoomLevel.QuarterMonthOptimal40px"),
-                TimelineZoomLevel.QuarterMonthOptimal50px => i18n.T("ZoomLevel.QuarterMonthOptimal50px"),
                 TimelineZoomLevel.QuarterMonthOptimal60px => i18n.T("ZoomLevel.QuarterMonthOptimal60px"),
-
-                // Month→Week pattern levels (optimal cell density)
-                TimelineZoomLevel.MonthWeekOptimal30px => i18n.T("ZoomLevel.MonthWeekOptimal30px"),
-                TimelineZoomLevel.MonthWeekOptimal40px => i18n.T("ZoomLevel.MonthWeekOptimal40px"),
                 TimelineZoomLevel.MonthWeekOptimal50px => i18n.T("ZoomLevel.MonthWeekOptimal50px"),
-                TimelineZoomLevel.MonthWeekOptimal60px => i18n.T("ZoomLevel.MonthWeekOptimal60px"),
-
-                // Week→Day pattern levels (optimal cell density)
-                TimelineZoomLevel.WeekDayOptimal30px => i18n.T("ZoomLevel.WeekDayOptimal30px"),
-                TimelineZoomLevel.WeekDayOptimal40px => i18n.T("ZoomLevel.WeekDayOptimal40px"),
                 TimelineZoomLevel.WeekDayOptimal50px => i18n.T("ZoomLevel.WeekDayOptimal50px"),
-                TimelineZoomLevel.WeekDayOptimal60px => i18n.T("ZoomLevel.WeekDayOptimal60px"),
 
                 _ => zoomLevel.ToString()
             };
@@ -56,29 +38,11 @@ namespace GanttComponents.Services
         {
             return zoomLevel switch
             {
-                // Year→Quarter pattern levels (optimal cell density)
-                TimelineZoomLevel.YearQuarterOptimal30px => i18n.T("ZoomLevel.YearQuarterOptimal30px.Description"),
-                TimelineZoomLevel.YearQuarterOptimal40px => i18n.T("ZoomLevel.YearQuarterOptimal40px.Description"),
-                TimelineZoomLevel.YearQuarterOptimal50px => i18n.T("ZoomLevel.YearQuarterOptimal50px.Description"),
+                // ABC Composition Architecture - Implemented Levels Only
                 TimelineZoomLevel.YearQuarterOptimal70px => i18n.T("ZoomLevel.YearQuarterOptimal70px.Description"),
-
-                // Quarter→Month pattern levels (optimal cell density)
-                TimelineZoomLevel.QuarterMonthOptimal30px => i18n.T("ZoomLevel.QuarterMonthOptimal30px.Description"),
-                TimelineZoomLevel.QuarterMonthOptimal40px => i18n.T("ZoomLevel.QuarterMonthOptimal40px.Description"),
-                TimelineZoomLevel.QuarterMonthOptimal50px => i18n.T("ZoomLevel.QuarterMonthOptimal50px.Description"),
                 TimelineZoomLevel.QuarterMonthOptimal60px => i18n.T("ZoomLevel.QuarterMonthOptimal60px.Description"),
-
-                // Month→Week pattern levels (optimal cell density)
-                TimelineZoomLevel.MonthWeekOptimal30px => i18n.T("ZoomLevel.MonthWeekOptimal30px.Description"),
-                TimelineZoomLevel.MonthWeekOptimal40px => i18n.T("ZoomLevel.MonthWeekOptimal40px.Description"),
                 TimelineZoomLevel.MonthWeekOptimal50px => i18n.T("ZoomLevel.MonthWeekOptimal50px.Description"),
-                TimelineZoomLevel.MonthWeekOptimal60px => i18n.T("ZoomLevel.MonthWeekOptimal60px.Description"),
-
-                // Week→Day pattern levels (optimal cell density)
-                TimelineZoomLevel.WeekDayOptimal30px => i18n.T("ZoomLevel.WeekDayOptimal30px.Description"),
-                TimelineZoomLevel.WeekDayOptimal40px => i18n.T("ZoomLevel.WeekDayOptimal40px.Description"),
                 TimelineZoomLevel.WeekDayOptimal50px => i18n.T("ZoomLevel.WeekDayOptimal50px.Description"),
-                TimelineZoomLevel.WeekDayOptimal60px => i18n.T("ZoomLevel.WeekDayOptimal60px.Description"),
 
                 _ => string.Empty
             };

@@ -38,175 +38,30 @@ public static class RendererFactory
     {
         return zoomLevel switch
         {
-            // WeekDay Levels - using stub renderers temporarily
-            TimelineZoomLevel.WeekDayOptimal30px => new WeekDay30pxRendererStub(
-                logger, i18n, dateFormatter, startDate, endDate, dayWidth,
-                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
+            // ABC Composition - 4 Full Implementations Only
 
-            TimelineZoomLevel.WeekDayOptimal40px => new WeekDay40pxRendererStub(
-                logger, i18n, dateFormatter, startDate, endDate, dayWidth,
-                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
-
+            // WeekDay50px - ABC implementation (hardcoded 50px day width)
             TimelineZoomLevel.WeekDayOptimal50px => new WeekDay50pxRenderer(
-                logger, i18n, dateFormatter, startDate, endDate, dayWidth,
+                logger, i18n, dateFormatter, startDate, endDate,
                 headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
 
-            TimelineZoomLevel.WeekDayOptimal60px => new WeekDay60pxRendererStub(
-                logger, i18n, dateFormatter, startDate, endDate, dayWidth,
-                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
-
-            // MonthWeek Levels - using stub renderers temporarily
-            TimelineZoomLevel.MonthWeekOptimal30px => new MonthWeek30pxRendererStub(
-                logger, i18n, dateFormatter, startDate, endDate, dayWidth,
-                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
-
-            TimelineZoomLevel.MonthWeekOptimal40px => new MonthWeek40pxRendererStub(
-                logger, i18n, dateFormatter, startDate, endDate, dayWidth,
-                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
-
+            // MonthWeek50px - ABC implementation (takes dayWidth parameter)
             TimelineZoomLevel.MonthWeekOptimal50px => new MonthWeek50pxRenderer(
-                logger, i18n, dateFormatter, startDate, endDate, dayWidth,
+                logger, i18n, dateFormatter, startDate, endDate, 8.0,
                 headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
 
-            TimelineZoomLevel.MonthWeekOptimal60px => new MonthWeek60pxRendererStub(
-                logger, i18n, dateFormatter, startDate, endDate, dayWidth,
-                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
-
-            // QuarterMonth Levels - integral day width implementations
+            // QuarterMonth60px - ABC implementation (hardcoded 2.0px day width)
             TimelineZoomLevel.QuarterMonthOptimal60px => new QuarterMonth60pxRenderer(
                 logger, i18n, dateFormatter, startDate, endDate,
                 headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
 
-            // YearQuarter Levels - integral day width implementations  
+            // YearQuarter70px - ABC implementation (using 90px renderer with hardcoded 1.0px day width)
             TimelineZoomLevel.YearQuarterOptimal70px => new YearQuarter90pxRenderer(
                 logger, i18n, dateFormatter, startDate, endDate,
                 headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
 
             // Unsupported levels (future implementations)
-            _ => throw new InvalidOperationException($"Unsupported zoom level: {zoomLevel}. Only WeekDay and MonthWeek optimal levels are currently supported by the renderer factory.")
+            _ => throw new InvalidOperationException($"Unsupported zoom level: {zoomLevel}. Only ABC composition levels are currently supported by the renderer factory.")
         };
     }
-}
-
-// === TEMPORARY STUB RENDERERS ===
-// These are minimal implementations that will be replaced with full renderers in later commits
-
-/// <summary>Stub renderer for WeekDay 30px level - temporary implementation</summary>
-internal class WeekDay30pxRendererStub : BaseTimelineRenderer
-{
-    public WeekDay30pxRendererStub(IUniversalLogger logger, IGanttI18N i18n, DateFormatHelper dateFormatter,
-        DateTime startDate, DateTime endDate, double dayWidth, int headerMonthHeight, int headerDayHeight,
-        TimelineZoomLevel zoomLevel, double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
-
-    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
-    protected override string RenderPrimaryHeader() => "<!-- WeekDay 30px Primary Header - Stub -->";
-    protected override string RenderSecondaryHeader() => "<!-- WeekDay 30px Secondary Header - Stub -->";
-    protected override string GetRendererDescription() => "WeekDay 30px (Stub)";
-    protected override string GetCSSClass() => "weekday-30px";
-}
-
-/// <summary>Stub renderer for WeekDay 40px level - temporary implementation</summary>
-internal class WeekDay40pxRendererStub : BaseTimelineRenderer
-{
-    public WeekDay40pxRendererStub(IUniversalLogger logger, IGanttI18N i18n, DateFormatHelper dateFormatter,
-        DateTime startDate, DateTime endDate, double dayWidth, int headerMonthHeight, int headerDayHeight,
-        TimelineZoomLevel zoomLevel, double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
-
-    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
-    protected override string RenderPrimaryHeader() => "<!-- WeekDay 40px Primary Header - Stub -->";
-    protected override string RenderSecondaryHeader() => "<!-- WeekDay 40px Secondary Header - Stub -->";
-    protected override string GetRendererDescription() => "WeekDay 40px (Stub)";
-    protected override string GetCSSClass() => "weekday-40px";
-}
-
-/// <summary>Stub renderer for WeekDay 50px level - temporary implementation</summary>
-internal class WeekDay50pxRendererStub : BaseTimelineRenderer
-{
-    public WeekDay50pxRendererStub(IUniversalLogger logger, IGanttI18N i18n, DateFormatHelper dateFormatter,
-        DateTime startDate, DateTime endDate, double dayWidth, int headerMonthHeight, int headerDayHeight,
-        TimelineZoomLevel zoomLevel, double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
-
-    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
-    protected override string RenderPrimaryHeader() => "<!-- WeekDay 50px Primary Header - Stub -->";
-    protected override string RenderSecondaryHeader() => "<!-- WeekDay 50px Secondary Header - Stub -->";
-    protected override string GetRendererDescription() => "WeekDay 50px (Stub)";
-    protected override string GetCSSClass() => "weekday-50px";
-}
-
-/// <summary>Stub renderer for WeekDay 60px level - temporary implementation</summary>
-internal class WeekDay60pxRendererStub : BaseTimelineRenderer
-{
-    public WeekDay60pxRendererStub(IUniversalLogger logger, IGanttI18N i18n, DateFormatHelper dateFormatter,
-        DateTime startDate, DateTime endDate, double dayWidth, int headerMonthHeight, int headerDayHeight,
-        TimelineZoomLevel zoomLevel, double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
-
-    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
-    protected override string RenderPrimaryHeader() => "<!-- WeekDay 60px Primary Header - Stub -->";
-    protected override string RenderSecondaryHeader() => "<!-- WeekDay 60px Secondary Header - Stub -->";
-    protected override string GetRendererDescription() => "WeekDay 60px (Stub)";
-    protected override string GetCSSClass() => "weekday-60px";
-}
-
-/// <summary>Stub renderer for MonthWeek 30px level - temporary implementation</summary>
-internal class MonthWeek30pxRendererStub : BaseTimelineRenderer
-{
-    public MonthWeek30pxRendererStub(IUniversalLogger logger, IGanttI18N i18n, DateFormatHelper dateFormatter,
-        DateTime startDate, DateTime endDate, double dayWidth, int headerMonthHeight, int headerDayHeight,
-        TimelineZoomLevel zoomLevel, double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
-
-    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
-    protected override string RenderPrimaryHeader() => "<!-- MonthWeek 30px Primary Header - Stub -->";
-    protected override string RenderSecondaryHeader() => "<!-- MonthWeek 30px Secondary Header - Stub -->";
-    protected override string GetRendererDescription() => "MonthWeek 30px (Stub)";
-    protected override string GetCSSClass() => "monthweek-30px";
-}
-
-/// <summary>Stub renderer for MonthWeek 40px level - temporary implementation</summary>
-internal class MonthWeek40pxRendererStub : BaseTimelineRenderer
-{
-    public MonthWeek40pxRendererStub(IUniversalLogger logger, IGanttI18N i18n, DateFormatHelper dateFormatter,
-        DateTime startDate, DateTime endDate, double dayWidth, int headerMonthHeight, int headerDayHeight,
-        TimelineZoomLevel zoomLevel, double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
-
-    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
-    protected override string RenderPrimaryHeader() => "<!-- MonthWeek 40px Primary Header - Stub -->";
-    protected override string RenderSecondaryHeader() => "<!-- MonthWeek 40px Secondary Header - Stub -->";
-    protected override string GetRendererDescription() => "MonthWeek 40px (Stub)";
-    protected override string GetCSSClass() => "monthweek-40px";
-}
-
-/// <summary>Stub renderer for MonthWeek 50px level - temporary implementation</summary>
-internal class MonthWeek50pxRendererStub : BaseTimelineRenderer
-{
-    public MonthWeek50pxRendererStub(IUniversalLogger logger, IGanttI18N i18n, DateFormatHelper dateFormatter,
-        DateTime startDate, DateTime endDate, double dayWidth, int headerMonthHeight, int headerDayHeight,
-        TimelineZoomLevel zoomLevel, double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
-
-    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
-    protected override string RenderPrimaryHeader() => "<!-- MonthWeek 50px Primary Header - Stub -->";
-    protected override string RenderSecondaryHeader() => "<!-- MonthWeek 50px Secondary Header - Stub -->";
-    protected override string GetRendererDescription() => "MonthWeek 50px (Stub)";
-    protected override string GetCSSClass() => "monthweek-50px";
-}
-
-/// <summary>Stub renderer for MonthWeek 60px level - temporary implementation</summary>
-internal class MonthWeek60pxRendererStub : BaseTimelineRenderer
-{
-    public MonthWeek60pxRendererStub(IUniversalLogger logger, IGanttI18N i18n, DateFormatHelper dateFormatter,
-        DateTime startDate, DateTime endDate, double dayWidth, int headerMonthHeight, int headerDayHeight,
-        TimelineZoomLevel zoomLevel, double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
-
-    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
-    protected override string RenderPrimaryHeader() => "<!-- MonthWeek 60px Primary Header - Stub -->";
-    protected override string RenderSecondaryHeader() => "<!-- MonthWeek 60px Secondary Header - Stub -->";
-    protected override string GetRendererDescription() => "MonthWeek 60px (Stub)";
-    protected override string GetCSSClass() => "monthweek-60px";
 }

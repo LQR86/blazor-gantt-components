@@ -5,16 +5,18 @@ namespace GanttComponents.Components.TimelineView;
 
 /// <summary>
 /// MonthWeek 50px level renderer for TimelineView composition architecture.
-/// Handles zoom level: MonthWeekOptimal50px (level 30).
+/// Handles month-week pattern with calculated day width validation.
 /// Primary Header: Month-Year ("February 2025", "March 2025")
 /// Secondary Header: Week start dates ("2/17", "2/24", "3/3") - Monday dates
-/// Cell Width: 56px week cells (8px day width × 7 days/week)
+/// Cell Width: Calculated week cells based on day width (typically 8px day = 56px week)
+/// Optimized for medium-range planning with weekly breakdown by month.
 /// Includes union expansion for complete header rendering at timeline edges.
 /// </summary>
 public class MonthWeek50pxRenderer : BaseTimelineRenderer
 {
     /// <summary>
     /// Constructor for MonthWeek 50px renderer with dependency injection.
+    /// Uses calculated day width for flexible week cell sizing.
     /// Union expansion is handled automatically by the base class.
     /// </summary>
     public MonthWeek50pxRenderer(
@@ -31,21 +33,20 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
         : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
-        ValidateRenderer();
-        Logger.LogDebugInfo($"MonthWeek50pxRenderer initialized - Range: {startDate} to {endDate} (union expansion will be applied by base class)");
+        Logger.LogDebugInfo($"MonthWeek50pxRenderer initialized - StartDate: {startDate}, EndDate: {endDate}, DayWidth: {DayWidth}");
     }
 
     /// <summary>
     /// Calculates header boundaries with union expansion for complete month coverage.
-    /// Extends timeline range to ensure headers are not truncated at edges.
+    /// Extends timeline range to ensure month headers are not truncated at edges.
     /// MonthWeek pattern: Extend to month boundaries (first of month to last of month).
     /// </summary>
     /// <returns>Expanded start and end dates for complete header rendering</returns>
     protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
     {
-        // For MonthWeek pattern, extend to complete month boundaries
-        var expandedStart = SVGRenderingHelpers.GetMonthStart(StartDate);  // Find first day of month containing StartDate
-        var expandedEnd = SVGRenderingHelpers.GetMonthEnd(EndDate);        // Find last day of month containing EndDate
+        // Extend to month boundaries for complete header coverage
+        var expandedStart = GetMonthStart(StartDate);
+        var expandedEnd = GetMonthEnd(EndDate);
 
         Logger.LogDebugInfo($"MonthWeek50px union expansion - Original: {StartDate} to {EndDate}, Expanded: {expandedStart} to {expandedEnd}");
 
@@ -53,96 +54,33 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
     }
 
     /// <summary>
-    /// Renders the primary header with month-year displays for MonthWeek50px.
-    /// Shows month boundaries like "February 2025", "March 2025" for each month in the timeline.
+    /// Renders the primary header with month-year displays.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
-        var monthPeriods = GenerateMonthWeek50pxMonthPeriods();
-        var headerElements = new List<string>();
-
-        foreach (var period in monthPeriods)
-        {
-            // Create background rectangle for the month
-            var rect = SVGRenderingHelpers.CreateSVGRect(
-                period.XPosition,
-                0,
-                period.Width,
-                HeaderMonthHeight,
-                "svg-monthweek-50px-cell-primary"
-            );
-
-            // Create centered text label for the month-year
-            var textX = period.XPosition + (period.Width / 2);
-            var textY = HeaderMonthHeight / 2;
-            var textClass = SVGRenderingHelpers.GetHeaderTextClass(ZoomLevel, isPrimary: true);
-            var text = SVGRenderingHelpers.CreateSVGText(
-                textX,
-                textY,
-                period.Label,
-                textClass
-            );
-
-            headerElements.Add(rect);
-            headerElements.Add(text);
-        }
-
-        return $@"
-            <!-- Primary Header: Month-Year (MonthWeek50px) -->
-            <g class=""monthweek-50px-primary-header"">
-                {string.Join("\n                ", headerElements)}
-            </g>";
+        var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
+        return RenderMonthHeader(expandedStart, expandedEnd);
     }
 
     /// <summary>
-    /// Renders the secondary header with week start dates for MonthWeek50px.
-    /// Shows Monday dates for each week like "2/17", "2/24", "3/3".
+    /// Renders the secondary header with week start dates.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()
     {
-        var weekPeriods = GenerateMonthWeek50pxWeekPeriods();
-        var headerElements = new List<string>();
-
-        foreach (var period in weekPeriods)
-        {
-            // Create background rectangle for the week
-            var rect = SVGRenderingHelpers.CreateSVGRect(
-                period.XPosition,
-                HeaderMonthHeight,
-                period.Width,
-                HeaderDayHeight,
-                "svg-monthweek-50px-cell-secondary"
-            );
-
-            // Create centered text label for the week start date
-            var textX = period.XPosition + (period.Width / 2);
-            var textY = HeaderMonthHeight + (HeaderDayHeight / 2);
-            var textClass = SVGRenderingHelpers.GetHeaderTextClass(ZoomLevel, isPrimary: false);
-            var text = SVGRenderingHelpers.CreateSVGText(
-                textX,
-                textY,
-                period.Label,
-                textClass
-            );
-
-            headerElements.Add(rect);
-            headerElements.Add(text);
-        }
-
-        return $@"
-            <!-- Secondary Header: Week Start Dates (MonthWeek50px) -->
-            <g class=""monthweek-50px-secondary-header"">
-                {string.Join("\n                ", headerElements)}
-            </g>";
+        var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
+        return RenderWeekHeader(expandedStart, expandedEnd);
     }
 
     /// <summary>
     /// Gets a human-readable description of this renderer for logging and debugging.
     /// </summary>
     /// <returns>Renderer description</returns>
-    protected override string GetRendererDescription() => "MonthWeek 50px";
+    protected override string GetRendererDescription()
+    {
+        return "MonthWeek 50px level with month-year and week starts - ABC Composition";
+    }
 
     /// <summary>
     /// Gets the CSS class prefix for this renderer's styling.
@@ -150,138 +88,111 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
     /// <returns>CSS class prefix</returns>
     protected override string GetCSSClass() => "monthweek-50px";
 
-    // === PERIOD GENERATION METHODS ===
+    // === MONTH BOUNDARY UTILITIES ===
 
     /// <summary>
-    /// Generates month periods for MonthWeek50px timeline range.
-    /// Each period represents one month with start/end dates, width, and formatted label.
+    /// Gets the first day of the month containing the given date.
     /// </summary>
-    /// <returns>List of HeaderPeriod objects representing months</returns>
-    private List<HeaderPeriod> GenerateMonthWeek50pxMonthPeriods()
+    /// <param name="date">Date within the month</param>
+    /// <returns>First day of the month</returns>
+    private DateTime GetMonthStart(DateTime date)
     {
-        var periods = new List<HeaderPeriod>();
-
-        // Start from the first day of the month containing StartDate (already expanded to month boundary)
-        var current = new DateTime(StartDate.Year, StartDate.Month, 1);
-
-        // Generate month periods until we cover the entire expanded timeline
-        while (current <= EndDate)
-        {
-            var monthStart = current;
-            var monthEnd = current.AddMonths(1).AddDays(-1); // Last day of the month
-
-            // Calculate X position and width for this month
-            var xPosition = SVGRenderingHelpers.DayToSVGX(monthStart, StartDate, DayWidth);
-            var daysInMonth = (monthEnd - monthStart).Days + 1;
-            var width = daysInMonth * DayWidth;
-
-            var period = new HeaderPeriod
-            {
-                Start = monthStart,
-                End = monthEnd,
-                XPosition = xPosition,
-                Width = width,
-                Level = HeaderLevel.Primary,
-                Label = FormatMonthWeek50pxMonthYear(monthStart)
-            };
-
-            periods.Add(period);
-
-            // Move to first day of next month
-            current = current.AddMonths(1);
-        }
-
-        return periods;
+        return new DateTime(date.Year, date.Month, 1);
     }
 
     /// <summary>
-    /// Generates week periods for MonthWeek50px secondary header.
-    /// Each period represents one week starting on Monday.
+    /// Gets the last day of the month containing the given date.
     /// </summary>
-    /// <returns>List of HeaderPeriod objects representing weeks</returns>
-    private List<HeaderPeriod> GenerateMonthWeek50pxWeekPeriods()
+    /// <param name="date">Date within the month</param>
+    /// <returns>Last day of the month</returns>
+    private DateTime GetMonthEnd(DateTime date)
     {
-        var periods = new List<HeaderPeriod>();
+        return new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month));
+    }
 
-        // Find the Monday of the week containing StartDate
-        var current = StartDate;
+    /// <summary>
+    /// Gets the Monday of the week containing the given date.
+    /// </summary>
+    /// <param name="date">Date within the week</param>
+    /// <returns>Monday of the week</returns>
+    private DateTime GetWeekStart(DateTime date)
+    {
+        var current = date;
         while (current.DayOfWeek != DayOfWeek.Monday)
         {
             current = current.AddDays(-1);
         }
-
-        // Generate week periods until we cover the entire expanded timeline
-        while (current <= EndDate)
-        {
-            var weekStart = current;
-            var weekEnd = current.AddDays(6); // Sunday of the same week
-
-            // Calculate the visible portion of this week within our expanded timeline
-            var visibleStart = weekStart < StartDate ? StartDate : weekStart;
-            var visibleEnd = weekEnd > EndDate ? EndDate : weekEnd;
-
-            // Only add if there's a visible portion
-            if (visibleStart <= visibleEnd)
-            {
-                var period = new HeaderPeriod
-                {
-                    Start = visibleStart,
-                    End = visibleEnd,
-                    XPosition = SVGRenderingHelpers.DayToSVGX(visibleStart, StartDate, DayWidth),
-                    Width = (visibleEnd - visibleStart).Days * DayWidth + DayWidth, // +1 day for inclusive end
-                    Level = HeaderLevel.Secondary,
-                    Label = FormatMonthWeek50pxWeekStart(weekStart)
-                };
-
-                periods.Add(period);
-            }
-
-            // Move to next Monday
-            current = current.AddDays(7);
-        }
-
-        return periods;
+        return current;
     }
 
-    // === FORMATTING METHODS ===
+    // === HEADER RENDERING METHODS ===
 
     /// <summary>
-    /// Formats a month-year for MonthWeek50px level display.
-    /// Format for 56px week cells with full month names.
+    /// Renders the primary header with month-year displays.
     /// </summary>
-    /// <param name="date">The date to format</param>
-    /// <returns>Formatted month-year string</returns>
-    private string FormatMonthWeek50pxMonthYear(DateTime date)
+    /// <param name="start">Expanded start date</param>
+    /// <param name="end">Expanded end date</param>
+    /// <returns>SVG markup for month header</returns>
+    private string RenderMonthHeader(DateTime start, DateTime end)
     {
-        try
+        var svg = new System.Text.StringBuilder();
+        var currentDate = start;
+        double xPosition = 0;
+
+        while (currentDate <= end)
         {
-            // Full month name with year for 56px week cells
-            return $"{date:MMMM yyyy}";
+            var monthStart = GetMonthStart(currentDate);
+            var monthEnd = GetMonthEnd(currentDate);
+
+            // Calculate month width in pixels
+            var monthDays = (monthEnd - monthStart).Days + 1;
+            var monthWidth = monthDays * DayWidth;
+
+            // Month display: "February 2025"
+            var monthText = $"{monthStart:MMMM yyyy}";
+
+            // Render month header cell
+            svg.Append(CreateSVGRect(xPosition, 0, monthWidth, HeaderMonthHeight, GetCSSClass() + "-cell-primary"));
+            svg.Append(CreateSVGText(xPosition + monthWidth / 2, HeaderMonthHeight / 2, monthText, GetCSSClass() + "-primary-text"));
+
+            xPosition += monthWidth;
+            currentDate = monthEnd.AddDays(1);
         }
-        catch (Exception ex)
-        {
-            Logger.LogError($"Error formatting MonthWeek50px month-year for {date:yyyy-MM-dd}: {ex.Message}");
-            return $"{date:MMM yyyy}";
-        }
+
+        return svg.ToString();
     }
 
     /// <summary>
-    /// Formats a week start date for MonthWeek50px level secondary header.
-    /// Short format for week start dates (Monday dates).
+    /// Renders the secondary header with week start dates (Monday dates).
     /// </summary>
-    /// <param name="weekStart">The Monday of the week</param>
-    /// <returns>Formatted week start date string</returns>
-    private string FormatMonthWeek50pxWeekStart(DateTime weekStart)
+    /// <param name="start">Expanded start date</param>
+    /// <param name="end">Expanded end date</param>
+    /// <returns>SVG markup for week header</returns>
+    private string RenderWeekHeader(DateTime start, DateTime end)
     {
-        try
+        var svg = new System.Text.StringBuilder();
+        var currentDate = GetWeekStart(start); // Start from Monday of first week
+        double xPosition = 0;
+
+        while (currentDate <= end)
         {
-            // Short format for week starts: "2/17", "3/3" etc.
-            return $"{weekStart.Month}/{weekStart.Day}";
+            var weekStart = currentDate;
+            var weekEnd = currentDate.AddDays(6); // Sunday
+
+            // Calculate week width (7 days)
+            var weekWidth = 7 * DayWidth;
+
+            // Week display: "2/17" (Monday date)
+            var weekText = $"{weekStart.Month}/{weekStart.Day}";
+
+            // Render week header cell
+            svg.Append(CreateSVGRect(xPosition, HeaderMonthHeight, weekWidth, HeaderDayHeight, GetCSSClass() + "-cell-secondary"));
+            svg.Append(CreateSVGText(xPosition + weekWidth / 2, HeaderMonthHeight + HeaderDayHeight / 2, weekText, GetCSSClass() + "-secondary-text"));
+
+            xPosition += weekWidth;
+            currentDate = currentDate.AddDays(7); // Next Monday
         }
-        catch (Exception ex)
-        {
-            Logger.LogError($"Error formatting MonthWeek50px week start for {weekStart:yyyy-MM-dd}: {ex.Message}");
-            return weekStart.Day.ToString();
-        }
+
+        return svg.ToString();
     }
 }

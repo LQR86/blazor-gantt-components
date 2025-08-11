@@ -150,8 +150,8 @@
     
     // Zoom level filtering - for different use cases  
     [Parameter] public IReadOnlyList<TimelineZoomLevel>? VisibleZoomLevels { get; set; }
-    [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal30px;  // Include MonthWeek and WeekDay patterns
-    [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal60px;    // Include MonthWeek and WeekDay patterns
+    [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.YearQuarterOptimal70px;  // Start from strategic overview
+    [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal50px;    // End at detailed weekly planning
     
     // Preset-only approach: Manual zoom controls removed for v0.8.5
     // All zoom control is handled via preset level selection only
@@ -209,20 +209,20 @@
             return VisibleZoomLevels;
         }
         
-        // FOR COMMIT 3 TESTING: Show WeekDay and MonthWeek levels that are implemented
+        // ABC COMPOSITION ARCHITECTURE: Show only implemented levels
         var implementedLevels = new List<TimelineZoomLevel>
         {
-            // WeekDay pattern (Commit 2)
-            TimelineZoomLevel.WeekDayOptimal30px,
-            TimelineZoomLevel.WeekDayOptimal40px,
-            TimelineZoomLevel.WeekDayOptimal50px,
-            TimelineZoomLevel.WeekDayOptimal60px,
+            // Strategic Overview
+            TimelineZoomLevel.YearQuarterOptimal70px,    // Years → Quarters
             
-            // MonthWeek pattern (Commit 3)
-            TimelineZoomLevel.MonthWeekOptimal30px,
-            TimelineZoomLevel.MonthWeekOptimal40px,
-            TimelineZoomLevel.MonthWeekOptimal50px,
-            TimelineZoomLevel.MonthWeekOptimal60px
+            // Quarterly Planning  
+            TimelineZoomLevel.QuarterMonthOptimal60px,   // Quarters → Months
+            
+            // Monthly Planning
+            TimelineZoomLevel.MonthWeekOptimal50px,      // Months → Weeks
+            
+            // Weekly Planning
+            TimelineZoomLevel.WeekDayOptimal50px,        // Weeks → Days
         };
         
         // Apply min/max range filtering if needed

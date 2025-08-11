@@ -5,18 +5,19 @@ namespace GanttComponents.Components.TimelineView;
 
 /// <summary>
 /// WeekDay 50px level renderer for TimelineView composition architecture.
-/// Handles zoom level: WeekDayOptimal50px (level 34).
+/// Handles week-day pattern with integral day width validation.
 /// Primary Header: Week ranges ("February 17-23, 2025")
 /// Secondary Header: Day names with numbers ("Mon 17", "Tue 18")
-/// Cell Width: 50px day cells = 350px week cells (50px × 7 days)
-/// Optimized for luxury wide timeline viewing with maximum information.
+/// Cell Width: 50px day cells with 50px integral day width
+/// Optimized for detailed weekly planning with daily breakdown.
 /// Includes union expansion for complete header rendering at timeline edges.
 /// </summary>
 public class WeekDay50pxRenderer : BaseTimelineRenderer
 {
     /// <summary>
     /// Constructor for WeekDay 50px renderer with dependency injection.
-    /// Union expansion is now handled automatically by the base class.
+    /// Uses integral 50px day width for perfect SVG coordinate calculations.
+    /// Union expansion is handled automatically by the base class.
     /// </summary>
     public WeekDay50pxRenderer(
         IUniversalLogger logger,
@@ -24,29 +25,28 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
-        double dayWidth,
         int headerMonthHeight,
         int headerDayHeight,
         TimelineZoomLevel zoomLevel,
         double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
+        : base(logger, i18n, dateFormatter, startDate, endDate,
+               50.0, // INTEGRAL DAY WIDTH: 50px day width = 350px week cells (50px × 7 days)
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
-        ValidateRenderer();
-        Logger.LogDebugInfo($"WeekDay50pxRenderer initialized - Range: {startDate} to {endDate} (union expansion will be applied by base class)");
+        Logger.LogDebugInfo($"WeekDay50pxRenderer initialized - StartDate: {startDate}, EndDate: {endDate}, DayWidth: {DayWidth}");
     }
 
     /// <summary>
     /// Calculates header boundaries with union expansion for complete week coverage.
-    /// Extends timeline range to ensure headers are not truncated at edges.
-    /// WeekDay pattern: Extend to week boundaries (first Monday to last Sunday).
+    /// Extends timeline range to ensure week headers are not truncated at edges.
+    /// WeekDay pattern: Extend to week boundaries (Monday to Sunday).
     /// </summary>
     /// <returns>Expanded start and end dates for complete header rendering</returns>
     protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
     {
-        // For WeekDay pattern, extend to complete week boundaries
-        var expandedStart = SVGRenderingHelpers.GetWeekStart(StartDate);  // Find Monday of week containing StartDate
-        var expandedEnd = SVGRenderingHelpers.GetWeekEnd(EndDate);        // Find Sunday of week containing EndDate
+        // Extend to week boundaries for complete header coverage
+        var expandedStart = GetWeekStart(StartDate);
+        var expandedEnd = GetWeekEnd(EndDate);
 
         Logger.LogDebugInfo($"WeekDay50px union expansion - Original: {StartDate} to {EndDate}, Expanded: {expandedStart} to {expandedEnd}");
 
@@ -54,96 +54,33 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
     }
 
     /// <summary>
-    /// Renders the primary header with week ranges for WeekDay 50px level.
-    /// Shows week boundaries like "February 17-23, 2025" for each week.
+    /// Renders the primary header with week ranges.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
-        var weekPeriods = GenerateWeekDay50pxWeekPeriods();
-        var headerElements = new List<string>();
-
-        foreach (var period in weekPeriods)
-        {
-            // Create background rectangle for the week
-            var rect = SVGRenderingHelpers.CreateSVGRect(
-                period.XPosition,
-                0,
-                period.Width,
-                HeaderMonthHeight,
-                "svg-weekday-50px-cell-primary"
-            );
-
-            // Create centered text label for the week range
-            var textX = period.XPosition + (period.Width / 2);
-            var textY = HeaderMonthHeight / 2;
-            var textClass = SVGRenderingHelpers.GetHeaderTextClass(ZoomLevel, isPrimary: true);
-            var text = SVGRenderingHelpers.CreateSVGText(
-                textX,
-                textY,
-                period.Label,
-                textClass
-            );
-
-            headerElements.Add(rect);
-            headerElements.Add(text);
-        }
-
-        return $@"
-            <!-- Primary Header: Week Ranges (WeekDay 50px) -->
-            <g class=""weekday-50px-primary-header"">
-                {string.Join("\n                ", headerElements)}
-            </g>";
+        var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
+        return RenderWeekHeader(expandedStart, expandedEnd);
     }
 
     /// <summary>
-    /// Renders the secondary header with day names and numbers for WeekDay 50px level.
-    /// Shows combined day names with numbers ("Mon 17", "Tue 18") for each day.
+    /// Renders the secondary header with day names and numbers.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()
     {
-        var dayPeriods = GenerateWeekDay50pxDayPeriods();
-        var headerElements = new List<string>();
-
-        foreach (var period in dayPeriods)
-        {
-            // Create background rectangle for the day
-            var rect = SVGRenderingHelpers.CreateSVGRect(
-                period.XPosition,
-                HeaderMonthHeight,
-                period.Width,
-                HeaderDayHeight,
-                "svg-weekday-50px-cell-secondary"
-            );
-
-            // Create centered text label for the day name and number
-            var textX = period.XPosition + (period.Width / 2);
-            var textY = HeaderMonthHeight + (HeaderDayHeight / 2);
-            var textClass = SVGRenderingHelpers.GetHeaderTextClass(ZoomLevel, isPrimary: false);
-            var text = SVGRenderingHelpers.CreateSVGText(
-                textX,
-                textY,
-                period.Label,
-                textClass
-            );
-
-            headerElements.Add(rect);
-            headerElements.Add(text);
-        }
-
-        return $@"
-            <!-- Secondary Header: Day Names + Numbers (WeekDay 50px) -->
-            <g class=""weekday-50px-secondary-header"">
-                {string.Join("\n                ", headerElements)}
-            </g>";
+        var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
+        return RenderDayHeader(expandedStart, expandedEnd);
     }
 
     /// <summary>
     /// Gets a human-readable description of this renderer for logging and debugging.
     /// </summary>
     /// <returns>Renderer description</returns>
-    protected override string GetRendererDescription() => "WeekDay 50px";
+    protected override string GetRendererDescription()
+    {
+        return "WeekDay 50px level with week ranges and day names - ABC Composition";
+    }
 
     /// <summary>
     /// Gets the CSS class prefix for this renderer's styling.
@@ -151,92 +88,106 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
     /// <returns>CSS class prefix</returns>
     protected override string GetCSSClass() => "weekday-50px";
 
-    // === PERIOD GENERATION METHODS ===
+    // === WEEK BOUNDARY UTILITIES ===
 
     /// <summary>
-    /// Generates week periods for WeekDay 50px level.
-    /// Each period represents one week with Monday-Sunday range.
+    /// Gets the Monday of the week containing the given date.
     /// </summary>
-    /// <returns>List of HeaderPeriod objects representing weeks</returns>
-    private List<HeaderPeriod> GenerateWeekDay50pxWeekPeriods()
+    /// <param name="date">Date within the week</param>
+    /// <returns>Monday of the week</returns>
+    private DateTime GetWeekStart(DateTime date)
     {
-        var periods = new List<HeaderPeriod>();
-
-        // Find the Monday of the week containing StartDate (already expanded to week boundary)
-        var current = StartDate;
+        var current = date;
         while (current.DayOfWeek != DayOfWeek.Monday)
         {
             current = current.AddDays(-1);
         }
-
-        // Generate week periods until we cover the entire expanded timeline
-        while (current <= EndDate)
-        {
-            var weekStart = current;
-            var weekEnd = current.AddDays(6); // Sunday of the same week
-
-            // Calculate X position and width for this week
-            var xPosition = SVGRenderingHelpers.DayToSVGX(weekStart, StartDate, DayWidth);
-            var width = 7 * DayWidth; // 7 days × day width
-
-            var period = new HeaderPeriod
-            {
-                Start = weekStart,
-                End = weekEnd,
-                XPosition = xPosition,
-                Width = width,
-                Level = HeaderLevel.Primary,
-                Label = FormatWeekDay50pxWeekRange(weekStart, weekEnd)
-            };
-
-            periods.Add(period);
-
-            // Move to next Monday
-            current = current.AddDays(7);
-        }
-
-        return periods;
+        return current;
     }
 
     /// <summary>
-    /// Generates day periods for WeekDay 50px level secondary header.
-    /// Each period represents one day with day name and number.
+    /// Gets the Sunday of the week containing the given date.
     /// </summary>
-    /// <returns>List of HeaderPeriod objects representing days</returns>
-    private List<HeaderPeriod> GenerateWeekDay50pxDayPeriods()
+    /// <param name="date">Date within the week</param>
+    /// <returns>Sunday of the week</returns>
+    private DateTime GetWeekEnd(DateTime date)
     {
-        var periods = new List<HeaderPeriod>();
-        var current = StartDate;
-
-        while (current <= EndDate)
-        {
-            var period = new HeaderPeriod
-            {
-                Start = current,
-                End = current,
-                XPosition = SVGRenderingHelpers.DayToSVGX(current, StartDate, DayWidth),
-                Width = DayWidth,
-                Level = HeaderLevel.Secondary,
-                Label = FormatWeekDay50pxDayNameNumber(current)
-            };
-
-            periods.Add(period);
-            current = current.AddDays(1);
-        }
-
-        return periods;
+        var monday = GetWeekStart(date);
+        return monday.AddDays(6); // Sunday
     }
 
-    // === FORMATTING METHODS ===
+    // === HEADER RENDERING METHODS ===
 
     /// <summary>
-    /// Formats a week range for WeekDay 50px level display.
-    /// Premium format for 350px week cells with maximum space and full month names.
+    /// Renders the primary header with week ranges.
+    /// </summary>
+    /// <param name="start">Expanded start date</param>
+    /// <param name="end">Expanded end date</param>
+    /// <returns>SVG markup for week header</returns>
+    private string RenderWeekHeader(DateTime start, DateTime end)
+    {
+        var svg = new System.Text.StringBuilder();
+        var currentDate = start;
+        double xPosition = 0;
+
+        while (currentDate <= end)
+        {
+            var weekStart = GetWeekStart(currentDate);
+            var weekEnd = GetWeekEnd(currentDate);
+
+            // Calculate week width (7 days * 50px = 350px)
+            var weekDays = (weekEnd - weekStart).Days + 1;
+            var weekWidth = weekDays * DayWidth;
+
+            // Week display: "February 17-23, 2025"
+            var weekText = FormatWeekRange(weekStart, weekEnd);
+
+            // Render week header cell
+            svg.Append(CreateSVGRect(xPosition, 0, weekWidth, HeaderMonthHeight, GetCSSClass() + "-cell-primary"));
+            svg.Append(CreateSVGText(xPosition + weekWidth / 2, HeaderMonthHeight / 2, weekText, GetCSSClass() + "-primary-text"));
+
+            xPosition += weekWidth;
+            currentDate = weekEnd.AddDays(1);
+        }
+
+        return svg.ToString();
+    }
+
+    /// <summary>
+    /// Renders the secondary header with day names and numbers.
+    /// </summary>
+    /// <param name="start">Expanded start date</param>
+    /// <param name="end">Expanded end date</param>
+    /// <returns>SVG markup for day header</returns>
+    private string RenderDayHeader(DateTime start, DateTime end)
+    {
+        var svg = new System.Text.StringBuilder();
+        var currentDate = start;
+        double xPosition = 0;
+
+        while (currentDate <= end)
+        {
+            // Day display: "Mon 17", "Tue 18", etc.
+            var dayText = $"{currentDate:ddd} {currentDate.Day}";
+
+            // Render day header cell
+            svg.Append(CreateSVGRect(xPosition, HeaderMonthHeight, DayWidth, HeaderDayHeight, GetCSSClass() + "-cell-secondary"));
+            svg.Append(CreateSVGText(xPosition + DayWidth / 2, HeaderMonthHeight + HeaderDayHeight / 2, dayText, GetCSSClass() + "-secondary-text"));
+
+            xPosition += DayWidth;
+            currentDate = currentDate.AddDays(1);
+        }
+
+        return svg.ToString();
+    }
+
+    /// <summary>
+    /// Formats a week range for display.
     /// </summary>
     /// <param name="weekStart">Monday of the week</param>
     /// <param name="weekEnd">Sunday of the week</param>
     /// <returns>Formatted week range string</returns>
-    private string FormatWeekDay50pxWeekRange(DateTime weekStart, DateTime weekEnd)
+    private string FormatWeekRange(DateTime weekStart, DateTime weekEnd)
     {
         try
         {
@@ -259,28 +210,8 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
         }
         catch (Exception ex)
         {
-            Logger.LogError($"Error formatting WeekDay 50px week range {weekStart:yyyy-MM-dd} to {weekEnd:yyyy-MM-dd}: {ex.Message}");
+            Logger.LogError($"Error formatting week range {weekStart:yyyy-MM-dd} to {weekEnd:yyyy-MM-dd}: {ex.Message}");
             return $"{weekStart:MMM d} - {weekEnd:MMM d}, {weekStart:yyyy}";
-        }
-    }
-
-    /// <summary>
-    /// Formats a day name with number for WeekDay 50px level secondary header.
-    /// Enhanced format for 50px day cells with room for both name and number.
-    /// </summary>
-    /// <param name="date">The date to format</param>
-    /// <returns>Formatted day name and number string</returns>
-    private string FormatWeekDay50pxDayNameNumber(DateTime date)
-    {
-        try
-        {
-            // Enhanced format for 50px cells - room for day name and number
-            return $"{date:ddd} {date.Day}";
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError($"Error formatting WeekDay 50px day name+number for {date:yyyy-MM-dd}: {ex.Message}");
-            return date.Day.ToString();
         }
     }
 }

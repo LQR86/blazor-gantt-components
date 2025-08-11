@@ -38,6 +38,13 @@ public partial class TimelineView : ComponentBase, IDisposable
     private const int TaskBarHeight = 20;
     private const int TaskBarMargin = 6;
 
+    // === COMPOSITION ARCHITECTURE ===
+    /// <summary>
+    /// Current renderer instance for composition architecture.
+    /// Used for zoom levels that have been migrated from partial class to composition.
+    /// </summary>
+    private BaseTimelineRenderer? currentRenderer;
+
     // === TIMELINE PROPERTIES ===
     private DateTime StartDate { get; set; }
     private DateTime EndDate { get; set; }
@@ -74,7 +81,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     // === MAIN SVG HEADER RENDERING ORCHESTRATOR ===
     /// <summary>
     /// Main orchestrator method that delegates to the appropriate pattern implementation.
-    /// Each pattern is implemented in its own partial class file for true independence.
+    /// Hybrid approach: Uses composition for migrated zoom levels, partial classes for others.
     /// </summary>
     protected string RenderSVGHeaders()
     {
@@ -82,16 +89,37 @@ public partial class TimelineView : ComponentBase, IDisposable
         {
             Logger.LogDebugInfo($"RenderSVGHeaders - ZoomLevel: {ZoomLevel}");
 
-            // Level-specific routing for maximum independence
+            // COMPOSITION ARCHITECTURE: Use renderer for migrated zoom levels
+            if (ZoomLevel == TimelineZoomLevel.WeekDayOptimal50px)
+            {
+                currentRenderer = RendererFactory.CreateRenderer(
+                    ZoomLevel,
+                    Logger,
+                    I18N,
+                    DateFormatter,
+                    StartDate,
+                    EndDate,
+                    DayWidth,
+                    HeaderMonthHeight,
+                    HeaderDayHeight,
+                    ZoomFactor
+                );
+                
+                Logger.LogDebugInfo($"Using composition renderer: {currentRenderer.GetType().Name}");
+                return currentRenderer.RenderHeaders();
+            }
+
+            // LEGACY PARTIAL CLASS ARCHITECTURE: Fallback for non-migrated zoom levels
+            Logger.LogDebugInfo($"Using legacy partial class architecture for {ZoomLevel}");
             return ZoomLevel switch
             {
-                // WeekDay Levels (Individual partial classes)
+                // WeekDay Levels (Individual partial classes) - WILL BE MIGRATED
                 TimelineZoomLevel.WeekDayOptimal30px => RenderWeekDay30pxHeaders(),
                 TimelineZoomLevel.WeekDayOptimal40px => RenderWeekDay40pxHeaders(),
-                TimelineZoomLevel.WeekDayOptimal50px => RenderWeekDay50pxHeaders(),
+                // TimelineZoomLevel.WeekDayOptimal50px - MIGRATED TO COMPOSITION ✅
                 TimelineZoomLevel.WeekDayOptimal60px => RenderWeekDay60pxHeaders(),
 
-                // MonthWeek Levels (Individual partial classes)
+                // MonthWeek Levels (Individual partial classes) - WILL BE MIGRATED
                 TimelineZoomLevel.MonthWeekOptimal30px => RenderMonthWeek30pxHeaders(),
                 TimelineZoomLevel.MonthWeekOptimal40px => RenderMonthWeek40pxHeaders(),
                 TimelineZoomLevel.MonthWeekOptimal50px => RenderMonthWeek50pxHeaders(),

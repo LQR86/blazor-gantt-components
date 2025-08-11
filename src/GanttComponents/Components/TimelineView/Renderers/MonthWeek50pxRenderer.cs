@@ -37,40 +37,50 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
     }
 
     /// <summary>
-    /// Calculates header boundaries with union expansion for complete month coverage.
-    /// Extends timeline range to ensure month headers are not truncated at edges.
-    /// MonthWeek pattern: Extend to month boundaries (first of month to last of month).
+    /// Calculate boundaries for primary header rendering (Month-Year displays).
+    /// MonthWeek pattern: Month headers need month boundaries for complete month coverage.
     /// </summary>
-    /// <returns>Expanded start and end dates for complete header rendering</returns>
-    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
+    /// <returns>Month boundary dates for primary month header complete rendering</returns>
+    protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
     {
-        // Extend to month boundaries for complete header coverage
-        var expandedStart = GetMonthStart(StartDate);
-        var expandedEnd = GetMonthEnd(EndDate);
+        var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(StartDate, EndDate);
+        Logger.LogDebugInfo($"MonthWeek50px primary boundaries (Month headers): {monthBounds.start} to {monthBounds.end}");
+        return monthBounds;
+    }
 
-        Logger.LogDebugInfo($"MonthWeek50px union expansion - Original: {StartDate} to {EndDate}, Expanded: {expandedStart} to {expandedEnd}");
-
-        return (expandedStart, expandedEnd);
+    /// <summary>
+    /// Calculate boundaries for secondary header rendering (Week start dates).
+    /// MonthWeek pattern: Week headers need week boundaries since weeks can cross month boundaries.
+    /// This is the KEY FIX: Week headers that span across months need week boundaries, not month boundaries.
+    /// </summary>
+    /// <returns>Week boundary dates for secondary week header complete rendering</returns>
+    protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
+    {
+        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(StartDate, EndDate);
+        Logger.LogDebugInfo($"MonthWeek50px secondary boundaries (Week headers): {weekBounds.start} to {weekBounds.end}");
+        return weekBounds;
     }
 
     /// <summary>
     /// Renders the primary header with month-year displays.
+    /// Uses automatic dual boundary expansion from base class.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
-        var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
-        return RenderMonthHeader(expandedStart, expandedEnd);
+        // Use expanded boundaries calculated by base class union logic
+        return RenderMonthHeader(StartDate, EndDate);
     }
 
     /// <summary>
     /// Renders the secondary header with week start dates.
+    /// Uses automatic dual boundary expansion from base class.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()
     {
-        var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
-        return RenderWeekHeader(expandedStart, expandedEnd);
+        // Use expanded boundaries calculated by base class union logic
+        return RenderWeekHeader(StartDate, EndDate);
     }
 
     /// <summary>
@@ -88,43 +98,6 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
     /// <returns>CSS class prefix</returns>
     protected override string GetCSSClass() => "monthweek-50px";
 
-    // === MONTH BOUNDARY UTILITIES ===
-
-    /// <summary>
-    /// Gets the first day of the month containing the given date.
-    /// </summary>
-    /// <param name="date">Date within the month</param>
-    /// <returns>First day of the month</returns>
-    private DateTime GetMonthStart(DateTime date)
-    {
-        return new DateTime(date.Year, date.Month, 1);
-    }
-
-    /// <summary>
-    /// Gets the last day of the month containing the given date.
-    /// </summary>
-    /// <param name="date">Date within the month</param>
-    /// <returns>Last day of the month</returns>
-    private DateTime GetMonthEnd(DateTime date)
-    {
-        return new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month));
-    }
-
-    /// <summary>
-    /// Gets the Monday of the week containing the given date.
-    /// </summary>
-    /// <param name="date">Date within the week</param>
-    /// <returns>Monday of the week</returns>
-    private DateTime GetWeekStart(DateTime date)
-    {
-        var current = date;
-        while (current.DayOfWeek != DayOfWeek.Monday)
-        {
-            current = current.AddDays(-1);
-        }
-        return current;
-    }
-
     // === HEADER RENDERING METHODS ===
 
     /// <summary>
@@ -141,8 +114,9 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
 
         while (currentDate <= end)
         {
-            var monthStart = GetMonthStart(currentDate);
-            var monthEnd = GetMonthEnd(currentDate);
+            var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(currentDate, currentDate);
+            var monthStart = monthBounds.start;
+            var monthEnd = monthBounds.end;
 
             // Calculate month width in pixels
             var monthDays = (monthEnd - monthStart).Days + 1;
@@ -171,7 +145,8 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
     private string RenderWeekHeader(DateTime start, DateTime end)
     {
         var svg = new System.Text.StringBuilder();
-        var currentDate = GetWeekStart(start); // Start from Monday of first week
+        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(start, start);
+        var currentDate = weekBounds.start; // Start from Monday of first week
         double xPosition = 0;
 
         while (currentDate <= end)

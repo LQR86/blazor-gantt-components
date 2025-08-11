@@ -86,7 +86,7 @@ public static class SVGRenderingHelpers
     /// <param name="cellClass">CSS class for the cell rectangle</param>
     /// <param name="textClass">CSS class for the text element</param>
     /// <returns>SVG group with rect and text</returns>
-    public static string CreateSVGHeaderCell(double x, double y, double width, double height, 
+    public static string CreateSVGHeaderCell(double x, double y, double width, double height,
         string text, string cellClass, string textClass)
     {
         var centerX = x + (width / 2);

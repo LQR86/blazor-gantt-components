@@ -29,13 +29,14 @@ public abstract class BaseTimelineRenderer
 
     /// <summary>
     /// Constructor for dependency injection and configuration.
+    /// Includes automatic integral day width validation for visual quality.
     /// </summary>
     /// <param name="logger">Universal logger service</param>
     /// <param name="i18n">Internationalization service</param>
     /// <param name="dateFormatter">Date formatting helper</param>
     /// <param name="startDate">Timeline start date</param>
     /// <param name="endDate">Timeline end date</param>
-    /// <param name="dayWidth">Width of each day in pixels</param>
+    /// <param name="dayWidth">Width of each day in pixels (must be integral)</param>
     /// <param name="headerMonthHeight">Height of primary header</param>
     /// <param name="headerDayHeight">Height of secondary header</param>
     /// <param name="zoomLevel">Current zoom level</param>
@@ -55,14 +56,17 @@ public abstract class BaseTimelineRenderer
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         I18N = i18n ?? throw new ArgumentNullException(nameof(i18n));
         DateFormatter = dateFormatter ?? throw new ArgumentNullException(nameof(dateFormatter));
-        
+
         StartDate = startDate;
         EndDate = endDate;
-        DayWidth = dayWidth;
         HeaderMonthHeight = headerMonthHeight;
         HeaderDayHeight = headerDayHeight;
         ZoomLevel = zoomLevel;
         ZoomFactor = zoomFactor;
+
+        // CRITICAL: Validate integral day width for all renderers (DRY principle)
+        ValidateIntegralDayWidth(dayWidth, zoomLevel, zoomFactor);
+        DayWidth = dayWidth;
     }
 
     /// <summary>
@@ -81,16 +85,16 @@ public abstract class BaseTimelineRenderer
             var originalStart = StartDate;
             var originalEnd = EndDate;
             var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
-            
+
             // Apply expanded boundaries
             StartDate = expandedStart;
             EndDate = expandedEnd;
-            
+
             Logger.LogDebugInfo($"Union expansion applied - Original: {originalStart} to {originalEnd}, Expanded: {StartDate} to {EndDate}");
 
             // Render headers with expanded range
             var result = RenderHeadersInternal();
-            
+
             Logger.LogDebugInfo($"Header rendering completed for {GetRendererDescription()}");
             return result;
         }
@@ -209,5 +213,42 @@ public abstract class BaseTimelineRenderer
             throw new InvalidOperationException("HeaderMonthHeight must be positive");
         if (HeaderDayHeight <= 0)
             throw new InvalidOperationException("HeaderDayHeight must be positive");
+    }
+
+    // === INTEGRAL DAY WIDTH VALIDATION ===
+    // Critical for visual quality - ensures all coordinates are integral pixels
+
+    /// <summary>
+    /// INTEGRAL DAY WIDTH VALIDATION: Validates that the effective day width is integral.
+    /// This is critical for clean SVG coordinate calculations and visual quality.
+    /// Applied automatically to all renderers for DRY compliance and future-proofing.
+    /// </summary>
+    /// <param name="dayWidth">The day width to validate (in pixels)</param>
+    /// <param name="zoomLevel">Current zoom level for error reporting</param>
+    /// <param name="zoomFactor">Current zoom factor for error reporting</param>
+    /// <exception cref="InvalidOperationException">Thrown when day width validation fails</exception>
+    private void ValidateIntegralDayWidth(double dayWidth, TimelineZoomLevel zoomLevel, double zoomFactor)
+    {
+        // VALIDATION 1: Effective day width must be integral (no fractional pixels)
+        if (Math.Abs(dayWidth - Math.Round(dayWidth)) > 0.001)
+        {
+            throw new InvalidOperationException(
+                $"INTEGRAL DAY WIDTH VIOLATION: {zoomLevel} @ {zoomFactor:F1}x = {dayWidth:F3}px effective day width. " +
+                $"Pure SVG TimelineView requires integral effective day widths for clean SVG coordinate calculations. " +
+                $"Try adjusting ZoomFactor to achieve a whole number result, such as {Math.Round(dayWidth):F0}px. " +
+                $"BaseDayWidth × ZoomFactor must result in integral pixel values. " +
+                $"This validation is automatically applied to all renderers in the composition architecture.");
+        }
+
+        // VALIDATION 2: Day width must be positive
+        if (dayWidth <= 0)
+        {
+            throw new InvalidOperationException(
+                $"DAY WIDTH VALIDATION: {zoomLevel} @ {zoomFactor:F1}x = {dayWidth}px. " +
+                $"Effective day width must be positive. " +
+                $"This validation is automatically applied to all renderers in the composition architecture.");
+        }
+
+        Logger.LogDebugInfo($"Integral day width validation passed: {zoomLevel} @ {zoomFactor:F1}x = {dayWidth:F0}px (integral)");
     }
 }

@@ -29,7 +29,7 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
         int headerDayHeight,
         TimelineZoomLevel zoomLevel,
         double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, 
+        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
         ValidateRenderer();
@@ -47,9 +47,9 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
         // For WeekDay pattern, extend to complete week boundaries
         var expandedStart = SVGRenderingHelpers.GetWeekStart(StartDate);  // Find Monday of week containing StartDate
         var expandedEnd = SVGRenderingHelpers.GetWeekEnd(EndDate);        // Find Sunday of week containing EndDate
-        
+
         Logger.LogDebugInfo($"WeekDay50px union expansion - Original: {StartDate} to {EndDate}, Expanded: {expandedStart} to {expandedEnd}");
-        
+
         return (expandedStart, expandedEnd);
     }
 

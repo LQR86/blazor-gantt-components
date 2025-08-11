@@ -28,7 +28,7 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
         int headerDayHeight,
         TimelineZoomLevel zoomLevel,
         double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, 
+        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
         ValidateRenderer();
@@ -46,9 +46,9 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
         // For MonthWeek pattern, extend to complete month boundaries
         var expandedStart = SVGRenderingHelpers.GetMonthStart(StartDate);  // Find first day of month containing StartDate
         var expandedEnd = SVGRenderingHelpers.GetMonthEnd(EndDate);        // Find last day of month containing EndDate
-        
+
         Logger.LogDebugInfo($"MonthWeek50px union expansion - Original: {StartDate} to {EndDate}, Expanded: {expandedStart} to {expandedEnd}");
-        
+
         return (expandedStart, expandedEnd);
     }
 

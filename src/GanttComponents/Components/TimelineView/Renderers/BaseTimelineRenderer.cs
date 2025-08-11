@@ -1,7 +1,7 @@
 using GanttComponents.Models;
 using GanttComponents.Services;
 
-namespace GanttComponents.Components.TimelineView;
+namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
 /// Abstract base class for timeline header renderers using template method pattern.

@@ -1,7 +1,7 @@
 using GanttComponents.Models;
 using GanttComponents.Services;
 
-namespace GanttComponents.Components.TimelineView;
+namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
 /// Static factory for creating timeline renderer instances based on zoom level.

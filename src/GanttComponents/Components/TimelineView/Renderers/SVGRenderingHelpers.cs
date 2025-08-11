@@ -1,6 +1,6 @@
 using GanttComponents.Models;
 
-namespace GanttComponents.Components.TimelineView;
+namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
 /// Static helper class for SVG rendering utilities shared across timeline renderers.

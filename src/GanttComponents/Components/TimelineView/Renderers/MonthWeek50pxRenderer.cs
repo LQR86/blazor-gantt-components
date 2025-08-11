@@ -1,7 +1,7 @@
 using GanttComponents.Models;
 using GanttComponents.Services;
 
-namespace GanttComponents.Components.TimelineView;
+namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
 /// MonthWeek 50px level renderer for TimelineView composition architecture.

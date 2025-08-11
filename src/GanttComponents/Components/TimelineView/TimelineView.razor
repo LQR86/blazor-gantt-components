@@ -1,5 +1,6 @@
 @using GanttComponents.Models
 @using GanttComponents.Services
+@using GanttComponents.Components.TimelineView.Renderers
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components
 
@@ -8,7 +9,7 @@
     @* Fixed Header SVG - Stays at top *@
     <div class="timeline-header-container">
         <svg class="timeline-header-svg" 
-             viewBox="@GetHeaderViewBox()"
+             viewBox="@SVGRenderingHelpers.GetHeaderViewBox((int)TotalWidth, TotalHeaderHeight)"
              width="@TotalWidth" 
              height="@TotalHeaderHeight">
             <!-- SVG Headers Group -->
@@ -21,7 +22,7 @@
     @* Scrollable Content SVG *@
     <div class="timeline-scroll-container" @onscroll="OnScrollAsync">
         <svg class="timeline-body-svg" 
-             viewBox="@GetBodyViewBox()"
+             viewBox="@SVGRenderingHelpers.GetBodyViewBox((int)TotalWidth, (int)TotalHeight)"
              width="@TotalWidth" 
              height="@TotalHeight">
             <!-- Timeline Body Group -->

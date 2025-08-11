@@ -1,5 +1,6 @@
 using GanttComponents.Models;
 using GanttComponents.Services;
+using GanttComponents.Components.TimelineView.Renderers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 

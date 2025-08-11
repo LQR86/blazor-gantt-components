@@ -37,40 +37,49 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
     }
 
     /// <summary>
-    /// Calculates header boundaries with union expansion for complete week coverage.
-    /// Extends timeline range to ensure week headers are not truncated at edges.
-    /// WeekDay pattern: Extend to week boundaries (Monday to Sunday).
+    /// Calculate boundaries for primary header rendering (Week ranges).
+    /// WeekDay pattern: Week headers need week boundaries for complete rendering.
     /// </summary>
-    /// <returns>Expanded start and end dates for complete header rendering</returns>
-    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
+    /// <returns>Week boundary dates for primary week header complete rendering</returns>
+    protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
     {
-        // Extend to week boundaries for complete header coverage
-        var expandedStart = GetWeekStart(StartDate);
-        var expandedEnd = GetWeekEnd(EndDate);
+        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(StartDate, EndDate);
+        Logger.LogDebugInfo($"WeekDay50px primary boundaries (Week headers): {weekBounds.start} to {weekBounds.end}");
+        return weekBounds;
+    }
 
-        Logger.LogDebugInfo($"WeekDay50px union expansion - Original: {StartDate} to {EndDate}, Expanded: {expandedStart} to {expandedEnd}");
-
-        return (expandedStart, expandedEnd);
+    /// <summary>
+    /// Calculate boundaries for secondary header rendering (Day names within weeks).
+    /// WeekDay pattern: Day headers need week boundaries for alignment with week structure.
+    /// </summary>
+    /// <returns>Week boundary dates for secondary day header complete rendering</returns>
+    protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
+    {
+        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(StartDate, EndDate);
+        Logger.LogDebugInfo($"WeekDay50px secondary boundaries (Day headers): {weekBounds.start} to {weekBounds.end}");
+        return weekBounds;
     }
 
     /// <summary>
     /// Renders the primary header with week ranges.
+    /// Uses automatic dual boundary expansion from base class.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
-        var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
-        return RenderWeekHeader(expandedStart, expandedEnd);
+        // Use expanded boundaries calculated by base class union logic
+        return RenderWeekHeader(StartDate, EndDate);
     }
 
     /// <summary>
     /// Renders the secondary header with day names and numbers.
+    /// Uses automatic dual boundary expansion from base class.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()
     {
-        var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
-        return RenderDayHeader(expandedStart, expandedEnd);
+        // Use expanded boundaries calculated by base class union logic
+        return RenderDayHeader(StartDate, EndDate);
     }
 
     /// <summary>
@@ -88,34 +97,6 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
     /// <returns>CSS class prefix</returns>
     protected override string GetCSSClass() => "weekday-50px";
 
-    // === WEEK BOUNDARY UTILITIES ===
-
-    /// <summary>
-    /// Gets the Monday of the week containing the given date.
-    /// </summary>
-    /// <param name="date">Date within the week</param>
-    /// <returns>Monday of the week</returns>
-    private DateTime GetWeekStart(DateTime date)
-    {
-        var current = date;
-        while (current.DayOfWeek != DayOfWeek.Monday)
-        {
-            current = current.AddDays(-1);
-        }
-        return current;
-    }
-
-    /// <summary>
-    /// Gets the Sunday of the week containing the given date.
-    /// </summary>
-    /// <param name="date">Date within the week</param>
-    /// <returns>Sunday of the week</returns>
-    private DateTime GetWeekEnd(DateTime date)
-    {
-        var monday = GetWeekStart(date);
-        return monday.AddDays(6); // Sunday
-    }
-
     // === HEADER RENDERING METHODS ===
 
     /// <summary>
@@ -132,8 +113,9 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
 
         while (currentDate <= end)
         {
-            var weekStart = GetWeekStart(currentDate);
-            var weekEnd = GetWeekEnd(currentDate);
+            var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(currentDate, currentDate);
+            var weekStart = weekBounds.start;
+            var weekEnd = weekBounds.end;
 
             // Calculate week width (7 days * 50px = 350px)
             var weekDays = (weekEnd - weekStart).Days + 1;

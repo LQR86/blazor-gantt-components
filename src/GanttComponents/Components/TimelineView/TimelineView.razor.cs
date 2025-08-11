@@ -55,6 +55,28 @@ public partial class TimelineView : ComponentBase, IDisposable
     // Individual zoom levels implemented in dedicated partial class files
     // No pattern detection needed - each level has direct routing
 
+    // === COMPOSITION PATTERN DETECTION ===
+    /// <summary>
+    /// Determines if the given zoom level uses the composition architecture.
+    /// These levels have been migrated from partial classes to BaseTimelineRenderer subclasses.
+    /// </summary>
+    /// <param name="zoomLevel">The zoom level to check</param>
+    /// <returns>True if the level uses composition, false if it uses legacy partial classes</returns>
+    private bool IsCompositionPattern(TimelineZoomLevel zoomLevel)
+    {
+        return zoomLevel switch
+        {
+            // MIGRATED TO COMPOSITION: 4 different timeline patterns
+            TimelineZoomLevel.WeekDayOptimal50px => true,      // Week boundaries
+            TimelineZoomLevel.MonthWeekOptimal50px => true,    // Month boundaries
+            TimelineZoomLevel.QuarterMonthOptimal60px => true, // Quarter boundaries  
+            TimelineZoomLevel.YearQuarterOptimal70px => true,  // Year boundaries
+
+            // LEGACY PARTIAL CLASSES: Non-migrated variants
+            _ => false
+        };
+    }
+
     // === ZOOM CALCULATIONS ===
     private double EffectiveDayWidth
     {
@@ -90,10 +112,7 @@ public partial class TimelineView : ComponentBase, IDisposable
             Logger.LogDebugInfo($"RenderSVGHeaders - ZoomLevel: {ZoomLevel}");
 
             // COMPOSITION ARCHITECTURE: Use renderer for migrated zoom levels
-            if (ZoomLevel == TimelineZoomLevel.WeekDayOptimal50px ||
-                ZoomLevel == TimelineZoomLevel.MonthWeekOptimal50px ||
-                ZoomLevel == TimelineZoomLevel.QuarterMonthOptimal60px ||
-                ZoomLevel == TimelineZoomLevel.YearQuarterOptimal70px)
+            if (IsCompositionPattern(ZoomLevel))
             {
                 currentRenderer = RendererFactory.CreateRenderer(
                     ZoomLevel,
@@ -116,26 +135,18 @@ public partial class TimelineView : ComponentBase, IDisposable
             Logger.LogDebugInfo($"Using legacy partial class architecture for {ZoomLevel}");
             return ZoomLevel switch
             {
-                // WeekDay Levels (Individual partial classes) - WILL BE MIGRATED
+                // WeekDay Levels (Individual partial classes) - REMAINING NON-MIGRATED VARIANTS
                 TimelineZoomLevel.WeekDayOptimal30px => RenderWeekDay30pxHeaders(),
                 TimelineZoomLevel.WeekDayOptimal40px => RenderWeekDay40pxHeaders(),
-                // TimelineZoomLevel.WeekDayOptimal50px - MIGRATED TO COMPOSITION ✅
                 TimelineZoomLevel.WeekDayOptimal60px => RenderWeekDay60pxHeaders(),
 
-                // MonthWeek Levels (Individual partial classes) - WILL BE MIGRATED
+                // MonthWeek Levels (Individual partial classes) - REMAINING NON-MIGRATED VARIANTS
                 TimelineZoomLevel.MonthWeekOptimal30px => RenderMonthWeek30pxHeaders(),
                 TimelineZoomLevel.MonthWeekOptimal40px => RenderMonthWeek40pxHeaders(),
-                // TimelineZoomLevel.MonthWeekOptimal50px - MIGRATED TO COMPOSITION ✅
                 TimelineZoomLevel.MonthWeekOptimal60px => RenderMonthWeek60pxHeaders(),
 
-                // QuarterMonth Levels - MIGRATED TO COMPOSITION ✅
-                // TimelineZoomLevel.QuarterMonthOptimal60px - MIGRATED TO COMPOSITION ✅
-
-                // YearQuarter Levels - MIGRATED TO COMPOSITION ✅  
-                // TimelineZoomLevel.YearQuarterOptimal70px - MIGRATED TO COMPOSITION ✅
-
-                // Unsupported levels (future implementations)
-                _ => throw new InvalidOperationException($"Unsupported zoom level: {ZoomLevel}. Only WeekDay and MonthWeek optimal levels are currently implemented.")
+                // All composition patterns handled above - this should not be reached
+                _ => throw new InvalidOperationException($"Unsupported zoom level: {ZoomLevel}. This level should be handled by composition architecture or is not yet implemented.")
             };
         }
         catch (Exception ex)

@@ -32,18 +32,18 @@ public class TimelineZoomService
                 "ZoomLevel.MonthWeekOptimal50px.Description"
             ),
 
-            // QuarterMonth60px - Month cells at 60px (2px day width) - Monthly planning
+            // QuarterMonth60px - Month cells at 180px (6px day width) - Monthly planning
             [TimelineZoomLevel.QuarterMonthOptimal60px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.QuarterMonthOptimal60px,
-                2.0, // Perfect: 2px day width = 60px month cells (2px × 30 days) - INTEGRAL
+                6.0, // Perfect: 6px day width = 180px month cells (6px × 30 days) - INTEGRAL
                 "ZoomLevel.QuarterMonthOptimal60px",
                 "ZoomLevel.QuarterMonthOptimal60px.Description"
             ),
 
-            // YearQuarter70px - Quarter cells at 70px (0.78px day width) - Strategic overview
+            // YearQuarter70px - Quarter cells at 270px (3px day width) - Strategic overview
             [TimelineZoomLevel.YearQuarterOptimal70px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.YearQuarterOptimal70px,
-                0.78, // Perfect: 0.78px day width = 70px quarter cells (0.78px × 90 days)
+                3.0, // Perfect: 3px day width = 270px quarter cells (3px × 90 days) - INTEGRAL
                 "ZoomLevel.YearQuarterOptimal70px",
                 "ZoomLevel.YearQuarterOptimal70px.Description"
             )

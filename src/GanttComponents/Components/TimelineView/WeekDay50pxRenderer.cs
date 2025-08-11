@@ -16,6 +16,7 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
 {
     /// <summary>
     /// Constructor for WeekDay 50px renderer with dependency injection.
+    /// Union expansion is now handled automatically by the base class.
     /// </summary>
     public WeekDay50pxRenderer(
         IUniversalLogger logger,
@@ -32,13 +33,7 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
         ValidateRenderer();
-        
-        // Apply union expansion for complete header rendering
-        var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
-        StartDate = expandedStart;
-        EndDate = expandedEnd;
-        
-        Logger.LogDebugInfo($"WeekDay50pxRenderer initialized - Original: {startDate} to {endDate}, Expanded: {StartDate} to {EndDate}");
+        Logger.LogDebugInfo($"WeekDay50pxRenderer initialized - Range: {startDate} to {endDate} (union expansion will be applied by base class)");
     }
 
     /// <summary>
@@ -47,7 +42,7 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
     /// WeekDay pattern: Extend to week boundaries (first Monday to last Sunday).
     /// </summary>
     /// <returns>Expanded start and end dates for complete header rendering</returns>
-    private (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
+    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
     {
         // For WeekDay pattern, extend to complete week boundaries
         var expandedStart = SVGRenderingHelpers.GetWeekStart(StartDate);  // Find Monday of week containing StartDate

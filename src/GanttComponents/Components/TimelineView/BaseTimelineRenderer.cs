@@ -66,25 +66,33 @@ public abstract class BaseTimelineRenderer
     }
 
     /// <summary>
-    /// Template method for rendering complete headers.
+    /// Template method for rendering complete headers with automatic union expansion.
     /// Orchestrates the header generation process using abstract methods.
+    /// Automatically applies boundary expansion to prevent header truncation.
     /// </summary>
     /// <returns>Complete SVG markup for timeline headers</returns>
     public string RenderHeaders()
     {
         try
         {
-            Logger.LogDebugInfo($"Rendering headers - ZoomLevel: {ZoomLevel}, StartDate: {StartDate}, EndDate: {EndDate}, DayWidth: {DayWidth}");
+            Logger.LogDebugInfo($"Starting header rendering - ZoomLevel: {ZoomLevel}, Original range: {StartDate} to {EndDate}");
 
-            var primaryHeader = RenderPrimaryHeader();
-            var secondaryHeader = RenderSecondaryHeader();
+            // UNION EXPANSION: Automatically expand timeline range for complete header rendering
+            var originalStart = StartDate;
+            var originalEnd = EndDate;
+            var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
+            
+            // Apply expanded boundaries
+            StartDate = expandedStart;
+            EndDate = expandedEnd;
+            
+            Logger.LogDebugInfo($"Union expansion applied - Original: {originalStart} to {originalEnd}, Expanded: {StartDate} to {EndDate}");
 
-            return $@"
-                <!-- {GetRendererDescription()} Headers -->
-                <g class=""{GetCSSClass()}-headers"">
-                    {primaryHeader}
-                    {secondaryHeader}
-                </g>";
+            // Render headers with expanded range
+            var result = RenderHeadersInternal();
+            
+            Logger.LogDebugInfo($"Header rendering completed for {GetRendererDescription()}");
+            return result;
         }
         catch (Exception ex)
         {
@@ -93,7 +101,33 @@ public abstract class BaseTimelineRenderer
         }
     }
 
+    /// <summary>
+    /// Internal template method for rendering headers after union expansion is applied.
+    /// Called by the public RenderHeaders method after boundary calculation.
+    /// </summary>
+    /// <returns>Complete SVG markup for timeline headers</returns>
+    private string RenderHeadersInternal()
+    {
+        var primaryHeader = RenderPrimaryHeader();
+        var secondaryHeader = RenderSecondaryHeader();
+
+        return $@"
+            <!-- {GetRendererDescription()} Headers -->
+            <g class=""{GetCSSClass()}-headers"">
+                {primaryHeader}
+                {secondaryHeader}
+            </g>";
+    }
+
     // === ABSTRACT METHODS FOR SUBCLASSES ===
+
+    /// <summary>
+    /// Calculates the expanded header boundaries for complete header rendering.
+    /// Each zoom level pattern defines its own boundary expansion logic.
+    /// This enables automatic union expansion to prevent header truncation.
+    /// </summary>
+    /// <returns>Tuple of expanded start and end dates for header rendering</returns>
+    protected abstract (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries();
 
     /// <summary>
     /// Renders the primary (top) header for the specific zoom level.

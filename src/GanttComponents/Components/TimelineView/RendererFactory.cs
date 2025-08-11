@@ -89,6 +89,7 @@ internal class WeekDay30pxRendererStub : BaseTimelineRenderer
         TimelineZoomLevel zoomLevel, double zoomFactor)
         : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
 
+    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
     protected override string RenderPrimaryHeader() => "<!-- WeekDay 30px Primary Header - Stub -->";
     protected override string RenderSecondaryHeader() => "<!-- WeekDay 30px Secondary Header - Stub -->";
     protected override string GetRendererDescription() => "WeekDay 30px (Stub)";
@@ -103,6 +104,7 @@ internal class WeekDay40pxRendererStub : BaseTimelineRenderer
         TimelineZoomLevel zoomLevel, double zoomFactor)
         : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
 
+    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
     protected override string RenderPrimaryHeader() => "<!-- WeekDay 40px Primary Header - Stub -->";
     protected override string RenderSecondaryHeader() => "<!-- WeekDay 40px Secondary Header - Stub -->";
     protected override string GetRendererDescription() => "WeekDay 40px (Stub)";
@@ -117,6 +119,7 @@ internal class WeekDay50pxRendererStub : BaseTimelineRenderer
         TimelineZoomLevel zoomLevel, double zoomFactor)
         : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
 
+    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
     protected override string RenderPrimaryHeader() => "<!-- WeekDay 50px Primary Header - Stub -->";
     protected override string RenderSecondaryHeader() => "<!-- WeekDay 50px Secondary Header - Stub -->";
     protected override string GetRendererDescription() => "WeekDay 50px (Stub)";
@@ -131,6 +134,7 @@ internal class WeekDay60pxRendererStub : BaseTimelineRenderer
         TimelineZoomLevel zoomLevel, double zoomFactor)
         : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
 
+    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
     protected override string RenderPrimaryHeader() => "<!-- WeekDay 60px Primary Header - Stub -->";
     protected override string RenderSecondaryHeader() => "<!-- WeekDay 60px Secondary Header - Stub -->";
     protected override string GetRendererDescription() => "WeekDay 60px (Stub)";
@@ -145,6 +149,7 @@ internal class MonthWeek30pxRendererStub : BaseTimelineRenderer
         TimelineZoomLevel zoomLevel, double zoomFactor)
         : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
 
+    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
     protected override string RenderPrimaryHeader() => "<!-- MonthWeek 30px Primary Header - Stub -->";
     protected override string RenderSecondaryHeader() => "<!-- MonthWeek 30px Secondary Header - Stub -->";
     protected override string GetRendererDescription() => "MonthWeek 30px (Stub)";
@@ -159,6 +164,7 @@ internal class MonthWeek40pxRendererStub : BaseTimelineRenderer
         TimelineZoomLevel zoomLevel, double zoomFactor)
         : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
 
+    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
     protected override string RenderPrimaryHeader() => "<!-- MonthWeek 40px Primary Header - Stub -->";
     protected override string RenderSecondaryHeader() => "<!-- MonthWeek 40px Secondary Header - Stub -->";
     protected override string GetRendererDescription() => "MonthWeek 40px (Stub)";
@@ -173,6 +179,7 @@ internal class MonthWeek50pxRendererStub : BaseTimelineRenderer
         TimelineZoomLevel zoomLevel, double zoomFactor)
         : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
 
+    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
     protected override string RenderPrimaryHeader() => "<!-- MonthWeek 50px Primary Header - Stub -->";
     protected override string RenderSecondaryHeader() => "<!-- MonthWeek 50px Secondary Header - Stub -->";
     protected override string GetRendererDescription() => "MonthWeek 50px (Stub)";
@@ -187,6 +194,7 @@ internal class MonthWeek60pxRendererStub : BaseTimelineRenderer
         TimelineZoomLevel zoomLevel, double zoomFactor)
         : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor) { }
 
+    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries() => (StartDate, EndDate);
     protected override string RenderPrimaryHeader() => "<!-- MonthWeek 60px Primary Header - Stub -->";
     protected override string RenderSecondaryHeader() => "<!-- MonthWeek 60px Secondary Header - Stub -->";
     protected override string GetRendererDescription() => "MonthWeek 60px (Stub)";

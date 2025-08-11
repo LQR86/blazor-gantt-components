@@ -91,7 +91,9 @@ public partial class TimelineView : ComponentBase, IDisposable
 
             // COMPOSITION ARCHITECTURE: Use renderer for migrated zoom levels
             if (ZoomLevel == TimelineZoomLevel.WeekDayOptimal50px ||
-                ZoomLevel == TimelineZoomLevel.MonthWeekOptimal50px)
+                ZoomLevel == TimelineZoomLevel.MonthWeekOptimal50px ||
+                ZoomLevel == TimelineZoomLevel.QuarterMonthOptimal60px ||
+                ZoomLevel == TimelineZoomLevel.YearQuarterOptimal70px)
             {
                 currentRenderer = RendererFactory.CreateRenderer(
                     ZoomLevel,
@@ -125,6 +127,12 @@ public partial class TimelineView : ComponentBase, IDisposable
                 TimelineZoomLevel.MonthWeekOptimal40px => RenderMonthWeek40pxHeaders(),
                 // TimelineZoomLevel.MonthWeekOptimal50px - MIGRATED TO COMPOSITION ✅
                 TimelineZoomLevel.MonthWeekOptimal60px => RenderMonthWeek60pxHeaders(),
+
+                // QuarterMonth Levels - MIGRATED TO COMPOSITION ✅
+                // TimelineZoomLevel.QuarterMonthOptimal60px - MIGRATED TO COMPOSITION ✅
+
+                // YearQuarter Levels - MIGRATED TO COMPOSITION ✅  
+                // TimelineZoomLevel.YearQuarterOptimal70px - MIGRATED TO COMPOSITION ✅
 
                 // Unsupported levels (future implementations)
                 _ => throw new InvalidOperationException($"Unsupported zoom level: {ZoomLevel}. Only WeekDay and MonthWeek optimal levels are currently implemented.")

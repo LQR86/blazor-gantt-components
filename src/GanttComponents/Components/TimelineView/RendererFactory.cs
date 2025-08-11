@@ -72,6 +72,16 @@ public static class RendererFactory
                 logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                 headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
 
+            // QuarterMonth Levels - integral day width implementations
+            TimelineZoomLevel.QuarterMonthOptimal60px => new QuarterMonth60pxRenderer(
+                logger, i18n, dateFormatter, startDate, endDate,
+                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
+
+            // YearQuarter Levels - integral day width implementations  
+            TimelineZoomLevel.YearQuarterOptimal70px => new YearQuarter90pxRenderer(
+                logger, i18n, dateFormatter, startDate, endDate,
+                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
+
             // Unsupported levels (future implementations)
             _ => throw new InvalidOperationException($"Unsupported zoom level: {zoomLevel}. Only WeekDay and MonthWeek optimal levels are currently supported by the renderer factory.")
         };

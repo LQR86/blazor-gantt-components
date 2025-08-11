@@ -38,41 +38,43 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
     }
 
     /// <summary>
-    /// Calculates header boundaries with union expansion for complete quarter coverage.
-    /// Extends timeline range to ensure quarter headers are not truncated at edges.
-    /// QuarterMonth pattern: Extend to quarter boundaries (first day of quarter to last day of quarter).
+    /// Calculate boundaries for primary header rendering (Quarter ranges).
+    /// QuarterMonth pattern: Quarter headers need quarter boundaries for complete quarter coverage.
     /// </summary>
-    /// <returns>Expanded start and end dates for complete header rendering</returns>
-    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
+    /// <returns>Quarter boundary dates for primary quarter header complete rendering</returns>
+    protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
     {
-        try
-        {
-            // QUARTER BOUNDARY EXPANSION: Expand to full quarter coverage
-            var expandedStart = GetQuarterStart(StartDate);
-            var expandedEnd = GetQuarterEnd(EndDate);
+        var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(StartDate, EndDate);
+        Logger.LogDebugInfo($"QuarterMonth60px primary boundaries (Quarter headers): {quarterBounds.start} to {quarterBounds.end}");
+        return quarterBounds;
+    }
 
-            Logger.LogDebugInfo($"QuarterMonth60px boundary expansion: {StartDate} to {EndDate} → {expandedStart} to {expandedEnd}");
-            return (expandedStart, expandedEnd);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError("Failed to calculate QuarterMonth60px header boundaries", ex);
-            return (StartDate, EndDate); // Fallback to original range
-        }
+    /// <summary>
+    /// Calculate boundaries for secondary header rendering (Month names).
+    /// QuarterMonth pattern: Month headers need month boundaries for precise month alignment.
+    /// This ensures months render completely even when timeline spans partial quarters.
+    /// </summary>
+    /// <returns>Month boundary dates for secondary month header complete rendering</returns>
+    protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
+    {
+        var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(StartDate, EndDate);
+        Logger.LogDebugInfo($"QuarterMonth60px secondary boundaries (Month headers): {monthBounds.start} to {monthBounds.end}");
+        return monthBounds;
     }
 
     /// <summary>
     /// Renders the complete headers for QuarterMonth 60px view.
     /// Primary Header: Quarter ranges with year context
     /// Secondary Header: Month abbreviations with perfect 60px cells
+    /// Uses automatic dual boundary expansion from base class.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
         try
         {
-            var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
-            return RenderQuarterHeader(expandedStart, expandedEnd);
+            // Use expanded boundaries calculated by base class union logic
+            return RenderQuarterHeader(StartDate, EndDate);
         }
         catch (Exception ex)
         {
@@ -83,14 +85,15 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
 
     /// <summary>
     /// Renders the secondary header with month names.
+    /// Uses automatic dual boundary expansion from base class.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()
     {
         try
         {
-            var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
-            return RenderMonthHeader(expandedStart, expandedEnd);
+            // Use expanded boundaries calculated by base class union logic
+            return RenderMonthHeader(StartDate, EndDate);
         }
         catch (Exception ex)
         {
@@ -117,33 +120,6 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
         return "quarter-month-60px";
     }
 
-    // === QUARTER BOUNDARY UTILITIES ===
-
-    /// <summary>
-    /// Gets the start date of the quarter containing the given date.
-    /// </summary>
-    /// <param name="date">Date within the quarter</param>
-    /// <returns>First day of the quarter</returns>
-    private DateTime GetQuarterStart(DateTime date)
-    {
-        var quarter = (date.Month - 1) / 3 + 1;
-        var quarterStartMonth = (quarter - 1) * 3 + 1;
-        return new DateTime(date.Year, quarterStartMonth, 1);
-    }
-
-    /// <summary>
-    /// Gets the end date of the quarter containing the given date.
-    /// </summary>
-    /// <param name="date">Date within the quarter</param>
-    /// <returns>Last day of the quarter</returns>
-    private DateTime GetQuarterEnd(DateTime date)
-    {
-        var quarter = (date.Month - 1) / 3 + 1;
-        var quarterStartMonth = (quarter - 1) * 3 + 1;
-        var quarterEndMonth = quarterStartMonth + 2;
-        return new DateTime(date.Year, quarterEndMonth, DateTime.DaysInMonth(date.Year, quarterEndMonth));
-    }
-
     // === HEADER RENDERING METHODS ===
 
     /// <summary>
@@ -160,8 +136,9 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
 
         while (currentDate <= end)
         {
-            var quarterStart = GetQuarterStart(currentDate);
-            var quarterEnd = GetQuarterEnd(currentDate);
+            var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(currentDate, currentDate);
+            var quarterStart = quarterBounds.start;
+            var quarterEnd = quarterBounds.end;
 
             // Calculate quarter width in pixels
             var quarterDays = (quarterEnd - quarterStart).Days + 1;

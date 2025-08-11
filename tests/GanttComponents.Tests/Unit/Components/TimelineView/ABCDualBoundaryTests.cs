@@ -39,7 +39,7 @@ public class ABCDualBoundaryTests
         
         var renderer = new WeekDay50pxRenderer(
             _mockLogger, _mockI18N, _dateFormatter,
-            startDate, endDate, 50, 30, TimelineZoomLevel.WeekDay50px, 1.0);
+            startDate, endDate, 50, 30, TimelineZoomLevel.WeekDayOptimal50px, 1.0);
 
         // ACT: Get boundaries through reflection to test ABC pattern
         var primaryBounds = InvokeProtectedMethod<(DateTime, DateTime)>(renderer, "CalculatePrimaryBoundaries");
@@ -73,7 +73,7 @@ public class ABCDualBoundaryTests
 
         var mockRenderer = new MockDualBoundaryRenderer(
             _mockLogger, _mockI18N, _dateFormatter,
-            startDate, endDate, 50, 30, TimelineZoomLevel.MonthWeek50px, 1.0);
+            startDate, endDate, 50, 30, TimelineZoomLevel.MonthWeekOptimal50px, 1.0);
 
         // Set up different primary vs secondary boundaries
         var monthStart = new DateTime(2025, 8, 1);  // Month boundaries (wider)
@@ -151,7 +151,7 @@ public class ABCDualBoundaryTests
         
         var renderer = new WeekDay50pxRenderer(
             _mockLogger, _mockI18N, _dateFormatter,
-            startDate, endDate, 50, 30, TimelineZoomLevel.WeekDay50px, 1.0);
+            startDate, endDate, 50, 30, TimelineZoomLevel.WeekDayOptimal50px, 1.0);
 
         // ACT & ASSERT: Multiple boundary calculations should be fast
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -179,7 +179,7 @@ public class ABCDualBoundaryTests
         
         var renderer = new WeekDay50pxRenderer(
             _mockLogger, _mockI18N, _dateFormatter,
-            singleDate, singleDate, 50, 30, TimelineZoomLevel.WeekDay50px, 1.0);
+            singleDate, singleDate, 50, 30, TimelineZoomLevel.WeekDayOptimal50px, 1.0);
 
         // ACT: Get union boundaries
         var unionBounds = InvokeProtectedMethod<(DateTime, DateTime)>(renderer, "CalculateHeaderBoundaries");
@@ -201,7 +201,14 @@ public class ABCDualBoundaryTests
     {
         var method = obj.GetType().GetMethod(methodName, 
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        return (T)method.Invoke(obj, parameters);
+        if (method == null)
+            throw new InvalidOperationException($"Method {methodName} not found on {obj.GetType().Name}");
+        
+        var result = method.Invoke(obj, parameters);
+        if (result == null)
+            throw new InvalidOperationException($"Method {methodName} returned null");
+            
+        return (T)result;
     }
 }
 
@@ -263,10 +270,23 @@ public class MockDualBoundaryRenderer : BaseTimelineRenderer
 /// </summary>
 public class MockUniversalLogger : IUniversalLogger
 {
-    public void LogDebugInfo(string message) { }
-    public void LogError(string message) { }
-    public void LogWarning(string message) { }
-    public void LogInfo(string message) { }
+    public void LogOperation(string category, string operation, object? data = null) { }
+    public void LogDebugInfo(string message, object? data = null) { }
+    public void LogError(string message, Exception? exception = null) { }
+    public void LogWarning(string message, object? data = null) { }
+    public void LogInfo(string message, object? data = null) { }
+    public void LogTaskGridOperation(string operation, object? data = null) { }
+    public void LogTimelineOperation(string operation, object? data = null) { }
+    public void LogRowAlignment(string operation, object? data = null) { }
+    public void LogWbsOperation(string operation, object? data = null) { }
+    public void LogDependencyOperation(string operation, object? data = null) { }
+    public void LogDateOperation(string taskName, DateOnly? date, string dateType) { }
+    public void LogDurationCalculation(string operation, int days, object? context = null) { }
+    public void LogComponentLifecycle(string componentName, string lifecycle, object? data = null) { }
+    public void LogStateChange(string component, string property, object? oldValue, object? newValue) { }
+    public void LogUserAction(string action, object? context = null) { }
+    public void LogPerformance(string operation, TimeSpan duration, object? metadata = null) { }
+    public void LogDatabaseOperation(string operation, object? data = null) { }
 }
 
 /// <summary>
@@ -274,6 +294,13 @@ public class MockUniversalLogger : IUniversalLogger
 /// </summary>
 public class MockGanttI18N : IGanttI18N
 {
-    public string GetLocalizedString(string key) => key;
-    public string GetLocalizedFormat(string key, params object[] args) => string.Format(key, args);
+    public string CurrentCulture => "en-US";
+    public string T(string key) => key;
+    public void SetCulture(string culture) { }
+    public IEnumerable<string> GetAvailableCultures() => new[] { "en-US", "zh-CN" };
+    public bool HasTranslation(string key) => !string.IsNullOrEmpty(key);
+    
+#pragma warning disable CS0067 // Event is never used - this is a mock for testing
+    public event Action? LanguageChanged;
+#pragma warning restore CS0067
 }

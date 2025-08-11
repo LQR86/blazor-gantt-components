@@ -38,39 +38,41 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
     }
 
     /// <summary>
-    /// Calculates header boundaries with union expansion for complete year coverage.
-    /// Extends timeline range to ensure year headers are not truncated at edges.
-    /// YearQuarter pattern: Extend to year boundaries (January 1 to December 31).
+    /// Calculate boundaries for primary header rendering (Year ranges).
+    /// YearQuarter pattern: Year headers need year boundaries for complete year coverage.
     /// </summary>
-    /// <returns>Expanded start and end dates for complete header rendering</returns>
-    protected override (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
+    /// <returns>Year boundary dates for primary year header complete rendering</returns>
+    protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
     {
-        try
-        {
-            // YEAR BOUNDARY EXPANSION: Expand to full year coverage
-            var expandedStart = new DateTime(StartDate.Year, 1, 1);
-            var expandedEnd = new DateTime(EndDate.Year, 12, 31);
+        var yearBounds = BoundaryCalculationHelpers.GetYearBoundaries(StartDate, EndDate);
+        Logger.LogDebugInfo($"YearQuarter90px primary boundaries (Year headers): {yearBounds.start} to {yearBounds.end}");
+        return yearBounds;
+    }
 
-            Logger.LogDebugInfo($"YearQuarter90px boundary expansion: {StartDate} to {EndDate} → {expandedStart} to {expandedEnd}");
-            return (expandedStart, expandedEnd);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError("Failed to calculate YearQuarter90px header boundaries", ex);
-            return (StartDate, EndDate); // Fallback to original range
-        }
+    /// <summary>
+    /// Calculate boundaries for secondary header rendering (Quarter labels).
+    /// YearQuarter pattern: Quarter headers need quarter boundaries for precise quarter alignment.
+    /// Since quarters fit perfectly within years, this maintains natural alignment.
+    /// </summary>
+    /// <returns>Quarter boundary dates for secondary quarter header complete rendering</returns>
+    protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
+    {
+        var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(StartDate, EndDate);
+        Logger.LogDebugInfo($"YearQuarter90px secondary boundaries (Quarter headers): {quarterBounds.start} to {quarterBounds.end}");
+        return quarterBounds;
     }
 
     /// <summary>
     /// Renders the primary header with year ranges.
+    /// Uses automatic dual boundary expansion from base class.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
         try
         {
-            var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
-            return RenderYearHeader(expandedStart, expandedEnd);
+            // Use expanded boundaries calculated by base class union logic
+            return RenderYearHeader(StartDate, EndDate);
         }
         catch (Exception ex)
         {
@@ -81,14 +83,15 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
 
     /// <summary>
     /// Renders the secondary header with quarter labels.
+    /// Uses automatic dual boundary expansion from base class.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()
     {
         try
         {
-            var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
-            return RenderQuarterHeader(expandedStart, expandedEnd);
+            // Use expanded boundaries calculated by base class union logic
+            return RenderQuarterHeader(StartDate, EndDate);
         }
         catch (Exception ex)
         {
@@ -113,33 +116,6 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
     protected override string GetCSSClass()
     {
         return "year-quarter-90px";
-    }
-
-    // === YEAR/QUARTER BOUNDARY UTILITIES ===
-
-    /// <summary>
-    /// Gets the start date of the quarter containing the given date.
-    /// </summary>
-    /// <param name="date">Date within the quarter</param>
-    /// <returns>First day of the quarter</returns>
-    private DateTime GetQuarterStart(DateTime date)
-    {
-        var quarter = (date.Month - 1) / 3 + 1;
-        var quarterStartMonth = (quarter - 1) * 3 + 1;
-        return new DateTime(date.Year, quarterStartMonth, 1);
-    }
-
-    /// <summary>
-    /// Gets the end date of the quarter containing the given date.
-    /// </summary>
-    /// <param name="date">Date within the quarter</param>
-    /// <returns>Last day of the quarter</returns>
-    private DateTime GetQuarterEnd(DateTime date)
-    {
-        var quarter = (date.Month - 1) / 3 + 1;
-        var quarterStartMonth = (quarter - 1) * 3 + 1;
-        var quarterEndMonth = quarterStartMonth + 2;
-        return new DateTime(date.Year, quarterEndMonth, DateTime.DaysInMonth(date.Year, quarterEndMonth));
     }
 
     // === HEADER RENDERING METHODS ===
@@ -193,8 +169,9 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
 
         while (currentDate <= end)
         {
-            var quarterStart = GetQuarterStart(currentDate);
-            var quarterEnd = GetQuarterEnd(currentDate);
+            var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(currentDate, currentDate);
+            var quarterStart = quarterBounds.start;
+            var quarterEnd = quarterBounds.end;
 
             // Calculate quarter width (approximately 90px for 90-day quarters with 1.0px day width)
             var quarterDays = (quarterEnd - quarterStart).Days + 1;

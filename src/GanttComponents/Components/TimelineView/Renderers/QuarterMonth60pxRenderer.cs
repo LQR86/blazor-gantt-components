@@ -34,7 +34,6 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
         ValidateRenderer();
-        Logger.LogDebugInfo($"QuarterMonth60pxRenderer initialized - Range: {startDate} to {endDate}, DayWidth: 2.0px (integral)");
     }
 
     /// <summary>
@@ -45,7 +44,6 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
     protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
     {
         var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(StartDate, EndDate);
-        Logger.LogDebugInfo($"QuarterMonth60px primary boundaries (Quarter headers): {quarterBounds.start} to {quarterBounds.end}");
         return quarterBounds;
     }
 
@@ -58,7 +56,6 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
     protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
     {
         var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(StartDate, EndDate);
-        Logger.LogDebugInfo($"QuarterMonth60px secondary boundaries (Month headers): {monthBounds.start} to {monthBounds.end}");
         return monthBounds;
     }
 

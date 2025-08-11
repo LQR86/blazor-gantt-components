@@ -33,7 +33,6 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
         : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
-        Logger.LogDebugInfo($"MonthWeek50pxRenderer initialized - StartDate: {startDate}, EndDate: {endDate}, DayWidth: {DayWidth}");
     }
 
     /// <summary>
@@ -44,7 +43,6 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
     protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
     {
         var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(StartDate, EndDate);
-        Logger.LogDebugInfo($"MonthWeek50px primary boundaries (Month headers): {monthBounds.start} to {monthBounds.end}");
         return monthBounds;
     }
 
@@ -57,7 +55,6 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
     protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
     {
         var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(StartDate, EndDate);
-        Logger.LogDebugInfo($"MonthWeek50px secondary boundaries (Week headers): {weekBounds.start} to {weekBounds.end}");
         return weekBounds;
     }
 
@@ -149,17 +146,6 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
         var svg = new System.Text.StringBuilder();
         var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(start, end);
         var currentDate = weekBounds.start; // Start from Monday of first week
-
-        // DIAGNOSTIC: Log first few weeks for debugging
-        var weekCount = 0;
-        var tempDate = currentDate;
-        while (tempDate <= end && weekCount < 3)
-        {
-            var weekText = $"{tempDate.Month}/{tempDate.Day}";
-            Logger.LogDebugInfo($"Week header #{weekCount}: {tempDate:yyyy-MM-dd} ({tempDate.DayOfWeek}) -> '{weekText}'");
-            tempDate = tempDate.AddDays(7);
-            weekCount++;
-        }
 
         while (currentDate <= end)
         {

@@ -33,7 +33,6 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
                50.0, // INTEGRAL DAY WIDTH: 50px day width = 350px week cells (50px × 7 days)
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
-        Logger.LogDebugInfo($"WeekDay50pxRenderer initialized - StartDate: {startDate}, EndDate: {endDate}, DayWidth: {DayWidth}");
     }
 
     /// <summary>
@@ -44,7 +43,6 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
     protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
     {
         var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(StartDate, EndDate);
-        Logger.LogDebugInfo($"WeekDay50px primary boundaries (Week headers): {weekBounds.start} to {weekBounds.end}");
         return weekBounds;
     }
 
@@ -56,7 +54,6 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
     protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
     {
         var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(StartDate, EndDate);
-        Logger.LogDebugInfo($"WeekDay50px secondary boundaries (Day headers): {weekBounds.start} to {weekBounds.end}");
         return weekBounds;
     }
 

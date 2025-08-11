@@ -93,8 +93,6 @@ public abstract class BaseTimelineRenderer
     {
         try
         {
-            Logger.LogDebugInfo($"Starting header rendering - ZoomLevel: {ZoomLevel}, Original range: {StartDate} to {EndDate}");
-
             // UNION EXPANSION: Automatically expand timeline range for complete header rendering
             var originalStart = StartDate;
             var originalEnd = EndDate;
@@ -104,8 +102,6 @@ public abstract class BaseTimelineRenderer
             StartDate = expandedStart;
             EndDate = expandedEnd;
 
-            Logger.LogDebugInfo($"Union expansion applied - Original: {originalStart} to {originalEnd}, Expanded: {StartDate} to {EndDate}");
-
             // Render headers with expanded range
             var result = RenderHeadersInternal();
 
@@ -113,7 +109,6 @@ public abstract class BaseTimelineRenderer
             StartDate = originalStart;
             EndDate = originalEnd;
 
-            Logger.LogDebugInfo($"Header rendering completed for {GetRendererDescription()}, original dates restored");
             return result;
         }
         catch (Exception ex)
@@ -162,18 +157,12 @@ public abstract class BaseTimelineRenderer
         {
             // STEP 1: Get primary header boundaries (e.g., Month boundaries for MonthWeek pattern)
             var primaryBounds = CalculatePrimaryBoundaries();
-            Logger.LogDebugInfo($"Primary boundaries: {primaryBounds.start} to {primaryBounds.end}");
-
             // STEP 2: Get secondary header boundaries (e.g., Week boundaries for MonthWeek pattern)  
             var secondaryBounds = CalculateSecondaryBoundaries();
-            Logger.LogDebugInfo($"Secondary boundaries: {secondaryBounds.start} to {secondaryBounds.end}");
 
             // STEP 3: AUTOMATIC UNION CALCULATION - Take the widest span to ensure both headers fit
             var unionStart = primaryBounds.start < secondaryBounds.start ? primaryBounds.start : secondaryBounds.start;
             var unionEnd = primaryBounds.end > secondaryBounds.end ? primaryBounds.end : secondaryBounds.end;
-
-            Logger.LogDebugInfo($"Union boundaries (automatic): {unionStart} to {unionEnd}");
-            Logger.LogDebugInfo($"Dual expansion applied: Primary=[{primaryBounds.start} to {primaryBounds.end}], Secondary=[{secondaryBounds.start} to {secondaryBounds.end}], Union=[{unionStart} to {unionEnd}]");
 
             return (unionStart, unionEnd);
         }
@@ -342,7 +331,5 @@ public abstract class BaseTimelineRenderer
                 $"Effective day width must be positive. " +
                 $"This validation is automatically applied to all renderers in the composition architecture.");
         }
-
-        Logger.LogDebugInfo($"Integral day width validation passed: {zoomLevel} @ {zoomFactor:F1}x = {dayWidth:F0}px (integral)");
     }
 }

@@ -15,7 +15,6 @@ window.timelineView = {
         const bodyContainer = timelineContainer.querySelector('.timeline-scroll-container');
         
         if (!headerContainer || !bodyContainer) {
-            console.warn('TimelineView: Could not find scroll containers for sync');
             return;
         }
         
@@ -36,8 +35,6 @@ window.timelineView = {
         
         // Attach immediate event listener (passive for performance)
         bodyContainer.addEventListener('scroll', scrollHandler, { passive: true });
-        
-        console.log('TimelineView: Immediate scroll sync initialized for', timelineElementId);
     },
     
     // Equalize header and body container widths to prevent scroll boundary mismatch
@@ -50,19 +47,7 @@ window.timelineView = {
         if (scrollbarWidth > 0) {
             // Add padding to header to match body's reduced width due to scrollbar
             headerContainer.style.paddingRight = `${scrollbarWidth}px`;
-            
-            console.log(`TimelineView: Equalized container widths - added ${scrollbarWidth}px padding to header`);
         }
-        
-        // Verify the fix
-        console.log('Width equalization result:', {
-            original: { headerClientWidth, bodyClientWidth, scrollbarWidth },
-            afterFix: { 
-                headerEffectiveWidth: headerContainer.clientWidth,
-                bodyClientWidth: bodyContainer.clientWidth,
-                isEqualized: headerContainer.clientWidth === bodyContainer.clientWidth
-            }
-        });
     },
     
     // Remove scroll synchronization (for cleanup)

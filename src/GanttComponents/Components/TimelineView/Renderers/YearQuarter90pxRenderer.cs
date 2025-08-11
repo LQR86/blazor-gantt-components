@@ -34,7 +34,6 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
         ValidateRenderer();
-        Logger.LogDebugInfo($"YearQuarter90pxRenderer initialized - Range: {startDate} to {endDate}, DayWidth: 1.0px (integral)");
     }
 
     /// <summary>
@@ -45,7 +44,6 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
     protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
     {
         var yearBounds = BoundaryCalculationHelpers.GetYearBoundaries(StartDate, EndDate);
-        Logger.LogDebugInfo($"YearQuarter90px primary boundaries (Year headers): {yearBounds.start} to {yearBounds.end}");
         return yearBounds;
     }
 
@@ -58,7 +56,6 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
     protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
     {
         var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(StartDate, EndDate);
-        Logger.LogDebugInfo($"YearQuarter90px secondary boundaries (Quarter headers): {quarterBounds.start} to {quarterBounds.end}");
         return quarterBounds;
     }
 

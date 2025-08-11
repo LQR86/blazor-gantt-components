@@ -105,8 +105,6 @@ public partial class TimelineView : ComponentBase, IDisposable
     {
         try
         {
-            Logger.LogDebugInfo($"RenderSVGHeaders - ZoomLevel: {ZoomLevel}");
-
             // PURE COMPOSITION ARCHITECTURE: All zoom levels use BaseTimelineRenderer
             currentRenderer = RendererFactory.CreateRenderer(
                 ZoomLevel,
@@ -127,7 +125,6 @@ public partial class TimelineView : ComponentBase, IDisposable
                 return "<!-- Renderer creation failed -->";
             }
 
-            Logger.LogDebugInfo($"Using composition renderer: {currentRenderer.GetType().Name}");
             var headerResult = currentRenderer.RenderHeaders();
 
             // Defensive programming: ensure we never return null
@@ -174,7 +171,6 @@ public partial class TimelineView : ComponentBase, IDisposable
     protected override void OnParametersSet()
     {
         ValidateRequiredParameters();
-        Logger.LogDebugInfo($"TimelineView header heights - Month: {HeaderMonthHeight}, Day: {HeaderDayHeight}, Total: {TotalHeaderHeight}");
         CalculateTimelineRange();
         StateHasChanged();
     }
@@ -219,8 +215,6 @@ public partial class TimelineView : ComponentBase, IDisposable
             EndDate = Tasks.Max(t => t.EndDate).Date;
         }
 
-        Logger.LogDebugInfo($"Base timeline range: {StartDate:yyyy-MM-dd} to {EndDate:yyyy-MM-dd}");
-
         // Step 2: Get expanded boundaries for SVG canvas sizing
         // The headers need expanded boundaries to prevent truncation, so the SVG canvas must be wide enough
         var expandedBounds = GetExpandedTimelineBounds();
@@ -233,9 +227,6 @@ public partial class TimelineView : ComponentBase, IDisposable
 
         TotalWidth = Math.Max(100, (int)(expandedDays * EffectiveDayWidth)); // Minimum 100px width
         TotalHeight = Math.Max(50, Tasks.Count * RowHeight); // Minimum 50px height
-
-        Logger.LogDebugInfo($"Timeline dimensions: {TotalWidth}x{TotalHeight} (expanded days: {expandedDays}, dayWidth: {EffectiveDayWidth:F2})");
-        Logger.LogDebugInfo($"Coordinate system unified: {StartDate:yyyy-MM-dd} to {EndDate:yyyy-MM-dd}");
     }
 
     /// <summary>
@@ -269,7 +260,6 @@ public partial class TimelineView : ComponentBase, IDisposable
 
             // Get the expanded boundaries from the renderer
             var expandedBounds = tempRenderer.CalculateHeaderBoundaries();
-            Logger.LogDebugInfo($"Expanded boundaries: {expandedBounds.expandedStart} to {expandedBounds.expandedEnd}");
 
             return (expandedBounds.expandedStart, expandedBounds.expandedEnd);
         }
@@ -284,12 +274,6 @@ public partial class TimelineView : ComponentBase, IDisposable
     {
         var days = (date.Date - StartDate).TotalDays;
         var pixelPosition = days * EffectiveDayWidth;
-
-        // Only log for task positioning issues - specifically Jan 1st task
-        if (date.Month == 1 && date.Day == 1 && date.Year == 2025)
-        {
-            Logger.LogDebugInfo($"Task positioning: Jan 1st 2025 -> {days} days from {StartDate:yyyy-MM-dd} = {pixelPosition}px");
-        }
 
         return pixelPosition;
     }

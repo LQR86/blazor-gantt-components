@@ -90,7 +90,8 @@ public partial class TimelineView : ComponentBase, IDisposable
             Logger.LogDebugInfo($"RenderSVGHeaders - ZoomLevel: {ZoomLevel}");
 
             // COMPOSITION ARCHITECTURE: Use renderer for migrated zoom levels
-            if (ZoomLevel == TimelineZoomLevel.WeekDayOptimal50px)
+            if (ZoomLevel == TimelineZoomLevel.WeekDayOptimal50px || 
+                ZoomLevel == TimelineZoomLevel.MonthWeekOptimal50px)
             {
                 currentRenderer = RendererFactory.CreateRenderer(
                     ZoomLevel,
@@ -122,7 +123,7 @@ public partial class TimelineView : ComponentBase, IDisposable
                 // MonthWeek Levels (Individual partial classes) - WILL BE MIGRATED
                 TimelineZoomLevel.MonthWeekOptimal30px => RenderMonthWeek30pxHeaders(),
                 TimelineZoomLevel.MonthWeekOptimal40px => RenderMonthWeek40pxHeaders(),
-                TimelineZoomLevel.MonthWeekOptimal50px => RenderMonthWeek50pxHeaders(),
+                // TimelineZoomLevel.MonthWeekOptimal50px - MIGRATED TO COMPOSITION ✅
                 TimelineZoomLevel.MonthWeekOptimal60px => RenderMonthWeek60pxHeaders(),
 
                 // Unsupported levels (future implementations)

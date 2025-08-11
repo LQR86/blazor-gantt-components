@@ -64,7 +64,7 @@ public static class RendererFactory
                 logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                 headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
 
-            TimelineZoomLevel.MonthWeekOptimal50px => new MonthWeek50pxRendererStub(
+            TimelineZoomLevel.MonthWeekOptimal50px => new MonthWeek50pxRenderer(
                 logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                 headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
 

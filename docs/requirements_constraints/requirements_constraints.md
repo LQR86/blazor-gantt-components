@@ -1,0 +1,1 @@
+- UTC datetime only, no timezone allowed

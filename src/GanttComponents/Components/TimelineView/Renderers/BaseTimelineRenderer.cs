@@ -1,5 +1,6 @@
 using GanttComponents.Models;
 using GanttComponents.Services;
+using GanttComponents.Components.TimelineView.Renderers;
 
 namespace GanttComponents.Components.TimelineView.Renderers;
 
@@ -126,12 +127,73 @@ public abstract class BaseTimelineRenderer
     // === ABSTRACT METHODS FOR SUBCLASSES ===
 
     /// <summary>
-    /// Calculates the expanded header boundaries for complete header rendering.
-    /// Each zoom level pattern defines its own boundary expansion logic.
-    /// This enables automatic union expansion to prevent header truncation.
+    /// AUTOMATIC DUAL BOUNDARY EXPANSION: Final method that enforces dual boundary union calculation.
+    /// This method automatically combines primary and secondary header boundaries to ensure
+    /// both header types render completely without truncation at timeline edges.
+    /// 
+    /// ABC COMPOSITION ENFORCEMENT: Subclasses CANNOT override this method - they must implement
+    /// the abstract boundary methods, and this base class automatically calculates the union.
+    /// This guarantees that all current and future timeline patterns get dual expansion "for free".
+    /// 
+    /// NOTE: While C# doesn't allow 'sealed' on non-override methods, this method should be treated
+    /// as final. Future renderers must implement the abstract boundary calculation methods instead.
     /// </summary>
-    /// <returns>Tuple of expanded start and end dates for header rendering</returns>
-    protected abstract (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries();
+    /// <returns>Union of primary and secondary boundaries for complete header rendering</returns>
+    protected (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
+    {
+        try
+        {
+            // STEP 1: Get primary header boundaries (e.g., Month boundaries for MonthWeek pattern)
+            var primaryBounds = CalculatePrimaryBoundaries();
+            Logger.LogDebugInfo($"Primary boundaries: {primaryBounds.start} to {primaryBounds.end}");
+
+            // STEP 2: Get secondary header boundaries (e.g., Week boundaries for MonthWeek pattern)  
+            var secondaryBounds = CalculateSecondaryBoundaries();
+            Logger.LogDebugInfo($"Secondary boundaries: {secondaryBounds.start} to {secondaryBounds.end}");
+
+            // STEP 3: AUTOMATIC UNION CALCULATION - Take the widest span to ensure both headers fit
+            var unionStart = primaryBounds.start < secondaryBounds.start ? primaryBounds.start : secondaryBounds.start;
+            var unionEnd = primaryBounds.end > secondaryBounds.end ? primaryBounds.end : secondaryBounds.end;
+
+            Logger.LogDebugInfo($"Union boundaries (automatic): {unionStart} to {unionEnd}");
+            Logger.LogDebugInfo($"Dual expansion applied: Primary=[{primaryBounds.start} to {primaryBounds.end}], Secondary=[{secondaryBounds.start} to {secondaryBounds.end}], Union=[{unionStart} to {unionEnd}]");
+
+            return (unionStart, unionEnd);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error in automatic dual boundary calculation for {GetRendererDescription()}: {ex.Message}");
+            
+            // FALLBACK: Use original date range if boundary calculation fails
+            return (StartDate, EndDate);
+        }
+    }
+
+    /// <summary>
+    /// ABSTRACT: Calculate boundaries for primary header rendering (e.g., Month, Quarter, Year, Week).
+    /// Each renderer must implement this to define what period boundaries the PRIMARY header needs.
+    /// 
+    /// Examples:
+    /// - MonthWeek: Returns month boundaries (for month headers)
+    /// - QuarterMonth: Returns quarter boundaries (for quarter headers)  
+    /// - WeekDay: Returns week boundaries (for week headers)
+    /// - YearQuarter: Returns year boundaries (for year headers)
+    /// </summary>
+    /// <returns>Boundary dates for primary header complete rendering</returns>
+    protected abstract (DateTime start, DateTime end) CalculatePrimaryBoundaries();
+
+    /// <summary>
+    /// ABSTRACT: Calculate boundaries for secondary header rendering (e.g., Week, Month, Day, Quarter).
+    /// Each renderer must implement this to define what period boundaries the SECONDARY header needs.
+    /// 
+    /// Examples:
+    /// - MonthWeek: Returns week boundaries (for week headers)
+    /// - QuarterMonth: Returns month boundaries (for month headers)
+    /// - WeekDay: Returns week boundaries (for day headers within weeks)  
+    /// - YearQuarter: Returns quarter boundaries (for quarter headers)
+    /// </summary>
+    /// <returns>Boundary dates for secondary header complete rendering</returns>
+    protected abstract (DateTime start, DateTime end) CalculateSecondaryBoundaries();
 
     /// <summary>
     /// Renders the primary (top) header for the specific zoom level.

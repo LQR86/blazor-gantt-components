@@ -40,7 +40,7 @@ public class SimpleTaskGeneratorService : ISimpleTaskGeneratorService
 
         // Generate root level tasks
         var timelineSegments = DivideTimelineIntoSegments(config.ProjectStartDate, config.ProjectEndDate, rootTaskCount);
-        
+
         for (int i = 0; i < rootTaskCount; i++)
         {
             var rootTask = CreateTask(
@@ -66,20 +66,39 @@ public class SimpleTaskGeneratorService : ISimpleTaskGeneratorService
 
     public async Task<List<GanttTask>> GenerateAndSeedTasksAsync(SimpleTaskGenerationConfig config)
     {
+        // Generate tasks first (before touching database)
         var tasks = await GenerateTasksAsync(config);
 
-        _logger.LogDatabaseOperation("ClearTasks", new { Message = "Clearing existing tasks before seeding" });
-        
-        // Clear existing tasks
-        _context.Tasks.RemoveRange(_context.Tasks);
-        await _context.SaveChangesAsync();
+        _logger.LogDatabaseOperation("StartSeeding", new { Message = "Starting database seeding with transaction" });
 
-        // Add generated tasks
-        _context.Tasks.AddRange(tasks);
-        await _context.SaveChangesAsync();
+        // Use database transaction for safety
+        using var transaction = await _context.Database.BeginTransactionAsync();
 
-        _logger.LogDatabaseOperation("SeedTasks", new { TaskCount = tasks.Count, Message = "Successfully seeded generated tasks" });
-        return tasks;
+        try
+        {
+            // Clear existing tasks
+            _logger.LogDatabaseOperation("ClearTasks", new { Message = "Clearing existing tasks before seeding" });
+            _context.Tasks.RemoveRange(_context.Tasks);
+            await _context.SaveChangesAsync();
+
+            // Add generated tasks
+            _logger.LogDatabaseOperation("AddTasks", new { TaskCount = tasks.Count, Message = "Adding generated tasks" });
+            _context.Tasks.AddRange(tasks);
+            await _context.SaveChangesAsync();
+
+            // Commit transaction
+            await transaction.CommitAsync();
+            _logger.LogDatabaseOperation("SeedTasks", new { TaskCount = tasks.Count, Message = "Successfully seeded generated tasks" });
+
+            return tasks;
+        }
+        catch (Exception ex)
+        {
+            // Rollback on any error
+            await transaction.RollbackAsync();
+            _logger.LogError("Failed to seed tasks, transaction rolled back", ex);
+            throw new InvalidOperationException($"Database seeding failed: {ex.Message}", ex);
+        }
     }
 
     public List<string> ValidateConfiguration(SimpleTaskGenerationConfig config)
@@ -114,7 +133,68 @@ public class SimpleTaskGeneratorService : ISimpleTaskGeneratorService
         return errors;
     }
 
-    private void GenerateChildTasks(GanttTask parentTask, List<GanttTask> allTasks, ref int taskIdCounter, 
+    public async Task<TaskGenerationPreview> GeneratePreviewAsync(SimpleTaskGenerationConfig config)
+    {
+        var preview = new TaskGenerationPreview
+        {
+            ProjectDurationMonths = config.ProjectDurationMonths()
+        };
+
+        // Perform comprehensive validation
+        await PerformComprehensiveValidation(config, preview);
+
+        // Set overall validity based on any failed validations
+        preview.IsValid = preview.ValidationResults.All(v => v.IsValid);
+
+        // Keep the simple error list for backward compatibility
+        preview.ValidationErrors = preview.ValidationResults
+            .Where(v => !v.IsValid)
+            .Select(v => v.Message)
+            .ToList();
+
+        if (!preview.IsValid)
+        {
+            return preview;
+        }
+
+        // Generate tasks for preview - show all tasks for validation
+        var previewConfig = new SimpleTaskGenerationConfig
+        {
+            ProjectStartDate = config.ProjectStartDate,
+            ProjectEndDate = config.ProjectEndDate,
+            TotalTaskCount = config.TotalTaskCount, // Show ALL tasks in preview
+            HierarchyDepth = config.HierarchyDepth,
+            MinTasksPerParent = config.MinTasksPerParent,
+            MaxTasksPerParent = config.MaxTasksPerParent,
+            MinTaskDurationDays = config.MinTaskDurationDays,
+            MaxTaskDurationDays = config.MaxTaskDurationDays,
+            RandomSeed = config.RandomSeed ?? 12345 // Use fixed seed for consistent preview
+        };
+
+        // Get current database state
+        var currentTasks = await _context.Tasks.OrderBy(t => t.WbsCode).ToListAsync();
+        preview.CurrentDatabaseTasks = currentTasks;
+        preview.CurrentTaskCount = currentTasks.Count;
+
+        var sampleTasks = await GenerateTasksAsync(previewConfig);
+        preview.SampleTasks = sampleTasks; // Show ALL tasks in preview
+
+        // Calculate statistics based on actually generated tasks
+        preview.EstimatedTaskCount = sampleTasks.Count;
+        preview.Statistics = new GenerationStatistics
+        {
+            TotalTasks = sampleTasks.Count, // Use actual count
+            RootTasks = sampleTasks.Count(t => !t.ParentId.HasValue),
+            MaxDepth = sampleTasks.Any() ? sampleTasks.Max(t => t.WbsCode.Split('.').Length) : 0,
+            EarliestStart = sampleTasks.Any() ? sampleTasks.Min(t => t.StartDate) : config.ProjectStartDate,
+            LatestEnd = sampleTasks.Any() ? sampleTasks.Max(t => t.EndDate) : config.ProjectEndDate,
+            AverageTaskDuration = (config.MinTaskDurationDays + config.MaxTaskDurationDays) / 2
+        };
+
+        return preview;
+    }
+
+    private void GenerateChildTasks(GanttTask parentTask, List<GanttTask> allTasks, ref int taskIdCounter,
         int currentLevel, SimpleTaskGenerationConfig config, Random random, Dictionary<int, int> tasksPerLevel)
     {
         if (currentLevel >= config.HierarchyDepth)
@@ -144,7 +224,7 @@ public class SimpleTaskGeneratorService : ISimpleTaskGeneratorService
         }
     }
 
-    private GanttTask CreateTask(int id, string name, string wbsCode, int? parentId, 
+    private GanttTask CreateTask(int id, string name, string wbsCode, int? parentId,
         DateTime startDate, DateTime endDate, int progress, Random random)
     {
         var duration = (endDate - startDate).Days;
@@ -197,5 +277,249 @@ public class SimpleTaskGeneratorService : ISimpleTaskGeneratorService
         }
 
         return segments;
+    }
+
+    private async Task PerformComprehensiveValidation(SimpleTaskGenerationConfig config, TaskGenerationPreview preview)
+    {
+        var results = new List<ValidationResult>();
+
+        // 1. Database Schema Validation
+        results.Add(await ValidateDatabaseConnection());
+        results.Add(await ValidateDatabaseSchema());
+
+        // 2. Configuration Validation
+        results.AddRange(ValidateConfigurationDetailed(config));
+
+        // 3. Date and Duration Logic Validation
+        results.AddRange(ValidateDateLogic(config));
+
+        // 4. Task Generation Logic Validation
+        results.AddRange(ValidateTaskGenerationLogic(config));
+
+        // 5. Database Constraints Validation
+        results.AddRange(await ValidateDatabaseConstraints(config));
+
+        preview.ValidationResults = results;
+    }
+
+    private async Task<ValidationResult> ValidateDatabaseConnection()
+    {
+        try
+        {
+            await _context.Database.CanConnectAsync();
+            return new ValidationResult
+            {
+                Category = "Database",
+                Check = "Connection",
+                IsValid = true,
+                Message = "Database connection successful"
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ValidationResult
+            {
+                Category = "Database",
+                Check = "Connection",
+                IsValid = false,
+                Message = $"Database connection failed: {ex.Message}"
+            };
+        }
+    }
+
+    private async Task<ValidationResult> ValidateDatabaseSchema()
+    {
+        try
+        {
+            // Check if Tasks table exists and has correct schema
+            var tableExists = await _context.Tasks.AnyAsync();
+            return new ValidationResult
+            {
+                Category = "Database",
+                Check = "Schema",
+                IsValid = true,
+                Message = "Database schema validated successfully"
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ValidationResult
+            {
+                Category = "Database",
+                Check = "Schema",
+                IsValid = false,
+                Message = $"Database schema validation failed: {ex.Message}"
+            };
+        }
+    }
+
+    private List<ValidationResult> ValidateConfigurationDetailed(SimpleTaskGenerationConfig config)
+    {
+        var results = new List<ValidationResult>();
+
+        // Task count validation
+        results.Add(new ValidationResult
+        {
+            Category = "Configuration",
+            Check = "Task Count",
+            IsValid = config.TotalTaskCount > 0 && config.TotalTaskCount <= 10000,
+            Message = config.TotalTaskCount > 0 && config.TotalTaskCount <= 10000
+                ? $"Task count ({config.TotalTaskCount}) is valid"
+                : $"Task count ({config.TotalTaskCount}) must be between 1 and 10,000"
+        });
+
+        // Hierarchy depth validation
+        results.Add(new ValidationResult
+        {
+            Category = "Configuration",
+            Check = "Hierarchy Depth",
+            IsValid = config.HierarchyDepth >= 1 && config.HierarchyDepth <= 5,
+            Message = config.HierarchyDepth >= 1 && config.HierarchyDepth <= 5
+                ? $"Hierarchy depth ({config.HierarchyDepth}) is valid"
+                : $"Hierarchy depth ({config.HierarchyDepth}) must be between 1 and 5"
+        });
+
+        // Tasks per parent validation
+        results.Add(new ValidationResult
+        {
+            Category = "Configuration",
+            Check = "Tasks Per Parent",
+            IsValid = config.MinTasksPerParent <= config.MaxTasksPerParent && config.MinTasksPerParent > 0,
+            Message = config.MinTasksPerParent <= config.MaxTasksPerParent && config.MinTasksPerParent > 0
+                ? $"Tasks per parent range ({config.MinTasksPerParent}-{config.MaxTasksPerParent}) is valid"
+                : $"Invalid tasks per parent range: min({config.MinTasksPerParent}) must be ≤ max({config.MaxTasksPerParent}) and > 0"
+        });
+
+        return results;
+    }
+
+    private List<ValidationResult> ValidateDateLogic(SimpleTaskGenerationConfig config)
+    {
+        var results = new List<ValidationResult>();
+
+        // Date range validation
+        var isDateRangeValid = config.ProjectStartDate < config.ProjectEndDate;
+        results.Add(new ValidationResult
+        {
+            Category = "Date Logic",
+            Check = "Date Range",
+            IsValid = isDateRangeValid,
+            Message = isDateRangeValid
+                ? $"Project dates ({config.ProjectStartDate:yyyy-MM-dd} to {config.ProjectEndDate:yyyy-MM-dd}) are valid"
+                : $"Start date ({config.ProjectStartDate:yyyy-MM-dd}) must be before end date ({config.ProjectEndDate:yyyy-MM-dd})"
+        });
+
+        // Project duration validation
+        var projectDuration = (config.ProjectEndDate - config.ProjectStartDate).Days;
+        var isDurationReasonable = projectDuration >= 1 && projectDuration <= 3650; // 1 day to 10 years
+        results.Add(new ValidationResult
+        {
+            Category = "Date Logic",
+            Check = "Project Duration",
+            IsValid = isDurationReasonable,
+            Message = isDurationReasonable
+                ? $"Project duration ({projectDuration} days) is reasonable"
+                : $"Project duration ({projectDuration} days) should be between 1 and 3,650 days"
+        });
+
+        // Task duration validation
+        var isTaskDurationValid = config.MinTaskDurationDays <= config.MaxTaskDurationDays &&
+                                 config.MinTaskDurationDays > 0 &&
+                                 config.MaxTaskDurationDays <= projectDuration;
+        results.Add(new ValidationResult
+        {
+            Category = "Date Logic",
+            Check = "Task Duration Range",
+            IsValid = isTaskDurationValid,
+            Message = isTaskDurationValid
+                ? $"Task duration range ({config.MinTaskDurationDays}-{config.MaxTaskDurationDays} days) is valid"
+                : $"Invalid task duration range: must be positive and within project duration ({projectDuration} days)"
+        });
+
+        return results;
+    }
+
+    private List<ValidationResult> ValidateTaskGenerationLogic(SimpleTaskGenerationConfig config)
+    {
+        var results = new List<ValidationResult>();
+
+        // Estimated task count vs configuration
+        var estimatedTasks = CalculateEstimatedTaskCount(config);
+        var isTaskCountRealistic = Math.Abs(estimatedTasks - config.TotalTaskCount) <= config.TotalTaskCount * 0.5; // Within 50%
+        results.Add(new ValidationResult
+        {
+            Category = "Generation Logic",
+            Check = "Task Count Estimation",
+            IsValid = isTaskCountRealistic,
+            Message = isTaskCountRealistic
+                ? $"Requested task count ({config.TotalTaskCount}) is achievable (estimated: {estimatedTasks})"
+                : $"Requested task count ({config.TotalTaskCount}) may not be achievable (estimated: {estimatedTasks})"
+        });
+
+        // WBS code generation capacity
+        var maxPossibleTasks = CalculateMaxPossibleTasks(config);
+        var isWithinCapacity = config.TotalTaskCount <= maxPossibleTasks;
+        results.Add(new ValidationResult
+        {
+            Category = "Generation Logic",
+            Check = "WBS Capacity",
+            IsValid = isWithinCapacity,
+            Message = isWithinCapacity
+                ? $"Task count ({config.TotalTaskCount}) is within WBS capacity ({maxPossibleTasks})"
+                : $"Task count ({config.TotalTaskCount}) exceeds WBS capacity ({maxPossibleTasks})"
+        });
+
+        return results;
+    }
+
+    private async Task<List<ValidationResult>> ValidateDatabaseConstraints(SimpleTaskGenerationConfig config)
+    {
+        var results = new List<ValidationResult>();
+
+        // Check current database size
+        var currentTaskCount = await _context.Tasks.CountAsync();
+        results.Add(new ValidationResult
+        {
+            Category = "Database Constraints",
+            Check = "Current Data",
+            IsValid = true,
+            Message = currentTaskCount > 0
+                ? $"Database contains {currentTaskCount} tasks (will be replaced)"
+                : "Database is empty (ready for seeding)"
+        });
+
+        // Check for potential conflicts
+        var hasConflicts = currentTaskCount > 0;
+        results.Add(new ValidationResult
+        {
+            Category = "Database Constraints",
+            Check = "Data Replacement",
+            IsValid = true,
+            Message = hasConflicts
+                ? "⚠️ Existing data will be completely replaced"
+                : "No data conflicts - safe to seed"
+        });
+
+        return results;
+    }
+
+    private int CalculateEstimatedTaskCount(SimpleTaskGenerationConfig config)
+    {
+        // Simple estimation based on hierarchy
+        var rootTasks = Math.Max(1, config.TotalTaskCount / (int)Math.Pow(config.MaxTasksPerParent, config.HierarchyDepth - 1));
+        var estimatedTotal = 0;
+
+        for (int level = 0; level < config.HierarchyDepth; level++)
+        {
+            estimatedTotal += rootTasks * (int)Math.Pow(config.MaxTasksPerParent, level);
+        }
+
+        return estimatedTotal;
+    }
+
+    private int CalculateMaxPossibleTasks(SimpleTaskGenerationConfig config)
+    {
+        // Calculate maximum tasks possible with given hierarchy constraints
+        return (int)Math.Pow(config.MaxTasksPerParent, config.HierarchyDepth) * 10; // Conservative estimate
     }
 }

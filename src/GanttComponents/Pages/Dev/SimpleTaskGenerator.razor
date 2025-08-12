@@ -49,7 +49,7 @@
                     <input type="number" class="form-control" @bind="Config.TotalTaskCount" min="1" max="1000" />
                     @if (ProjectDurationMonths > 0)
                     {
-                        <small class="text-muted">Suggested: ~@(ProjectDurationMonths * 10) tasks (@(ProjectDurationMonths * 10) tasks/month)</small>
+                        <small class="text-muted">Suggested: ~@(ProjectDurationMonths * 10) tasks (avg. 10 tasks/month)</small>
                     }
                 </div>
                 <div class="mb-3">
@@ -137,21 +137,33 @@
         <div class="row">
             <div class="col-md-8">
                 <div class="d-grid gap-2 d-md-flex">
-                    <button class="btn btn-success btn-lg" @onclick="GenerateAndSeedTasks" disabled="@IsGenerating">
+                    <button class="btn btn-primary btn-lg" @onclick="GeneratePreview" disabled="@IsGenerating">
                         @if (IsGenerating)
                         {
                             <span class="spinner-border spinner-border-sm me-2"></span>
-                            <text>Generating...</text>
+                            <text>Generating Preview...</text>
                         }
                         else
                         {
-                            <i class="fas fa-cogs me-2"></i>
-                            <text>Generate and Seed Database</text>
+                            <i class="fas fa-search me-2"></i>
+                            <text>Generate Preview & Validate</text>
                         }
                     </button>
-                    <button class="btn btn-outline-secondary" @onclick="ValidateConfiguration">
-                        🔍 Validate Configuration
-                    </button>
+                    @if (Preview != null && Preview.IsValid)
+                    {
+                        <button class="btn btn-success btn-lg" @onclick="SeedDatabase" disabled="@IsSeeding">
+                            @if (IsSeeding)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                <text>Seeding Database...</text>
+                            }
+                            else
+                            {
+                                <i class="fas fa-database me-2"></i>
+                                <text>Seed Database</text>
+                            }
+                        </button>
+                    }
                 </div>
             </div>
             <div class="col-md-4 text-end">
@@ -166,12 +178,199 @@
     </div>
 </div>
 
+@* Preview Results Section *@
+@if (Preview != null)
+{
+    <div class="card mt-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                @if (Preview.IsValid)
+                {
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <text>Validation Passed</text>
+                }
+                else
+                {
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    <text>Validation Issues Found</text>
+                }
+            </h4>
+            <small class="text-muted">Preview generated with @Preview.EstimatedTaskCount estimated tasks</small>
+        </div>
+        <div class="card-body">
+            @if (Preview.ValidationErrors.Any())
+            {
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-exclamation-triangle me-2"></i>Validation Errors:</h6>
+                    <ul class="mb-0">
+                        @foreach (var error in Preview.ValidationErrors)
+                        {
+                            <li>@error</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            @* Detailed Validation Results *@
+            @if (Preview.ValidationResults.Any())
+            {
+                <div class="mb-4">
+                    <h6><i class="fas fa-clipboard-check me-2"></i>Detailed Validation Results</h6>
+                    <div class="row">
+                        @foreach (var categoryGroup in Preview.ValidationResults.GroupBy(v => v.Category))
+                        {
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-header py-2 bg-transparent">
+                                        <strong>@categoryGroup.Key</strong>
+                                    </div>
+                                    <div class="card-body py-2">
+                                        @foreach (var result in categoryGroup)
+                                        {
+                                            <div class="d-flex align-items-center mb-1">
+                                                <span class="me-2">@result.Icon</span>
+                                                <small class="@result.CssClass">
+                                                    <strong>@result.Check:</strong> @result.Message
+                                                </small>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="row">
+                <div class="col-md-4">
+                    <h6><i class="fas fa-chart-bar me-2"></i>Generation Statistics</h6>
+                    <table class="table table-sm">
+                        <tr><td>Current DB Tasks:</td><td><strong>@Preview.CurrentTaskCount</strong></td></tr>
+                        <tr><td>Will Generate:</td><td><strong>@Preview.Statistics.TotalTasks</strong></td></tr>
+                        <tr><td>After Replacement:</td><td><strong>@Preview.Statistics.TotalTasks</strong> (replaces all current)</td></tr>
+                        <tr><td>Root Tasks:</td><td>@Preview.Statistics.RootTasks</td></tr>
+                        <tr><td>Max Depth:</td><td>@Preview.Statistics.MaxDepth</td></tr>
+                        <tr><td>Avg Duration:</td><td>@Preview.Statistics.AverageTaskDuration days</td></tr>
+                        <tr><td>Project Span:</td><td>@((Preview.Statistics.LatestEnd - Preview.Statistics.EarliestStart).Days) days</td></tr>
+                    </table>
+                </div>
+                <div class="col-md-8">
+                    <h6><i class="fas fa-database me-2"></i>Database Comparison</h6>
+                    <p class="text-muted small">Current database contents vs. new tasks to be generated</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* Current Database Table *@
+@if (Preview != null)
+{
+    <div class="card mt-3">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="fas fa-database me-2"></i>Current Database (@Preview.CurrentTaskCount tasks)</h6>
+        </div>
+        <div class="card-body">
+            @if (Preview.CurrentDatabaseTasks.Any())
+            {
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-sm table-striped">
+                        <thead class="table-secondary sticky-top">
+                            <tr>
+                                <th>WBS</th>
+                                <th>Name</th>
+                                <th>Start</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var task in Preview.CurrentDatabaseTasks)
+                            {
+                                <tr>
+                                    <td><code>@task.WbsCode</code></td>
+                                    <td style="padding-left: @((task.WbsCode.Split('.').Length - 1) * 15)px;">
+                                        @if (task.WbsCode.Contains('.'))
+                                        {
+                                            <i class="fas fa-arrow-right text-muted me-1" style="font-size: 0.7em;"></i>
+                                        }
+                                        @task.Name
+                                    </td>
+                                    <td>@task.StartDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@task.Duration</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>Database is currently empty
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@* New Tasks Table *@
+@if (Preview != null)
+{
+    <div class="card mt-3">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="fas fa-plus-circle me-2"></i>New Tasks to Generate (@Preview.Statistics.TotalTasks tasks)</h6>
+        </div>
+        <div class="card-body">
+            @if (Preview.SampleTasks.Any())
+            {
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-sm table-striped">
+                        <thead class="table-success sticky-top">
+                            <tr>
+                                <th>WBS</th>
+                                <th>Name</th>
+                                <th>Start</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var task in Preview.SampleTasks)
+                            {
+                                <tr>
+                                    <td><code>@task.WbsCode</code></td>
+                                    <td style="padding-left: @((task.WbsCode.Split('.').Length - 1) * 15)px;">
+                                        @if (task.WbsCode.Contains('.'))
+                                        {
+                                            <i class="fas fa-arrow-right text-muted me-1" style="font-size: 0.7em;"></i>
+                                        }
+                                        @task.Name
+                                    </td>
+                                    <td>@task.StartDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@task.Duration</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">No new tasks to preview</p>
+            }
+        </div>
+    </div>
+}
+}
+
 @code {
     private SimpleTaskGenerationConfig Config = new();
     private string StatusMessage = "";
     private bool IsSuccess = false;
     private bool IsGenerating = false;
+    private bool IsSeeding = false;
     private int CurrentTaskCount = 0;
+    private TaskGenerationPreview? Preview = null;
 
     private int ProjectDurationMonths => Config.ProjectEndDate > Config.ProjectStartDate 
         ? (int)Math.Ceiling((Config.ProjectEndDate - Config.ProjectStartDate).TotalDays / 30.0) 
@@ -184,7 +383,10 @@
         // Set default values
         Config.ProjectStartDate = DateTime.Today;
         Config.ProjectEndDate = DateTime.Today.AddMonths(12);
-        Config.TotalTaskCount = 50;
+        
+        // Set default task count to suggested number
+        Config.TotalTaskCount = Config.SuggestedTaskCount();
+        
         Config.HierarchyDepth = 3;
         Config.MinTasksPerParent = 3;
         Config.MaxTasksPerParent = 7;
@@ -274,40 +476,81 @@
         return Task.CompletedTask;
     }
 
-    private async Task GenerateAndSeedTasks()
+    private async Task GeneratePreview()
     {
         IsGenerating = true;
         StatusMessage = "";
+        Preview = null;
         StateHasChanged();
 
         try
         {
-            // Validate first
-            var validationErrors = ((SimpleTaskGeneratorService)TaskGenerator).ValidateConfiguration(Config);
-            if (validationErrors.Any())
+            Preview = await TaskGenerator.GeneratePreviewAsync(Config);
+            
+            if (Preview.IsValid)
             {
-                StatusMessage = $"Configuration validation failed: {string.Join(", ", validationErrors)}";
-                IsSuccess = false;
-                return;
+                StatusMessage = $"✅ Preview generated successfully! {Preview.Statistics.TotalTasks} tasks ready to seed.";
+                IsSuccess = true;
             }
-
-            // Generate and seed
-            var tasks = await TaskGenerator.GenerateAndSeedTasksAsync(Config);
-            
-            StatusMessage = $"✅ Successfully generated and seeded {tasks.Count} tasks!";
-            IsSuccess = true;
-            
-            // Refresh current count
-            await LoadCurrentTaskCount();
+            else
+            {
+                StatusMessage = $"⚠️ Validation issues found. Please review and fix before seeding.";
+                IsSuccess = false;
+            }
         }
         catch (Exception ex)
         {
-            StatusMessage = $"❌ Error generating tasks: {ex.Message}";
+            StatusMessage = $"❌ Error generating preview: {ex.Message}";
             IsSuccess = false;
+            Preview = null;
         }
         finally
         {
             IsGenerating = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SeedDatabase()
+    {
+        if (Preview == null || !Preview.IsValid)
+        {
+            StatusMessage = "❌ Cannot seed database: No valid preview available.";
+            return;
+        }
+
+        // Additional safety check - ensure all validations passed
+        var failedValidations = Preview.ValidationResults.Where(v => !v.IsValid).ToList();
+        if (failedValidations.Any())
+        {
+            StatusMessage = $"❌ Cannot seed database: {failedValidations.Count} validation(s) failed.";
+            return;
+        }
+
+        IsSeeding = true;
+        StatusMessage = "🔄 Seeding database with transaction safety...";
+        StateHasChanged();
+
+        try
+        {
+            var tasks = await TaskGenerator.GenerateAndSeedTasksAsync(Config);
+            
+            StatusMessage = $"✅ Successfully seeded {tasks.Count} tasks to database! All data replaced safely.";
+            IsSuccess = true;
+            
+            // Refresh current count and clear preview
+            await LoadCurrentTaskCount();
+            Preview = null;
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"❌ Database seeding failed: {ex.Message} (Original data preserved)";
+            IsSuccess = false;
+            // Note: Error details are logged by the service layer
+        }
+        finally
+        {
+            IsSeeding = false;
             StateHasChanged();
         }
     }

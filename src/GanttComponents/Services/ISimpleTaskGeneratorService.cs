@@ -28,4 +28,11 @@ public interface ISimpleTaskGeneratorService
     /// <param name="config">Configuration to validate</param>
     /// <returns>List of validation error messages (empty if valid)</returns>
     List<string> ValidateConfiguration(SimpleTaskGenerationConfig config);
+
+    /// <summary>
+    /// Generates preview information showing what would be created without actually creating tasks
+    /// </summary>
+    /// <param name="config">Generation configuration parameters</param>
+    /// <returns>Preview information including validation results and sample tasks</returns>
+    Task<TaskGenerationPreview> GeneratePreviewAsync(SimpleTaskGenerationConfig config);
 }

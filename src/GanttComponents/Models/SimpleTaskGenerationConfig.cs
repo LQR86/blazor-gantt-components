@@ -103,3 +103,80 @@ public class SimpleTaskGenerationConfig
         return duration.TotalDays / 30.0;
     }
 }
+
+/// <summary>
+/// Preview information for task generation showing what would be created
+/// </summary>
+public class TaskGenerationPreview
+{
+    /// <summary>
+    /// Whether the configuration is valid for generation
+    /// </summary>
+    public bool IsValid { get; set; }
+
+    /// <summary>
+    /// List of validation error messages (empty if valid)
+    /// </summary>
+    public List<string> ValidationErrors { get; set; } = new();
+
+    /// <summary>
+    /// Estimated number of tasks that will be generated
+    /// </summary>
+    public int EstimatedTaskCount { get; set; }
+
+    /// <summary>
+    /// Project duration in months
+    /// </summary>
+    public double ProjectDurationMonths { get; set; }
+
+    /// <summary>
+    /// Sample of first few tasks that would be generated (for preview)
+    /// </summary>
+    public List<GanttTask> SampleTasks { get; set; } = new();
+
+    /// <summary>
+    /// Statistics about the generation
+    /// </summary>
+    public GenerationStatistics Statistics { get; set; } = new();
+
+    /// <summary>
+    /// Current tasks in database (before seeding)
+    /// </summary>
+    public List<GanttTask> CurrentDatabaseTasks { get; set; } = new();
+
+    /// <summary>
+    /// Count of current tasks in database
+    /// </summary>
+    public int CurrentTaskCount { get; set; }
+
+    /// <summary>
+    /// Detailed validation results
+    /// </summary>
+    public List<ValidationResult> ValidationResults { get; set; } = new();
+}
+
+/// <summary>
+/// Detailed validation result with category and status
+/// </summary>
+public class ValidationResult
+{
+    public string Category { get; set; } = string.Empty;
+    public string Check { get; set; } = string.Empty;
+    public bool IsValid { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string Icon => IsValid ? "✅" : "❌";
+    public string CssClass => IsValid ? "text-success" : "text-danger";
+}
+
+/// <summary>
+/// Statistics about task generation
+/// </summary>
+public class GenerationStatistics
+{
+    public int TotalTasks { get; set; }
+    public int RootTasks { get; set; }
+    public int MaxDepth { get; set; }
+    public DateTime EarliestStart { get; set; }
+    public DateTime LatestEnd { get; set; }
+    public int AverageTaskDuration { get; set; }
+}

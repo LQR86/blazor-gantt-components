@@ -1,0 +1,113 @@
+@using GanttComponents.Models
+@using GanttComponents.Services
+@using GanttComponents.Components.TimelineView.Renderers
+@using Microsoft.AspNetCore.Components
+
+<div id="timeline-export-@ComponentId" class="timeline-export-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
+    
+    @* Single Unified SVG for Export - Headers + Body in one SVG *@
+    <svg class="timeline-export-svg" 
+         viewBox="0 0 @TotalWidth @(TotalHeight + TotalHeaderHeight)"
+         width="@TotalWidth" 
+         height="@(TotalHeight + TotalHeaderHeight)">
+        
+        <!-- Headers at top -->
+        <g class="svg-headers">
+            @((MarkupString)RenderSVGHeaders())
+        </g>
+        
+        <!-- Body offset by header height -->
+        <g class="svg-timeline-body" transform="translate(0, @TotalHeaderHeight)">
+            <!-- Grid lines for days -->
+            @for (var day = StartDate; day <= EndDate; day = day.AddDays(1))
+            {
+                var x = DayToPixel(day);
+                <line x1="@x" y1="0" x2="@x" y2="@TotalHeight" 
+                      class="timeline-grid-line" />
+            }
+            
+            <!-- Simple Task bars - No interactions -->
+            @if (Tasks != null)
+            {
+                @for (int i = 0; i < Tasks.Count; i++)
+                {
+                    var task = Tasks[i];
+                    var y = i * RowHeight + TaskBarMargin;
+                    var x = DayToPixel(task.StartDate);
+                    var width = CalculateTaskWidth(task);
+                    
+                    <!-- Simple task bar - no background row, no interactions -->
+                    <rect x="@x" y="@y" width="@width" height="@TaskBarHeight"
+                          class="timeline-task-bar" />
+                    
+                    <!-- Task text label -->
+                    <svg:text x="@(x + 4)" y="@(y + 14)">@task.Name</svg:text>
+                }
+            }
+        </g>
+    </svg>
+</div>
+
+<style>
+    /* Export-specific styles optimized for PDF generation */
+    .timeline-export-container {
+        position: relative;
+        display: block; /* Simpler layout for export */
+        background: var(--gantt-surface, #ffffff);
+        /* No borders for clean export */
+        
+        /* Print-friendly properties */
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .timeline-export-svg {
+        display: block;
+        /* Vector graphics - perfect for PDF export */
+        shape-rendering: crispEdges; /* Sharp lines for export */
+    }
+
+    /* Grid lines - lighter for export */
+    .timeline-grid-line {
+        stroke: var(--gantt-outline, #e0e0e0);
+        stroke-width: 0.5; /* Thinner lines for export */
+        opacity: 0.7; /* Subtle grid */
+    }
+
+    /* Task bars - clean export styling */
+    .timeline-task-bar {
+        fill: var(--gantt-primary, #1976d2);
+        stroke: var(--gantt-primary-dark, #1565c0);
+        stroke-width: 1;
+        /* NO interactive styles - no hover, focus, or cursor changes */
+    }
+
+    /* SVG Text - clean and readable */
+    .timeline-export-svg text {
+        font-family: var(--gantt-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+        font-size: 12px;
+        fill: var(--gantt-on-surface, #212121);
+        /* Ensure text is always readable in export */
+        text-rendering: optimizeLegibility;
+    }
+
+    /* Headers - clean export styling */
+    .svg-headers text {
+        font-weight: 500;
+        fill: var(--gantt-on-surface-variant, #424242);
+    }
+
+    /* Print optimization */
+    @@media print {
+        .timeline-export-container {
+            break-inside: avoid; /* Avoid page breaks inside timeline */
+            page-break-inside: avoid;
+        }
+        
+        .timeline-export-svg {
+            max-width: 100%;
+            height: auto;
+        }
+    }
+</style>

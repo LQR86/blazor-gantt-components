@@ -227,6 +227,17 @@ public partial class TimelineView : ComponentBase, IDisposable
 
         TotalWidth = Math.Max(100, (int)(expandedDays * EffectiveDayWidth)); // Minimum 100px width
         TotalHeight = Math.Max(50, Tasks.Count * RowHeight); // Minimum 50px height
+
+        // ALIGNMENT VALIDATION: Ensure header and body use identical widths
+        var headerViewBox = SVGRenderingHelpers.GetHeaderViewBox(TotalWidth, TotalHeaderHeight);
+        var bodyViewBox = SVGRenderingHelpers.GetBodyViewBox(TotalWidth, (int)TotalHeight);
+        var headerWidth = headerViewBox.Split(' ')[2]; // Extract width from "0 0 width height"
+        var bodyWidth = bodyViewBox.Split(' ')[2];
+
+        if (headerWidth != bodyWidth)
+        {
+            throw new InvalidOperationException($"Timeline alignment error: Header width ({headerWidth}) != Body width ({bodyWidth}). ViewBoxes: Header='{headerViewBox}', Body='{bodyViewBox}'");
+        }
     }
 
     /// <summary>

@@ -93,7 +93,15 @@
         z-index: 10;
         background: var(--gantt-surface, #ffffff);
         border-bottom: 1px solid var(--gantt-outline, #e0e0e0);
-        overflow: hidden; /* Prevent horizontal scrollbar on header */
+        overflow-y: scroll; /* Reserve scrollbar space for alignment */
+        overflow-x: auto; /* Reserve horizontal scrollbar space */
+        /* Hide scrollbars while preserving space */
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+    }
+
+    .timeline-header-container::-webkit-scrollbar {
+        display: none; /* Chrome/Safari/Webkit */
     }
 
     .timeline-header-svg {
@@ -104,7 +112,8 @@
     /* Scrollable Content Container */
     .timeline-scroll-container {
         flex: 1;
-        overflow: auto;
+        overflow-y: scroll; /* Always reserve scrollbar space for alignment */
+        overflow-x: auto; /* Allow horizontal scrolling when needed */
         position: relative;
     }
 

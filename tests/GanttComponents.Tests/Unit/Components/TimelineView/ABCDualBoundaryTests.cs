@@ -166,7 +166,7 @@ public class ABCDualBoundaryTests
         // Should complete 1000 calculations reasonably fast (under 2 seconds in debug builds)
         Assert.True(stopwatch.ElapsedMilliseconds < 2000,
             $"ABC dual boundary calculation too slow: {stopwatch.ElapsedMilliseconds}ms for 1000 operations");
-        
+
         // Log performance for monitoring (should be much faster in release builds)
         _mockLogger.LogInfo($"ABC boundary calculation performance: {stopwatch.ElapsedMilliseconds}ms for 1000 operations");
     }

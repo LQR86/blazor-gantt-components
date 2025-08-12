@@ -1,0 +1,314 @@
+@page "/dev/simple-task-generator"
+@using GanttComponents.Models
+@using GanttComponents.Services
+@inject ISimpleTaskGeneratorService TaskGenerator
+@inject IGanttI18N I18N
+
+<PageTitle>🛠️ Simple Task Generator - Development Tool</PageTitle>
+
+<h1>🛠️ Simple Task Generator</h1>
+<p>Development tool for generating test data with configurable parameters</p>
+
+@if (!string.IsNullOrEmpty(StatusMessage))
+{
+    <div class="alert @(IsSuccess ? "alert-success" : "alert-danger")">
+        @StatusMessage
+    </div>
+}
+
+<div class="card">
+    <div class="card-header">
+        <h4>📅 Generation Parameters</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Project Timeline -->
+            <div class="col-md-6">
+                <h5>📅 Project Timeline</h5>
+                <div class="mb-3">
+                    <label class="form-label">Project Start Date</label>
+                    <input type="date" class="form-control" @bind="Config.ProjectStartDate" @bind:format="yyyy-MM-dd" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Project End Date</label>
+                    <input type="date" class="form-control" @bind="Config.ProjectEndDate" @bind:format="yyyy-MM-dd" />
+                </div>
+                @if (ProjectDurationMonths > 0)
+                {
+                    <div class="alert alert-info">
+                        <strong>Duration:</strong> @ProjectDurationMonths months (@((ProjectDurationMonths / 12.0).ToString("F1")) years)
+                    </div>
+                }
+            </div>
+
+            <!-- Task Generation Settings -->
+            <div class="col-md-6">
+                <h5>📊 Task Generation Settings</h5>
+                <div class="mb-3">
+                    <label class="form-label">Total Number of Tasks</label>
+                    <input type="number" class="form-control" @bind="Config.TotalTaskCount" min="1" max="1000" />
+                    @if (ProjectDurationMonths > 0)
+                    {
+                        <small class="text-muted">Suggested: ~@(ProjectDurationMonths * 10) tasks (@(ProjectDurationMonths * 10) tasks/month)</small>
+                    }
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Hierarchy Depth</label>
+                    <select class="form-select" @bind="Config.HierarchyDepth">
+                        <option value="2">2 levels</option>
+                        <option value="3">3 levels</option>
+                        <option value="4">4 levels</option>
+                        <option value="5">5 levels</option>
+                    </select>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">Min Tasks per Parent</label>
+                        <input type="number" class="form-control" @bind="Config.MinTasksPerParent" min="1" max="10" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Max Tasks per Parent</label>
+                        <input type="number" class="form-control" @bind="Config.MaxTasksPerParent" min="1" max="20" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <!-- Task Duration & Randomization -->
+            <div class="col-md-6">
+                <h5>⏱️ Task Duration Settings</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">Min Duration (days)</label>
+                        <input type="number" class="form-control" @bind="Config.MinTaskDurationDays" min="1" max="365" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Max Duration (days)</label>
+                        <input type="number" class="form-control" @bind="Config.MaxTaskDurationDays" min="1" max="365" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Randomization -->
+            <div class="col-md-6">
+                <h5>🎲 Randomization Settings</h5>
+                <div class="mb-3">
+                    <label class="form-label">Random Seed (optional)</label>
+                    <input type="number" class="form-control" @bind="Config.RandomSeed" placeholder="Leave empty for random" />
+                    <small class="text-muted">Use same seed for reproducible results</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Presets -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h4>🎯 Quick Presets</h4>
+    </div>
+    <div class="card-body">
+        <div class="btn-group" role="group">
+            <button class="btn btn-outline-primary" @onclick="() => ApplyPreset(PresetType.Small)">
+                📊 Small Project (25 tasks, 6 months)
+            </button>
+            <button class="btn btn-outline-primary" @onclick="() => ApplyPreset(PresetType.Medium)">
+                📈 Medium Project (50 tasks, 12 months)
+            </button>
+            <button class="btn btn-outline-primary" @onclick="() => ApplyPreset(PresetType.Large)">
+                📊 Large Project (200 tasks, 36 months)
+            </button>
+            <button class="btn btn-outline-primary" @onclick="() => ApplyPreset(PresetType.Testing)">
+                🧪 Testing Dataset (10 tasks, 3 months)
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Generation Controls -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h4>💾 Database Operations</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="d-grid gap-2 d-md-flex">
+                    <button class="btn btn-success btn-lg" @onclick="GenerateAndSeedTasks" disabled="@IsGenerating">
+                        @if (IsGenerating)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            <text>Generating...</text>
+                        }
+                        else
+                        {
+                            <i class="fas fa-cogs me-2"></i>
+                            <text>Generate and Seed Database</text>
+                        }
+                    </button>
+                    <button class="btn btn-outline-secondary" @onclick="ValidateConfiguration">
+                        🔍 Validate Configuration
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4 text-end">
+                @if (CurrentTaskCount > 0)
+                {
+                    <div class="alert alert-info mb-0">
+                        <strong>Current DB:</strong> @CurrentTaskCount tasks
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private SimpleTaskGenerationConfig Config = new();
+    private string StatusMessage = "";
+    private bool IsSuccess = false;
+    private bool IsGenerating = false;
+    private int CurrentTaskCount = 0;
+
+    private int ProjectDurationMonths => Config.ProjectEndDate > Config.ProjectStartDate 
+        ? (int)Math.Ceiling((Config.ProjectEndDate - Config.ProjectStartDate).TotalDays / 30.0) 
+        : 0;
+
+    private enum PresetType { Small, Medium, Large, Testing }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Set default values
+        Config.ProjectStartDate = DateTime.Today;
+        Config.ProjectEndDate = DateTime.Today.AddMonths(12);
+        Config.TotalTaskCount = 50;
+        Config.HierarchyDepth = 3;
+        Config.MinTasksPerParent = 3;
+        Config.MaxTasksPerParent = 7;
+        Config.MinTaskDurationDays = 1;
+        Config.MaxTaskDurationDays = 60;
+
+        // TODO: Get current task count from database
+        await LoadCurrentTaskCount();
+    }
+
+    private Task LoadCurrentTaskCount()
+    {
+        try
+        {
+            // TODO: Implement this when we have access to the database service
+            CurrentTaskCount = 0; // Placeholder
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error loading current task count: {ex.Message}";
+            IsSuccess = false;
+        }
+        return Task.CompletedTask;
+    }
+
+    private void ApplyPreset(PresetType preset)
+    {
+        var today = DateTime.Today;
+        
+        switch (preset)
+        {
+            case PresetType.Small:
+                Config.ProjectStartDate = today;
+                Config.ProjectEndDate = today.AddMonths(6);
+                Config.TotalTaskCount = 25;
+                Config.HierarchyDepth = 3;
+                break;
+            
+            case PresetType.Medium:
+                Config.ProjectStartDate = today;
+                Config.ProjectEndDate = today.AddMonths(12);
+                Config.TotalTaskCount = 50;
+                Config.HierarchyDepth = 3;
+                break;
+            
+            case PresetType.Large:
+                Config.ProjectStartDate = today;
+                Config.ProjectEndDate = today.AddMonths(36);
+                Config.TotalTaskCount = 200;
+                Config.HierarchyDepth = 4;
+                break;
+            
+            case PresetType.Testing:
+                Config.ProjectStartDate = today;
+                Config.ProjectEndDate = today.AddMonths(3);
+                Config.TotalTaskCount = 10;
+                Config.HierarchyDepth = 2;
+                break;
+        }
+        
+        StateHasChanged();
+    }
+
+    private Task ValidateConfiguration()
+    {
+        try
+        {
+            var validationErrors = ((SimpleTaskGeneratorService)TaskGenerator).ValidateConfiguration(Config);
+            if (validationErrors.Any())
+            {
+                StatusMessage = $"Validation errors: {string.Join(", ", validationErrors)}";
+                IsSuccess = false;
+            }
+            else
+            {
+                StatusMessage = "✅ Configuration is valid!";
+                IsSuccess = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Validation error: {ex.Message}";
+            IsSuccess = false;
+        }
+        
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private async Task GenerateAndSeedTasks()
+    {
+        IsGenerating = true;
+        StatusMessage = "";
+        StateHasChanged();
+
+        try
+        {
+            // Validate first
+            var validationErrors = ((SimpleTaskGeneratorService)TaskGenerator).ValidateConfiguration(Config);
+            if (validationErrors.Any())
+            {
+                StatusMessage = $"Configuration validation failed: {string.Join(", ", validationErrors)}";
+                IsSuccess = false;
+                return;
+            }
+
+            // Generate and seed
+            var tasks = await TaskGenerator.GenerateAndSeedTasksAsync(Config);
+            
+            StatusMessage = $"✅ Successfully generated and seeded {tasks.Count} tasks!";
+            IsSuccess = true;
+            
+            // Refresh current count
+            await LoadCurrentTaskCount();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"❌ Error generating tasks: {ex.Message}";
+            IsSuccess = false;
+        }
+        finally
+        {
+            IsGenerating = false;
+            StateHasChanged();
+        }
+    }
+}

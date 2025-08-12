@@ -1,8 +1,10 @@
 @using GanttComponents.Models
 @using GanttComponents.Services
 @using Microsoft.AspNetCore.Components
+@using System.Reflection
 @inject IGanttI18N I18N
 @inject IUniversalLogger Logger
+@implements IDisposable
 
 <div class="timeline-zoom-controls @GetEffectiveCssClass()" style="@Style">
     @if (EffectiveConfig.ShowLevelPresets)
@@ -148,8 +150,8 @@
     
     // Zoom level filtering - for different use cases  
     [Parameter] public IReadOnlyList<TimelineZoomLevel>? VisibleZoomLevels { get; set; }
-    [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.YearQuarter3px;  // Most zoomed out (overview)
-    [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDay97px;      // Most zoomed in (detail)
+    [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.YearQuarterOptimal70px;  // Start from strategic overview
+    [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal50px;    // End at detailed daily planning
     
     // Preset-only approach: Manual zoom controls removed for v0.8.5
     // All zoom control is handled via preset level selection only
@@ -174,7 +176,7 @@
                     HideCurrentState = HideCurrentState,
                     CssClass = CssClass,
                     UseDropdownForPresets = false, // Can be added as parameter if needed
-                    MaxVisiblePresets = 11  // Updated for 11-level system
+                    MaxVisiblePresets = 4  // Updated for 4-level ABC composition system
                 };
             }
             else
@@ -207,28 +209,55 @@
             return VisibleZoomLevels;
         }
         
-        // Use min/max range - NOTE: YearQuarter3px=0 (overview) to WeekDay97px=10 (detail)
-        var allLevels = Enum.GetValues<TimelineZoomLevel>().OrderBy(x => (int)x);
-        var filteredLevels = allLevels.Where(level => (int)level >= (int)MinZoomLevel && (int)level <= (int)MaxZoomLevel).ToList();
-        
-        // Apply preset limit for visible presets
-        if (EffectiveConfig.MaxVisiblePresets > 0 && filteredLevels.Count > EffectiveConfig.MaxVisiblePresets)
+        // ABC COMPOSITION ARCHITECTURE: Show only 4 implemented levels
+        var implementedLevels = new List<TimelineZoomLevel>
         {
-            // Take evenly distributed levels across the range
-            var step = (double)filteredLevels.Count / EffectiveConfig.MaxVisiblePresets;
-            var selectedLevels = new List<TimelineZoomLevel>();
-            for (int i = 0; i < EffectiveConfig.MaxVisiblePresets; i++)
-            {
-                var index = (int)(i * step);
-                if (index < filteredLevels.Count)
-                {
-                    selectedLevels.Add(filteredLevels[index]);
-                }
-            }
-            return selectedLevels;
-        }
+            // Strategic Overview - 0.78px day width → 70px quarters
+            TimelineZoomLevel.YearQuarterOptimal70px,    // Years → Quarters
+            
+            // Monthly Planning - 2px day width → 60px months  
+            TimelineZoomLevel.QuarterMonthOptimal60px,   // Quarters → Months
+            
+            // Weekly Planning - 8px day width → 56px weeks
+            TimelineZoomLevel.MonthWeekOptimal50px,      // Months → Weeks
+            
+            // Daily Detail - 50px day width → 350px weeks
+            TimelineZoomLevel.WeekDayOptimal50px,        // Weeks → Days
+        };
+        
+        // Apply min/max range filtering if needed
+        var filteredLevels = implementedLevels
+            .Where(level => (int)level >= (int)MinZoomLevel && (int)level <= (int)MaxZoomLevel)
+            .OrderBy(x => (int)x)
+            .ToList();
         
         return filteredLevels;
+    }
+    
+    // Helper method to check if a zoom level is obsolete
+    private bool IsObsoleteZoomLevel(TimelineZoomLevel level)
+    {
+        // Check if the enum value is marked with ObsoleteAttribute
+        var field = typeof(TimelineZoomLevel).GetField(level.ToString());
+        return field?.GetCustomAttributes(typeof(ObsoleteAttribute), false).Length > 0;
+    }
+    
+    // Component lifecycle - reactive i18n support
+    protected override void OnInitialized()
+    {
+        Logger.LogComponentLifecycle("TimelineZoomControls", "OnInitialized - Reactive i18n enabled", new { 
+            CurrentZoomLevel, Preset, MinZoomLevel, MaxZoomLevel
+        });
+        
+        // Subscribe to language changes to force re-render when locale changes
+        I18N.LanguageChanged += OnLanguageChangedFromService;
+    }
+    
+    private void OnLanguageChangedFromService()
+    {
+        // Force re-render when language changes to update localized zoom level names
+        Logger.LogComponentLifecycle("TimelineZoomControls", "Language changed - forcing re-render", null);
+        InvokeAsync(StateHasChanged);
     }
     
     // Event handlers
@@ -307,5 +336,11 @@
         var levels = GetVisibleZoomLevels().OrderBy(x => (int)x).ToList();
         var result = levels.Count > 0 && CurrentZoomLevel == levels.First(); // Minimum zoom = lowest enum value (least detail)
         return result;
+    }
+    
+    public void Dispose()
+    {
+        // Unsubscribe from language changes to prevent memory leaks
+        I18N.LanguageChanged -= OnLanguageChangedFromService;
     }
 }

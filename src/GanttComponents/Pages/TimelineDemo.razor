@@ -281,8 +281,8 @@
     private GanttTask? SelectedTaskInfo { get; set; }
     
     // Zoom state properties
-    private TimelineZoomLevel CurrentZoomLevel { get; set; } = TimelineZoomLevel.QuarterMonth24px;
-    private double CurrentZoomFactor { get; set; } = 1.6; // Maintain current 40px day width
+    private TimelineZoomLevel CurrentZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px;
+    private double CurrentZoomFactor { get; set; } = 1.0; // ABC composition uses fixed 1.0 factor
     
     // Calculated properties
     private double EffectiveDayWidth => TimelineZoomService.GetConfiguration(CurrentZoomLevel).GetEffectiveDayWidth(CurrentZoomFactor);

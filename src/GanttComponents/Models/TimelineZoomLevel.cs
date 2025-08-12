@@ -1,88 +1,45 @@
 namespace GanttComponents.Models;
 
 /// <summary>
-/// Defines the optimal 11-level integral pixel zoom system for timeline visualization.
-/// Fibonacci-like progression: [3, 4, 6, 8, 12, 17, 24, 34, 48, 68, 97] px
-/// 5 pattern groups with natural transitions: YearQuarter → Month-only → QuarterMonth → MonthDay → WeekDay
-/// All day widths are integral pixels for crisp rendering and optimal performance.
+/// Timeline zoom levels for ABC composition architecture.
+/// DEVELOPMENT PHASE: Only implemented levels included for clean codebase.
+/// 4 distinct timeline patterns with different planning perspectives.
 /// </summary>
 public enum TimelineZoomLevel
 {
     /// <summary>
-    /// Year-Quarter Minimal level: 3px per day (Level 1)
-    /// Best for: Long-term strategic view with minimum day width
-    /// Pattern: Year → Quarter
-    /// Enforces 3px minimum day width boundary
+    /// Year-Quarter Pattern: 1.0px per day (Strategic Overview)
+    /// Primary Header: Years ("2025", "2026") 
+    /// Secondary Header: Quarters ("Q1", "Q2", "Q3", "Q4")
+    /// Best for: Long-term strategic planning with quarterly milestones
+    /// ABC Renderer: YearQuarter90pxRenderer
     /// </summary>
-    YearQuarter3px = 0,
+    YearQuarterOptimal70px = 23,
 
     /// <summary>
-    /// Year-Quarter Medium level: 4px per day (Level 2)
-    /// Best for: Medium annual view with quarterly periods
-    /// Pattern: Year → Quarter
+    /// Quarter-Month Pattern: 2.0px per day (Quarterly Planning)
+    /// Primary Header: Quarters ("Q1 2025", "Q2 2025")
+    /// Secondary Header: Months ("Jan", "Feb", "Mar")
+    /// Best for: Quarterly planning with monthly breakdown
+    /// ABC Renderer: QuarterMonth60pxRenderer
     /// </summary>
-    YearQuarter4px = 1,
+    QuarterMonthOptimal60px = 27,
 
     /// <summary>
-    /// Year-Quarter High level: 6px per day (Level 3)
-    /// Best for: Annual overview with quarterly breakdown
-    /// Pattern: Year → Quarter
+    /// Month-Week Pattern: 8px per day (Monthly Planning)
+    /// Primary Header: Months ("February 2025", "March 2025")
+    /// Secondary Header: Week start dates ("2/17", "2/24", "3/3")
+    /// Best for: Monthly planning with weekly breakdown
+    /// ABC Renderer: MonthWeek50pxRenderer
     /// </summary>
-    YearQuarter6px = 2,
+    MonthWeekOptimal50px = 30,
 
     /// <summary>
-    /// Month-only Medium level: 8px per day (Level 4)
-    /// Best for: Compact monthly view for overview
-    /// Pattern: Month-only
+    /// Week-Day Pattern: 50px per day (Weekly Planning)
+    /// Primary Header: Week ranges ("February 17-23, 2025")
+    /// Secondary Header: Day names with numbers ("Mon 17", "Tue 18")
+    /// Best for: Detailed weekly planning with daily breakdown
+    /// ABC Renderer: WeekDay50pxRenderer
     /// </summary>
-    Month8px = 3,
-
-    /// <summary>
-    /// Month-only High level: 12px per day (Level 5)
-    /// Best for: Month-focused view for project planning
-    /// Pattern: Month-only
-    /// </summary>
-    Month12px = 4,
-
-    /// <summary>
-    /// Quarter-Month Medium level: 17px per day (Level 6)
-    /// Best for: Medium quarterly view with monthly periods
-    /// Pattern: Quarter → Month
-    /// </summary>
-    QuarterMonth17px = 5,
-
-    /// <summary>
-    /// Quarter-Month High level: 24px per day (Level 7)
-    /// Best for: Quarterly overview with monthly breakdown
-    /// Pattern: Quarter → Month
-    /// </summary>
-    QuarterMonth24px = 6,
-
-    /// <summary>
-    /// Month-Day Medium level: 34px per day (Level 8)
-    /// Best for: Medium monthly view with daily periods
-    /// Pattern: Month → Day
-    /// </summary>
-    MonthDay34px = 7,
-
-    /// <summary>
-    /// Month-Day High level: 48px per day (Level 9)
-    /// Best for: Monthly overview with daily breakdown
-    /// Pattern: Month → Day
-    /// </summary>
-    MonthDay48px = 8,
-
-    /// <summary>
-    /// Week-Day High level: 68px per day (Level 10)
-    /// Best for: High detail weekly view with daily tracking
-    /// Pattern: Week → Day (with year context)
-    /// </summary>
-    WeekDay68px = 9,
-
-    /// <summary>
-    /// Week-Day Maximum level: 97px per day (Level 11)
-    /// Best for: Maximum detail weekly view with daily granularity
-    /// Pattern: Week → Day (with year context)
-    /// </summary>
-    WeekDay97px = 10
+    WeekDayOptimal50px = 34
 }

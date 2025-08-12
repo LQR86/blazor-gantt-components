@@ -1,0 +1,335 @@
+using GanttComponents.Models;
+using GanttComponents.Services;
+using GanttComponents.Components.TimelineView.Renderers;
+
+namespace GanttComponents.Components.TimelineView.Renderers;
+
+/// <summary>
+/// Abstract base class for timeline header renderers using template method pattern.
+/// Provides common infrastructure for all zoom level implementations while allowing
+/// specific header generation logic in concrete subclasses.
+/// </summary>
+public abstract class BaseTimelineRenderer
+{
+    // === DEPENDENCY INJECTION ===
+    protected IUniversalLogger Logger { get; }
+    protected IGanttI18N I18N { get; }
+    protected DateFormatHelper DateFormatter { get; }
+
+    // === TIMELINE PROPERTIES ===
+    protected DateTime StartDate { get; set; }
+    protected DateTime EndDate { get; set; }
+
+    /// <summary>
+    /// Fixed coordinate system reference date - always matches TimelineView's StartDate.
+    /// Used for consistent SVG positioning calculations between headers and taskbars.
+    /// This prevents coordinate system drift during boundary expansions.
+    /// </summary>
+    protected DateTime CoordinateSystemStart { get; private set; }
+
+    protected double DayWidth { get; set; }
+    protected int HeaderMonthHeight { get; set; }
+    protected int HeaderDayHeight { get; set; }
+    protected TimelineZoomLevel ZoomLevel { get; set; }
+    protected double ZoomFactor { get; set; }
+
+    // === COMPUTED PROPERTIES ===
+    protected int TotalHeaderHeight => HeaderMonthHeight + HeaderDayHeight;
+
+    /// <summary>
+    /// Constructor for dependency injection and configuration.
+    /// Includes automatic integral day width validation for visual quality.
+    /// </summary>
+    /// <param name="logger">Universal logger service</param>
+    /// <param name="i18n">Internationalization service</param>
+    /// <param name="dateFormatter">Date formatting helper</param>
+    /// <param name="startDate">Timeline start date</param>
+    /// <param name="endDate">Timeline end date</param>
+    /// <param name="dayWidth">Width of each day in pixels (must be integral)</param>
+    /// <param name="headerMonthHeight">Height of primary header</param>
+    /// <param name="headerDayHeight">Height of secondary header</param>
+    /// <param name="zoomLevel">Current zoom level</param>
+    /// <param name="zoomFactor">Current zoom factor</param>
+    protected BaseTimelineRenderer(
+        IUniversalLogger logger,
+        IGanttI18N i18n,
+        DateFormatHelper dateFormatter,
+        DateTime startDate,
+        DateTime endDate,
+        double dayWidth,
+        int headerMonthHeight,
+        int headerDayHeight,
+        TimelineZoomLevel zoomLevel,
+        double zoomFactor)
+    {
+        Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        I18N = i18n ?? throw new ArgumentNullException(nameof(i18n));
+        DateFormatter = dateFormatter ?? throw new ArgumentNullException(nameof(dateFormatter));
+
+        StartDate = startDate;
+        EndDate = endDate;
+
+        // CRITICAL FIX: Lock in the coordinate system reference to prevent drift
+        // This ensures headers and taskbars use the same pixel-to-date conversion
+        CoordinateSystemStart = startDate;
+
+        HeaderMonthHeight = headerMonthHeight;
+        HeaderDayHeight = headerDayHeight;
+        ZoomLevel = zoomLevel;
+        ZoomFactor = zoomFactor;
+
+        // CRITICAL: Validate integral day width for all renderers (DRY principle)
+        ValidateIntegralDayWidth(dayWidth, zoomLevel, zoomFactor);
+        DayWidth = dayWidth;
+    }
+
+    /// <summary>
+    /// Template method for rendering complete headers with automatic union expansion.
+    /// Orchestrates the header generation process using abstract methods.
+    /// Automatically applies boundary expansion to prevent header truncation.
+    /// </summary>
+    /// <returns>Complete SVG markup for timeline headers</returns>
+    public string RenderHeaders()
+    {
+        try
+        {
+            // UNION EXPANSION: Automatically expand timeline range for complete header rendering
+            var originalStart = StartDate;
+            var originalEnd = EndDate;
+            var (expandedStart, expandedEnd) = CalculateHeaderBoundaries();
+
+            // Apply expanded boundaries temporarily
+            StartDate = expandedStart;
+            EndDate = expandedEnd;
+
+            // Render headers with expanded range
+            var result = RenderHeadersInternal();
+
+            // CRITICAL FIX: Restore original dates after rendering
+            StartDate = originalStart;
+            EndDate = originalEnd;
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error rendering headers for {GetRendererDescription()}: {ex.Message}");
+            return $"<!-- Error in {GetRendererDescription()}: {ex.Message} -->";
+        }
+    }
+
+    /// <summary>
+    /// Internal template method for rendering headers after union expansion is applied.
+    /// Called by the public RenderHeaders method after boundary calculation.
+    /// </summary>
+    /// <returns>Complete SVG markup for timeline headers</returns>
+    private string RenderHeadersInternal()
+    {
+        var primaryHeader = RenderPrimaryHeader();
+        var secondaryHeader = RenderSecondaryHeader();
+
+        return $@"
+            <!-- {GetRendererDescription()} Headers -->
+            <g class=""{GetCSSClass()}-headers"">
+                {primaryHeader}
+                {secondaryHeader}
+            </g>";
+    }
+
+    // === ABSTRACT METHODS FOR SUBCLASSES ===
+
+    /// <summary>
+    /// AUTOMATIC DUAL BOUNDARY EXPANSION: Final method that enforces dual boundary union calculation.
+    /// This method automatically combines primary and secondary header boundaries to ensure
+    /// both header types render completely without truncation at timeline edges.
+    /// 
+    /// ABC COMPOSITION ENFORCEMENT: Subclasses CANNOT override this method - they must implement
+    /// the abstract boundary methods, and this base class automatically calculates the union.
+    /// This guarantees that all current and future timeline patterns get dual expansion "for free".
+    /// 
+    /// NOTE: While C# doesn't allow 'sealed' on non-override methods, this method should be treated
+    /// as final. Future renderers must implement the abstract boundary calculation methods instead.
+    /// </summary>
+    /// <returns>Union of primary and secondary boundaries for complete header rendering</returns>
+    public (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
+    {
+        try
+        {
+            // STEP 1: Get primary header boundaries (e.g., Month boundaries for MonthWeek pattern)
+            var primaryBounds = CalculatePrimaryBoundaries();
+            // STEP 2: Get secondary header boundaries (e.g., Week boundaries for MonthWeek pattern)  
+            var secondaryBounds = CalculateSecondaryBoundaries();
+
+            // STEP 3: AUTOMATIC UNION CALCULATION - Take the widest span to ensure both headers fit
+            var unionStart = primaryBounds.start < secondaryBounds.start ? primaryBounds.start : secondaryBounds.start;
+            var unionEnd = primaryBounds.end > secondaryBounds.end ? primaryBounds.end : secondaryBounds.end;
+
+            return (unionStart, unionEnd);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"Error in automatic dual boundary calculation for {GetRendererDescription()}: {ex.Message}");
+
+            // FALLBACK: Use original date range if boundary calculation fails
+            return (StartDate, EndDate);
+        }
+    }
+
+    /// <summary>
+    /// ABSTRACT: Calculate boundaries for primary header rendering (e.g., Month, Quarter, Year, Week).
+    /// Each renderer must implement this to define what period boundaries the PRIMARY header needs.
+    /// 
+    /// Examples:
+    /// - MonthWeek: Returns month boundaries (for month headers)
+    /// - QuarterMonth: Returns quarter boundaries (for quarter headers)  
+    /// - WeekDay: Returns week boundaries (for week headers)
+    /// - YearQuarter: Returns year boundaries (for year headers)
+    /// </summary>
+    /// <returns>Boundary dates for primary header complete rendering</returns>
+    protected abstract (DateTime start, DateTime end) CalculatePrimaryBoundaries();
+
+    /// <summary>
+    /// ABSTRACT: Calculate boundaries for secondary header rendering (e.g., Week, Month, Day, Quarter).
+    /// Each renderer must implement this to define what period boundaries the SECONDARY header needs.
+    /// 
+    /// Examples:
+    /// - MonthWeek: Returns week boundaries (for week headers)
+    /// - QuarterMonth: Returns month boundaries (for month headers)
+    /// - WeekDay: Returns week boundaries (for day headers within weeks)  
+    /// - YearQuarter: Returns quarter boundaries (for quarter headers)
+    /// </summary>
+    /// <returns>Boundary dates for secondary header complete rendering</returns>
+    protected abstract (DateTime start, DateTime end) CalculateSecondaryBoundaries();
+
+    /// <summary>
+    /// Renders the primary (top) header for the specific zoom level.
+    /// Each zoom level defines its own primary header structure.
+    /// </summary>
+    /// <returns>SVG markup for primary header</returns>
+    protected abstract string RenderPrimaryHeader();
+
+    /// <summary>
+    /// Renders the secondary (bottom) header for the specific zoom level.
+    /// Each zoom level defines its own secondary header structure.
+    /// </summary>
+    /// <returns>SVG markup for secondary header</returns>
+    protected abstract string RenderSecondaryHeader();
+
+    /// <summary>
+    /// Gets a human-readable description of this renderer for logging and debugging.
+    /// </summary>
+    /// <returns>Renderer description (e.g., "WeekDay 50px")</returns>
+    protected abstract string GetRendererDescription();
+
+    /// <summary>
+    /// Gets the CSS class prefix for this renderer's styling.
+    /// </summary>
+    /// <returns>CSS class prefix (e.g., "weekday-50px")</returns>
+    protected abstract string GetCSSClass();
+
+    // === SHARED UTILITY METHODS ===
+
+    /// <summary>
+    /// Creates an SVG rectangle element with specified properties.
+    /// </summary>
+    /// <param name="x">X position</param>
+    /// <param name="y">Y position</param>
+    /// <param name="width">Width</param>
+    /// <param name="height">Height</param>
+    /// <param name="cssClass">CSS class name</param>
+    /// <returns>SVG rect element</returns>
+    protected string CreateSVGRect(double x, double y, double width, double height, string cssClass)
+    {
+        // Add inline styles as fallback for when CSS fails to load
+        var inlineStyle = cssClass.Contains("primary") || cssClass.Contains("year") || cssClass.Contains("quarter")
+            ? "fill: #f8f9fa; stroke: #dee2e6; stroke-width: 1;"
+            : "fill: #ffffff; stroke: #dee2e6; stroke-width: 1;";
+
+        return $@"<rect x=""{x}"" y=""{y}"" width=""{width}"" height=""{height}"" 
+                       class=""{cssClass}"" style=""{inlineStyle}"" />";
+    }
+
+    /// <summary>
+    /// Creates an SVG text element with specified properties.
+    /// </summary>
+    /// <param name="x">X position</param>
+    /// <param name="y">Y position</param>
+    /// <param name="text">Text content</param>
+    /// <param name="cssClass">CSS class name</param>
+    /// <returns>SVG text element</returns>
+    protected string CreateSVGText(double x, double y, string text, string cssClass)
+    {
+        // Add inline styles as fallback for when CSS fails to load
+        var fontSize = cssClass.Contains("primary") || cssClass.Contains("year") || cssClass.Contains("quarter")
+            ? "12px" : "10px";
+        var fontWeight = cssClass.Contains("primary") || cssClass.Contains("year") || cssClass.Contains("quarter")
+            ? "600" : "500";
+        var inlineStyle = $"fill: #333333; font-family: 'Segoe UI', Arial, sans-serif; font-size: {fontSize}; font-weight: {fontWeight};";
+
+        return $@"<text x=""{x}"" y=""{y}"" class=""{cssClass}"" 
+                       text-anchor=""middle"" dominant-baseline=""middle""
+                       style=""{inlineStyle}"">{System.Net.WebUtility.HtmlEncode(text)}</text>";
+    }
+
+    /// <summary>
+    /// Gets the appropriate CSS class for header text based on position.
+    /// </summary>
+    /// <param name="isPrimary">True for primary header, false for secondary</param>
+    /// <returns>CSS class name for header text</returns>
+    protected string GetHeaderTextClass(bool isPrimary)
+    {
+        return isPrimary ? "svg-header-text-primary" : "svg-header-text-secondary";
+    }
+
+    /// <summary>
+    /// Validates that all required properties are set correctly.
+    /// </summary>
+    protected void ValidateRenderer()
+    {
+        if (StartDate == default)
+            throw new InvalidOperationException("StartDate must be set");
+        if (EndDate == default)
+            throw new InvalidOperationException("EndDate must be set");
+        if (DayWidth <= 0)
+            throw new InvalidOperationException("DayWidth must be positive");
+        if (HeaderMonthHeight <= 0)
+            throw new InvalidOperationException("HeaderMonthHeight must be positive");
+        if (HeaderDayHeight <= 0)
+            throw new InvalidOperationException("HeaderDayHeight must be positive");
+    }
+
+    // === INTEGRAL DAY WIDTH VALIDATION ===
+    // Critical for visual quality - ensures all coordinates are integral pixels
+
+    /// <summary>
+    /// INTEGRAL DAY WIDTH VALIDATION: Validates that the effective day width is integral.
+    /// This is critical for clean SVG coordinate calculations and visual quality.
+    /// Applied automatically to all renderers for DRY compliance and future-proofing.
+    /// </summary>
+    /// <param name="dayWidth">The day width to validate (in pixels)</param>
+    /// <param name="zoomLevel">Current zoom level for error reporting</param>
+    /// <param name="zoomFactor">Current zoom factor for error reporting</param>
+    /// <exception cref="InvalidOperationException">Thrown when day width validation fails</exception>
+    private void ValidateIntegralDayWidth(double dayWidth, TimelineZoomLevel zoomLevel, double zoomFactor)
+    {
+        // VALIDATION 1: Effective day width must be integral (no fractional pixels)
+        if (Math.Abs(dayWidth - Math.Round(dayWidth)) > 0.001)
+        {
+            throw new InvalidOperationException(
+                $"INTEGRAL DAY WIDTH VIOLATION: {zoomLevel} @ {zoomFactor:F1}x = {dayWidth:F3}px effective day width. " +
+                $"Pure SVG TimelineView requires integral effective day widths for clean SVG coordinate calculations. " +
+                $"Try adjusting ZoomFactor to achieve a whole number result, such as {Math.Round(dayWidth):F0}px. " +
+                $"BaseDayWidth × ZoomFactor must result in integral pixel values. " +
+                $"This validation is automatically applied to all renderers in the composition architecture.");
+        }
+
+        // VALIDATION 2: Day width must be positive
+        if (dayWidth <= 0)
+        {
+            throw new InvalidOperationException(
+                $"DAY WIDTH VALIDATION: {zoomLevel} @ {zoomFactor:F1}x = {dayWidth}px. " +
+                $"Effective day width must be positive. " +
+                $"This validation is automatically applied to all renderers in the composition architecture.");
+        }
+    }
+}

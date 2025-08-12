@@ -1,0 +1,61 @@
+/* TimelineView QuarterMonth 60px Level - Quarterly Overview */
+/* Pattern: Quarters (3 months) in primary header, Months in secondary header */
+/* Day Width: 60px - Wide spacing for clear quarterly planning */
+
+.svg-quarter-month-60px-quarter {
+    fill: #e3f2fd;
+    stroke: #1976d2;
+    stroke-width: 2px;
+}
+
+.svg-quarter-month-60px-quarter-text {
+    font-size: 16px;
+    font-weight: 700;
+    fill: #1976d2;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.svg-quarter-month-60px-month {
+    fill: #f3e5f5;
+    stroke: #7b1fa2;
+    stroke-width: 1px;
+}
+
+.svg-quarter-month-60px-month-text {
+    font-size: 14px;
+    font-weight: 500;
+    fill: #7b1fa2;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+/* Primary and secondary text for general use */
+.svg-quarter-month-60px-primary-text {
+    font-size: 16px;
+    font-weight: 700;
+    fill: #1976d2;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.svg-quarter-month-60px-secondary-text {
+    font-size: 14px;
+    font-weight: 500;
+    fill: #7b1fa2;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+/* Level-specific cell styling for quarterly overview */
+.svg-quarter-month-60px-cell-primary {
+    fill: #e3f2fd;
+    stroke: #1976d2;
+    stroke-width: 2px;
+}
+
+.svg-quarter-month-60px-cell-secondary {
+    fill: #f3e5f5;
+    stroke: #7b1fa2;
+    stroke-width: 1px;
+}

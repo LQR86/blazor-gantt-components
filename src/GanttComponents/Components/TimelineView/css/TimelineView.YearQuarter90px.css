@@ -1,0 +1,61 @@
+/* TimelineView YearQuarter 90px Level - Annual Overview */
+/* Pattern: Years in primary header, Quarters in secondary header */
+/* Day Width: 90px - Very wide spacing for long-term planning */
+
+.svg-year-quarter-90px-year {
+    fill: #e8f5e8;
+    stroke: #2e7d32;
+    stroke-width: 3px;
+}
+
+.svg-year-quarter-90px-year-text {
+    font-size: 18px;
+    font-weight: 800;
+    fill: #2e7d32;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.svg-year-quarter-90px-quarter {
+    fill: #fff3e0;
+    stroke: #f57c00;
+    stroke-width: 2px;
+}
+
+.svg-year-quarter-90px-quarter-text {
+    font-size: 16px;
+    font-weight: 600;
+    fill: #f57c00;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+/* Primary and secondary text for general use */
+.svg-year-quarter-90px-primary-text {
+    font-size: 18px;
+    font-weight: 800;
+    fill: #2e7d32;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.svg-year-quarter-90px-secondary-text {
+    font-size: 16px;
+    font-weight: 600;
+    fill: #f57c00;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+/* Level-specific cell styling for annual overview */
+.svg-year-quarter-90px-cell-primary {
+    fill: #e8f5e8;
+    stroke: #2e7d32;
+    stroke-width: 3px;
+}
+
+.svg-year-quarter-90px-cell-secondary {
+    fill: #fff3e0;
+    stroke: #f57c00;
+    stroke-width: 2px;
+}

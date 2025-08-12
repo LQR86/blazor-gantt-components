@@ -1,469 +1,80 @@
 @using GanttComponents.Models
 @using GanttComponents.Services
-@using GanttComponents.Components.TimelineHeader
+@using GanttComponents.Components.TimelineView.Renderers
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components
-@inject IUniversalLogger Logger
-@inject IGanttI18N I18N
-@inject DateFormatHelper DateFormatter
-@inject IJSRuntime JSRuntime
-@inject ITimelineHeaderService HeaderService
-@inject ITimelineTooltipService TooltipService
-@implements IDisposable
 
-<div class="timeline-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
+<div id="timeline-@ComponentId" class="timeline-container" style="--header-month-height: @(HeaderMonthHeight)px; --header-day-height: @(HeaderDayHeight)px;">
     
-    @* Floating edge tooltips - stay fixed at viewport corners during horizontal scroll *@
-    @{
-        var tooltipResult = GetTooltipResult();
-    }
-    
-    @if (tooltipResult.HasLeftTooltip)
-    {
-        <div class="timeline-viewport-tooltip timeline-viewport-tooltip-left" title="Hidden periods to the left">
-            @tooltipResult.LeftTooltip
-        </div>
-    }
-    
-    @if (tooltipResult.HasRightTooltip)
-    {
-        <div class="timeline-viewport-tooltip timeline-viewport-tooltip-right" title="Hidden periods to the right">
-            @tooltipResult.RightTooltip
-        </div>
-    }
-    
-    <div class="timeline-scroll-container" @onscroll="OnScroll">
-        @* 
-        === TIMELINE HEADER ARCHITECTURE ===
-        Header rendering is now handled by the dedicated TimelineHeader component for better:
-        - Maintainability: Header logic isolated in its own service and component
-        - Testability: Business logic can be unit tested independently  
-        - Reusability: TimelineHeader can be used standalone or in other contexts
-        - Performance: Data-driven rendering using HeaderPeriod models
-        
-        The TimelineHeader component uses TimelineHeaderService to generate periods
-        and renders them using the same CSS classes for visual consistency.
-        *@
-        <TimelineHeader StartDate="@StartDate" 
-                       EndDate="@EndDate" 
-                       EffectiveDayWidth="@EffectiveDayWidth" 
-                       ZoomLevel="@ZoomLevel"
-                       HeaderMonthHeight="@HeaderMonthHeight"
-                       HeaderDayHeight="@HeaderDayHeight" />
-        
-        <div class="timeline-body">
-        <svg class="timeline-svg" width="@(TotalWidth)" height="@(TotalHeight)">
-            <!-- Grid lines for days -->
-            @for (var day = StartDate; day <= EndDate; day = day.AddDays(1))
-            {
-                var x = DayToPixel(day);
-                <line x1="@x" y1="0" x2="@x" y2="@TotalHeight" 
-                      class="timeline-grid-line" />
-            }
-            
-            <!-- Task bars -->
-            @if (Tasks != null)
-            {
-                @for (int i = 0; i < Tasks.Count; i++)
-                {
-                    var task = Tasks[i];
-                    var y = i * RowHeight;
-                    var x = DayToPixel(task.StartDate);
-                    var width = CalculateTaskWidth(task);
-                    var rowIndex = i;
-                    
-                    <!-- Task background row -->
-                    <rect x="0" y="@y" width="@TotalWidth" height="@RowHeight"
-                          class="timeline-row @(SelectedTaskId == task.Id ? "selected" : "") @(HoveredTaskId == task.Id ? "hovered" : "")"
-                          data-task-id="@task.Id"
-                          @onclick="() => SelectTask(task.Id)"
-                          @onmouseenter="() => HoverTask(task.Id)"
-                          @onmouseleave="() => HoverTask(null)" />
-                    
-                    <!-- Task bar -->
-                    <rect x="@x" y="@(y + TaskBarMargin)" 
-                          width="@width" height="@(TaskBarHeight)"
-                          class="timeline-task-bar"
-                          data-task-id="@task.Id"
-                          @onclick="() => SelectTask(task.Id)"
-                          @onmouseenter="() => HoverTask(task.Id)"
-                          @onmouseleave="() => HoverTask(null)">
-                        <title>@GetTaskTooltip(task)</title>
-                    </rect>
-                    
-                    <!-- Task label (WBS Code) - TODO: Add text labels -->
-                    @* <svg:text x="@(x + 4)" y="@(y + RowHeight/2 + 4)" class="timeline-task-label">@task.WbsCode</svg:text> *@
-                }
-            }
+    @* Fixed Header SVG - Stays at top *@
+    <div class="timeline-header-container">
+        <svg class="timeline-header-svg" 
+             viewBox="@SVGRenderingHelpers.GetHeaderViewBox((int)TotalWidth, TotalHeaderHeight)"
+             width="@TotalWidth" 
+             height="@TotalHeaderHeight">
+            <!-- SVG Headers Group -->
+            <g class="svg-headers">
+                @((MarkupString)RenderSVGHeaders())
+            </g>
         </svg>
-        </div>
+    </div>
+
+    @* Scrollable Content SVG *@
+    <div class="timeline-scroll-container">
+        <svg class="timeline-body-svg" 
+             viewBox="@SVGRenderingHelpers.GetBodyViewBox((int)TotalWidth, (int)TotalHeight)"
+             width="@TotalWidth" 
+             height="@TotalHeight">
+            <!-- Timeline Body Group -->
+            <g class="svg-timeline-body">
+                <!-- Grid lines for days -->
+                @for (var day = StartDate; day <= EndDate; day = day.AddDays(1))
+                {
+                    var x = DayToPixel(day);
+                    <line x1="@x" y1="0" x2="@x" y2="@TotalHeight" 
+                          class="timeline-grid-line" />
+                }
+                
+                <!-- Task bars -->
+                @if (Tasks != null)
+                {
+                    @for (int i = 0; i < Tasks.Count; i++)
+                    {
+                        var task = Tasks[i];
+                        var y = i * RowHeight;
+                        var x = DayToPixel(task.StartDate);
+                        var width = CalculateTaskWidth(task);
+                        var rowIndex = i;
+                        
+                        <!-- Task background row -->
+                        <rect x="0" y="@y" width="@TotalWidth" height="@RowHeight"
+                              class="timeline-row @(SelectedTaskId == task.Id ? "selected" : "") @(HoveredTaskId == task.Id ? "hovered" : "")"
+                              data-task-id="@task.Id"
+                              @onclick="() => SelectTask(task.Id)"
+                              @onmouseenter="() => HoverTask(task.Id)"
+                              @onmouseleave="() => HoverTask(null)" />
+                        
+                        <!-- Task bar -->
+                        <rect x="@x" y="@(y + TaskBarMargin)" 
+                              width="@width" height="@(TaskBarHeight)"
+                              class="timeline-task-bar"
+                              data-task-id="@task.Id"
+                              @onclick="() => SelectTask(task.Id)"
+                              @onmouseenter="() => HoverTask(task.Id)"
+                              @onmouseleave="() => HoverTask(null)">
+                            <title>@GetTaskTooltip(task)</title>
+                        </rect>
+                        
+                        <!-- Task label (WBS Code) - TODO: Add text labels -->
+                        @* <svg:text x="@(x + 4)" y="@(y + RowHeight/2 + 4)" class="timeline-task-label">@task.WbsCode</svg:text> *@
+                    }
+                }
+            </g>
+        </svg>
     </div>
 </div>
 
-@code {
-    [Parameter, EditorRequired] public List<GanttTask> Tasks { get; set; } = new();
-    [Parameter] public EventCallback<int> OnTaskSelected { get; set; }
-    [Parameter] public EventCallback<EventArgs> OnScrollChanged { get; set; }
-    [Parameter] public int? SelectedTaskId { get; set; }
-    [Parameter, EditorRequired] public int RowHeight { get; set; } = 32; // Default row height for alignment
-    [Parameter, EditorRequired] public int HeaderMonthHeight { get; set; } = 32; // Month row height
-    [Parameter, EditorRequired] public int HeaderDayHeight { get; set; } = 24; // Day row height
-    [Parameter] public EventCallback<int?> OnTaskHovered { get; set; }
-    [Parameter] public int? HoveredTaskId { get; set; }
-    
-    // Zoom parameters - maintain backward compatibility with current 40px day width
-    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.QuarterMonth24px;
-    
-    // Viewport tracking for tooltip edge detection
-    private double ViewportScrollLeft { get; set; } = 0;
-    private double ViewportWidth { get; set; } = 1000;
-    [Parameter] public double ZoomFactor { get; set; } = 1.6; // 25px * 1.6 = 40px (maintains current behavior)
-    
-    // Zoom state change events
-    [Parameter] public EventCallback<TimelineZoomLevel> OnZoomLevelChanged { get; set; }
-    [Parameter] public EventCallback<double> OnZoomFactorChanged { get; set; }
-    
-    // Timeline configuration
-    // Legacy constant maintained for reference - replaced by EffectiveDayWidth property
-    private const int LegacyDayWidth = 40; // Was: 40px per day (fixed scale)
-    private const int TaskBarHeight = 20;
-    private const int TaskBarMargin = 6; // Center task bar in row
-    
-    // Dynamic day width based on zoom level and factor
-    private double EffectiveDayWidth
-    {
-        get
-        {
-            var config = TimelineZoomService.GetConfiguration(ZoomLevel);
-            return config.GetEffectiveDayWidth(ZoomFactor);
-        }
-    }
-    
-    // Calculated total header height
-    private int TotalHeaderHeight => HeaderMonthHeight + HeaderDayHeight;
-    
-    // Timeline date range
-    private DateTime StartDate { get; set; }
-    private DateTime EndDate { get; set; }
-    private int TotalWidth { get; set; }
-    private int TotalHeight { get; set; }
 
-    protected override void OnInitialized()
-    {
-        Logger.LogComponentLifecycle("TimelineView", "OnInitialized", new { TaskCount = Tasks.Count });
-        
-        // Subscribe to language changes
-        I18N.LanguageChanged += OnLanguageChanged;
-        
-        CalculateTimelineRange();
-    }
-
-    protected override void OnParametersSet()
-    {
-        // Validate required parameters for tooltip functionality
-        ValidateRequiredParameters();
-        
-        CalculateTimelineRange();
-        StateHasChanged();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            try
-            {
-                // Initialize viewport width after first render
-                ViewportWidth = await JSRuntime.InvokeAsync<double>("eval", "document.querySelector('.timeline-scroll-container')?.clientWidth || 1000");
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError($"Error initializing viewport width: {ex.Message}");
-                ViewportWidth = 1000; // Fallback default
-            }
-        }
-    }
-
-    private void CalculateTimelineRange()
-    {
-        DateTime taskStartDate, taskEndDate;
-        
-        if (!Tasks.Any())
-        {
-            // Default range if no tasks
-            taskStartDate = DateTime.UtcNow.Date.AddDays(-30);
-            taskEndDate = DateTime.UtcNow.Date.AddDays(90);
-        }
-        else
-        {
-            taskStartDate = Tasks.Min(t => t.StartDate).Date.AddDays(-7);
-            taskEndDate = Tasks.Max(t => t.EndDate).Date.AddDays(7);
-        }
-        
-        // Get header configuration to align timeline boundaries with header periods
-        var headerConfig = TimelineHeaderAdapter.GetHeaderConfigurationFromTemplate(ZoomLevel, Logger);
-        
-        // Align StartDate with primary period boundary (e.g., week start for WeekDay modes)
-        StartDate = TimelineHeaderAdapter.GetPeriodStart(taskStartDate, headerConfig.PrimaryUnit, Logger);
-        
-        // Align EndDate with primary period boundary
-        var endPeriodStart = TimelineHeaderAdapter.GetPeriodStart(taskEndDate, headerConfig.PrimaryUnit, Logger);
-        var increment = TimelineHeaderAdapter.GetDateIncrement(headerConfig.PrimaryUnit);
-        EndDate = increment(endPeriodStart).AddDays(-1); // End of the period
-        
-        var totalDays = (EndDate - StartDate).Days + 1;
-        TotalWidth = (int)(totalDays * EffectiveDayWidth);
-        TotalHeight = Tasks.Count * RowHeight;
-    }
-
-    private double DayToPixel(DateTime date)
-    {
-        var days = (date.Date - StartDate).TotalDays;
-        return days * EffectiveDayWidth;
-    }
-
-    private double CalculateTaskWidth(GanttTask task)
-    {
-        var duration = (task.EndDate.Date - task.StartDate.Date).TotalDays + 1;
-        return duration * EffectiveDayWidth;
-    }
-
-    private int GetMonthWidth(DateTime month)
-    {
-        var daysInMonth = DateTime.DaysInMonth(month.Year, month.Month);
-        return (int)(daysInMonth * EffectiveDayWidth);
-    }
-
-    private async Task SelectTask(int taskId)
-    {
-        SelectedTaskId = taskId;
-        Logger.LogUserAction("TimelineView_TaskSelected", new { TaskId = taskId });
-        
-        if (OnTaskSelected.HasDelegate)
-        {
-            await OnTaskSelected.InvokeAsync(taskId);
-        }
-        
-        StateHasChanged();
-    }
-
-    private async Task HoverTask(int? taskId)
-    {
-        if (HoveredTaskId != taskId)
-        {
-            HoveredTaskId = taskId;
-            await OnTaskHovered.InvokeAsync(taskId);
-        }
-    }
-
-    private async Task OnScroll(EventArgs e)
-    {
-        try
-        {
-            // Update viewport properties for tooltip edge detection
-            ViewportScrollLeft = await JSRuntime.InvokeAsync<double>("eval", "document.querySelector('.timeline-scroll-container').scrollLeft");
-            ViewportWidth = await JSRuntime.InvokeAsync<double>("eval", "document.querySelector('.timeline-scroll-container').clientWidth");
-            
-            // Force re-render to update tooltips
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError($"Error updating viewport data during scroll: {ex.Message}");
-        }
-
-        if (OnScrollChanged.HasDelegate)
-        {
-            await OnScrollChanged.InvokeAsync(e);
-        }
-    }
-
-    private void OnLanguageChanged()
-    {
-        try
-        {
-            InvokeAsync(StateHasChanged);
-        }
-        catch (ObjectDisposedException)
-        {
-            // Component has been disposed, ignore language change
-        }
-        catch (InvalidOperationException)
-        {
-            // Component is not in a valid state for updates, ignore
-        }
-    }
-
-    // Zoom control methods
-    public async Task SetZoomLevelAsync(TimelineZoomLevel newZoomLevel)
-    {
-        if (ZoomLevel != newZoomLevel)
-        {
-            ZoomLevel = newZoomLevel;
-            CalculateTimelineRange(); // Recalculate dimensions
-            Logger.LogUserAction("TimelineView_ZoomLevelChanged", new { OldLevel = ZoomLevel, NewLevel = newZoomLevel });
-            
-            if (OnZoomLevelChanged.HasDelegate)
-            {
-                await OnZoomLevelChanged.InvokeAsync(newZoomLevel);
-            }
-            
-            StateHasChanged();
-        }
-    }
-
-    public async Task SetZoomFactorAsync(double newZoomFactor)
-    {
-        // Clamp zoom factor to reasonable bounds (0.5x to 3.0x)
-        var clampedFactor = Math.Max(0.5, Math.Min(3.0, newZoomFactor));
-        
-        if (Math.Abs(ZoomFactor - clampedFactor) > 0.01) // Avoid tiny changes
-        {
-            var oldFactor = ZoomFactor;
-            ZoomFactor = clampedFactor;
-            CalculateTimelineRange(); // Recalculate dimensions
-            Logger.LogUserAction("TimelineView_ZoomFactorChanged", new { OldFactor = oldFactor, NewFactor = clampedFactor });
-            
-            if (OnZoomFactorChanged.HasDelegate)
-            {
-                await OnZoomFactorChanged.InvokeAsync(clampedFactor);
-            }
-            
-            StateHasChanged();
-        }
-    }
-
-    public async Task ZoomInAsync()
-    {
-        var newFactor = ZoomFactor * 1.2; // 20% increase
-        await SetZoomFactorAsync(newFactor);
-    }
-
-    public async Task ZoomOutAsync()
-    {
-        var newFactor = ZoomFactor / 1.2; // 20% decrease
-        await SetZoomFactorAsync(newFactor);
-    }
-
-    public async Task ResetZoomAsync()
-    {
-        await SetZoomFactorAsync(1.0); // Reset to base factor
-    }
-
-    // Read-only properties for current zoom state
-    public double CurrentEffectiveDayWidth => EffectiveDayWidth;
-    public string CurrentZoomDescription => $"{ZoomLevel} @ {ZoomFactor:F1}x";
-
-    // Tooltip calculation using dedicated service
-    private TimelineTooltipResult GetTooltipResult()
-    {
-        try
-        {
-            var request = new TimelineTooltipRequest
-            {
-                StartDate = StartDate,
-                EndDate = EndDate,
-                EffectiveDayWidth = EffectiveDayWidth,
-                ZoomLevel = ZoomLevel,
-                ViewportScrollLeft = ViewportScrollLeft,
-                ViewportWidth = ViewportWidth,
-                Options = new TimelineTooltipOptions
-                {
-                    HiddenThreshold = 0.5, // Show when >50% hidden
-                    LeftArrow = "←",
-                    RightArrow = "→",
-                    UsePrimaryPeriods = true
-                }
-            };
-
-            return TooltipService.CalculateTooltips(request);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError($"Error getting tooltip result: {ex.Message}");
-            return new TimelineTooltipResult();
-        }
-    }
-
-    private int GetWeekOfYear(DateTime date)
-    {
-        var culture = System.Globalization.CultureInfo.CurrentCulture;
-        var dayOfWeek = culture.DateTimeFormat.FirstDayOfWeek;
-        var weekRule = culture.DateTimeFormat.CalendarWeekRule;
-        return culture.Calendar.GetWeekOfYear(date, weekRule, dayOfWeek);
-    }
-
-    /// <summary>
-    /// Validates that all required parameters are properly set for tooltip functionality.
-    /// Throws meaningful exceptions if critical parameters are missing.
-    /// </summary>
-    private void ValidateRequiredParameters()
-    {
-        if (RowHeight <= 0)
-        {
-            throw new InvalidOperationException(
-                "TimelineView requires RowHeight > 0. " +
-                "This parameter is critical for proper row alignment and tooltip positioning. " +
-                "Example: <TimelineView RowHeight=\"32\" ... />");
-        }
-
-        if (HeaderMonthHeight <= 0)
-        {
-            throw new InvalidOperationException(
-                "TimelineView requires HeaderMonthHeight > 0. " +
-                "This parameter is critical for tooltip positioning (CSS calc). " +
-                "Example: <TimelineView HeaderMonthHeight=\"32\" ... />");
-        }
-
-        if (HeaderDayHeight <= 0)
-        {
-            throw new InvalidOperationException(
-                "TimelineView requires HeaderDayHeight > 0. " +
-                "This parameter is critical for header rendering and alignment. " +
-                "Example: <TimelineView HeaderDayHeight=\"24\" ... />");
-        }
-
-        // Validate Tasks parameter
-        if (Tasks == null)
-        {
-            throw new InvalidOperationException(
-                "TimelineView requires a non-null Tasks parameter. " +
-                "Pass an empty list if no tasks are available. " +
-                "Example: <TimelineView Tasks=\"@(new List<GanttTask>())\" ... />");
-        }
-    }
-
-    public void Dispose()
-    {
-        try
-        {
-            if (I18N != null)
-            {
-                I18N.LanguageChanged -= OnLanguageChanged;
-            }
-        }
-        catch (ObjectDisposedException)
-        {
-            // Ignore disposal exceptions during cleanup
-        }
-    }
-
-    private string GetTaskTooltip(GanttTask task)
-    {
-        if (task == null) return string.Empty;
-        
-        try
-        {
-            return $"{task.Name} ({task.StartDate:MM/dd/yyyy} - {task.EndDate:MM/dd/yyyy})";
-        }
-        catch
-        {
-            // Fallback if formatting fails
-            return task.Name ?? "Task";
-        }
-    }
-}
 
 <style>
     .timeline-container {
@@ -475,15 +86,93 @@
         background: var(--gantt-surface, #ffffff);
     }
 
+    /* Fixed Header Container */
+    .timeline-header-container {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--gantt-surface, #ffffff);
+        border-bottom: 1px solid var(--gantt-outline, #e0e0e0);
+        overflow-y: scroll; /* Reserve scrollbar space for alignment */
+        overflow-x: auto; /* Reserve horizontal scrollbar space */
+        /* Hide scrollbars while preserving space */
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+    }
+
+    .timeline-header-container::-webkit-scrollbar {
+        display: none; /* Chrome/Safari/Webkit */
+    }
+
+    .timeline-header-svg {
+        display: block;
+        flex-shrink: 0;
+    }
+
+    /* Scrollable Content Container */
     .timeline-scroll-container {
         flex: 1;
-        overflow: auto;
+        overflow-y: scroll; /* Always reserve scrollbar space for alignment */
+        overflow-x: auto; /* Allow horizontal scrolling when needed */
         position: relative;
     }
 
-    /* === HEADER STYLES === */
-    /* NOTE: Header rendering now handled by TimelineHeader component, but keeping CSS for backward compatibility */
-    
+    .timeline-body-svg {
+        display: block;
+        flex-shrink: 0;
+    }
+
+    /* Legacy timeline-svg for backward compatibility */
+    .timeline-svg {
+        display: block;
+        flex-shrink: 0;
+    }
+
+    /* === SVG HEADER STYLES === */
+    .svg-headers {
+        /* SVG headers group - no additional styling needed, positioning handled by SVG */
+    }
+
+    .svg-primary-cell {
+        fill: var(--gantt-surface-variant, #f5f5f5);
+        stroke: var(--gantt-outline, #e0e0e0);
+        stroke-width: 1;
+    }
+
+    .svg-secondary-cell {
+        fill: var(--gantt-surface, #ffffff);
+        stroke: var(--gantt-outline, #e0e0e0);
+        stroke-width: 1;
+    }
+
+    .svg-primary-text {
+        fill: var(--gantt-on-surface, #000000);
+        font-family: var(--gantt-monospace-font, 'Consolas', 'Monaco', 'Courier New', monospace);
+        font-size: 14px;
+        font-weight: 500;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .svg-secondary-text {
+        fill: var(--gantt-on-surface, #000000);
+        font-family: var(--gantt-monospace-font, 'Consolas', 'Monaco', 'Courier New', monospace);
+        font-size: 12px;
+        font-weight: normal;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .svg-header-cell-group {
+        /* Container for individual header cells */
+    }
+
+    .svg-cell-selected {
+        fill: var(--gantt-state-selected, rgba(25, 118, 210, 0.12)) !important;
+    }
+
+    /* === LEGACY HEADER STYLES (DEPRECATED) === */
+    /* Keep for backward compatibility - may be used by external CSS or JS */
     .timeline-header {
         position: sticky;
         top: 0;
@@ -585,10 +274,6 @@
     .timeline-body {
         position: relative;
         min-width: fit-content;
-    }
-
-    .timeline-svg {
-        display: block;
     }
 
     .timeline-grid-line {

@@ -42,10 +42,10 @@ public static class TaskDisplayConstants
 
     /// <summary>
     /// Default zoom level for preset-only zoom approach.
-    /// QuarterMonth24px level at 24px provides good balance for most use cases.
-    /// Shows quarterly structure with monthly details at crisp integral pixel width.
+    /// MonthWeekOptimal50px level provides optimal balance for most use cases.
+    /// Shows monthly structure with weekly details at perfect 50px cell density.
     /// </summary>
-    public const TimelineZoomLevel DEFAULT_ZOOM_LEVEL = TimelineZoomLevel.QuarterMonth24px;
+    public const TimelineZoomLevel DEFAULT_ZOOM_LEVEL = TimelineZoomLevel.MonthWeekOptimal50px;
 
     /// <summary>
     /// Minimum effective day width in pixels to maintain task visibility.

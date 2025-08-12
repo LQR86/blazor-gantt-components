@@ -1,0 +1,159 @@
+@page "/timeline-export-demo"
+@using GanttComponents.Components.TimelineView
+@using GanttComponents.Components.TimelineZoomControls
+@using GanttComponents.Models
+@using GanttComponents.Services
+@inject IGanttTaskService TaskService
+@inject IGanttI18N I18N
+
+<PageTitle>@I18N.T("page.title.timeline-export-demo")</PageTitle>
+
+<h1>📄 Timeline Export Component Demo</h1>
+
+<p>This page demonstrates the new <strong>separate export component</strong> architecture: <code>TimelineView_Export.razor</code> vs <code>TimelineView.razor</code>.</p>
+
+<div class="demo-controls mb-3">
+    <div class="btn-group" role="group">
+        <button class="btn btn-outline-primary" @onclick="LoadSampleData">
+            📊 @I18N.T("demo.load-sample-data")
+        </button>
+        <button class="btn btn-outline-info" @onclick="ClearSelection">
+            ❌ @I18N.T("demo.clear-selection")
+        </button>
+    </div>
+    
+    <div class="btn-group ms-3" role="group">
+        <button class="btn @(UseExportComponent ? "btn-secondary" : "btn-primary")" 
+                @onclick="() => UseExportComponent = false">
+            🖥️ Interactive
+        </button>
+        <button class="btn @(UseExportComponent ? "btn-primary" : "btn-secondary")" 
+                @onclick="() => UseExportComponent = true">
+            📄 Export
+        </button>
+    </div>
+</div>
+
+@if (Tasks?.Any() == true)
+{
+    <div class="zoom-controls mb-3">
+        <TimelineZoomControls 
+            CurrentZoomLevel="@ZoomLevel" 
+            CurrentZoomFactor="@ZoomFactor"
+            OnZoomLevelChanged="HandleZoomLevelChanged"
+            OnZoomFactorChanged="HandleZoomFactorChanged" />
+    </div>
+
+    @if (UseExportComponent)
+    {
+        <div class="export-timeline-container">
+            <h4>📄 Export Component (TimelineView_Export)</h4>
+            <TimelineView_Export 
+                Tasks="@Tasks"
+                RowHeight="32"
+                HeaderMonthHeight="32"
+                HeaderDayHeight="24"
+                ZoomLevel="@ZoomLevel"
+                ZoomFactor="@ZoomFactor" />
+        </div>
+    }
+    else
+    {
+        <div class="interactive-timeline-container">
+            <h4>🖥️ Interactive Component (TimelineView)</h4>
+            <TimelineView 
+                Tasks="@Tasks"
+                RowHeight="32"
+                HeaderMonthHeight="32"
+                HeaderDayHeight="24"
+                ZoomLevel="@ZoomLevel"
+                ZoomFactor="@ZoomFactor"
+                SelectedTaskId="@SelectedTaskId"
+                HoveredTaskId="@HoveredTaskId"
+                OnTaskSelected="HandleTaskSelected"
+                OnTaskHovered="HandleTaskHovered"
+                OnZoomLevelChanged="HandleZoomLevelChanged"
+                OnZoomFactorChanged="HandleZoomFactorChanged" />
+        </div>
+    }
+
+    @if (SelectedTaskId.HasValue)
+    {
+        var selectedTask = Tasks?.FirstOrDefault(t => t.Id == SelectedTaskId.Value);
+        <div class="selected-task-info alert alert-primary mt-3">
+            <h5>📋 Selected Task (Interactive Mode Only)</h5>
+            @if (selectedTask != null)
+            {
+                <div class="row">
+                    <div class="col-md-3"><strong>Name:</strong> @selectedTask.Name</div>
+                    <div class="col-md-3"><strong>Start:</strong> @selectedTask.StartDate.ToString("yyyy-MM-dd")</div>
+                    <div class="col-md-3"><strong>End:</strong> @selectedTask.EndDate.ToString("yyyy-MM-dd")</div>
+                    <div class="col-md-3"><strong>Duration:</strong> @selectedTask.Duration</div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (HoveredTaskId.HasValue)
+    {
+        var hoveredTask = Tasks?.FirstOrDefault(t => t.Id == HoveredTaskId.Value);
+        <div class="hovered-task-info alert alert-light mt-2">
+            <small><strong>Hovering:</strong> @hoveredTask?.Name (Interactive Mode Only)</small>
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-warning">
+        <h5>⚠️ No Tasks Available</h5>
+        <p>Click <strong>"📊 Load Sample Data"</strong> to load test tasks for the timeline demo.</p>
+    </div>
+}
+
+@code {
+    // === STATE MANAGEMENT ===
+    private List<GanttTask>? Tasks { get; set; }
+    private TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px;
+    private double ZoomFactor { get; set; } = 1.0;
+    private int? SelectedTaskId { get; set; }
+    private int? HoveredTaskId { get; set; }
+    private bool UseExportComponent { get; set; } = false;
+
+    // === LIFECYCLE ===
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSampleData();
+    }
+
+    // === EVENT HANDLERS ===
+    private async Task LoadSampleData()
+    {
+        Tasks = await TaskService.GetAllTasksAsync();
+    }
+
+    private void ClearSelection()
+    {
+        SelectedTaskId = null;
+        HoveredTaskId = null;
+    }
+
+    private void HandleTaskSelected(int taskId)
+    {
+        SelectedTaskId = taskId == SelectedTaskId ? null : taskId;
+    }
+
+    private void HandleTaskHovered(int? taskId)
+    {
+        HoveredTaskId = taskId;
+    }
+
+    private void HandleZoomLevelChanged(TimelineZoomLevel newZoomLevel)
+    {
+        ZoomLevel = newZoomLevel;
+    }
+
+    private void HandleZoomFactorChanged(double newZoomFactor)
+    {
+        ZoomFactor = newZoomFactor;
+    }
+}

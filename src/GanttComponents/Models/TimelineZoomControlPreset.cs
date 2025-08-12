@@ -116,7 +116,7 @@ public class TimelineZoomControlConfiguration
                 HideCurrentState = false,
                 CssClass = "",
                 UseDropdownForPresets = false,
-                MaxVisiblePresets = 13
+                MaxVisiblePresets = 16  // Updated for 4-4-4-4 optimal structure
             },
 
             TimelineZoomControlPreset.ExtremelyCompact => new TimelineZoomControlConfiguration

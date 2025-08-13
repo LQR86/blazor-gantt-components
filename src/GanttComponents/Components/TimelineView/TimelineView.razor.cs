@@ -302,12 +302,23 @@ public partial class TimelineView : ComponentBase, IDisposable
     }
 
     // === USER INTERACTIONS ===
-    private async Task SelectTask(int taskId)
+    public async Task SelectTask(int taskId)
+    {
+        await SelectTaskInternal(taskId, notifyParent: true);
+    }
+
+    /// <summary>
+    /// Internal selection method that can optionally skip parent notification to prevent loops
+    /// </summary>
+    public async Task SelectTaskInternal(int taskId, bool notifyParent = true)
     {
         SelectedTaskId = taskId;
         Logger.LogUserAction("TimelineView_TaskSelected", new { TaskId = taskId });
 
-        if (OnTaskSelected.HasDelegate)
+        // Auto-center the selected task in viewport (works in both standalone and composed contexts)
+        await CenterSelectedTask();
+
+        if (notifyParent && OnTaskSelected.HasDelegate)
         {
             await OnTaskSelected.InvokeAsync(taskId);
         }
@@ -434,6 +445,29 @@ public partial class TimelineView : ComponentBase, IDisposable
     public async Task ZoomInAsync() => await SetZoomFactorAsync(ZoomFactor * 1.2);
     public async Task ZoomOutAsync() => await SetZoomFactorAsync(ZoomFactor / 1.2);
     public async Task ResetZoomAsync() => await SetZoomFactorAsync(1.0);
+
+    /// <summary>
+    /// Centers the currently selected task in the timeline viewport.
+    /// Uses DOM-based positioning for future-proof centering independent of SVG dimensions.
+    /// </summary>
+    public async Task CenterSelectedTask()
+    {
+        if (!SelectedTaskId.HasValue) return;
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("timelineView.centerTaskById",
+                $"timeline-{ComponentId}",
+                SelectedTaskId.Value);
+
+            Logger.LogUserAction("TimelineView_TaskCentered", new { TaskId = SelectedTaskId.Value });
+        }
+        catch (Exception ex)
+        {
+            // Graceful degradation - centering is enhancement, not critical feature
+            Logger.LogError($"Error centering task {SelectedTaskId}: {ex.Message}");
+        }
+    }
 
     // === PUBLIC PROPERTIES ===
     public double CurrentEffectiveDayWidth => EffectiveDayWidth;

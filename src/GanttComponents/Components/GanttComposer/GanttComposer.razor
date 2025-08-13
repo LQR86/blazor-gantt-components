@@ -29,7 +29,8 @@
     <!-- TimelineView takes remaining space with natural width -->
     <div id="composer-timeline-@ComponentId" class="composer-timeline" 
          style="position: absolute; left: @(GridWidth + SplitterWidth)px; top: 0; right: 0; height: 100%;">
-        <TimelineView Tasks="@Tasks" 
+        <TimelineView @ref="timelineViewRef"
+                     Tasks="@Tasks" 
                      OnTaskSelected="HandleTaskSelection"
                      SelectedTaskId="@SelectedTaskId"
                      OnTaskHovered="HandleTaskHover"
@@ -57,6 +58,9 @@
     [Parameter] public double ZoomFactor { get; set; } = 1.6;
     [Parameter] public EventCallback<TimelineZoomLevel> OnZoomLevelChanged { get; set; }
     [Parameter] public EventCallback<double> OnZoomFactorChanged { get; set; }
+    
+    // Component references for explicit method calls
+    private TimelineView timelineViewRef = default!;
     
     private int? SelectedTaskId { get; set; }
     private int? HoveredTaskId { get; set; }
@@ -139,8 +143,12 @@
     {
         SelectedTaskId = taskId;
         
-        // Center the selected task bar in TimelineView viewport
-        await CenterTaskBarInTimeline(taskId);
+        // Call TimelineView selection WITHOUT parent notification to prevent infinite loop
+        // This ensures TaskGrid → TimelineView selection triggers centering but doesn't loop back
+        if (timelineViewRef != null)
+        {
+            await timelineViewRef.SelectTaskInternal(taskId, notifyParent: false);
+        }
         
         // Notify parent component if needed
         if (OnTaskSelected.HasDelegate)
@@ -155,36 +163,6 @@
     {
         HoveredTaskId = taskId;
         StateHasChanged(); // Sync hover state between both components
-    }
-    
-    private async Task CenterTaskBarInTimeline(int taskId)
-    {
-        if (Tasks == null) return;
-        
-        var selectedTask = Tasks.FirstOrDefault(t => t.Id == taskId);
-        if (selectedTask == null) return;
-        
-        try
-        {
-            // Calculate timeline start date using EXACT same logic as TimelineView.CalculateTimelineRange
-            var taskStartDate = Tasks.Min(t => t.StartDate).Date.AddDays(-7);
-            
-            // Align to month boundary for consistent scroll positioning (replaces legacy TimelineHeaderAdapter)
-            var startDate = new DateTime(taskStartDate.Year, taskStartDate.Month, 1);
-            
-            // Use dynamic day width based on current zoom level and factor
-            var effectiveDayWidth = TimelineZoomService.CalculateEffectiveDayWidth(ZoomLevel, ZoomFactor);
-            
-            await JSRuntime.InvokeVoidAsync("ganttComposer.scrollTaskBarToCenter",
-                $"composer-timeline-{ComponentId}",
-                selectedTask.StartDate.ToString("yyyy-MM-dd"),
-                startDate.ToString("yyyy-MM-dd"),
-                effectiveDayWidth);
-        }
-        catch (Exception)
-        {
-            // Fallback if JS interop fails - component still works without centering
-        }
     }
     
     protected override async Task OnParametersSetAsync()

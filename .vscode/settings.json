@@ -1,31 +1,4 @@
 {
     "terminal.integrated.shellIntegration.enabled": true,
-    "terminal.integrated.shellIntegration.decorationsEnabled": "both",
-    "terminal.integrated.shellIntegration.history": 100,
-    "terminal.integrated.profiles.windows": {
-        "PowerShell": {
-            "source": "PowerShell",
-            "icon": "terminal-powershell"
-        },
-        "Command Prompt": {
-            "path": [
-                "${env:windir}\\Sysnative\\cmd.exe",
-                "${env:windir}\\System32\\cmd.exe"
-            ],
-            "args": [],
-            "icon": "terminal-cmd"
-        },
-        "Git Bash": {
-            "path": "C:\\Users\\LQR\\AppData\\Local\\Programs\\Git\\bin\\bash.exe",
-            "args": ["--login", "-i"],
-            "icon": "terminal-bash"
-        }
-    },
-    "terminal.integrated.defaultProfile.windows": "Git Bash",
-    "terminal.integrated.automationProfile.windows": {
-        "path": "C:\\Users\\LQR\\AppData\\Local\\Programs\\Git\\bin\\bash.exe",
-        "args": ["--login"]
-    },
-    "terminal.integrated.shellIntegration.suggestEnabled": true,
-    "terminal.integrated.enablePersistentSessions": false
+    "terminal.integrated.defaultProfile.windows": "Git Bash"
 }

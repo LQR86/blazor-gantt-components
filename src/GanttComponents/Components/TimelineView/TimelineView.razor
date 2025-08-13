@@ -46,10 +46,9 @@
                         var width = CalculateTaskWidth(task);
                         var rowIndex = i;
                         
-                        <!-- Task background row -->
+                        <!-- Task background row (no data-task-id - only for styling) -->
                         <rect x="0" y="@y" width="@TotalWidth" height="@RowHeight"
                               class="timeline-row @(SelectedTaskId == task.Id ? "selected" : "") @(HoveredTaskId == task.Id ? "hovered" : "")"
-                              data-task-id="@task.Id"
                               @onclick="() => SelectTask(task.Id)"
                               @onmouseenter="() => HoverTask(task.Id)"
                               @onmouseleave="() => HoverTask(null)" />

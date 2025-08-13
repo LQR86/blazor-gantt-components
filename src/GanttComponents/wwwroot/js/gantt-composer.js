@@ -178,37 +178,5 @@ window.ganttComposer = {
         // Parameter-based alignment handles this automatically
         // This function is kept for compatibility but does nothing
         console.log('Row alignment is now handled via component parameters');
-    },
-    
-    // Center a task bar horizontally in the TimelineView viewport
-    scrollTaskBarToCenter: function(timelineElementId, taskStartDate, startDate, dayWidth) {
-        const container = document.querySelector(`#${timelineElementId} .timeline-scroll-container`);
-        if (!container) {
-            console.warn('Could not find timeline scroll container for centering:', timelineElementId);
-            return;
-        }
-        
-        try {
-            // Calculate task bar X position (same logic as DayToPixel in C#)
-            const taskDate = new Date(taskStartDate);
-            const baseDate = new Date(startDate);
-            const days = (taskDate - baseDate) / (1000 * 60 * 60 * 24);
-            const taskX = days * dayWidth;
-            
-            // Center the task bar in viewport
-            const containerWidth = container.clientWidth;
-            const centerOffset = containerWidth / 2;
-            const scrollLeft = taskX - centerOffset;
-            
-            // Smooth scroll to center the task bar
-            container.scrollTo({
-                left: Math.max(0, scrollLeft),
-                behavior: 'smooth'
-            });
-            
-            console.log('Centered task bar at X position:', taskX, 'with scroll left:', Math.max(0, scrollLeft));
-        } catch (error) {
-            console.error('Error centering task bar:', error);
-        }
     }
 };

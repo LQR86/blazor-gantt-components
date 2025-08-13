@@ -163,7 +163,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     // === COMPONENT LIFECYCLE ===
     protected override void OnInitialized()
     {
-        Logger.LogComponentLifecycle("TimelineView", "OnInitialized", new { TaskCount = Tasks.Count });
+        Logger.LogInfo($"TimelineView initialized with {Tasks.Count} tasks");
         I18N.LanguageChanged += OnLanguageChanged;
         CalculateTimelineRange();
     }
@@ -313,7 +313,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     public async Task SelectTaskInternal(int taskId, bool notifyParent = true)
     {
         SelectedTaskId = taskId;
-        Logger.LogUserAction("TimelineView_TaskSelected", new { TaskId = taskId });
+        Logger.LogInfo($"Task {taskId} selected in TimelineView");
 
         // Auto-center the selected task in viewport (works in both standalone and composed contexts)
         await CenterSelectedTask();
@@ -407,10 +407,10 @@ public partial class TimelineView : ComponentBase, IDisposable
     {
         if (ZoomLevel != newZoomLevel)
         {
+            var oldLevel = ZoomLevel;
             ZoomLevel = newZoomLevel;
             CalculateTimelineRange();
-            Logger.LogUserAction("TimelineView_ZoomLevelChanged",
-                new { OldLevel = ZoomLevel, NewLevel = newZoomLevel });
+            Logger.LogInfo($"Zoom level changed from {oldLevel} to {newZoomLevel}");
 
             if (OnZoomLevelChanged.HasDelegate)
             {
@@ -430,8 +430,7 @@ public partial class TimelineView : ComponentBase, IDisposable
             var oldFactor = ZoomFactor;
             ZoomFactor = clampedFactor;
             CalculateTimelineRange();
-            Logger.LogUserAction("TimelineView_ZoomFactorChanged",
-                new { OldFactor = oldFactor, NewFactor = clampedFactor });
+            Logger.LogInfo($"Zoom factor changed from {oldFactor:F2} to {clampedFactor:F2}");
 
             if (OnZoomFactorChanged.HasDelegate)
             {
@@ -460,7 +459,7 @@ public partial class TimelineView : ComponentBase, IDisposable
                 $"timeline-{ComponentId}",
                 SelectedTaskId.Value);
 
-            Logger.LogUserAction("TimelineView_TaskCentered", new { TaskId = SelectedTaskId.Value });
+            Logger.LogInfo($"Task {SelectedTaskId.Value} centered in timeline");
         }
         catch (Exception ex)
         {

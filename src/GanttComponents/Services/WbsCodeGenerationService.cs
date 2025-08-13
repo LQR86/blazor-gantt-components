@@ -24,7 +24,7 @@ public class WbsCodeGenerationService : IWbsCodeGenerationService
     {
         try
         {
-            _logger.LogOperation("WBS Generation", "Starting WBS code generation", new { TaskCount = tasks.Count });
+            _logger.LogInfo($"Starting WBS code generation for {tasks.Count} tasks");
 
             // Create a lookup for parent-child relationships
             var taskById = tasks.ToDictionary(t => t.Id);
@@ -47,7 +47,7 @@ public class WbsCodeGenerationService : IWbsCodeGenerationService
                 rootPosition++;
             }
 
-            _logger.LogOperation("WBS Generation", "Completed WBS code generation", new { TaskCount = tasks.Count, Success = true });
+            _logger.LogInfo($"Completed WBS code generation for {tasks.Count} tasks");
             return Task.FromResult(tasks);
         }
         catch (Exception ex)
@@ -139,22 +139,13 @@ public class WbsCodeGenerationService : IWbsCodeGenerationService
     {
         try
         {
-            _logger.LogOperation("WBS Renumbering", "Starting WBS code renumbering", new
-            {
-                TaskCount = tasks.Count,
-                ChangedTaskId = changedTaskId
-            });
+            _logger.LogInfo($"Starting WBS code renumbering for {tasks.Count} tasks (changed task: {changedTaskId})");
 
             // For simplicity, regenerate all WBS codes when hierarchy changes
             // This ensures consistency and is straightforward to implement
             var updatedTasks = await GenerateWbsCodesAsync(tasks);
 
-            _logger.LogOperation("WBS Renumbering", "Completed WBS code renumbering", new
-            {
-                TaskCount = tasks.Count,
-                ChangedTaskId = changedTaskId,
-                Success = true
-            });
+            _logger.LogInfo($"Completed WBS code renumbering for {tasks.Count} tasks");
 
             return updatedTasks;
         }
@@ -231,7 +222,7 @@ public class WbsCodeGenerationService : IWbsCodeGenerationService
 
         try
         {
-            _logger.LogOperation("WBS Validation", "Starting WBS hierarchy validation", new { TaskCount = tasks.Count });
+            _logger.LogInfo($"Starting WBS hierarchy validation for {tasks.Count} tasks");
 
             var tasksByWbsCode = new Dictionary<string, GanttTask>();
 
@@ -295,12 +286,7 @@ public class WbsCodeGenerationService : IWbsCodeGenerationService
                 }
             }
 
-            _logger.LogOperation("WBS Validation", "Completed WBS hierarchy validation", new
-            {
-                TaskCount = tasks.Count,
-                ErrorCount = errors.Count,
-                Success = errors.Count == 0
-            });
+            _logger.LogInfo($"Completed WBS hierarchy validation for {tasks.Count} tasks ({errors.Count} errors found)");
 
             return errors;
         }

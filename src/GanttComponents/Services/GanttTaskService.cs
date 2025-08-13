@@ -27,13 +27,12 @@ public class GanttTaskService : IGanttTaskService
     {
         try
         {
-            _universalLogger.LogDatabaseOperation("GetAllTasks", new { Operation = "Retrieving all tasks from database" });
-
+            // Removed expensive object serialization logging for performance
             var tasks = await _context.Tasks
                 .OrderBy(t => t.Id)
                 .ToListAsync();
 
-            _universalLogger.LogDatabaseOperation("GetAllTasks", new { TaskCount = tasks.Count, Success = true });
+            _logger.LogInformation("Retrieved {TaskCount} tasks from database", tasks.Count);
             return tasks;
         }
         catch (Exception ex)
@@ -170,7 +169,7 @@ public class GanttTaskService : IGanttTaskService
     {
         try
         {
-            _universalLogger.LogWbsOperation("Regenerating all WBS codes", new { Operation = "Starting regeneration" });
+            _logger.LogInformation("Regenerating all WBS codes");
 
             var allTasks = await GetAllTasksAsync();
             var updatedTasks = await _wbsService.GenerateWbsCodesAsync(allTasks);
@@ -205,28 +204,20 @@ public class GanttTaskService : IGanttTaskService
     {
         try
         {
-            _universalLogger.LogWbsOperation("Validating WBS hierarchy", new { Operation = "Starting validation" });
+            _logger.LogInformation("Validating WBS hierarchy");
 
             var allTasks = await GetAllTasksAsync();
             var validationErrors = _wbsService.ValidateWbsHierarchy(allTasks);
 
             if (validationErrors.Any())
             {
-                _universalLogger.LogWarning("WBS hierarchy validation found errors", new
-                {
-                    ErrorCount = validationErrors.Count,
-                    Errors = validationErrors
-                });
+                _logger.LogWarning("WBS hierarchy validation found {ErrorCount} errors, regenerating codes", validationErrors.Count);
 
                 // Fix by regenerating all WBS codes
                 return await RegenerateAllWbsCodesAsync();
             }
 
-            _universalLogger.LogWbsOperation("WBS hierarchy validation passed", new
-            {
-                TaskCount = allTasks.Count,
-                Success = true
-            });
+            _logger.LogInformation("WBS hierarchy validation passed for {TaskCount} tasks", allTasks.Count);
 
             return allTasks;
         }

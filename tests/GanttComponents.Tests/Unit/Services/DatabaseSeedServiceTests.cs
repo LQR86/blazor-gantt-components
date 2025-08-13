@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using GanttComponents.Data;
 using GanttComponents.Models;
+using GanttComponents.Models.ValueObjects;
 using GanttComponents.Services;
 using Xunit;
 using System.Text.Json;
@@ -50,8 +51,8 @@ public class DatabaseSeedServiceTests : IDisposable
                 Id = 1,
                 Name = "Test Task 1",
                 Duration = "2d",
-                StartDate = DateTime.UtcNow.Date,
-                EndDate = DateTime.UtcNow.Date.AddDays(2),
+                StartDate = GanttDate.FromDateTime(DateTime.UtcNow.Date),
+                EndDate = GanttDate.FromDateTime(DateTime.UtcNow.Date.AddDays(2)),
                 TaskType = TaskType.FixedDuration
             },
             new GanttTask
@@ -59,8 +60,8 @@ public class DatabaseSeedServiceTests : IDisposable
                 Id = 2,
                 Name = "Test Task 2",
                 Duration = "3d",
-                StartDate = DateTime.UtcNow.Date.AddDays(3),
-                EndDate = DateTime.UtcNow.Date.AddDays(6),
+                StartDate = GanttDate.FromDateTime(DateTime.UtcNow.Date.AddDays(3)),
+                EndDate = GanttDate.FromDateTime(DateTime.UtcNow.Date.AddDays(6)),
                 TaskType = TaskType.FixedWork
             }
         };
@@ -118,8 +119,8 @@ public class DatabaseSeedServiceTests : IDisposable
         {
             Name = "Existing Task",
             Duration = "1d",
-            StartDate = DateTime.UtcNow.Date,
-            EndDate = DateTime.UtcNow.Date.AddDays(1)
+            StartDate = GanttDate.FromDateTime(DateTime.UtcNow.Date),
+            EndDate = GanttDate.FromDateTime(DateTime.UtcNow.Date.AddDays(1))
         };
         _context.Tasks.Add(existingTask);
         await _context.SaveChangesAsync();
@@ -132,8 +133,8 @@ public class DatabaseSeedServiceTests : IDisposable
                 Id = 1,
                 Name = "New Task",
                 Duration = "2d",
-                StartDate = DateTime.UtcNow.Date,
-                EndDate = DateTime.UtcNow.Date.AddDays(2),
+                StartDate = GanttDate.FromDateTime(DateTime.UtcNow.Date),
+                EndDate = GanttDate.FromDateTime(DateTime.UtcNow.Date.AddDays(2)),
                 TaskType = TaskType.FixedDuration
             }
         };

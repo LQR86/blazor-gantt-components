@@ -1,5 +1,6 @@
 using Xunit;
 using GanttComponents.Models;
+using GanttComponents.Models.ValueObjects;
 using GanttComponents.Services;
 using GanttComponents.Data;
 using Microsoft.EntityFrameworkCore;
@@ -43,8 +44,8 @@ public class GanttTaskServiceWbsTests : IDisposable
                 Id = 1,
                 Name = "Task 1",
                 WbsCode = "1",
-                StartDate = DateTime.Today,
-                EndDate = DateTime.Today.AddDays(1),
+                StartDate = GanttDate.FromDateTime(DateTime.Today),
+                EndDate = GanttDate.FromDateTime(DateTime.Today.AddDays(1)),
                 Duration = "1d",
                 TaskType = TaskType.FixedDuration
             },
@@ -53,8 +54,8 @@ public class GanttTaskServiceWbsTests : IDisposable
                 Id = 2,
                 Name = "Task 1.1",
                 WbsCode = "1.1",
-                StartDate = DateTime.Today,
-                EndDate = DateTime.Today.AddDays(1),
+                StartDate = GanttDate.FromDateTime(DateTime.Today),
+                EndDate = GanttDate.FromDateTime(DateTime.Today.AddDays(1)),
                 Duration = "1d",
                 TaskType = TaskType.FixedDuration,
                 ParentId = 1
@@ -82,8 +83,8 @@ public class GanttTaskServiceWbsTests : IDisposable
             Id = 1,
             Name = "Existing Task",
             WbsCode = "1",
-            StartDate = DateTime.Today,
-            EndDate = DateTime.Today.AddDays(1),
+            StartDate = GanttDate.FromDateTime(DateTime.Today),
+            EndDate = GanttDate.FromDateTime(DateTime.Today.AddDays(1)),
             Duration = "1d",
             TaskType = TaskType.FixedDuration
         };
@@ -107,8 +108,8 @@ public class GanttTaskServiceWbsTests : IDisposable
             Id = 1,
             Name = "Existing Task",
             WbsCode = "1",
-            StartDate = DateTime.Today,
-            EndDate = DateTime.Today.AddDays(1),
+            StartDate = GanttDate.FromDateTime(DateTime.Today),
+            EndDate = GanttDate.FromDateTime(DateTime.Today.AddDays(1)),
             Duration = "1d",
             TaskType = TaskType.FixedDuration
         };
@@ -132,8 +133,8 @@ public class GanttTaskServiceWbsTests : IDisposable
             Id = 1,
             Name = "Existing Task",
             WbsCode = "1",
-            StartDate = DateTime.Today,
-            EndDate = DateTime.Today.AddDays(1),
+            StartDate = GanttDate.FromDateTime(DateTime.Today),
+            EndDate = GanttDate.FromDateTime(DateTime.Today.AddDays(1)),
             Duration = "1d",
             TaskType = TaskType.FixedDuration
         };
@@ -157,8 +158,8 @@ public class GanttTaskServiceWbsTests : IDisposable
             Id = 1,
             Name = "Existing Task",
             WbsCode = "1",
-            StartDate = DateTime.Today,
-            EndDate = DateTime.Today.AddDays(1),
+            StartDate = GanttDate.FromDateTime(DateTime.Today),
+            EndDate = GanttDate.FromDateTime(DateTime.Today.AddDays(1)),
             Duration = "1d",
             TaskType = TaskType.FixedDuration
         };
@@ -170,8 +171,8 @@ public class GanttTaskServiceWbsTests : IDisposable
         {
             Name = "New Task",
             WbsCode = "1", // Duplicate WBS code
-            StartDate = DateTime.Today,
-            EndDate = DateTime.Today.AddDays(1),
+            StartDate = GanttDate.FromDateTime(DateTime.Today),
+            EndDate = GanttDate.FromDateTime(DateTime.Today.AddDays(1)),
             Duration = "1d",
             TaskType = TaskType.FixedDuration
         };
@@ -192,8 +193,8 @@ public class GanttTaskServiceWbsTests : IDisposable
             Id = 1,
             Name = "Task 1",
             WbsCode = "1",
-            StartDate = DateTime.Today,
-            EndDate = DateTime.Today.AddDays(1),
+            StartDate = GanttDate.FromDateTime(DateTime.Today),
+            EndDate = GanttDate.FromDateTime(DateTime.Today.AddDays(1)),
             Duration = "1d",
             TaskType = TaskType.FixedDuration
         };
@@ -203,8 +204,8 @@ public class GanttTaskServiceWbsTests : IDisposable
             Id = 2,
             Name = "Task 2",
             WbsCode = "2",
-            StartDate = DateTime.Today,
-            EndDate = DateTime.Today.AddDays(1),
+            StartDate = GanttDate.FromDateTime(DateTime.Today),
+            EndDate = GanttDate.FromDateTime(DateTime.Today.AddDays(1)),
             Duration = "1d",
             TaskType = TaskType.FixedDuration
         };

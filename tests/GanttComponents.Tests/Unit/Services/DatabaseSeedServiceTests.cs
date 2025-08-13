@@ -4,9 +4,9 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using GanttComponents.Data;
 using GanttComponents.Models;
+using GanttComponents.Models.ValueObjects;
 using GanttComponents.Services;
 using Xunit;
-using System.Text.Json;
 
 namespace GanttComponents.Tests.Unit.Services;
 
@@ -16,7 +16,6 @@ public class DatabaseSeedServiceTests : IDisposable
     private readonly DatabaseSeedService _service;
     private readonly Mock<ILogger<DatabaseSeedService>> _loggerMock;
     private readonly Mock<IWebHostEnvironment> _environmentMock;
-    private readonly string _tempDirectory;
 
     public DatabaseSeedServiceTests()
     {
@@ -31,155 +30,86 @@ public class DatabaseSeedServiceTests : IDisposable
         _loggerMock = new Mock<ILogger<DatabaseSeedService>>();
         _environmentMock = new Mock<IWebHostEnvironment>();
 
-        // Create temporary directory for test files
-        _tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(_tempDirectory);
-        _environmentMock.Setup(x => x.ContentRootPath).Returns(_tempDirectory);
-
         _service = new DatabaseSeedService(_loggerMock.Object, _environmentMock.Object);
     }
 
     [Fact]
-    public async Task SeedTasksFromJsonAsync_ShouldAddTasks_WhenValidJsonFile()
+    public async Task SeedSampleTasksAsync_ShouldAddTasks_WhenDatabaseIsEmpty()
     {
-        // Arrange
-        var sampleTasks = new List<GanttTask>
-        {
-            new GanttTask
-            {
-                Id = 1,
-                Name = "Test Task 1",
-                Duration = "2d",
-                StartDate = DateTime.UtcNow.Date,
-                EndDate = DateTime.UtcNow.Date.AddDays(2),
-                TaskType = TaskType.FixedDuration
-            },
-            new GanttTask
-            {
-                Id = 2,
-                Name = "Test Task 2",
-                Duration = "3d",
-                StartDate = DateTime.UtcNow.Date.AddDays(3),
-                EndDate = DateTime.UtcNow.Date.AddDays(6),
-                TaskType = TaskType.FixedWork
-            }
-        };
-
-        var jsonContent = JsonSerializer.Serialize(sampleTasks, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Converters = { new TaskTypeJsonConverter() }
-        });
-
-        var testFilePath = "test-tasks.json";
-        var fullPath = Path.Combine(_tempDirectory, testFilePath);
-        await File.WriteAllTextAsync(fullPath, jsonContent);
-
         // Act
-        await _service.SeedTasksFromJsonAsync(testFilePath, _context);
+        await _service.SeedSampleTasksAsync(_context);
 
         // Assert
         var tasks = await _context.Tasks.ToListAsync();
-        Assert.Equal(2, tasks.Count);
-        Assert.Equal("Test Task 1", tasks.First(t => t.Id == 1).Name);
-        Assert.Equal("Test Task 2", tasks.First(t => t.Id == 2).Name);
+        Assert.True(tasks.Count >= 5); // Should have at least the sample tasks
+        Assert.Contains(tasks, t => t.Name == "Project Planning Phase");
+        Assert.Contains(tasks, t => t.Name == "Requirements Analysis");
+        Assert.Contains(tasks, t => t.Name == "Development Phase");
     }
 
     [Fact]
-    public async Task SeedTasksFromJsonAsync_ShouldLogWarning_WhenFileNotFound()
+    public async Task SeedSampleTasksAsync_ShouldSkipSeeding_WhenTasksAlreadyExist()
     {
-        // Arrange
-        var nonExistentFile = "non-existent.json";
+        // Arrange - Add an existing task
+        var existingTask = new GanttTask
+        {
+            Name = "Existing Task",
+            Duration = "1d",
+            StartDate = GanttDate.Parse("2025-01-01"),
+            EndDate = GanttDate.Parse("2025-01-02")
+        };
+        _context.Tasks.Add(existingTask);
+        await _context.SaveChangesAsync();
 
         // Act
-        await _service.SeedTasksFromJsonAsync(nonExistentFile, _context);
+        await _service.SeedSampleTasksAsync(_context);
 
         // Assert
         var tasks = await _context.Tasks.ToListAsync();
-        Assert.Empty(tasks);
+        Assert.Single(tasks);
+        Assert.Equal("Existing Task", tasks.First().Name);
+    }
 
-        // Verify warning was logged
+    [Fact]
+    public async Task SeedSampleTasksAsync_ShouldLogSuccess_WhenSeedingCompletes()
+    {
+        // Act
+        await _service.SeedSampleTasksAsync(_context);
+
+        // Assert
         _loggerMock.Verify(
             x => x.Log(
-                LogLevel.Warning,
+                LogLevel.Information,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Seed file not found")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Successfully seeded")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 
     [Fact]
-    public async Task SeedTasksFromJsonAsync_ShouldClearExistingTasks_BeforeSeeding()
+    public async Task SeedSampleTasksAsync_ShouldLogSkip_WhenTasksAlreadyExist()
     {
-        // Arrange
-        // Add an existing task
+        // Arrange - Add an existing task
         var existingTask = new GanttTask
         {
             Name = "Existing Task",
             Duration = "1d",
-            StartDate = DateTime.UtcNow.Date,
-            EndDate = DateTime.UtcNow.Date.AddDays(1)
+            StartDate = GanttDate.Parse("2025-01-01"),
+            EndDate = GanttDate.Parse("2025-01-02")
         };
         _context.Tasks.Add(existingTask);
         await _context.SaveChangesAsync();
 
-        // Create JSON file with new tasks
-        var newTasks = new List<GanttTask>
-        {
-            new GanttTask
-            {
-                Id = 1,
-                Name = "New Task",
-                Duration = "2d",
-                StartDate = DateTime.UtcNow.Date,
-                EndDate = DateTime.UtcNow.Date.AddDays(2),
-                TaskType = TaskType.FixedDuration
-            }
-        };
-
-        var jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-            Converters = { new TaskTypeJsonConverter() }
-        };
-        var jsonContent = JsonSerializer.Serialize(newTasks, jsonOptions);
-        var testFilePath = "new-tasks.json";
-        var fullPath = Path.Combine(_tempDirectory, testFilePath);
-        await File.WriteAllTextAsync(fullPath, jsonContent);
-
         // Act
-        await _service.SeedTasksFromJsonAsync(testFilePath, _context);
+        await _service.SeedSampleTasksAsync(_context);
 
         // Assert
-        var tasks = await _context.Tasks.ToListAsync();
-        Assert.Single(tasks);
-        Assert.Equal("New Task", tasks.First().Name);
-        Assert.DoesNotContain(tasks, t => t.Name == "Existing Task");
-    }
-
-    [Fact]
-    public async Task SeedTasksFromJsonAsync_ShouldLogWarning_WhenEmptyJsonArray()
-    {
-        // Arrange
-        var jsonContent = "[]";
-        var testFilePath = "empty-tasks.json";
-        var fullPath = Path.Combine(_tempDirectory, testFilePath);
-        await File.WriteAllTextAsync(fullPath, jsonContent);
-
-        // Act
-        await _service.SeedTasksFromJsonAsync(testFilePath, _context);
-
-        // Assert
-        var tasks = await _context.Tasks.ToListAsync();
-        Assert.Empty(tasks);
-
-        // Verify warning was logged
         _loggerMock.Verify(
             x => x.Log(
-                LogLevel.Warning,
+                LogLevel.Information,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("No tasks found")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("already exist, skipping seed")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
@@ -189,9 +119,5 @@ public class DatabaseSeedServiceTests : IDisposable
     {
         _context.Database.CloseConnection();
         _context.Dispose();
-        if (Directory.Exists(_tempDirectory))
-        {
-            Directory.Delete(_tempDirectory, true);
-        }
     }
 }

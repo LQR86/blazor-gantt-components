@@ -33,7 +33,7 @@
                 {
                     var task = Tasks[i];
                     var y = i * RowHeight + TaskBarMargin;
-                    var x = DayToPixel(task.StartDate);
+                    var x = DayToPixel(task.StartDate.ToUtcDateTime());
                     var width = CalculateTaskWidth(task);
                     
                     <!-- Simple task bar - no background row, no interactions -->

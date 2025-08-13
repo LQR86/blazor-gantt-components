@@ -1,5 +1,6 @@
 @page "/timeline-demo"
 @using GanttComponents.Models
+@using GanttComponents.Models.ValueObjects
 @using GanttComponents.Components.TimelineView
 @using GanttComponents.Components.TimelineZoomControls
 @using GanttComponents.Services
@@ -359,8 +360,8 @@
                 Id = 1, 
                 WbsCode = "1", 
                 Name = "Timeline Demo Project", 
-                StartDate = baseDate,
-                EndDate = baseDate.AddDays(30),
+                StartDate = GanttDate.FromDateTime(baseDate),
+                EndDate = GanttDate.FromDateTime(baseDate.AddDays(30)),
                 Duration = "30d",
                 Progress = 25
             },
@@ -369,8 +370,8 @@
                 Id = 2, 
                 WbsCode = "1.1", 
                 Name = "Planning Phase", 
-                StartDate = baseDate,
-                EndDate = baseDate.AddDays(5),
+                StartDate = GanttDate.FromDateTime(baseDate),
+                EndDate = GanttDate.FromDateTime(baseDate.AddDays(5)),
                 Duration = "5d",
                 Progress = 100
             },
@@ -379,8 +380,8 @@
                 Id = 3, 
                 WbsCode = "1.2", 
                 Name = "Development Phase", 
-                StartDate = baseDate.AddDays(6),
-                EndDate = baseDate.AddDays(20),
+                StartDate = GanttDate.FromDateTime(baseDate.AddDays(6)),
+                EndDate = GanttDate.FromDateTime(baseDate.AddDays(20)),
                 Duration = "14d",
                 Progress = 45
             },
@@ -389,8 +390,8 @@
                 Id = 4, 
                 WbsCode = "1.2.1", 
                 Name = "Component Architecture", 
-                StartDate = baseDate.AddDays(6),
-                EndDate = baseDate.AddDays(10),
+                StartDate = GanttDate.FromDateTime(baseDate.AddDays(6)),
+                EndDate = GanttDate.FromDateTime(baseDate.AddDays(10)),
                 Duration = "4d",
                 Progress = 80
             },
@@ -399,8 +400,8 @@
                 Id = 5, 
                 WbsCode = "1.2.2", 
                 Name = "TimelineView Implementation", 
-                StartDate = baseDate.AddDays(11),
-                EndDate = baseDate.AddDays(15),
+                StartDate = GanttDate.FromDateTime(baseDate.AddDays(11)),
+                EndDate = GanttDate.FromDateTime(baseDate.AddDays(15)),
                 Duration = "4d",
                 Progress = 20
             },
@@ -409,8 +410,8 @@
                 Id = 6, 
                 WbsCode = "1.3", 
                 Name = "Testing Phase", 
-                StartDate = baseDate.AddDays(21),
-                EndDate = baseDate.AddDays(30),
+                StartDate = GanttDate.FromDateTime(baseDate.AddDays(21)),
+                EndDate = GanttDate.FromDateTime(baseDate.AddDays(30)),
                 Duration = "9d",
                 Progress = 0
             }

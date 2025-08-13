@@ -1,4 +1,5 @@
 using GanttComponents.Models;
+using GanttComponents.Models.ValueObjects;
 using Xunit;
 
 namespace GanttComponents.Tests.Unit.Models;
@@ -33,8 +34,8 @@ public class GanttTaskTests
         {
             Id = 1,
             Name = "Test Task",
-            StartDate = startDate,
-            EndDate = endDate,
+            StartDate = GanttDate.FromDateTime(startDate),
+            EndDate = GanttDate.FromDateTime(endDate),
             Duration = "5d",
             Progress = 50,
             ParentId = 10,
@@ -45,8 +46,8 @@ public class GanttTaskTests
         // Assert
         Assert.Equal(1, task.Id);
         Assert.Equal("Test Task", task.Name);
-        Assert.Equal(startDate, task.StartDate);
-        Assert.Equal(endDate, task.EndDate);
+        Assert.Equal(GanttDate.FromDateTime(startDate), task.StartDate);
+        Assert.Equal(GanttDate.FromDateTime(endDate), task.EndDate);
         Assert.Equal("5d", task.Duration);
         Assert.Equal(50, task.Progress);
         Assert.Equal(10, task.ParentId);

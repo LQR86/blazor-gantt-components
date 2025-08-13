@@ -42,7 +42,7 @@
                     {
                         var task = Tasks[i];
                         var y = i * RowHeight;
-                        var x = DayToPixel(task.StartDate);
+                        var x = DayToPixel(task.StartDate.ToUtcDateTime());
                         var width = CalculateTaskWidth(task);
                         var rowIndex = i;
                         

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using GanttComponents.Data;
 using GanttComponents.Models;
+using GanttComponents.Models.ValueObjects;
 using GanttComponents.Services;
 using Moq;
 using Xunit;
@@ -51,8 +52,8 @@ public class GanttTaskServiceTests : IDisposable
         {
             Name = "Test Task",
             Duration = "3d",
-            StartDate = DateTime.UtcNow.Date,
-            EndDate = DateTime.UtcNow.Date.AddDays(3)
+            StartDate = GanttDate.FromDateTime(DateTime.UtcNow.Date),
+            EndDate = GanttDate.FromDateTime(DateTime.UtcNow.Date.AddDays(3))
         };
 
         // Act
@@ -72,8 +73,8 @@ public class GanttTaskServiceTests : IDisposable
         {
             Name = "Test Task",
             Duration = "2d",
-            StartDate = DateTime.UtcNow.Date,
-            EndDate = DateTime.UtcNow.Date.AddDays(2)
+            StartDate = GanttDate.FromDateTime(DateTime.UtcNow.Date),
+            EndDate = GanttDate.FromDateTime(DateTime.UtcNow.Date.AddDays(2))
         };
         var createdTask = await _service.CreateTaskAsync(task);
 
@@ -104,8 +105,8 @@ public class GanttTaskServiceTests : IDisposable
         {
             Name = "Original Task",
             Duration = "1d",
-            StartDate = DateTime.UtcNow.Date,
-            EndDate = DateTime.UtcNow.Date.AddDays(1)
+            StartDate = GanttDate.FromDateTime(DateTime.UtcNow.Date),
+            EndDate = GanttDate.FromDateTime(DateTime.UtcNow.Date.AddDays(1))
         };
         var createdTask = await _service.CreateTaskAsync(task);
 
@@ -128,8 +129,8 @@ public class GanttTaskServiceTests : IDisposable
         {
             Name = "Task to Delete",
             Duration = "1d",
-            StartDate = DateTime.UtcNow.Date,
-            EndDate = DateTime.UtcNow.Date.AddDays(1)
+            StartDate = GanttDate.FromDateTime(DateTime.UtcNow.Date),
+            EndDate = GanttDate.FromDateTime(DateTime.UtcNow.Date.AddDays(1))
         };
         var createdTask = await _service.CreateTaskAsync(task);
 

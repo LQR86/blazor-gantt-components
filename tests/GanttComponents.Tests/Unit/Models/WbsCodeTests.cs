@@ -1,5 +1,6 @@
 using Xunit;
 using GanttComponents.Models;
+using GanttComponents.Models.ValueObjects;
 using GanttComponents.Services;
 using GanttComponents.Data;
 using Microsoft.EntityFrameworkCore;
@@ -33,8 +34,8 @@ public class WbsCodeTests
         var task = new GanttTask
         {
             Name = "Test Task",
-            StartDate = DateTime.Today,
-            EndDate = DateTime.Today.AddDays(1),
+            StartDate = GanttDate.FromDateTime(DateTime.Today),
+            EndDate = GanttDate.FromDateTime(DateTime.Today.AddDays(1)),
             Duration = "1d",
             TaskType = TaskType.FixedDuration
             // WbsCode intentionally not set
@@ -62,8 +63,8 @@ public class WbsCodeTests
         {
             Name = "Test Task",
             WbsCode = wbsCode,
-            StartDate = DateTime.Today,
-            EndDate = DateTime.Today.AddDays(1),
+            StartDate = GanttDate.FromDateTime(DateTime.Today),
+            EndDate = GanttDate.FromDateTime(DateTime.Today.AddDays(1)),
             Duration = "1d",
             TaskType = TaskType.FixedDuration
         };
@@ -86,8 +87,8 @@ public class WbsCodeTests
         {
             Name = "Test Task",
             WbsCode = longWbsCode,
-            StartDate = DateTime.Today,
-            EndDate = DateTime.Today.AddDays(1),
+            StartDate = GanttDate.FromDateTime(DateTime.Today),
+            EndDate = GanttDate.FromDateTime(DateTime.Today.AddDays(1)),
             Duration = "1d",
             TaskType = TaskType.FixedDuration
         };

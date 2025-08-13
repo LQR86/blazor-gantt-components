@@ -103,5 +103,58 @@ window.timelineView = {
         }
         
         return bodyContainer.scrollLeft;
+    },
+
+    /**
+     * Centers a task bar in the TimelineView viewport using DOM-based positioning
+     * Future-proof viewport-relative centering independent of SVG dimensions
+     * @param {string} timelineElementId - The ID of the timeline component container
+     * @param {number} taskId - The ID of the task to center
+     */
+    centerTaskById: function(timelineElementId, taskId) {
+        // Find the timeline scroll container
+        const container = document.querySelector(`#${timelineElementId} .timeline-scroll-container`);
+        if (!container) {
+            console.warn(`TimelineView centering: Could not find scroll container for timeline: ${timelineElementId}`);
+            return;
+        }
+
+        // Find the specific task bar element (not background row) using specific selector
+        const taskBar = container.querySelector(`.timeline-task-bar[data-task-id="${taskId}"]`);
+        if (!taskBar) {
+            console.warn(`TimelineView centering: Could not find task bar for task ID: ${taskId}`);
+            return;
+        }
+
+        try {
+            // Get viewport dimensions
+            const containerWidth = container.clientWidth;
+            const containerScrollLeft = container.scrollLeft;
+
+            // Get task bar position using DOM bounding rectangles
+            const taskBarRect = taskBar.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+
+            // Calculate task bar position relative to container
+            const taskBarRelativeLeft = taskBarRect.left - containerRect.left + containerScrollLeft;
+            
+            // Use task bar LEFT BORDER position for more intuitive centering
+            // This aligns the task start date with viewport center rather than task middle
+            const taskBarLeftPosition = taskBarRelativeLeft;
+
+            // Calculate scroll position to center the task bar's LEFT BORDER in viewport
+            const targetScrollLeft = taskBarLeftPosition - (containerWidth / 2);
+
+            // Smooth scroll to center the task bar
+            container.scrollTo({
+                left: Math.max(0, targetScrollLeft),
+                behavior: 'smooth'
+            });
+
+            console.log(`TimelineView centering: Successfully centered task ${taskId} at position ${Math.max(0, targetScrollLeft)}`);
+
+        } catch (error) {
+            console.error(`TimelineView centering: Error centering task ${taskId}:`, error);
+        }
     }
 };

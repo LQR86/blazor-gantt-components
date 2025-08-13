@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace GanttComponents.Models.ValueObjects;
 
 /// <summary>
@@ -74,6 +76,7 @@ public readonly struct GanttDate : IEquatable<GanttDate>, IComparable<GanttDate>
     /// Date property for compatibility with existing code that uses .Date
     /// Returns the same GanttDate since it's already date-only.
     /// </summary>
+    [JsonIgnore]
     public GanttDate Date => this;
 
     // Essential comparison operations
@@ -85,11 +88,11 @@ public readonly struct GanttDate : IEquatable<GanttDate>, IComparable<GanttDate>
     // Essential operators
     public static bool operator ==(GanttDate left, GanttDate right) => left.Equals(right);
     public static bool operator !=(GanttDate left, GanttDate right) => !left.Equals(right);
-    
+
     /// <summary>
     /// Subtraction operator: returns TimeSpan between two dates
     /// </summary>
-    public static TimeSpan operator -(GanttDate left, GanttDate right) => 
+    public static TimeSpan operator -(GanttDate left, GanttDate right) =>
         left.ToUtcDateTime() - right.ToUtcDateTime();
 
     // Implicit conversions for ease of use

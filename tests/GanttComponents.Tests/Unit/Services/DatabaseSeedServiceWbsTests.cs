@@ -13,7 +13,6 @@ public class DatabaseSeedServiceWbsTests : IDisposable
 {
     private readonly GanttDbContext _context;
     private readonly DatabaseSeedService _seedService;
-    private readonly string _tempFilePath;
 
     public DatabaseSeedServiceWbsTests()
     {
@@ -28,86 +27,42 @@ public class DatabaseSeedServiceWbsTests : IDisposable
         var mockLogger = new Mock<ILogger<DatabaseSeedService>>();
         var mockEnvironment = new Mock<IWebHostEnvironment>();
 
-        // Create a temporary JSON file for testing
-        _tempFilePath = Path.Combine(Path.GetTempPath(), $"test-tasks-{Guid.NewGuid()}.json");
-        var testJson = """
-        [
-          {
-            "Id": 1,
-            "Name": "Project Planning",
-            "WbsCode": "1",
-            "StartDate": "2025-07-27",
-            "EndDate": "2025-08-02",
-            "Duration": "5d",
-            "Progress": 20,
-            "TaskType": "FixedDuration",
-            "ParentId": null,
-            "Predecessors": null
-          },
-          {
-            "Id": 2,
-            "Name": "Requirements Analysis", 
-            "WbsCode": "1.1",
-            "StartDate": "2025-07-28",
-            "EndDate": "2025-07-30",
-            "Duration": "2d",
-            "Progress": 50,
-            "TaskType": "FixedDuration",
-            "ParentId": 1,
-            "Predecessors": null
-          },
-          {
-            "Id": 3,
-            "Name": "System Design",
-            "WbsCode": "2",
-            "StartDate": "2025-08-03",
-            "EndDate": "2025-08-10",
-            "Duration": "6d",
-            "Progress": 0,
-            "TaskType": "FixedDuration",
-            "ParentId": null,
-            "Predecessors": "1FS"
-          }
-        ]
-        """;
-
-        File.WriteAllText(_tempFilePath, testJson);
-        mockEnvironment.Setup(e => e.ContentRootPath).Returns(Path.GetTempPath());
-
         _seedService = new DatabaseSeedService(mockLogger.Object, mockEnvironment.Object);
     }
 
     [Fact]
-    public async Task SeedTasksFromJsonAsync_LoadsWbsCodesCorrectly()
+    public async Task SeedSampleTasksAsync_LoadsWbsCodesCorrectly()
     {
-        // Arrange
-        var fileName = Path.GetFileName(_tempFilePath);
-
         // Act
-        await _seedService.SeedTasksFromJsonAsync(fileName, _context);
+        await _seedService.SeedSampleTasksAsync(_context);
 
         // Assert
         var tasks = await _context.Tasks.OrderBy(t => t.Id).ToListAsync();
-        Assert.Equal(3, tasks.Count);
+        Assert.True(tasks.Count >= 5); // Should have all 50 sample tasks
 
-        Assert.Equal("1", tasks[0].WbsCode);
-        Assert.Equal("Project Planning", tasks[0].Name);
+        // Check specific WBS codes from our sample data
+        var planningTask = tasks.FirstOrDefault(t => t.Name == "Project Planning Phase");
+        Assert.NotNull(planningTask);
+        Assert.Equal("1", planningTask.WbsCode);
 
-        Assert.Equal("1.1", tasks[1].WbsCode);
-        Assert.Equal("Requirements Analysis", tasks[1].Name);
+        var requirementsTask = tasks.FirstOrDefault(t => t.Name == "Requirements Analysis");
+        Assert.NotNull(requirementsTask);
+        Assert.Equal("1.1", requirementsTask.WbsCode);
 
-        Assert.Equal("2", tasks[2].WbsCode);
-        Assert.Equal("System Design", tasks[2].Name);
+        var techSpecTask = tasks.FirstOrDefault(t => t.Name == "Technical Specification");
+        Assert.NotNull(techSpecTask);
+        Assert.Equal("1.2", techSpecTask.WbsCode);
+
+        var devTask = tasks.FirstOrDefault(t => t.Name == "Development Phase");
+        Assert.NotNull(devTask);
+        Assert.Equal("2", devTask.WbsCode);
     }
 
     [Fact]
-    public async Task SeedTasksFromJsonAsync_PersistsWbsCodesToDatabaseCorrectly()
+    public async Task SeedSampleTasksAsync_PersistsWbsCodesToDatabaseCorrectly()
     {
-        // Arrange
-        var fileName = Path.GetFileName(_tempFilePath);
-
         // Act
-        await _seedService.SeedTasksFromJsonAsync(fileName, _context);
+        await _seedService.SeedSampleTasksAsync(_context);
 
         // Assert - Verify data is persisted by reading from a fresh context
         using var freshContext = new GanttDbContext(new DbContextOptionsBuilder<GanttDbContext>()
@@ -115,20 +70,20 @@ public class DatabaseSeedServiceWbsTests : IDisposable
             .Options);
 
         var tasks = await freshContext.Tasks.OrderBy(t => t.Id).ToListAsync();
-        Assert.Equal(3, tasks.Count);
+        Assert.True(tasks.Count >= 5);
         Assert.All(tasks, task => Assert.NotNull(task.WbsCode));
-        Assert.Equal("1", tasks[0].WbsCode);
-        Assert.Equal("1.1", tasks[1].WbsCode);
-        Assert.Equal("2", tasks[2].WbsCode);
+
+        // Verify hierarchical WBS structure
+        var parentTasks = tasks.Where(t => t.ParentId == null).ToList();
+        Assert.True(parentTasks.Count >= 2); // Should have multiple top-level tasks
+
+        var childTasks = tasks.Where(t => t.ParentId != null).ToList();
+        Assert.True(childTasks.Count >= 3); // Should have child tasks
     }
 
     public void Dispose()
     {
         _context?.Database.CloseConnection();
         _context?.Dispose();
-        if (File.Exists(_tempFilePath))
-        {
-            File.Delete(_tempFilePath);
-        }
     }
 }

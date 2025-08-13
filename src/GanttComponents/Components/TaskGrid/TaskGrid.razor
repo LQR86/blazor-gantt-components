@@ -57,11 +57,11 @@
                     </div>
                     
                     <div class="grid-cell" style="width: 120px;">
-                        @DateFormatter.FormatDate(task.StartDate)
+                        @DateFormatter.FormatDate(task.StartDate.ToUtcDateTime())
                     </div>
                     
                     <div class="grid-cell" style="width: 120px;">
-                        @DateFormatter.FormatDate(task.EndDate)
+                        @DateFormatter.FormatDate(task.EndDate.ToUtcDateTime())
                     </div>
                     
                     <div class="grid-cell" style="width: 100px;">

@@ -38,23 +38,14 @@ public class GanttDbContext : DbContext
             //       .HasColumnType("DATE")                    // Force DATE-only schema
             //       .HasConversion<GanttDateConverter>();     // Enforce constraints
 
-            // TEMPORARY: Legacy DateTime support with constraint enforcement
-            // During gradual migration, these ensure constraint enforcement even with DateTime properties
+            // CHOKE POINT 2: Database enforcement with GanttDate converter
             entity.Property(e => e.StartDate)
                   .HasColumnType("DATE")                          // Database enforces DATE-only
-                  .HasConversion(
-                      // TO DATABASE: Strip time, ensure UTC
-                      v => DateTime.SpecifyKind(v.ToUniversalTime().Date, DateTimeKind.Utc),
-                      // FROM DATABASE: Force to UTC midnight regardless of what SQLite returns
-                      v => new DateTime(v.Year, v.Month, v.Day, 0, 0, 0, DateTimeKind.Utc));
+                  .HasConversion<GanttDateConverter>();           // Enforce constraints
 
             entity.Property(e => e.EndDate)
                   .HasColumnType("DATE")                          // Database enforces DATE-only  
-                  .HasConversion(
-                      // TO DATABASE: Strip time, ensure UTC
-                      v => DateTime.SpecifyKind(v.ToUniversalTime().Date, DateTimeKind.Utc),
-                      // FROM DATABASE: Force to UTC midnight regardless of what SQLite returns
-                      v => new DateTime(v.Year, v.Month, v.Day, 0, 0, 0, DateTimeKind.Utc));
+                  .HasConversion<GanttDateConverter>();           // Enforce constraints
 
             // Ignore complex properties that can't be easily mapped to database
             entity.Ignore(e => e.CustomFields);

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using GanttComponents.Models.ValueObjects;
 
 namespace GanttComponents.Models;
 
@@ -23,16 +24,16 @@ public class GanttTask
     public string WbsCode { get; set; } = string.Empty;
 
     /// <summary>
-    /// Task start date (day precision)
+    /// Task start date (day precision, UTC enforced)
     /// </summary>
     [Required]
-    public DateTime StartDate { get; set; }
+    public GanttDate StartDate { get; set; }
 
     /// <summary>
-    /// Task end date (day precision)
+    /// Task end date (day precision, UTC enforced)
     /// </summary>
     [Required]
-    public DateTime EndDate { get; set; }
+    public GanttDate EndDate { get; set; }
 
     /// <summary>
     /// Duration in format "5d" (days) or "8h" (hours)
@@ -98,8 +99,8 @@ public enum TaskType
 /// </summary>
 public class GanttBaseline
 {
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
+    public GanttDate StartDate { get; set; }
+    public GanttDate EndDate { get; set; }
     public string Duration { get; set; } = "1d";
     public int Progress { get; set; } = 0;
 }

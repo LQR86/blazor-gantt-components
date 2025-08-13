@@ -211,8 +211,8 @@ public partial class TimelineView : ComponentBase, IDisposable
         else
         {
             // Use exact task date range
-            StartDate = Tasks.Min(t => t.StartDate).Date;
-            EndDate = Tasks.Max(t => t.EndDate).Date;
+            StartDate = Tasks.Min(t => t.StartDate).ToUtcDateTime().Date;
+            EndDate = Tasks.Max(t => t.EndDate).ToUtcDateTime().Date;
         }
 
         // Step 2: Get expanded boundaries for SVG canvas sizing

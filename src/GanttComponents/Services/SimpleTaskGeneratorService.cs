@@ -1,4 +1,5 @@
 using GanttComponents.Models;
+using GanttComponents.Models.ValueObjects;
 using GanttComponents.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,7 +40,10 @@ public class SimpleTaskGeneratorService : ISimpleTaskGeneratorService
         var tasksPerLevel = DistributeTasksAcrossLevels(config.TotalTaskCount, config.HierarchyDepth, rootTaskCount);
 
         // Generate root level tasks
-        var timelineSegments = DivideTimelineIntoSegments(config.ProjectStartDate, config.ProjectEndDate, rootTaskCount);
+        var timelineSegments = DivideTimelineIntoSegments(
+            GanttDate.FromDateTime(config.ProjectStartDate),
+            GanttDate.FromDateTime(config.ProjectEndDate),
+            rootTaskCount);
 
         for (int i = 0; i < rootTaskCount; i++)
         {
@@ -186,8 +190,8 @@ public class SimpleTaskGeneratorService : ISimpleTaskGeneratorService
             TotalTasks = sampleTasks.Count, // Use actual count
             RootTasks = sampleTasks.Count(t => !t.ParentId.HasValue),
             MaxDepth = sampleTasks.Any() ? sampleTasks.Max(t => t.WbsCode.Split('.').Length) : 0,
-            EarliestStart = sampleTasks.Any() ? sampleTasks.Min(t => t.StartDate) : config.ProjectStartDate,
-            LatestEnd = sampleTasks.Any() ? sampleTasks.Max(t => t.EndDate) : config.ProjectEndDate,
+            EarliestStart = sampleTasks.Any() ? sampleTasks.Min(t => t.StartDate).ToUtcDateTime() : config.ProjectStartDate,
+            LatestEnd = sampleTasks.Any() ? sampleTasks.Max(t => t.EndDate).ToUtcDateTime() : config.ProjectEndDate,
             AverageTaskDuration = (config.MinTaskDurationDays + config.MaxTaskDurationDays) / 2
         };
 
@@ -225,7 +229,7 @@ public class SimpleTaskGeneratorService : ISimpleTaskGeneratorService
     }
 
     private GanttTask CreateTask(int id, string name, string wbsCode, int? parentId,
-        DateTime startDate, DateTime endDate, int progress, Random random)
+        GanttDate startDate, GanttDate endDate, int progress, Random random)
     {
         var duration = (endDate - startDate).Days;
         return new GanttTask
@@ -263,16 +267,16 @@ public class SimpleTaskGeneratorService : ISimpleTaskGeneratorService
         return new Dictionary<int, int> { { 1, rootCount } };
     }
 
-    private List<(DateTime Start, DateTime End)> DivideTimelineIntoSegments(DateTime start, DateTime end, int segmentCount)
+    private List<(GanttDate Start, GanttDate End)> DivideTimelineIntoSegments(GanttDate start, GanttDate end, int segmentCount)
     {
-        var segments = new List<(DateTime Start, DateTime End)>();
+        var segments = new List<(GanttDate Start, GanttDate End)>();
         var totalDays = (end - start).Days;
         var daysPerSegment = Math.Max(1, totalDays / segmentCount);
 
         for (int i = 0; i < segmentCount; i++)
         {
-            var segmentStart = start.AddDays(i * daysPerSegment);
-            var segmentEnd = i == segmentCount - 1 ? end : start.AddDays((i + 1) * daysPerSegment);
+            var segmentStart = GanttDate.FromDateTime(start.ToUtcDateTime().AddDays(i * daysPerSegment));
+            var segmentEnd = i == segmentCount - 1 ? end : GanttDate.FromDateTime(start.ToUtcDateTime().AddDays((i + 1) * daysPerSegment));
             segments.Add((segmentStart, segmentEnd));
         }
 

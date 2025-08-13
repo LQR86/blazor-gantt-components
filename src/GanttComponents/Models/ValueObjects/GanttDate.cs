@@ -65,6 +65,17 @@ public readonly struct GanttDate : IEquatable<GanttDate>, IComparable<GanttDate>
     /// </summary>
     public override string ToString() => _value.ToString("yyyy-MM-dd");
 
+    /// <summary>
+    /// Custom format support for UI display.
+    /// </summary>
+    public string ToString(string format) => _value.ToString(format);
+
+    /// <summary>
+    /// Date property for compatibility with existing code that uses .Date
+    /// Returns the same GanttDate since it's already date-only.
+    /// </summary>
+    public GanttDate Date => this;
+
     // Essential comparison operations
     public bool Equals(GanttDate other) => _value.Equals(other._value);
     public int CompareTo(GanttDate other) => _value.CompareTo(other._value);
@@ -74,6 +85,12 @@ public readonly struct GanttDate : IEquatable<GanttDate>, IComparable<GanttDate>
     // Essential operators
     public static bool operator ==(GanttDate left, GanttDate right) => left.Equals(right);
     public static bool operator !=(GanttDate left, GanttDate right) => !left.Equals(right);
+    
+    /// <summary>
+    /// Subtraction operator: returns TimeSpan between two dates
+    /// </summary>
+    public static TimeSpan operator -(GanttDate left, GanttDate right) => 
+        left.ToUtcDateTime() - right.ToUtcDateTime();
 
     // Implicit conversions for ease of use
     public static implicit operator DateOnly(GanttDate ganttDate) => ganttDate._value;

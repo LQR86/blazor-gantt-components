@@ -113,8 +113,8 @@ public partial class TimelineView_Export : ComponentBase
         }
         else
         {
-            StartDate = Tasks.Min(t => t.StartDate).Date;
-            EndDate = Tasks.Max(t => t.EndDate).Date;
+            StartDate = Tasks.Min(t => t.StartDate).ToUtcDateTime().Date;
+            EndDate = Tasks.Max(t => t.EndDate).ToUtcDateTime().Date;
         }
 
         // Step 2: Get expanded boundaries for consistent header rendering

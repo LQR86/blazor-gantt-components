@@ -1,6 +1,7 @@
 using GanttComponents.Models;
 using GanttComponents.Services;
 using GanttComponents.Components.TimelineView.Renderers;
+using GanttComponents.Utilities;
 
 namespace GanttComponents.Components.TimelineView.Renderers;
 
@@ -279,6 +280,67 @@ public abstract class BaseTimelineRenderer
     protected string GetHeaderTextClass(bool isPrimary)
     {
         return isPrimary ? "svg-header-text-primary" : "svg-header-text-secondary";
+    }
+
+    // === COORDINATE SYSTEM ENFORCEMENT ===
+    // Ensures all renderers use consistent coordinate calculations
+
+    /// <summary>
+    /// COORDINATE ENFORCEMENT: Calculates X position for a date using the timeline coordinate system.
+    /// All renderers must use this method to ensure consistent positioning across headers and task bars.
+    /// This prevents coordinate drift and ensures pixel-perfect alignment in the ABC composition pattern.
+    /// </summary>
+    /// <param name="date">The date to convert to X coordinate</param>
+    /// <returns>X position in SVG pixels from the coordinate system origin</returns>
+    /// <exception cref="ArgumentException">Thrown when date is invalid</exception>
+    protected double CalculateCoordinateX(DateTime date)
+    {
+        // Use proven coordinate logic from SVGRenderingHelpers for consistency
+        return SVGRenderingHelpers.DayToSVGX(date, CoordinateSystemStart, DayWidth);
+    }
+
+    /// <summary>
+    /// COORDINATE ENFORCEMENT: Calculates width for a date range using timeline coordinate system.
+    /// All renderers must use this method to ensure consistent width calculations.
+    /// Handles inclusive date ranges with proper day-level precision.
+    /// </summary>
+    /// <param name="startDate">Start date of the range (inclusive)</param>
+    /// <param name="endDate">End date of the range (inclusive)</param>
+    /// <returns>Width in pixels for the date range</returns>
+    /// <exception cref="ArgumentException">Thrown when date range is invalid</exception>
+    protected double CalculateCoordinateWidth(DateTime startDate, DateTime endDate)
+    {
+        if (endDate < startDate)
+        {
+            throw new ArgumentException($"End date ({endDate:yyyy-MM-dd}) cannot be before start date ({startDate:yyyy-MM-dd})");
+        }
+
+        // Calculate inclusive date range in days
+        var days = (endDate.Date - startDate.Date).Days + 1;
+        return days * DayWidth;
+    }
+
+    /// <summary>
+    /// COORDINATE VALIDATION: Development-mode validation to detect coordinate inconsistencies.
+    /// This helps catch coordinate system violations during development and debugging.
+    /// Only active in DEBUG builds to avoid performance impact in production.
+    /// </summary>
+    /// <param name="date">The date being positioned</param>
+    /// <param name="actualX">The X position calculated by renderer</param>
+    /// <param name="context">Context description for debugging (e.g., "quarter header")</param>
+    [System.Diagnostics.Conditional("DEBUG")]
+    protected void ValidateCoordinateConsistency(DateTime date, double actualX, string context = "header cell")
+    {
+        var expectedX = CalculateCoordinateX(date);
+        var tolerance = 1.0; // 1 pixel tolerance for floating point precision
+
+        if (Math.Abs(actualX - expectedX) > tolerance)
+        {
+            Logger.LogWarning(
+                $"COORDINATE INCONSISTENCY in {GetRendererDescription()}: " +
+                $"{context} for {date:yyyy-MM-dd} at X={actualX:F1}, expected X={expectedX:F1}. " +
+                $"Use CalculateCoordinateX() for consistent positioning.");
+        }
     }
 
     /// <summary>

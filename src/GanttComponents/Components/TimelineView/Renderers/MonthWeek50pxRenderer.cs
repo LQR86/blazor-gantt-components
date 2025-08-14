@@ -114,12 +114,11 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
             var monthStart = monthBounds.start;
             var monthEnd = monthBounds.end;
 
-            // CRITICAL FIX: Use fixed coordinate system to match taskbar positioning
-            var xPosition = SVGRenderingHelpers.DayToSVGX(monthStart, CoordinateSystemStart, DayWidth);
+            // COORDINATE ENFORCEMENT: Use base class coordinate system
+            var xPosition = CalculateCoordinateX(monthStart);
 
-            // Calculate month width in pixels
-            var monthDays = (monthEnd - monthStart).Days + 1;
-            var monthWidth = monthDays * DayWidth;
+            // Calculate month width using coordinate system
+            var monthWidth = CalculateCoordinateWidth(monthStart, monthEnd);
 
             // Month display: "February 2025"
             var monthText = $"{monthStart:MMMM yyyy}";
@@ -152,11 +151,11 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
             var weekStart = currentDate;
             var weekEnd = currentDate.AddDays(6); // Sunday
 
-            // CRITICAL FIX: Use fixed coordinate system to match taskbar positioning
-            var xPosition = SVGRenderingHelpers.DayToSVGX(weekStart, CoordinateSystemStart, DayWidth);
+            // COORDINATE ENFORCEMENT: Use base class coordinate system
+            var xPosition = CalculateCoordinateX(weekStart);
 
-            // Calculate week width (7 days)
-            var weekWidth = 7 * DayWidth;
+            // Calculate week width using coordinate system (7 days)
+            var weekWidth = CalculateCoordinateWidth(weekStart, weekEnd);
 
             // Week display: "2/17" (Monday date)
             var weekText = $"{weekStart.Month}/{weekStart.Day}";

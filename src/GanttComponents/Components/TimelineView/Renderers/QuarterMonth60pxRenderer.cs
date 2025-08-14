@@ -129,7 +129,6 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
     {
         var svg = new System.Text.StringBuilder();
         var currentDate = start;
-        double xPosition = 0;
 
         while (currentDate <= end)
         {
@@ -137,9 +136,9 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
             var quarterStart = quarterBounds.start;
             var quarterEnd = quarterBounds.end;
 
-            // Calculate quarter width in pixels
-            var quarterDays = (quarterEnd - quarterStart).Days + 1;
-            var quarterWidth = quarterDays * DayWidth;
+            // COORDINATE ENFORCEMENT: Use base class coordinate system
+            var xPosition = CalculateCoordinateX(quarterStart);
+            var quarterWidth = CalculateCoordinateWidth(quarterStart, quarterEnd);
 
             // Quarter display: "Q1 2025", "Q2 2025", etc.
             var quarter = (quarterStart.Month - 1) / 3 + 1;
@@ -149,7 +148,6 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
             svg.Append(CreateSVGRect(xPosition, 0, quarterWidth, HeaderMonthHeight, GetCSSClass() + "-quarter"));
             svg.Append(CreateSVGText(xPosition + quarterWidth / 2, HeaderMonthHeight / 2, quarterText, GetCSSClass() + "-quarter-text"));
 
-            xPosition += quarterWidth;
             currentDate = quarterEnd.AddDays(1);
         }
 
@@ -166,16 +164,15 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
     {
         var svg = new System.Text.StringBuilder();
         var currentDate = start;
-        double xPosition = 0;
 
         while (currentDate <= end)
         {
             var monthStart = new DateTime(currentDate.Year, currentDate.Month, 1);
             var monthEnd = monthStart.AddMonths(1).AddDays(-1);
 
-            // Calculate month width (approximately 60px for 30-day months with 2.0px day width)
-            var monthDays = (monthEnd - monthStart).Days + 1;
-            var monthWidth = monthDays * DayWidth;
+            // COORDINATE ENFORCEMENT: Use base class coordinate system  
+            var xPosition = CalculateCoordinateX(monthStart);
+            var monthWidth = CalculateCoordinateWidth(monthStart, monthEnd);
 
             // Month display: "Jan", "Feb", "Mar", etc.
             var monthText = monthStart.ToString("MMM");
@@ -184,7 +181,6 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
             svg.Append(CreateSVGRect(xPosition, HeaderMonthHeight, monthWidth, HeaderDayHeight, GetCSSClass() + "-month"));
             svg.Append(CreateSVGText(xPosition + monthWidth / 2, HeaderMonthHeight + HeaderDayHeight / 2, monthText, GetCSSClass() + "-month-text"));
 
-            xPosition += monthWidth;
             currentDate = monthEnd.AddDays(1);
         }
 

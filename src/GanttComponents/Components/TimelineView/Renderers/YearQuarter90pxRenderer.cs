@@ -127,16 +127,15 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
     {
         var svg = new System.Text.StringBuilder();
         var currentYear = start.Year;
-        double xPosition = 0;
 
         while (currentYear <= end.Year)
         {
             var yearStart = new DateTime(currentYear, 1, 1);
             var yearEnd = new DateTime(currentYear, 12, 31);
 
-            // Calculate year width in pixels (365 or 366 days × 1.0px = 365-366px)
-            var yearDays = (yearEnd - yearStart).Days + 1;
-            var yearWidth = yearDays * DayWidth;
+            // COORDINATE ENFORCEMENT: Use base class coordinate system
+            var xPosition = CalculateCoordinateX(yearStart);
+            var yearWidth = CalculateCoordinateWidth(yearStart, yearEnd);
 
             // Year display: "2025", "2026", etc.
             var yearText = currentYear.ToString();
@@ -145,7 +144,6 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
             svg.Append(CreateSVGRect(xPosition, 0, yearWidth, HeaderMonthHeight, GetCSSClass() + "-year"));
             svg.Append(CreateSVGText(xPosition + yearWidth / 2, HeaderMonthHeight / 2, yearText, GetCSSClass() + "-year-text"));
 
-            xPosition += yearWidth;
             currentYear++;
         }
 
@@ -162,7 +160,6 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
     {
         var svg = new System.Text.StringBuilder();
         var currentDate = start;
-        double xPosition = 0;
 
         while (currentDate <= end)
         {
@@ -170,9 +167,9 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
             var quarterStart = quarterBounds.start;
             var quarterEnd = quarterBounds.end;
 
-            // Calculate quarter width (approximately 90px for 90-day quarters with 1.0px day width)
-            var quarterDays = (quarterEnd - quarterStart).Days + 1;
-            var quarterWidth = quarterDays * DayWidth;
+            // COORDINATE ENFORCEMENT: Use base class coordinate system
+            var xPosition = CalculateCoordinateX(quarterStart);
+            var quarterWidth = CalculateCoordinateWidth(quarterStart, quarterEnd);
 
             // Quarter display: "Q1", "Q2", "Q3", "Q4"
             var quarter = (quarterStart.Month - 1) / 3 + 1;
@@ -182,7 +179,6 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
             svg.Append(CreateSVGRect(xPosition, HeaderMonthHeight, quarterWidth, HeaderDayHeight, GetCSSClass() + "-quarter"));
             svg.Append(CreateSVGText(xPosition + quarterWidth / 2, HeaderMonthHeight + HeaderDayHeight / 2, quarterText, GetCSSClass() + "-quarter-text"));
 
-            xPosition += quarterWidth;
             currentDate = quarterEnd.AddDays(1);
         }
 

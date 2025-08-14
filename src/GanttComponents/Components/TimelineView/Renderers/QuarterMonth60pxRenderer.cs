@@ -16,7 +16,7 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
 {
     /// <summary>
     /// Constructor for QuarterMonth 60px renderer with dependency injection.
-    /// Uses integral 2.0px day width for perfect SVG coordinate calculations.
+    /// Uses calculated day width for flexible quarter/month cell sizing.
     /// Union expansion is handled automatically by the base class.
     /// </summary>
     public QuarterMonth60pxRenderer(
@@ -25,12 +25,12 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
+        double dayWidth,
         int headerMonthHeight,
         int headerDayHeight,
         TimelineZoomLevel zoomLevel,
         double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate,
-               2.0, // INTEGRAL DAY WIDTH: 2.0px day width = 60px month cells (2.0px × 30 days)
+        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
         ValidateRenderer();

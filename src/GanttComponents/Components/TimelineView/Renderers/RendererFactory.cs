@@ -45,19 +45,19 @@ public static class RendererFactory
                 logger, i18n, dateFormatter, startDate, endDate,
                 headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
 
-            // MonthWeek50px - ABC implementation (takes dayWidth parameter)
+            // MonthWeek50px - ABC implementation (uses calculated dayWidth)
             TimelineZoomLevel.MonthWeekOptimal50px => new MonthWeek50pxRenderer(
-                logger, i18n, dateFormatter, startDate, endDate, 8.0,
+                logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                 headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
 
-            // QuarterMonth60px - ABC implementation (hardcoded 2.0px day width)
+            // QuarterMonth60px - ABC implementation (uses calculated dayWidth)
             TimelineZoomLevel.QuarterMonthOptimal60px => new QuarterMonth60pxRenderer(
-                logger, i18n, dateFormatter, startDate, endDate,
+                logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                 headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
 
-            // YearQuarter70px - ABC implementation (using 90px renderer with hardcoded 1.0px day width)
+            // YearQuarter70px - ABC implementation (uses calculated dayWidth)
             TimelineZoomLevel.YearQuarterOptimal70px => new YearQuarter90pxRenderer(
-                logger, i18n, dateFormatter, startDate, endDate,
+                logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                 headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor),
 
             // Unsupported levels (future implementations)

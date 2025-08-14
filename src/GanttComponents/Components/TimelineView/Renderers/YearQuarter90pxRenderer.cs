@@ -16,7 +16,7 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
 {
     /// <summary>
     /// Constructor for YearQuarter 90px renderer with dependency injection.
-    /// Uses integral 1.0px day width for perfect SVG coordinate calculations.
+    /// Uses calculated day width for flexible year/quarter cell sizing.
     /// Union expansion is handled automatically by the base class.
     /// </summary>
     public YearQuarter90pxRenderer(
@@ -25,12 +25,12 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
+        double dayWidth,
         int headerMonthHeight,
         int headerDayHeight,
         TimelineZoomLevel zoomLevel,
         double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate,
-               1.0, // INTEGRAL DAY WIDTH: 1.0px day width = 90px quarter cells (1.0px × 90 days)
+        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
         ValidateRenderer();

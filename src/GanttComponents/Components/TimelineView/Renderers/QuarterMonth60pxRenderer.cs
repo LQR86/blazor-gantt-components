@@ -16,7 +16,7 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
 {
     /// <summary>
     /// Constructor for QuarterMonth 60px renderer with dependency injection.
-    /// Uses integral 2.0px day width for perfect SVG coordinate calculations.
+    /// Uses calculated day width for flexible quarter/month cell sizing.
     /// Union expansion is handled automatically by the base class.
     /// </summary>
     public QuarterMonth60pxRenderer(
@@ -25,12 +25,12 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
+        double dayWidth,
         int headerMonthHeight,
         int headerDayHeight,
         TimelineZoomLevel zoomLevel,
         double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate,
-               2.0, // INTEGRAL DAY WIDTH: 2.0px day width = 60px month cells (2.0px × 30 days)
+        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
         ValidateRenderer();
@@ -129,7 +129,6 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
     {
         var svg = new System.Text.StringBuilder();
         var currentDate = start;
-        double xPosition = 0;
 
         while (currentDate <= end)
         {
@@ -137,19 +136,15 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
             var quarterStart = quarterBounds.start;
             var quarterEnd = quarterBounds.end;
 
-            // Calculate quarter width in pixels
-            var quarterDays = (quarterEnd - quarterStart).Days + 1;
-            var quarterWidth = quarterDays * DayWidth;
-
             // Quarter display: "Q1 2025", "Q2 2025", etc.
             var quarter = (quarterStart.Month - 1) / 3 + 1;
             var quarterText = $"Q{quarter} {quarterStart.Year}";
 
-            // Render quarter header cell
-            svg.Append(CreateSVGRect(xPosition, 0, quarterWidth, HeaderMonthHeight, GetCSSClass() + "-quarter"));
-            svg.Append(CreateSVGText(xPosition + quarterWidth / 2, HeaderMonthHeight / 2, quarterText, GetCSSClass() + "-quarter-text"));
+            // SoC BENEFIT: Renderer focuses on WHAT to show, base class handles HOW to position
+            svg.Append(CreateValidatedHeaderCell(
+                quarterStart, quarterEnd, 0, HeaderMonthHeight,
+                quarterText, GetCSSClass() + "-quarter", GetCSSClass() + "-quarter-text"));
 
-            xPosition += quarterWidth;
             currentDate = quarterEnd.AddDays(1);
         }
 
@@ -166,25 +161,20 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
     {
         var svg = new System.Text.StringBuilder();
         var currentDate = start;
-        double xPosition = 0;
 
         while (currentDate <= end)
         {
             var monthStart = new DateTime(currentDate.Year, currentDate.Month, 1);
             var monthEnd = monthStart.AddMonths(1).AddDays(-1);
 
-            // Calculate month width (approximately 60px for 30-day months with 2.0px day width)
-            var monthDays = (monthEnd - monthStart).Days + 1;
-            var monthWidth = monthDays * DayWidth;
-
             // Month display: "Jan", "Feb", "Mar", etc.
             var monthText = monthStart.ToString("MMM");
 
-            // Render month header cell
-            svg.Append(CreateSVGRect(xPosition, HeaderMonthHeight, monthWidth, HeaderDayHeight, GetCSSClass() + "-month"));
-            svg.Append(CreateSVGText(xPosition + monthWidth / 2, HeaderMonthHeight + HeaderDayHeight / 2, monthText, GetCSSClass() + "-month-text"));
+            // SoC BENEFIT: Clean, focused code - no coordinate calculations cluttering business logic
+            svg.Append(CreateValidatedHeaderCell(
+                monthStart, monthEnd, HeaderMonthHeight, HeaderDayHeight,
+                monthText, GetCSSClass() + "-month", GetCSSClass() + "-month-text"));
 
-            xPosition += monthWidth;
             currentDate = monthEnd.AddDays(1);
         }
 

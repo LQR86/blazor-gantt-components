@@ -114,19 +114,13 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
             var monthStart = monthBounds.start;
             var monthEnd = monthBounds.end;
 
-            // CRITICAL FIX: Use fixed coordinate system to match taskbar positioning
-            var xPosition = SVGRenderingHelpers.DayToSVGX(monthStart, CoordinateSystemStart, DayWidth);
-
-            // Calculate month width in pixels
-            var monthDays = (monthEnd - monthStart).Days + 1;
-            var monthWidth = monthDays * DayWidth;
-
             // Month display: "February 2025"
             var monthText = $"{monthStart:MMMM yyyy}";
 
-            // Render month header cell
-            svg.Append(CreateSVGRect(xPosition, 0, monthWidth, HeaderMonthHeight, GetCSSClass() + "-cell-primary"));
-            svg.Append(CreateSVGText(xPosition + monthWidth / 2, HeaderMonthHeight / 2, monthText, GetCSSClass() + "-primary-text"));
+            // SoC BENEFIT: Renderer focuses on WHAT to show, base class handles HOW to position
+            svg.Append(CreateValidatedHeaderCell(
+                monthStart, monthEnd, 0, HeaderMonthHeight,
+                monthText, GetCSSClass() + "-cell-primary", GetCSSClass() + "-primary-text"));
 
             // Move to next month
             currentDate = monthEnd.AddDays(1);
@@ -152,18 +146,13 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
             var weekStart = currentDate;
             var weekEnd = currentDate.AddDays(6); // Sunday
 
-            // CRITICAL FIX: Use fixed coordinate system to match taskbar positioning
-            var xPosition = SVGRenderingHelpers.DayToSVGX(weekStart, CoordinateSystemStart, DayWidth);
-
-            // Calculate week width (7 days)
-            var weekWidth = 7 * DayWidth;
-
             // Week display: "2/17" (Monday date)
             var weekText = $"{weekStart.Month}/{weekStart.Day}";
 
-            // Render week header cell
-            svg.Append(CreateSVGRect(xPosition, HeaderMonthHeight, weekWidth, HeaderDayHeight, GetCSSClass() + "-cell-secondary"));
-            svg.Append(CreateSVGText(xPosition + weekWidth / 2, HeaderMonthHeight + HeaderDayHeight / 2, weekText, GetCSSClass() + "-secondary-text"));
+            // SoC BENEFIT: Clean, focused code - no coordinate calculations cluttering business logic
+            svg.Append(CreateValidatedHeaderCell(
+                weekStart, weekEnd, HeaderMonthHeight, HeaderDayHeight,
+                weekText, GetCSSClass() + "-cell-secondary", GetCSSClass() + "-secondary-text"));
 
             currentDate = currentDate.AddDays(7); // Next Monday
         }

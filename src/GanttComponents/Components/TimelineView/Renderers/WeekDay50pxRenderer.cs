@@ -113,19 +113,13 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
             var weekStart = weekBounds.start;
             var weekEnd = weekBounds.end;
 
-            // CRITICAL FIX: Calculate proper X position using date-to-pixel conversion
-            var xPosition = SVGRenderingHelpers.DayToSVGX(weekStart, CoordinateSystemStart, DayWidth);
-
-            // Calculate week width (7 days * 50px = 350px)
-            var weekDays = (weekEnd - weekStart).Days + 1;
-            var weekWidth = weekDays * DayWidth;
-
             // Week display: "February 17-23, 2025"
             var weekText = FormatWeekRange(weekStart, weekEnd);
 
-            // Render week header cell
-            svg.Append(CreateSVGRect(xPosition, 0, weekWidth, HeaderMonthHeight, GetCSSClass() + "-cell-primary"));
-            svg.Append(CreateSVGText(xPosition + weekWidth / 2, HeaderMonthHeight / 2, weekText, GetCSSClass() + "-primary-text"));
+            // SoC BENEFIT: Renderer focuses on WHAT to show, base class handles HOW to position
+            svg.Append(CreateValidatedHeaderCell(
+                weekStart, weekEnd, 0, HeaderMonthHeight,
+                weekText, GetCSSClass() + "-cell-primary", GetCSSClass() + "-primary-text"));
 
             // Move to next week
             currentDate = weekEnd.AddDays(1);
@@ -147,15 +141,13 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
 
         while (currentDate <= end)
         {
-            // CRITICAL FIX: Calculate proper X position using date-to-pixel conversion
-            var xPosition = SVGRenderingHelpers.DayToSVGX(currentDate, CoordinateSystemStart, DayWidth);
-
             // Day display: "Mon 17", "Tue 18", etc.
             var dayText = $"{currentDate:ddd} {currentDate.Day}";
 
-            // Render day header cell
-            svg.Append(CreateSVGRect(xPosition, HeaderMonthHeight, DayWidth, HeaderDayHeight, GetCSSClass() + "-cell-secondary"));
-            svg.Append(CreateSVGText(xPosition + DayWidth / 2, HeaderMonthHeight + HeaderDayHeight / 2, dayText, GetCSSClass() + "-secondary-text"));
+            // SoC BENEFIT: Single day cells use individual date for both start and end
+            svg.Append(CreateValidatedHeaderCell(
+                currentDate, currentDate, HeaderMonthHeight, HeaderDayHeight,
+                dayText, GetCSSClass() + "-cell-secondary", GetCSSClass() + "-secondary-text"));
 
             // Move to next day
             currentDate = currentDate.AddDays(1);

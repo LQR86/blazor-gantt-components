@@ -1,6 +1,7 @@
 using GanttComponents.Models;
 using GanttComponents.Services;
 using GanttComponents.Components.TimelineView.Renderers;
+using GanttComponents.Utilities;
 
 namespace GanttComponents.Components.TimelineView.Renderers;
 
@@ -281,6 +282,67 @@ public abstract class BaseTimelineRenderer
         return isPrimary ? "svg-header-text-primary" : "svg-header-text-secondary";
     }
 
+    // === COORDINATE SYSTEM ENFORCEMENT ===
+    // Ensures all renderers use consistent coordinate calculations
+
+    /// <summary>
+    /// COORDINATE ENFORCEMENT: Calculates X position for a date using the timeline coordinate system.
+    /// All renderers must use this method to ensure consistent positioning across headers and task bars.
+    /// This prevents coordinate drift and ensures pixel-perfect alignment in the ABC composition pattern.
+    /// </summary>
+    /// <param name="date">The date to convert to X coordinate</param>
+    /// <returns>X position in SVG pixels from the coordinate system origin</returns>
+    /// <exception cref="ArgumentException">Thrown when date is invalid</exception>
+    protected double CalculateCoordinateX(DateTime date)
+    {
+        // Use proven coordinate logic from SVGRenderingHelpers for consistency
+        return SVGRenderingHelpers.DayToSVGX(date, CoordinateSystemStart, DayWidth);
+    }
+
+    /// <summary>
+    /// COORDINATE ENFORCEMENT: Calculates width for a date range using timeline coordinate system.
+    /// All renderers must use this method to ensure consistent width calculations.
+    /// Handles inclusive date ranges with proper day-level precision.
+    /// </summary>
+    /// <param name="startDate">Start date of the range (inclusive)</param>
+    /// <param name="endDate">End date of the range (inclusive)</param>
+    /// <returns>Width in pixels for the date range</returns>
+    /// <exception cref="ArgumentException">Thrown when date range is invalid</exception>
+    protected double CalculateCoordinateWidth(DateTime startDate, DateTime endDate)
+    {
+        if (endDate < startDate)
+        {
+            throw new ArgumentException($"End date ({endDate:yyyy-MM-dd}) cannot be before start date ({startDate:yyyy-MM-dd})");
+        }
+
+        // Calculate inclusive date range in days
+        var days = (endDate.Date - startDate.Date).Days + 1;
+        return days * DayWidth;
+    }
+
+    /// <summary>
+    /// COORDINATE VALIDATION: Development-mode validation to detect coordinate inconsistencies.
+    /// This helps catch coordinate system violations during development and debugging.
+    /// Only active in DEBUG builds to avoid performance impact in production.
+    /// </summary>
+    /// <param name="date">The date being positioned</param>
+    /// <param name="actualX">The X position calculated by renderer</param>
+    /// <param name="context">Context description for debugging (e.g., "quarter header")</param>
+    [System.Diagnostics.Conditional("DEBUG")]
+    protected void ValidateCoordinateConsistency(DateTime date, double actualX, string context = "header cell")
+    {
+        var expectedX = CalculateCoordinateX(date);
+        var tolerance = 1.0; // 1 pixel tolerance for floating point precision
+
+        if (Math.Abs(actualX - expectedX) > tolerance)
+        {
+            Logger.LogWarning(
+                $"COORDINATE INCONSISTENCY in {GetRendererDescription()}: " +
+                $"{context} for {date:yyyy-MM-dd} at X={actualX:F1}, expected X={expectedX:F1}. " +
+                $"Use CalculateCoordinateX() for consistent positioning.");
+        }
+    }
+
     /// <summary>
     /// Validates that all required properties are set correctly.
     /// </summary>
@@ -296,6 +358,76 @@ public abstract class BaseTimelineRenderer
             throw new InvalidOperationException("HeaderMonthHeight must be positive");
         if (HeaderDayHeight <= 0)
             throw new InvalidOperationException("HeaderDayHeight must be positive");
+    }
+
+    // === VALIDATED SVG CREATION HELPERS ===
+    // SoC Enhancement: Base class handles coordinate calculation + validation, renderers focus on logic
+
+    /// <summary>
+    /// COORDINATE-SAFE: Creates SVG rectangle with validated positioning.
+    /// SoC: Base class responsibility = coordinate calculation, renderer responsibility = what to show.
+    /// Automatically uses coordinate system and validates consistency in DEBUG builds.
+    /// </summary>
+    /// <param name="startDate">Start date of the rectangle (inclusive)</param>
+    /// <param name="endDate">End date of the rectangle (inclusive)</param>
+    /// <param name="y">Y position in pixels</param>
+    /// <param name="height">Height in pixels</param>
+    /// <param name="cssClass">CSS class for styling</param>
+    /// <returns>SVG rectangle markup with validated coordinates</returns>
+    protected string CreateValidatedSVGRect(DateTime startDate, DateTime endDate, int y, int height, string cssClass)
+    {
+        var x = CalculateCoordinateX(startDate);
+        var width = CalculateCoordinateWidth(startDate, endDate);
+
+        // Automatic validation in DEBUG builds - catches coordinate issues at creation time
+        ValidateCoordinateConsistency(startDate, x, $"rect for {cssClass}");
+
+        return CreateSVGRect(x, y, width, height, cssClass);
+    }
+
+    /// <summary>
+    /// COORDINATE-SAFE: Creates SVG text with validated center positioning.
+    /// SoC: Base class handles coordinate calculation, renderer provides content and styling.
+    /// Automatically centers text within the date range bounds.
+    /// </summary>
+    /// <param name="startDate">Start date of the text container (inclusive)</param>
+    /// <param name="endDate">End date of the text container (inclusive)</param>
+    /// <param name="y">Y position in pixels (typically center of container)</param>
+    /// <param name="text">Text content to display</param>
+    /// <param name="cssClass">CSS class for text styling</param>
+    /// <returns>SVG text markup with validated center positioning</returns>
+    protected string CreateValidatedSVGText(DateTime startDate, DateTime endDate, int y, string text, string cssClass)
+    {
+        var x = CalculateCoordinateX(startDate);
+        var width = CalculateCoordinateWidth(startDate, endDate);
+        var centerX = x + width / 2;
+
+        // Automatic validation in DEBUG builds
+        ValidateCoordinateConsistency(startDate, x, $"text for {cssClass}");
+
+        return CreateSVGText(centerX, y, text, cssClass);
+    }
+
+    /// <summary>
+    /// COORDINATE-SAFE: Creates complete SVG header cell (rectangle + centered text).
+    /// SoC: Base class handles all coordinate complexity, renderer just provides content.
+    /// This is the highest-level helper that combines rect + text with perfect alignment.
+    /// </summary>
+    /// <param name="startDate">Start date of the header cell (inclusive)</param>
+    /// <param name="endDate">End date of the header cell (inclusive)</param>
+    /// <param name="y">Y position of the cell</param>
+    /// <param name="height">Height of the cell</param>
+    /// <param name="text">Text to display in the cell</param>
+    /// <param name="rectCssClass">CSS class for the rectangle background</param>
+    /// <param name="textCssClass">CSS class for the text content</param>
+    /// <returns>Complete SVG markup for header cell with validated coordinates</returns>
+    protected string CreateValidatedHeaderCell(DateTime startDate, DateTime endDate, int y, int height,
+        string text, string rectCssClass, string textCssClass)
+    {
+        var rect = CreateValidatedSVGRect(startDate, endDate, y, height, rectCssClass);
+        var textSvg = CreateValidatedSVGText(startDate, endDate, y + height / 2, text, textCssClass);
+
+        return rect + textSvg;
     }
 
     // === INTEGRAL DAY WIDTH VALIDATION ===

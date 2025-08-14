@@ -16,7 +16,7 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
 {
     /// <summary>
     /// Constructor for YearQuarter 90px renderer with dependency injection.
-    /// Uses integral 1.0px day width for perfect SVG coordinate calculations.
+    /// Uses calculated day width for flexible year/quarter cell sizing.
     /// Union expansion is handled automatically by the base class.
     /// </summary>
     public YearQuarter90pxRenderer(
@@ -25,12 +25,12 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
+        double dayWidth,
         int headerMonthHeight,
         int headerDayHeight,
         TimelineZoomLevel zoomLevel,
         double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate,
-               1.0, // INTEGRAL DAY WIDTH: 1.0px day width = 90px quarter cells (1.0px × 90 days)
+        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
                headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
     {
         ValidateRenderer();
@@ -127,25 +127,20 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
     {
         var svg = new System.Text.StringBuilder();
         var currentYear = start.Year;
-        double xPosition = 0;
 
         while (currentYear <= end.Year)
         {
             var yearStart = new DateTime(currentYear, 1, 1);
             var yearEnd = new DateTime(currentYear, 12, 31);
 
-            // Calculate year width in pixels (365 or 366 days × 1.0px = 365-366px)
-            var yearDays = (yearEnd - yearStart).Days + 1;
-            var yearWidth = yearDays * DayWidth;
-
             // Year display: "2025", "2026", etc.
             var yearText = currentYear.ToString();
 
-            // Render year header cell
-            svg.Append(CreateSVGRect(xPosition, 0, yearWidth, HeaderMonthHeight, GetCSSClass() + "-year"));
-            svg.Append(CreateSVGText(xPosition + yearWidth / 2, HeaderMonthHeight / 2, yearText, GetCSSClass() + "-year-text"));
+            // SoC BENEFIT: Renderer focuses on WHAT to show, base class handles HOW to position
+            svg.Append(CreateValidatedHeaderCell(
+                yearStart, yearEnd, 0, HeaderMonthHeight,
+                yearText, GetCSSClass() + "-year", GetCSSClass() + "-year-text"));
 
-            xPosition += yearWidth;
             currentYear++;
         }
 
@@ -162,7 +157,6 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
     {
         var svg = new System.Text.StringBuilder();
         var currentDate = start;
-        double xPosition = 0;
 
         while (currentDate <= end)
         {
@@ -170,19 +164,15 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
             var quarterStart = quarterBounds.start;
             var quarterEnd = quarterBounds.end;
 
-            // Calculate quarter width (approximately 90px for 90-day quarters with 1.0px day width)
-            var quarterDays = (quarterEnd - quarterStart).Days + 1;
-            var quarterWidth = quarterDays * DayWidth;
-
             // Quarter display: "Q1", "Q2", "Q3", "Q4"
             var quarter = (quarterStart.Month - 1) / 3 + 1;
             var quarterText = $"Q{quarter}";
 
-            // Render quarter header cell
-            svg.Append(CreateSVGRect(xPosition, HeaderMonthHeight, quarterWidth, HeaderDayHeight, GetCSSClass() + "-quarter"));
-            svg.Append(CreateSVGText(xPosition + quarterWidth / 2, HeaderMonthHeight + HeaderDayHeight / 2, quarterText, GetCSSClass() + "-quarter-text"));
+            // SoC BENEFIT: Clean, focused code - no coordinate calculations cluttering business logic
+            svg.Append(CreateValidatedHeaderCell(
+                quarterStart, quarterEnd, HeaderMonthHeight, HeaderDayHeight,
+                quarterText, GetCSSClass() + "-quarter", GetCSSClass() + "-quarter-text"));
 
-            xPosition += quarterWidth;
             currentDate = quarterEnd.AddDays(1);
         }
 

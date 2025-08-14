@@ -136,17 +136,14 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
             var quarterStart = quarterBounds.start;
             var quarterEnd = quarterBounds.end;
 
-            // COORDINATE ENFORCEMENT: Use base class coordinate system
-            var xPosition = CalculateCoordinateX(quarterStart);
-            var quarterWidth = CalculateCoordinateWidth(quarterStart, quarterEnd);
-
             // Quarter display: "Q1 2025", "Q2 2025", etc.
             var quarter = (quarterStart.Month - 1) / 3 + 1;
             var quarterText = $"Q{quarter} {quarterStart.Year}";
 
-            // Render quarter header cell
-            svg.Append(CreateSVGRect(xPosition, 0, quarterWidth, HeaderMonthHeight, GetCSSClass() + "-quarter"));
-            svg.Append(CreateSVGText(xPosition + quarterWidth / 2, HeaderMonthHeight / 2, quarterText, GetCSSClass() + "-quarter-text"));
+            // SoC BENEFIT: Renderer focuses on WHAT to show, base class handles HOW to position
+            svg.Append(CreateValidatedHeaderCell(
+                quarterStart, quarterEnd, 0, HeaderMonthHeight,
+                quarterText, GetCSSClass() + "-quarter", GetCSSClass() + "-quarter-text"));
 
             currentDate = quarterEnd.AddDays(1);
         }
@@ -170,16 +167,13 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
             var monthStart = new DateTime(currentDate.Year, currentDate.Month, 1);
             var monthEnd = monthStart.AddMonths(1).AddDays(-1);
 
-            // COORDINATE ENFORCEMENT: Use base class coordinate system  
-            var xPosition = CalculateCoordinateX(monthStart);
-            var monthWidth = CalculateCoordinateWidth(monthStart, monthEnd);
-
             // Month display: "Jan", "Feb", "Mar", etc.
             var monthText = monthStart.ToString("MMM");
 
-            // Render month header cell
-            svg.Append(CreateSVGRect(xPosition, HeaderMonthHeight, monthWidth, HeaderDayHeight, GetCSSClass() + "-month"));
-            svg.Append(CreateSVGText(xPosition + monthWidth / 2, HeaderMonthHeight + HeaderDayHeight / 2, monthText, GetCSSClass() + "-month-text"));
+            // SoC BENEFIT: Clean, focused code - no coordinate calculations cluttering business logic
+            svg.Append(CreateValidatedHeaderCell(
+                monthStart, monthEnd, HeaderMonthHeight, HeaderDayHeight,
+                monthText, GetCSSClass() + "-month", GetCSSClass() + "-month-text"));
 
             currentDate = monthEnd.AddDays(1);
         }

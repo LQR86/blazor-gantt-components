@@ -360,6 +360,76 @@ public abstract class BaseTimelineRenderer
             throw new InvalidOperationException("HeaderDayHeight must be positive");
     }
 
+    // === VALIDATED SVG CREATION HELPERS ===
+    // SoC Enhancement: Base class handles coordinate calculation + validation, renderers focus on logic
+
+    /// <summary>
+    /// COORDINATE-SAFE: Creates SVG rectangle with validated positioning.
+    /// SoC: Base class responsibility = coordinate calculation, renderer responsibility = what to show.
+    /// Automatically uses coordinate system and validates consistency in DEBUG builds.
+    /// </summary>
+    /// <param name="startDate">Start date of the rectangle (inclusive)</param>
+    /// <param name="endDate">End date of the rectangle (inclusive)</param>
+    /// <param name="y">Y position in pixels</param>
+    /// <param name="height">Height in pixels</param>
+    /// <param name="cssClass">CSS class for styling</param>
+    /// <returns>SVG rectangle markup with validated coordinates</returns>
+    protected string CreateValidatedSVGRect(DateTime startDate, DateTime endDate, int y, int height, string cssClass)
+    {
+        var x = CalculateCoordinateX(startDate);
+        var width = CalculateCoordinateWidth(startDate, endDate);
+
+        // Automatic validation in DEBUG builds - catches coordinate issues at creation time
+        ValidateCoordinateConsistency(startDate, x, $"rect for {cssClass}");
+
+        return CreateSVGRect(x, y, width, height, cssClass);
+    }
+
+    /// <summary>
+    /// COORDINATE-SAFE: Creates SVG text with validated center positioning.
+    /// SoC: Base class handles coordinate calculation, renderer provides content and styling.
+    /// Automatically centers text within the date range bounds.
+    /// </summary>
+    /// <param name="startDate">Start date of the text container (inclusive)</param>
+    /// <param name="endDate">End date of the text container (inclusive)</param>
+    /// <param name="y">Y position in pixels (typically center of container)</param>
+    /// <param name="text">Text content to display</param>
+    /// <param name="cssClass">CSS class for text styling</param>
+    /// <returns>SVG text markup with validated center positioning</returns>
+    protected string CreateValidatedSVGText(DateTime startDate, DateTime endDate, int y, string text, string cssClass)
+    {
+        var x = CalculateCoordinateX(startDate);
+        var width = CalculateCoordinateWidth(startDate, endDate);
+        var centerX = x + width / 2;
+
+        // Automatic validation in DEBUG builds
+        ValidateCoordinateConsistency(startDate, x, $"text for {cssClass}");
+
+        return CreateSVGText(centerX, y, text, cssClass);
+    }
+
+    /// <summary>
+    /// COORDINATE-SAFE: Creates complete SVG header cell (rectangle + centered text).
+    /// SoC: Base class handles all coordinate complexity, renderer just provides content.
+    /// This is the highest-level helper that combines rect + text with perfect alignment.
+    /// </summary>
+    /// <param name="startDate">Start date of the header cell (inclusive)</param>
+    /// <param name="endDate">End date of the header cell (inclusive)</param>
+    /// <param name="y">Y position of the cell</param>
+    /// <param name="height">Height of the cell</param>
+    /// <param name="text">Text to display in the cell</param>
+    /// <param name="rectCssClass">CSS class for the rectangle background</param>
+    /// <param name="textCssClass">CSS class for the text content</param>
+    /// <returns>Complete SVG markup for header cell with validated coordinates</returns>
+    protected string CreateValidatedHeaderCell(DateTime startDate, DateTime endDate, int y, int height,
+        string text, string rectCssClass, string textCssClass)
+    {
+        var rect = CreateValidatedSVGRect(startDate, endDate, y, height, rectCssClass);
+        var textSvg = CreateValidatedSVGText(startDate, endDate, y + height / 2, text, textCssClass);
+
+        return rect + textSvg;
+    }
+
     // === INTEGRAL DAY WIDTH VALIDATION ===
     // Critical for visual quality - ensures all coordinates are integral pixels
 

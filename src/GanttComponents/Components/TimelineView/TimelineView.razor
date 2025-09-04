@@ -53,16 +53,34 @@
                               @onmouseenter="() => HoverTask(task.Id)"
                               @onmouseleave="() => HoverTask(null)" />
                         
-                        <!-- Task bar -->
-                        <rect x="@x" y="@(y + TaskBarMargin)" 
-                              width="@width" height="@(TaskBarHeight)"
-                              class="timeline-task-bar"
-                              data-task-id="@task.Id"
-                              @onclick="() => SelectTask(task.Id)"
-                              @onmouseenter="() => HoverTask(task.Id)"
-                              @onmouseleave="() => HoverTask(null)">
-                            <title>@GetTaskTooltip(task)</title>
-                        </rect>
+                        @if (width < 3.0)
+                        {
+                            <!-- Tiny task marker (red asterisk) for tasks < 3px width -->
+                            <g class="timeline-tiny-task-group" 
+                               data-task-id="@task.Id"
+                               style="cursor: pointer;"
+                               @onclick="() => SelectTask(task.Id)"
+                               @onmouseenter="() => HoverTask(task.Id)"
+                               @onmouseleave="() => HoverTask(null)">
+                                <text x="@(x + 1)" y="@(y + RowHeight/2 + 4)" 
+                                      class="timeline-tiny-task-marker"
+                                      style="fill: red; font-weight: bold; font-size: 12px; pointer-events: none;">*</text>
+                                <title>@GetTaskTooltip(task) (Tiny Task - @width.ToString("F1")px)</title>
+                            </g>
+                        }
+                        else
+                        {
+                            <!-- Regular task bar -->
+                            <rect x="@x" y="@(y + TaskBarMargin)" 
+                                  width="@width" height="@(TaskBarHeight)"
+                                  class="timeline-task-bar"
+                                  data-task-id="@task.Id"
+                                  @onclick="() => SelectTask(task.Id)"
+                                  @onmouseenter="() => HoverTask(task.Id)"
+                                  @onmouseleave="() => HoverTask(null)">
+                                <title>@GetTaskTooltip(task)</title>
+                            </rect>
+                        }
                         
                         <!-- Task label (WBS Code) - TODO: Add text labels -->
                         @* <svg:text x="@(x + 4)" y="@(y + RowHeight/2 + 4)" class="timeline-task-label">@task.WbsCode</svg:text> *@
@@ -305,6 +323,26 @@
 
     .timeline-task-bar:hover {
         fill: var(--gantt-primary-dark, #1565c0);
+    }
+
+    /* Tiny task marker styles */
+    .timeline-tiny-task-group {
+        cursor: pointer;
+    }
+
+    .timeline-tiny-task-group:hover .timeline-tiny-task-marker {
+        fill: var(--gantt-error-dark, #d32f2f);
+        filter: drop-shadow(0 0 2px rgba(211, 47, 47, 0.5));
+    }
+
+    .timeline-tiny-task-marker {
+        fill: var(--gantt-error, #f44336);
+        font-weight: bold;
+        font-size: 12px;
+        font-family: var(--gantt-font-family, system-ui);
+        pointer-events: none;
+        user-select: none;
+        transition: fill 0.2s ease;
     }
 
     .timeline-task-label {

@@ -1,6 +1,7 @@
 @using GanttComponents.Components.TaskGrid
 @using GanttComponents.Components.TimelineView
 @using GanttComponents.Models
+@using GanttComponents.Models.Filtering
 @using GanttComponents.Services
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
@@ -41,7 +42,8 @@
                      ZoomLevel="@ZoomLevel"
                      ZoomFactor="@ZoomFactor"
                      OnZoomLevelChanged="@OnZoomLevelChanged"
-                     OnZoomFactorChanged="@OnZoomFactorChanged" />
+                     OnZoomFactorChanged="@OnZoomFactorChanged"
+                     FilterCriteria="@FilterCriteria" />
     </div>
 </div>
 
@@ -52,6 +54,7 @@
     [Parameter] public int RowHeight { get; set; } = 32; // Row height for alignment consistency
     [Parameter] public int HeaderHeight { get; set; } = 56; // Total header height (should match TimelineView total)
     [Parameter] public int ContainerHeight { get; set; } = 600; // Container height (configurable)
+    [Parameter] public TaskFilterCriteria? FilterCriteria { get; set; }
     
     // Timeline Zoom Parameters
     [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px;

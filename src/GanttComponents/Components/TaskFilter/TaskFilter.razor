@@ -1,0 +1,242 @@
+@using GanttComponents.Models.Filtering
+@using GanttComponents.Models.ValueObjects
+
+<div class="task-filter-container">
+    <div class="task-filter-header">
+        <h4 class="task-filter-title">Task Filter</h4>
+        <button class="task-filter-toggle" @onclick="ToggleExpanded">
+            @if (IsExpanded)
+            {
+                <span>▼ Collapse</span>
+            }
+            else
+            {
+                <span>▶ Expand</span>
+            }
+        </button>
+    </div>
+
+    @if (IsExpanded)
+    {
+        <div class="task-filter-content">
+            <!-- Text Filters -->
+            <div class="filter-section">
+                <h5>Text Filters</h5>
+                <div class="filter-row">
+                    <label>Task Name:</label>
+                    <input type="text" @bind="FilterCriteria.NameFilter" @bind:event="oninput" 
+                           placeholder="Search task names..." class="filter-input" />
+                </div>
+                <div class="filter-row">
+                    <label>WBS Code:</label>
+                    <input type="text" @bind="FilterCriteria.WbsFilter" @bind:event="oninput" 
+                           placeholder="Search WBS codes..." class="filter-input" />
+                </div>
+            </div>
+
+            <!-- Date Range Filters -->
+            <div class="filter-section">
+                <h5>Date Range</h5>
+                <div class="filter-row">
+                    <label>Start Date:</label>
+                    <input type="date" value="@StartDateInput" @onchange="OnStartDateChanged" class="filter-input" />
+                </div>
+                <div class="filter-row">
+                    <label>End Date:</label>
+                    <input type="date" value="@EndDateInput" @onchange="OnEndDateChanged" class="filter-input" />
+                </div>
+            </div>
+
+            <!-- Progress Filters -->
+            <div class="filter-section">
+                <h5>Progress Range</h5>
+                <div class="filter-row">
+                    <label>Min Progress (%):</label>
+                    <input type="number" @bind="FilterCriteria.MinProgress" min="0" max="100" 
+                           class="filter-input" />
+                </div>
+                <div class="filter-row">
+                    <label>Max Progress (%):</label>
+                    <input type="number" @bind="FilterCriteria.MaxProgress" min="0" max="100" 
+                           class="filter-input" />
+                </div>
+            </div>
+
+            <!-- Task Structure Filters -->
+            <div class="filter-section">
+                <h5>Task Structure</h5>
+                <div class="filter-row">
+                    <label>
+                        <input type="checkbox" @bind="FilterCriteria.ShowOnlyRootTasks" />
+                        Show only root tasks
+                    </label>
+                </div>
+                <div class="filter-row">
+                    <label>
+                        <input type="checkbox" @bind="HasPredecessorsInput" />
+                        Has dependencies
+                    </label>
+                </div>
+            </div>
+
+            <!-- Tiny Task Filters -->
+            <div class="filter-section">
+                <h5>Task Duration Filter</h5>
+                <div class="filter-row">
+                    <label>
+                        <input type="checkbox" @bind="FilterCriteria.ShowTinyTasks" />
+                        Show tiny tasks (red asterisk markers)
+                    </label>
+                </div>
+                <div class="filter-row">
+                    <label>Min task duration (days):</label>
+                    <input type="number" @bind="FilterCriteria.MinTaskDurationDays" 
+                           min="1" max="30" step="1" class="filter-input" />
+                    <small style="margin-left: 8px; color: var(--gantt-on-surface-variant, #666);">
+                        Hide tasks shorter than this duration (tasks &lt;3px width always show as red asterisk)
+                    </small>
+                </div>
+            </div>
+
+            <!-- Advanced Filters -->
+            <div class="filter-section">
+                <h5>Advanced</h5>
+                <div class="filter-row">
+                    <label>
+                        <input type="checkbox" @bind="FilterCriteria.ShowOnlyCriticalPath" />
+                        Show only critical path tasks
+                    </label>
+                </div>
+            </div>
+
+            <!-- Filter Actions -->
+            <div class="filter-actions">
+                <button class="btn-primary" @onclick="ApplyFilters">Apply Filters</button>
+                <button class="btn-secondary" @onclick="ClearFilters">Clear All</button>
+                <button class="btn-secondary" @onclick="ResetToDefaults">Reset to Defaults</button>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .task-filter-container {
+        background: var(--gantt-surface, #ffffff);
+        border: 1px solid var(--gantt-outline, #e0e0e0);
+        border-radius: 4px;
+        margin: 8px 0;
+    }
+
+    .task-filter-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: var(--gantt-surface-variant, #f5f5f5);
+        border-bottom: 1px solid var(--gantt-outline, #e0e0e0);
+    }
+
+    .task-filter-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--gantt-on-surface, #000000);
+    }
+
+    .task-filter-toggle {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        color: var(--gantt-primary, #1976d2);
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    .task-filter-toggle:hover {
+        background: var(--gantt-state-hover, rgba(25, 118, 210, 0.04));
+    }
+
+    .task-filter-content {
+        padding: 16px;
+    }
+
+    .filter-section {
+        margin-bottom: 20px;
+    }
+
+    .filter-section h5 {
+        margin: 0 0 12px 0;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--gantt-on-surface, #000000);
+        border-bottom: 1px solid var(--gantt-outline-variant, #f0f0f0);
+        padding-bottom: 4px;
+    }
+
+    .filter-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 8px;
+    }
+
+    .filter-row label {
+        min-width: 120px;
+        font-size: 12px;
+        color: var(--gantt-on-surface-variant, #666666);
+    }
+
+    .filter-input {
+        flex: 1;
+        padding: 6px 8px;
+        border: 1px solid var(--gantt-outline, #e0e0e0);
+        border-radius: 4px;
+        font-size: 12px;
+        background: var(--gantt-surface, #ffffff);
+        color: var(--gantt-on-surface, #000000);
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: var(--gantt-primary, #1976d2);
+        box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 8px;
+        padding-top: 16px;
+        border-top: 1px solid var(--gantt-outline-variant, #f0f0f0);
+    }
+
+    .btn-primary {
+        background: var(--gantt-primary, #1976d2);
+        color: var(--gantt-on-primary, #ffffff);
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover {
+        background: var(--gantt-primary-dark, #1565c0);
+    }
+
+    .btn-secondary {
+        background: var(--gantt-surface-variant, #f5f5f5);
+        color: var(--gantt-on-surface, #000000);
+        border: 1px solid var(--gantt-outline, #e0e0e0);
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+        background: var(--gantt-state-hover, rgba(25, 118, 210, 0.04));
+    }
+</style>

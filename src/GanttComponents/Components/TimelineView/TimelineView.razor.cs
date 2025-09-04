@@ -1,4 +1,5 @@
 using GanttComponents.Models;
+using GanttComponents.Models.Filtering;
 using GanttComponents.Services;
 using GanttComponents.Components.TimelineView.Renderers;
 using Microsoft.AspNetCore.Components;
@@ -32,6 +33,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     [Parameter] public double ZoomFactor { get; set; } = 1.0;  // Template-native: 1.0x to template maximum
     [Parameter] public EventCallback<TimelineZoomLevel> OnZoomLevelChanged { get; set; }
     [Parameter] public EventCallback<double> OnZoomFactorChanged { get; set; }
+    [Parameter] public TaskFilterCriteria? FilterCriteria { get; set; }
 
     // === COMPONENT STATE ===
     private double ViewportScrollLeft { get; set; } = 0;
@@ -283,6 +285,21 @@ public partial class TimelineView : ComponentBase, IDisposable
         var duration = (task.EndDate.Date - task.StartDate.Date).TotalDays + 1;
         // Use template-based duration-to-pixel mapping
         return TimelineZoomService.CalculateTaskPixelWidth(ZoomLevel, duration, ZoomFactor);
+    }
+
+    /// <summary>
+    /// Determines if a task should be rendered as a tiny marker instead of a task bar
+    /// </summary>
+    private bool ShouldRenderAsTinyMarker(GanttTask task, double pixelWidth)
+    {
+        // Use FilterCriteria if available, otherwise default behavior (show tiny tasks with 3px threshold)
+        if (FilterCriteria != null)
+        {
+            return FilterCriteria.ShouldRenderAsTinyMarker(task, pixelWidth);
+        }
+
+        // Default behavior: show tiny markers for tasks < 3px width
+        return pixelWidth < 3.0;
     }
 
     private int GetMonthWidth(DateTime month)

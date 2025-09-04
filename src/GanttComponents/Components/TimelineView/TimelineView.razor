@@ -53,9 +53,9 @@
                               @onmouseenter="() => HoverTask(task.Id)"
                               @onmouseleave="() => HoverTask(null)" />
                         
-                        @if (width < 3.0)
+                        @if (ShouldRenderAsTinyMarker(task, width))
                         {
-                            <!-- Tiny task marker (red asterisk) for tasks < 3px width -->
+                            <!-- Tiny task marker (red asterisk) for tasks < threshold width -->
                             <g class="timeline-tiny-task-group" 
                                data-task-id="@task.Id"
                                style="cursor: pointer;"

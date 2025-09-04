@@ -20,7 +20,9 @@
                  HoveredTaskId="@HoveredTaskId"
                  RowHeight="@RowHeight"
                  HeaderHeight="@HeaderHeight"
-                 ShowVerticalScrollbar="false" />
+                 ShowVerticalScrollbar="false"
+                 FilterCriteria="@FilterCriteria"
+                 TinyTaskIds="@GetTinyTaskIds()" />
     </div>
     
     <!-- Draggable splitter at TaskGrid boundary -->
@@ -140,6 +142,35 @@
         {
             // Fallback if JS interop fails
         }
+    }
+    
+    /// <summary>
+    /// Calculates which tasks are considered "tiny" based on current zoom level
+    /// </summary>
+    private HashSet<int> GetTinyTaskIds()
+    {
+        var tinyTaskIds = new HashSet<int>();
+        
+        if (Tasks == null || FilterCriteria == null) return tinyTaskIds;
+        
+        // Get effective day width for current zoom
+        var config = TimelineZoomService.GetConfiguration(ZoomLevel);
+        var dayWidth = config.GetEffectiveDayWidth(ZoomFactor);
+        
+        foreach (var task in Tasks)
+        {
+            // Calculate pixel width for this task
+            var duration = (task.EndDate.ToUtcDateTime() - task.StartDate.ToUtcDateTime()).TotalDays + 1;
+            var pixelWidth = duration * dayWidth;
+            
+            // If below threshold, mark as tiny
+            if (pixelWidth < FilterCriteria.TinyTaskPixelThreshold)
+            {
+                tinyTaskIds.Add(task.Id);
+            }
+        }
+        
+        return tinyTaskIds;
     }
     
     private async Task HandleTaskSelection(int taskId)

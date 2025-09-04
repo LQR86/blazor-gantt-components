@@ -1,4 +1,5 @@
 @using GanttComponents.Models
+@using GanttComponents.Models.Filtering
 @using GanttComponents.Services
 @inject GanttRowAlignmentService RowAlignmentService
 @inject IUniversalLogger Logger
@@ -18,11 +19,11 @@
     </div>
     
     <div class="task-grid-body @(!ShowVerticalScrollbar ? "hide-scrollbar" : "")" @onscroll="OnScroll">
-        @if (Tasks != null)
+        @if (FilteredTasks != null)
         {
-            @for (int i = 0; i < Tasks.Count; i++)
+            @for (int i = 0; i < FilteredTasks.Count; i++)
             {
-                var task = Tasks[i];
+                var task = FilteredTasks[i];
                 var rowIndex = i;
                 var indentLevel = GetIndentLevel(task);
                 
@@ -94,8 +95,29 @@
     [Parameter] public bool ShowVerticalScrollbar { get; set; } = true; // Controls scrollbar visibility
     [Parameter] public EventCallback<int?> OnTaskHovered { get; set; }
     [Parameter] public int? HoveredTaskId { get; set; }
+    [Parameter] public TaskFilterCriteria? FilterCriteria { get; set; }
 
     private Dictionary<int, bool> ExpandedTasks { get; set; } = new();
+
+    /// <summary>
+    /// Returns tasks filtered by current FilterCriteria (basic filters only, no pixel-width filtering)
+    /// </summary>
+    private List<GanttTask> FilteredTasks
+    {
+        get
+        {
+            if (Tasks == null) return new List<GanttTask>();
+            
+            if (FilterCriteria == null) return Tasks;
+            
+            // Get tiny task IDs from parent - TaskGrid doesn't calculate these itself
+            var tinyTaskIds = TinyTaskIds;
+            
+            return Tasks.Where(task => FilterCriteria.PassesFilter(task, tinyTaskIds)).ToList();
+        }
+    }
+
+    [Parameter] public HashSet<int>? TinyTaskIds { get; set; }
 
     protected override void OnInitialized()
     {

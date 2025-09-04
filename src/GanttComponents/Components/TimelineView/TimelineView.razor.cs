@@ -75,6 +75,59 @@ public partial class TimelineView : ComponentBase, IDisposable
         return true;
     }
 
+    // === FILTERING ===
+    /// <summary>
+    /// Returns tasks filtered by current FilterCriteria, including tiny task filtering
+    /// </summary>
+    private List<GanttTask> FilteredTasks
+    {
+        get
+        {
+            if (Tasks == null) return new List<GanttTask>();
+
+            var filteredTasks = new List<GanttTask>();
+
+            // Calculate tiny task IDs if filtering is enabled
+            HashSet<int>? tinyTaskIds = null;
+            if (FilterCriteria != null)
+            {
+                tinyTaskIds = CalculateTinyTaskIds();
+            }
+
+            foreach (var task in Tasks)
+            {
+                // Apply all filters including tiny task filtering
+                if (FilterCriteria != null && !FilterCriteria.PassesFilter(task, tinyTaskIds))
+                    continue;
+
+                filteredTasks.Add(task);
+            }
+
+            return filteredTasks;
+        }
+    }
+
+    /// <summary>
+    /// Calculates which tasks should be considered tiny based on pixel width
+    /// </summary>
+    private HashSet<int> CalculateTinyTaskIds()
+    {
+        var tinyTaskIds = new HashSet<int>();
+
+        if (Tasks == null || FilterCriteria == null) return tinyTaskIds;
+
+        foreach (var task in Tasks)
+        {
+            var pixelWidth = CalculateTaskWidth(task);
+            if (pixelWidth < FilterCriteria.TinyTaskPixelThreshold)
+            {
+                tinyTaskIds.Add(task.Id);
+            }
+        }
+
+        return tinyTaskIds;
+    }
+
     // === ZOOM CALCULATIONS ===
     private double EffectiveDayWidth
     {
@@ -218,7 +271,7 @@ public partial class TimelineView : ComponentBase, IDisposable
         EndDate = expandedBounds.end;
 
         TotalWidth = Math.Max(100, (int)(expandedDays * EffectiveDayWidth)); // Minimum 100px width
-        TotalHeight = Math.Max(50, Tasks.Count * RowHeight); // Minimum 50px height
+        TotalHeight = Math.Max(50, FilteredTasks.Count * RowHeight); // Minimum 50px height
 
         // ALIGNMENT VALIDATION: Ensure header and body use identical widths
         var headerViewBox = SVGRenderingHelpers.GetHeaderViewBox(TotalWidth, TotalHeaderHeight);

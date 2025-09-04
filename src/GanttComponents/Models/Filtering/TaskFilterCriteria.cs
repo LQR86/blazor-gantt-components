@@ -98,6 +98,17 @@ public class TaskFilterCriteria
     /// <returns>True if task should be visible, false to hide</returns>
     public bool PassesFilter(GanttTask task)
     {
+        return PassesFilter(task, null);
+    }
+
+    /// <summary>
+    /// Evaluates if a task passes all filter criteria including tiny task filtering
+    /// </summary>
+    /// <param name="task">The task to evaluate</param>
+    /// <param name="tinyTaskIds">Set of task IDs that are considered tiny (null to skip tiny task filtering)</param>
+    /// <returns>True if task should be visible, false to hide</returns>
+    public bool PassesFilter(GanttTask task, HashSet<int>? tinyTaskIds)
+    {
         // Name filter
         if (!string.IsNullOrWhiteSpace(NameFilter) &&
             !task.Name.Contains(NameFilter, StringComparison.OrdinalIgnoreCase))
@@ -156,6 +167,10 @@ public class TaskFilterCriteria
                     return false;
             }
         }
+
+        // Tiny task filter (only if tiny task IDs are provided and ShowTinyTasks is false)
+        if (tinyTaskIds != null && !ShowTinyTasks && tinyTaskIds.Contains(task.Id))
+            return false;
 
         return true;
     }

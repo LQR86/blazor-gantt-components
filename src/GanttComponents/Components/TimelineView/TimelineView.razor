@@ -36,11 +36,11 @@
                 }
                 
                 <!-- Task bars -->
-                @if (Tasks != null)
+                @if (FilteredTasks != null)
                 {
-                    @for (int i = 0; i < Tasks.Count; i++)
+                    @for (int i = 0; i < FilteredTasks.Count; i++)
                     {
-                        var task = Tasks[i];
+                        var task = FilteredTasks[i];
                         var y = i * RowHeight;
                         var x = DayToPixel(task.StartDate.ToUtcDateTime());
                         var width = CalculateTaskWidth(task);

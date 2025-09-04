@@ -26,30 +26,30 @@ public class TimelineZoomService
                 "ZoomLevel.YearQuarterOptimal70px.Description"
             ),
 
-            // Quarter-Month Template: 20px per month (30 days)
+            // Quarter-Month Template: 25px per month (30 days) - increased for better month abbreviation spacing
             [TimelineZoomLevel.QuarterMonthOptimal60px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.QuarterMonthOptimal60px,
-                20.0,   // 20px per month
+                25.0,   // 25px per month (was 20px) - accommodates "Sep" text with comfortable spacing
                 30.0,   // 30 days per month
                 3.5,    // Max zoom: 3.5x
                 "ZoomLevel.QuarterMonthOptimal60px",
                 "ZoomLevel.QuarterMonthOptimal60px.Description"
             ),
 
-            // Month-Week Template: 18px per week (7 days)
+            // Month-Week Template: 28px per week (7 days) - increased for better week date spacing
             [TimelineZoomLevel.MonthWeekOptimal50px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.MonthWeekOptimal50px,
-                18.0,   // 18px per week
+                28.0,   // 28px per week (was 24px) - provides generous spacing for "12/31" text
                 7.0,    // 7 days per week
                 3.0,    // Max zoom: 3.0x
                 "ZoomLevel.MonthWeekOptimal50px",
                 "ZoomLevel.MonthWeekOptimal50px.Description"
             ),
 
-            // Week-Day Template: 12px per day (1 day)
+            // Week-Day Template: 50px per day (1 day) - significantly increased for week range text
             [TimelineZoomLevel.WeekDayOptimal50px] = ZoomLevelConfiguration.Create(
                 TimelineZoomLevel.WeekDayOptimal50px,
-                12.0,   // 12px per day
+                50.0,   // 50px per day (was 12px) - accommodates "December 30, 2024 - January 5, 2025" text
                 1.0,    // 1 day per day
                 2.5,    // Max zoom: 2.5x
                 "ZoomLevel.WeekDayOptimal50px",

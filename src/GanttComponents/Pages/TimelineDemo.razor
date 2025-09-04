@@ -5,7 +5,6 @@
 @using GanttComponents.Components.TimelineView
 @using GanttComponents.Components.TimelineZoomControls
 @using GanttComponents.Components.TaskFilter
-@using GanttComponents.Components.TemplateSelector
 @using GanttComponents.Services
 @inject IGanttTaskService TaskService
 @inject IGanttI18N I18N
@@ -17,16 +16,6 @@
 <p>Demo showcasing TimelineView with tiny task markers and task filtering.</p>
 
 <div class="demo-container">
-    <!-- Template Selection -->
-    <div class="demo-section">
-        <h3>🎯 Template Selection</h3>
-        <TemplateSelector SelectedTemplate="@CurrentZoomLevel"
-                         OnTemplateChanged="HandleTemplateChanged" />
-        <div class="template-status">
-            <small>Current: @CurrentZoomLevel.ToString() (Zoom: @CurrentZoomFactor.ToString("F1")x, Day Width: @EffectiveDayWidth.ToString("F0")px)</small>
-        </div>
-    </div>
-
     <!-- Task Filter -->
     <div class="demo-section">
         <h3>🎛️ Task Filter</h3>
@@ -168,14 +157,6 @@
     {
         Logger.LogOperation("TIMELINE_DEMO", $"Zoom factor changed: {CurrentZoomFactor} -> {newFactor}");
         CurrentZoomFactor = newFactor;
-        await InvokeAsync(StateHasChanged);
-    }
-    
-    private async Task HandleTemplateChanged(TimelineZoomLevel newTemplate)
-    {
-        Logger.LogOperation("TIMELINE_DEMO", $"Template changed: {CurrentZoomLevel} -> {newTemplate}");
-        CurrentZoomLevel = newTemplate;
-        CurrentZoomFactor = 1.0; // Reset zoom factor when template changes
         await InvokeAsync(StateHasChanged);
     }
 

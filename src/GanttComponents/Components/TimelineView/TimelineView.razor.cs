@@ -29,7 +29,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     [Parameter] public EventCallback<int?> OnTaskHovered { get; set; }
     [Parameter] public int? HoveredTaskId { get; set; }
     [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px;
-    [Parameter] public double ZoomFactor { get; set; } = 1.0;  // ABC composition uses fixed 1.0 factor
+    [Parameter] public double ZoomFactor { get; set; } = 1.0;  // Template-native: 1.0x to template maximum
     [Parameter] public EventCallback<TimelineZoomLevel> OnZoomLevelChanged { get; set; }
     [Parameter] public EventCallback<double> OnZoomFactorChanged { get; set; }
 
@@ -79,16 +79,7 @@ public partial class TimelineView : ComponentBase, IDisposable
         get
         {
             var config = TimelineZoomService.GetConfiguration(ZoomLevel);
-
-            // VALIDATION 1: Base Day Width must be integral
-            ValidateBaseDayWidth(config.BaseDayWidth);
-
-            var effectiveWidth = config.GetEffectiveDayWidth(ZoomFactor);
-
-            // VALIDATION 2: Effective Day Width must be integral  
-            ValidateEffectiveDayWidth(effectiveWidth);
-
-            return effectiveWidth;
+            return config.GetEffectiveDayWidth(ZoomFactor);
         }
     }
 
@@ -105,7 +96,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     {
         try
         {
-            // PURE COMPOSITION ARCHITECTURE: All zoom levels use BaseTimelineRenderer
+            // TEMPLATE-BASED ARCHITECTURE: All zoom levels use template configurations
             currentRenderer = RendererFactory.CreateRenderer(
                 ZoomLevel,
                 Logger,
@@ -113,7 +104,6 @@ public partial class TimelineView : ComponentBase, IDisposable
                 DateFormatter,
                 StartDate,
                 EndDate,
-                DayWidth,
                 HeaderMonthHeight,
                 HeaderDayHeight,
                 ZoomFactor
@@ -257,7 +247,6 @@ public partial class TimelineView : ComponentBase, IDisposable
                 DateFormatter,
                 StartDate,
                 EndDate,
-                DayWidth,
                 HeaderMonthHeight,
                 HeaderDayHeight,
                 ZoomFactor
@@ -292,7 +281,8 @@ public partial class TimelineView : ComponentBase, IDisposable
     private double CalculateTaskWidth(GanttTask task)
     {
         var duration = (task.EndDate.Date - task.StartDate.Date).TotalDays + 1;
-        return duration * EffectiveDayWidth;
+        // Use template-based duration-to-pixel mapping
+        return TimelineZoomService.CalculateTaskPixelWidth(ZoomLevel, duration, ZoomFactor);
     }
 
     private int GetMonthWidth(DateTime month)
@@ -423,14 +413,15 @@ public partial class TimelineView : ComponentBase, IDisposable
 
     public async Task SetZoomFactorAsync(double newZoomFactor)
     {
-        var clampedFactor = Math.Max(0.5, Math.Min(3.0, newZoomFactor));
+        // Use template-based zoom factor clamping instead of hardcoded limits
+        var clampedFactor = TimelineZoomService.ClampZoomFactor(ZoomLevel, newZoomFactor);
 
         if (Math.Abs(ZoomFactor - clampedFactor) > 0.01)
         {
             var oldFactor = ZoomFactor;
             ZoomFactor = clampedFactor;
             CalculateTimelineRange();
-            Logger.LogInfo($"Zoom factor changed from {oldFactor:F2} to {clampedFactor:F2}");
+            Logger.LogInfo($"Zoom factor changed from {oldFactor:F2} to {clampedFactor:F2} (template: {ZoomLevel})");
 
             if (OnZoomFactorChanged.HasDelegate)
             {
@@ -441,8 +432,32 @@ public partial class TimelineView : ComponentBase, IDisposable
         }
     }
 
-    public async Task ZoomInAsync() => await SetZoomFactorAsync(ZoomFactor * 1.2);
-    public async Task ZoomOutAsync() => await SetZoomFactorAsync(ZoomFactor / 1.2);
+    public async Task ZoomInAsync()
+    {
+        var proposedFactor = ZoomFactor * 1.2;
+        if (TimelineZoomService.CanZoomIn(ZoomLevel, ZoomFactor, 0.2))
+        {
+            await SetZoomFactorAsync(proposedFactor);
+        }
+        else
+        {
+            Logger.LogInfo($"Cannot zoom in further: at template maximum for {ZoomLevel}");
+        }
+    }
+
+    public async Task ZoomOutAsync()
+    {
+        var proposedDecrease = ZoomFactor * 0.2; // 20% decrease
+        if (TimelineZoomService.CanZoomOut(ZoomLevel, ZoomFactor, proposedDecrease))
+        {
+            await SetZoomFactorAsync(ZoomFactor / 1.2);
+        }
+        else
+        {
+            Logger.LogInfo($"Cannot zoom out further: at template minimum for {ZoomLevel}");
+        }
+    }
+
     public async Task ResetZoomAsync() => await SetZoomFactorAsync(1.0);
 
     /// <summary>
@@ -516,56 +531,6 @@ public partial class TimelineView : ComponentBase, IDisposable
         }
     }
 
-    /// <summary>
-    /// INTEGRAL DAY WIDTH VALIDATION 1: Validates that the base day width is integral.
-    /// This enforces the "Integral Day Widths" architectural requirement at the configuration level.
-    /// </summary>
-    /// <param name="baseDayWidth">The base day width from zoom configuration</param>
-    /// <exception cref="InvalidOperationException">Thrown when base day width is not integral</exception>
-    private void ValidateBaseDayWidth(double baseDayWidth)
-    {
-        if (Math.Abs(baseDayWidth - Math.Round(baseDayWidth)) > 0.001)
-        {
-            throw new InvalidOperationException(
-                $"INTEGRAL DAY WIDTH VIOLATION (Base): {ZoomLevel} has fractional BaseDayWidth = {baseDayWidth:F3}px. " +
-                $"Pure SVG TimelineView requires integral base day widths for clean coordinate calculations. " +
-                $"Configuration should use whole numbers like {Math.Round(baseDayWidth):F0}px instead. " +
-                $"This ensures predictable effective day widths across all zoom factors.");
-        }
-
-        if (baseDayWidth <= 0)
-        {
-            throw new InvalidOperationException(
-                $"DAY WIDTH VALIDATION: {ZoomLevel} has invalid BaseDayWidth = {baseDayWidth}px. " +
-                $"Day width must be positive.");
-        }
-    }
-
-    /// <summary>
-    /// INTEGRAL DAY WIDTH VALIDATION 2: Validates that the effective day width is integral.
-    /// This provides a safety net for the computed width (BaseDayWidth × ZoomFactor).
-    /// </summary>
-    /// <param name="effectiveDayWidth">The computed effective day width</param>
-    /// <exception cref="InvalidOperationException">Thrown when effective day width is not integral</exception>
-    private void ValidateEffectiveDayWidth(double effectiveDayWidth)
-    {
-        if (Math.Abs(effectiveDayWidth - Math.Round(effectiveDayWidth)) > 0.001)
-        {
-            throw new InvalidOperationException(
-                $"INTEGRAL DAY WIDTH VIOLATION (Effective): {ZoomLevel} @ {ZoomFactor:F1}x = {effectiveDayWidth:F3}px effective day width. " +
-                $"Pure SVG TimelineView requires integral effective day widths for clean SVG coordinate calculations. " +
-                $"Try adjusting ZoomFactor to achieve a whole number result, such as {Math.Round(effectiveDayWidth):F0}px. " +
-                $"BaseDayWidth × ZoomFactor must result in integral pixel values.");
-        }
-
-        if (effectiveDayWidth <= 0)
-        {
-            throw new InvalidOperationException(
-                $"EFFECTIVE DAY WIDTH VALIDATION: {ZoomLevel} @ {ZoomFactor:F1}x = {effectiveDayWidth}px. " +
-                $"Effective day width must be positive.");
-        }
-    }
-
     // === UTILITY METHODS ===
     private string GetTaskTooltip(GanttTask task)
     {
@@ -579,6 +544,74 @@ public partial class TimelineView : ComponentBase, IDisposable
         {
             return task.Name ?? "Task";
         }
+    }
+
+    /// <summary>
+    /// Get grid line dates based on secondary header boundaries for the current template.
+    /// - YearQuarter: Grid lines at quarter starts
+    /// - QuarterMonth: Grid lines at month starts  
+    /// - MonthWeek: Grid lines at week starts
+    /// - WeekDay: Grid lines at day starts
+    /// </summary>
+    private List<DateTime> GetSecondaryGridLineDates()
+    {
+        var gridDates = new List<DateTime>();
+
+        try
+        {
+            switch (ZoomLevel)
+            {
+                case TimelineZoomLevel.YearQuarterOptimal70px:
+                    // Grid lines at quarter starts
+                    var quarterStart = new DateTime(StartDate.Year, ((StartDate.Month - 1) / 3) * 3 + 1, 1);
+                    while (quarterStart <= EndDate)
+                    {
+                        if (quarterStart >= StartDate) gridDates.Add(quarterStart);
+                        quarterStart = quarterStart.AddMonths(3);
+                    }
+                    break;
+
+                case TimelineZoomLevel.QuarterMonthOptimal60px:
+                    // Grid lines at month starts
+                    var monthStart = new DateTime(StartDate.Year, StartDate.Month, 1);
+                    while (monthStart <= EndDate)
+                    {
+                        if (monthStart >= StartDate) gridDates.Add(monthStart);
+                        monthStart = monthStart.AddMonths(1);
+                    }
+                    break;
+
+                case TimelineZoomLevel.MonthWeekOptimal50px:
+                    // Grid lines at week starts (Monday)
+                    var weekStart = StartDate.AddDays(-(int)StartDate.DayOfWeek + (int)DayOfWeek.Monday);
+                    if (weekStart > StartDate) weekStart = weekStart.AddDays(-7);
+                    while (weekStart <= EndDate)
+                    {
+                        if (weekStart >= StartDate) gridDates.Add(weekStart);
+                        weekStart = weekStart.AddDays(7);
+                    }
+                    break;
+
+                case TimelineZoomLevel.WeekDayOptimal50px:
+                    // Grid lines at day starts (daily)
+                    for (var day = StartDate; day <= EndDate; day = day.AddDays(1))
+                    {
+                        gridDates.Add(day);
+                    }
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogOperation("TimelineView", $"Error calculating grid line dates: {ex.Message}");
+            // Fallback to daily grid lines
+            for (var day = StartDate; day <= EndDate; day = day.AddDays(1))
+            {
+                gridDates.Add(day);
+            }
+        }
+
+        return gridDates;
     }
 
     // === DISPOSAL ===

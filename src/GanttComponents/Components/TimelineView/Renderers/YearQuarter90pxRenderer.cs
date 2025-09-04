@@ -15,9 +15,9 @@ namespace GanttComponents.Components.TimelineView.Renderers;
 public class YearQuarter90pxRenderer : BaseTimelineRenderer
 {
     /// <summary>
-    /// Constructor for YearQuarter 90px renderer with dependency injection.
-    /// Uses calculated day width for flexible year/quarter cell sizing.
-    /// Union expansion is handled automatically by the base class.
+    /// Constructor for YearQuarter template renderer with dependency injection.
+    /// Uses template-based approach: 24px per quarter with 4.0x max zoom.
+    /// Template unit: 1 quarter (90 days) = 24px base width.
     /// </summary>
     public YearQuarter90pxRenderer(
         IUniversalLogger logger,
@@ -25,13 +25,12 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
-        double dayWidth,
-        int headerMonthHeight,
-        int headerDayHeight,
         TimelineZoomLevel zoomLevel,
-        double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
-               headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
+        double zoomFactor,
+        int headerMonthHeight,
+        int headerDayHeight)
+        : base(logger, i18n, dateFormatter, startDate, endDate,
+               zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight)
     {
         ValidateRenderer();
     }

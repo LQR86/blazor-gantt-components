@@ -15,9 +15,9 @@ namespace GanttComponents.Components.TimelineView.Renderers;
 public class QuarterMonth60pxRenderer : BaseTimelineRenderer
 {
     /// <summary>
-    /// Constructor for QuarterMonth 60px renderer with dependency injection.
-    /// Uses calculated day width for flexible quarter/month cell sizing.
-    /// Union expansion is handled automatically by the base class.
+    /// Constructor for QuarterMonth template renderer with dependency injection.
+    /// Uses template-based approach: 20px per month with 3.5x max zoom.
+    /// Template unit: 1 month (30 days) = 20px base width.
     /// </summary>
     public QuarterMonth60pxRenderer(
         IUniversalLogger logger,
@@ -25,13 +25,12 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
-        double dayWidth,
-        int headerMonthHeight,
-        int headerDayHeight,
         TimelineZoomLevel zoomLevel,
-        double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
-               headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
+        double zoomFactor,
+        int headerMonthHeight,
+        int headerDayHeight)
+        : base(logger, i18n, dateFormatter, startDate, endDate,
+               zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight)
     {
         ValidateRenderer();
     }

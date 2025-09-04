@@ -15,9 +15,9 @@ namespace GanttComponents.Components.TimelineView.Renderers;
 public class WeekDay50pxRenderer : BaseTimelineRenderer
 {
     /// <summary>
-    /// Constructor for WeekDay 50px renderer with dependency injection.
-    /// Uses integral 50px day width for perfect SVG coordinate calculations.
-    /// Union expansion is handled automatically by the base class.
+    /// Constructor for WeekDay template renderer with dependency injection.
+    /// Uses template-based approach: 12px per day with 2.5x max zoom.
+    /// Template unit: 1 day = 12px base width.
     /// </summary>
     public WeekDay50pxRenderer(
         IUniversalLogger logger,
@@ -25,13 +25,12 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
-        int headerMonthHeight,
-        int headerDayHeight,
         TimelineZoomLevel zoomLevel,
-        double zoomFactor)
+        double zoomFactor,
+        int headerMonthHeight,
+        int headerDayHeight)
         : base(logger, i18n, dateFormatter, startDate, endDate,
-               50.0, // INTEGRAL DAY WIDTH: 50px day width = 350px week cells (50px × 7 days)
-               headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
+               zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight)
     {
     }
 

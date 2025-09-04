@@ -15,9 +15,9 @@ namespace GanttComponents.Components.TimelineView.Renderers;
 public class MonthWeek50pxRenderer : BaseTimelineRenderer
 {
     /// <summary>
-    /// Constructor for MonthWeek 50px renderer with dependency injection.
-    /// Uses calculated day width for flexible week cell sizing.
-    /// Union expansion is handled automatically by the base class.
+    /// Constructor for MonthWeek template renderer with dependency injection.
+    /// Uses template-based approach: 18px per week with 3.0x max zoom.
+    /// Template unit: 1 week (7 days) = 18px base width.
     /// </summary>
     public MonthWeek50pxRenderer(
         IUniversalLogger logger,
@@ -25,13 +25,12 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
-        double dayWidth,
-        int headerMonthHeight,
-        int headerDayHeight,
         TimelineZoomLevel zoomLevel,
-        double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
-               headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
+        double zoomFactor,
+        int headerMonthHeight,
+        int headerDayHeight)
+        : base(logger, i18n, dateFormatter, startDate, endDate,
+               zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight)
     {
     }
 

@@ -39,7 +39,7 @@ public class ABCDualBoundaryTests
 
         var renderer = new WeekDay50pxRenderer(
             _mockLogger, _mockI18N, _dateFormatter,
-            startDate, endDate, 50, 30, TimelineZoomLevel.WeekDayOptimal50px, 1.0);
+            startDate, endDate, TimelineZoomLevel.WeekDayOptimal50px, 1.0, 50, 30);
 
         // ACT: Get boundaries through reflection (protected) and direct call (public) to test ABC pattern
         var primaryBounds = InvokeProtectedMethod<(DateTime, DateTime)>(renderer, "CalculatePrimaryBoundaries");
@@ -151,7 +151,7 @@ public class ABCDualBoundaryTests
 
         var renderer = new WeekDay50pxRenderer(
             _mockLogger, _mockI18N, _dateFormatter,
-            startDate, endDate, 50, 30, TimelineZoomLevel.WeekDayOptimal50px, 1.0);
+            startDate, endDate, TimelineZoomLevel.WeekDayOptimal50px, 1.0, 50, 30);
 
         // ACT & ASSERT: Multiple boundary calculations should be fast
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -182,7 +182,7 @@ public class ABCDualBoundaryTests
 
         var renderer = new WeekDay50pxRenderer(
             _mockLogger, _mockI18N, _dateFormatter,
-            singleDate, singleDate, 50, 30, TimelineZoomLevel.WeekDayOptimal50px, 1.0);
+            singleDate, singleDate, TimelineZoomLevel.WeekDayOptimal50px, 1.0, 50, 30);
 
         // ACT: Get union boundaries (CalculateHeaderBoundaries is public)
         var unionBounds = renderer.CalculateHeaderBoundaries();
@@ -235,7 +235,7 @@ public class MockDualBoundaryRenderer : BaseTimelineRenderer
         TimelineZoomLevel zoomLevel,
         double zoomFactor)
         : base(logger, i18n, dateFormatter, startDate, endDate,
-               50.0, headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
+               zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight)
     {
     }
 

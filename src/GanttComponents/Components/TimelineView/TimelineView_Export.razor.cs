@@ -86,7 +86,7 @@ public partial class TimelineView_Export : ComponentBase
         get
         {
             var config = TimelineZoomService.GetConfiguration(ZoomLevel);
-            ValidateBaseDayWidth(config.BaseDayWidth);
+            ValidateBaseUnitWidth(config.BaseUnitWidth);
             var effectiveWidth = config.GetEffectiveDayWidth(ZoomFactor);
             ValidateEffectiveDayWidth(effectiveWidth);
             return effectiveWidth;
@@ -144,7 +144,6 @@ public partial class TimelineView_Export : ComponentBase
                 DateFormatter,
                 StartDate,
                 EndDate,
-                DayWidth,
                 HeaderMonthHeight,
                 HeaderDayHeight,
                 ZoomFactor
@@ -182,12 +181,12 @@ public partial class TimelineView_Export : ComponentBase
     }
 
     // === VALIDATION METHODS (REUSED) ===
-    private void ValidateBaseDayWidth(double baseDayWidth)
+    private void ValidateBaseUnitWidth(double baseUnitWidth)
     {
-        if (Math.Abs(baseDayWidth - Math.Round(baseDayWidth)) > 0.001)
+        if (Math.Abs(baseUnitWidth - Math.Round(baseUnitWidth)) > 0.001)
         {
             throw new InvalidOperationException(
-                $"Base day width must be integral for proper alignment. Got: {baseDayWidth}");
+                $"Base unit width must be integral for proper alignment. Got: {baseUnitWidth}");
         }
     }
 
@@ -209,7 +208,7 @@ public partial class TimelineView_Export : ComponentBase
     {
         try
         {
-            // PURE COMPOSITION ARCHITECTURE: All zoom levels use BaseTimelineRenderer
+            // TEMPLATE-BASED ARCHITECTURE: All zoom levels use template configurations
             currentRenderer = RendererFactory.CreateRenderer(
                 ZoomLevel,
                 Logger,
@@ -217,7 +216,6 @@ public partial class TimelineView_Export : ComponentBase
                 DateFormatter,
                 StartDate,
                 EndDate,
-                DayWidth,
                 HeaderMonthHeight,
                 HeaderDayHeight,
                 ZoomFactor

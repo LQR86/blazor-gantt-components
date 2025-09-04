@@ -14,6 +14,25 @@
 
 <div class="demo-container">
     <div class="demo-section">
+        <h3>🎯 Template Selection (Phase 5) - NEW!</h3>
+        <p>Manual template selection for different planning horizons with optimal zoom ranges.</p>
+        
+        <!-- Template Selector Demo Section -->
+        <div class="template-selector-demo">
+            <h4>Timeline Template Selector</h4>
+            <div class="template-demo-variant">
+                <h5>Template Selection Control</h5>
+                <p>Choose optimal template for your planning horizon:</p>
+                <TemplateSelector SelectedTemplate="@CurrentZoomLevel"
+                                 OnTemplateChanged="HandleTemplateChanged" />
+                <div class="template-status">
+                    <small>Current: @CurrentZoomLevel.ToString() (Zoom: @CurrentZoomFactor.ToString("F1")x)</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
         <h3>✨ Timeline Zoom Control Presets (v0.8.5) - NEW!</h3>
         <p>Comprehensive showcase of all preset configurations for different UI scenarios.</p>
         
@@ -328,6 +347,28 @@
         
         await InvokeAsync(StateHasChanged);
         Logger.LogOperation("TIMELINE_DEMO", "StateHasChanged invoked after zoom factor change");
+    }
+    
+    // Template selection handler
+    private async Task HandleTemplateChanged(TimelineZoomLevel newTemplate)
+    {
+        Logger.LogOperation("TIMELINE_DEMO", $"HandleTemplateChanged: {CurrentZoomLevel} -> {newTemplate}");
+        
+        var oldTemplate = CurrentZoomLevel;
+        CurrentZoomLevel = newTemplate;
+        
+        // Reset zoom factor when template changes
+        CurrentZoomFactor = 1.0;
+        
+        Logger.LogStateChange("TimelineDemo", "Template", oldTemplate, newTemplate);
+        Logger.LogDebugInfo("Template change", new { 
+            NewTemplate = newTemplate, 
+            ZoomFactorReset = CurrentZoomFactor,
+            EffectiveDayWidth 
+        });
+        
+        await InvokeAsync(StateHasChanged);
+        Logger.LogOperation("TIMELINE_DEMO", "StateHasChanged invoked after template change");
     }
 
     private async Task LoadSampleData()

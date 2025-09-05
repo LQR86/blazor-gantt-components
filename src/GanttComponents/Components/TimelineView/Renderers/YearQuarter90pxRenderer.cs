@@ -36,38 +36,15 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
     }
 
     /// <summary>
-    /// Calculate boundaries for primary header rendering (Year ranges).
-    /// YearQuarter pattern: Year headers need year boundaries for complete year coverage.
-    /// </summary>
-    /// <returns>Year boundary dates for primary year header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
-    {
-        var yearBounds = BoundaryCalculationHelpers.GetYearBoundaries(StartDate, EndDate);
-        return yearBounds;
-    }
-
-    /// <summary>
-    /// Calculate boundaries for secondary header rendering (Quarter labels).
-    /// YearQuarter pattern: Quarter headers need quarter boundaries for precise quarter alignment.
-    /// Since quarters fit perfectly within years, this maintains natural alignment.
-    /// </summary>
-    /// <returns>Quarter boundary dates for secondary quarter header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
-    {
-        var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(StartDate, EndDate);
-        return quarterBounds;
-    }
-
-    /// <summary>
     /// Renders the primary header with year ranges.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
         try
         {
-            // Use expanded boundaries calculated by base class union logic
+            // Use expanded boundaries calculated by base class template-unit padding
             return RenderYearHeader(StartDate, EndDate);
         }
         catch (Exception ex)
@@ -79,14 +56,14 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
 
     /// <summary>
     /// Renders the secondary header with quarter labels.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()
     {
         try
         {
-            // Use expanded boundaries calculated by base class union logic
+            // Use expanded boundaries calculated by base class template-unit padding
             return RenderQuarterHeader(StartDate, EndDate);
         }
         catch (Exception ex)

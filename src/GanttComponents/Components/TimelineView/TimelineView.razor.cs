@@ -128,17 +128,27 @@ public partial class TimelineView : ComponentBase, IDisposable
         return tinyTaskIds;
     }
 
-    // === ZOOM CALCULATIONS ===
-    private double EffectiveDayWidth
+    // === TEMPLATE-BASED CALCULATIONS ===
+    private double TemplateUnitWidth
     {
         get
         {
             var config = TimelineZoomService.GetConfiguration(ZoomLevel);
-            return config.GetEffectiveDayWidth(ZoomFactor);
+            return config.BaseUnitWidth * ZoomFactor;
         }
     }
 
-    protected double DayWidth => EffectiveDayWidth; // Alias for easier usage in patterns
+    private double TemplateUnitDays
+    {
+        get
+        {
+            var config = TimelineZoomService.GetConfiguration(ZoomLevel);
+            return config.TemplateUnitDays;
+        }
+    }
+
+    // Legacy alias - will be removed after cleanup
+    protected double DayWidth => TemplateUnitWidth / TemplateUnitDays;
 
     private int TotalHeaderHeight => HeaderMonthHeight + HeaderDayHeight;
 
@@ -270,7 +280,7 @@ public partial class TimelineView : ComponentBase, IDisposable
         StartDate = expandedBounds.start;
         EndDate = expandedBounds.end;
 
-        TotalWidth = Math.Max(100, (int)(expandedDays * EffectiveDayWidth)); // Minimum 100px width
+        TotalWidth = Math.Max(100, (int)(expandedDays * (TemplateUnitWidth / TemplateUnitDays))); // Minimum 100px width
         TotalHeight = Math.Max(50, FilteredTasks.Count * RowHeight); // Minimum 50px height
 
         // ALIGNMENT VALIDATION: Ensure header and body use identical widths
@@ -316,6 +326,7 @@ public partial class TimelineView : ComponentBase, IDisposable
             // Get the expanded boundaries from the renderer
             var expandedBounds = tempRenderer.CalculateHeaderBoundaries();
 
+            // Debug logging for boundary expansion
             return (expandedBounds.expandedStart, expandedBounds.expandedEnd);
         }
         catch (Exception ex)
@@ -325,24 +336,34 @@ public partial class TimelineView : ComponentBase, IDisposable
         }
     }
 
-    private double DayToPixel(DateTime date)
+    /// <summary>
+    /// Converts a date to pixel position using template-unit based calculation.
+    /// Template-pure approach: No day-width concept, direct template-unit mapping.
+    /// </summary>
+    private double DateToPixel(DateTime date)
     {
+        var config = TimelineZoomService.GetConfiguration(ZoomLevel);
         var days = (date.Date - StartDate).TotalDays;
-        var pixelPosition = days * EffectiveDayWidth;
+
+        // Template-pure calculation: Days → Template Units → Pixels
+        var templateUnits = days / config.TemplateUnitDays;
+        var pixelPosition = templateUnits * config.BaseUnitWidth * ZoomFactor;
 
         return pixelPosition;
     }
 
     private double CalculateTaskWidth(GanttTask task)
     {
-        var duration = (task.EndDate.Date - task.StartDate.Date).TotalDays + 1;
-        // Use template-based duration-to-pixel mapping
-        return TimelineZoomService.CalculateTaskPixelWidth(ZoomLevel, duration, ZoomFactor);
-    }
+        // COORDINATE SYSTEM FIX: Calculate width using template-based coordinate system
+        // instead of direct duration to ensure alignment between start and end positions
+        var startPixel = DateToPixel(task.StartDate.ToUtcDateTime());
+        var endPixel = DateToPixel(task.EndDate.ToUtcDateTime().AddDays(1)); // +1 for inclusive end date
+        var width = Math.Max(1.0, endPixel - startPixel); // Minimum 1px width
 
-    /// <summary>
-    /// Determines if a task should be rendered as a tiny marker instead of a task bar
-    /// </summary>
+        return width;
+    }    /// <summary>
+         /// Determines if a task should be rendered as a tiny marker instead of a task bar
+         /// </summary>
     private bool ShouldRenderAsTinyMarker(GanttTask task, double pixelWidth)
     {
         // Use FilterCriteria if available, otherwise default behavior (show tiny tasks with 3px threshold)
@@ -358,7 +379,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     private int GetMonthWidth(DateTime month)
     {
         var daysInMonth = DateTime.DaysInMonth(month.Year, month.Month);
-        return (int)(daysInMonth * EffectiveDayWidth);
+        return (int)(daysInMonth * (TemplateUnitWidth / TemplateUnitDays));
     }
 
     // === USER INTERACTIONS ===
@@ -554,7 +575,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     }
 
     // === PUBLIC PROPERTIES ===
-    public double CurrentEffectiveDayWidth => EffectiveDayWidth;
+    public double CurrentEffectiveDayWidth => TemplateUnitWidth / TemplateUnitDays;
     public string CurrentZoomDescription => $"{ZoomLevel} @ {ZoomFactor:F1}x";
 
     private int GetWeekOfYear(DateTime date)

@@ -48,11 +48,11 @@ public static class TaskDisplayConstants
     public const TimelineZoomLevel DEFAULT_ZOOM_LEVEL = TimelineZoomLevel.MonthWeekOptimal50px;
 
     /// <summary>
-    /// Minimum effective day width in pixels to maintain task visibility.
-    /// Prevents zoom-out beyond YearQuarter base level (3.0px/day).
-    /// This avoids the need for taskbar hiding strategies while maintaining
-    /// reasonable strategic planning capability at decade-level views.
+    /// [OBSOLETE - Template-Pure Migration] Minimum effective day width in pixels to maintain task visibility.
+    /// Legacy constraint from day-width based system. Template-pure approach uses template-unit constraints instead.
+    /// Replaced by MinZoomFactor/MaxZoomFactor in ZoomLevelConfiguration.
     /// </summary>
+    [Obsolete("Use template-unit constraints via ZoomLevelConfiguration MinZoomFactor instead of day-width constraints")]
     public const double MIN_EFFECTIVE_DAY_WIDTH = 3.0;
 
     /// <summary>

@@ -36,40 +36,17 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
     }
 
     /// <summary>
-    /// Calculate boundaries for primary header rendering (Quarter ranges).
-    /// QuarterMonth pattern: Quarter headers need quarter boundaries for complete quarter coverage.
-    /// </summary>
-    /// <returns>Quarter boundary dates for primary quarter header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
-    {
-        var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(StartDate, EndDate);
-        return quarterBounds;
-    }
-
-    /// <summary>
-    /// Calculate boundaries for secondary header rendering (Month names).
-    /// QuarterMonth pattern: Month headers need month boundaries for precise month alignment.
-    /// This ensures months render completely even when timeline spans partial quarters.
-    /// </summary>
-    /// <returns>Month boundary dates for secondary month header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
-    {
-        var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(StartDate, EndDate);
-        return monthBounds;
-    }
-
-    /// <summary>
     /// Renders the complete headers for QuarterMonth 60px view.
     /// Primary Header: Quarter ranges with year context
     /// Secondary Header: Month abbreviations with perfect 60px cells
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
         try
         {
-            // Use expanded boundaries calculated by base class union logic
+            // Use expanded boundaries calculated by base class template-unit padding
             return RenderQuarterHeader(StartDate, EndDate);
         }
         catch (Exception ex)
@@ -81,7 +58,7 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
 
     /// <summary>
     /// Renders the secondary header with month names.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()

@@ -35,47 +35,24 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
     }
 
     /// <summary>
-    /// Calculate boundaries for primary header rendering (Month-Year displays).
-    /// MonthWeek pattern: Month headers need month boundaries for complete month coverage.
-    /// </summary>
-    /// <returns>Month boundary dates for primary month header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
-    {
-        var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(StartDate, EndDate);
-        return monthBounds;
-    }
-
-    /// <summary>
-    /// Calculate boundaries for secondary header rendering (Week start dates).
-    /// MonthWeek pattern: Week headers need week boundaries since weeks can cross month boundaries.
-    /// This is the KEY FIX: Week headers that span across months need week boundaries, not month boundaries.
-    /// </summary>
-    /// <returns>Week boundary dates for secondary week header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
-    {
-        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(StartDate, EndDate);
-        return weekBounds;
-    }
-
-    /// <summary>
     /// Renders the primary header with month-year displays.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
-        // Use expanded boundaries calculated by base class union logic
+        // Use expanded boundaries calculated by base class template-unit padding
         return RenderMonthHeader(StartDate, EndDate);
     }
 
     /// <summary>
     /// Renders the secondary header with week start dates.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()
     {
-        // Use expanded boundaries calculated by base class union logic
+        // Use expanded boundaries calculated by base class template-unit padding
         return RenderWeekHeader(StartDate, EndDate);
     }
 

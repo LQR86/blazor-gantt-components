@@ -30,7 +30,7 @@
                 <!-- Grid lines aligned with secondary header boundaries -->
                 @foreach (var date in GetSecondaryGridLineDates())
                 {
-                    var x = DayToPixel(date);
+                    var x = DateToPixel(date);
                     <line x1="@x" y1="0" x2="@x" y2="@TotalHeight" 
                           class="timeline-grid-line" />
                 }
@@ -42,7 +42,7 @@
                     {
                         var task = FilteredTasks[i];
                         var y = i * RowHeight;
-                        var x = DayToPixel(task.StartDate.ToUtcDateTime());
+                        var x = DateToPixel(task.StartDate.ToUtcDateTime());
                         var width = CalculateTaskWidth(task);
                         var rowIndex = i;
                         

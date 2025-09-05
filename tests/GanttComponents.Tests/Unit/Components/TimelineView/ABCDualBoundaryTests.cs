@@ -249,16 +249,6 @@ public class MockDualBoundaryRenderer : BaseTimelineRenderer
         _secondaryBounds = (start, end);
     }
 
-    protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
-    {
-        return _primaryBounds;
-    }
-
-    protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
-    {
-        return _secondaryBounds;
-    }
-
     protected override string RenderPrimaryHeader() => "<g>Mock Primary</g>";
 
     protected override string RenderSecondaryHeader() => "<g>Mock Secondary</g>";

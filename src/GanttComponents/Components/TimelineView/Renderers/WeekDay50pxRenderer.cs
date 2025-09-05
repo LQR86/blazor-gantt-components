@@ -35,41 +35,19 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
     }
 
     /// <summary>
-    /// Calculate boundaries for primary header rendering (Week ranges).
-    /// WeekDay pattern: Week headers need week boundaries for complete rendering.
-    /// </summary>
-    /// <returns>Week boundary dates for primary week header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
-    {
-        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(StartDate, EndDate);
-        return weekBounds;
-    }
-
-    /// <summary>
-    /// Calculate boundaries for secondary header rendering (Day names within weeks).
-    /// WeekDay pattern: Day headers need week boundaries for alignment with week structure.
-    /// </summary>
-    /// <returns>Week boundary dates for secondary day header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
-    {
-        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(StartDate, EndDate);
-        return weekBounds;
-    }
-
-    /// <summary>
     /// Renders the primary header with week ranges.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
-        // Use expanded boundaries calculated by base class union logic
+        // Use expanded boundaries calculated by base class template-unit padding
         return RenderWeekHeader(StartDate, EndDate);
     }
 
     /// <summary>
     /// Renders the secondary header with day names and numbers.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()

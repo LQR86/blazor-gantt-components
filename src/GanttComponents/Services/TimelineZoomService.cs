@@ -117,17 +117,8 @@ public class TimelineZoomService
     {
         var config = GetConfiguration(level);
 
-        // Template-native approach: 1.0x minimum, template-specific maximum
+        // Template-native approach: Use configuration min/max zoom factors directly
         var clampedFactor = Math.Max(config.MinZoomFactor, Math.Min(config.MaxZoomFactor, zoomFactor));
-
-        // Ensure minimum day width constraint is met
-        var dayWidth = config.GetEffectiveDayWidth(clampedFactor);
-        if (dayWidth < TaskDisplayConstants.MIN_EFFECTIVE_DAY_WIDTH)
-        {
-            // Calculate minimum zoom factor to meet day width requirement
-            var minRequiredZoom = (TaskDisplayConstants.MIN_EFFECTIVE_DAY_WIDTH * config.TemplateUnitDays) / config.BaseUnitWidth;
-            clampedFactor = Math.Max(clampedFactor, minRequiredZoom);
-        }
 
         return clampedFactor;
     }
@@ -177,15 +168,16 @@ public class TimelineZoomService
     }
 
     /// <summary>
-    /// Check if current zoom settings are at the minimum day width boundary.
+    /// Check if current zoom settings are at the minimum zoom boundary.
+    /// Template-pure approach: Check against configuration min zoom factor.
     /// </summary>
     /// <param name="level">Current zoom level</param>
     /// <param name="zoomFactor">Current zoom factor</param>
     /// <returns>True if at minimum boundary</returns>
     public static bool IsAtMinimumDayWidth(TimelineZoomLevel level, double zoomFactor)
     {
-        var effectiveDayWidth = CalculateEffectiveDayWidth(level, zoomFactor);
-        return Math.Abs(effectiveDayWidth - TaskDisplayConstants.MIN_EFFECTIVE_DAY_WIDTH) < 0.001;
+        var config = GetConfiguration(level);
+        return Math.Abs(zoomFactor - config.MinZoomFactor) < 0.001;
     }
 
     /// <summary>

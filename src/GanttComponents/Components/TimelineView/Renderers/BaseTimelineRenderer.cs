@@ -154,18 +154,18 @@ public abstract class BaseTimelineRenderer
     // === ABSTRACT METHODS FOR SUBCLASSES ===
 
     /// <summary>
-    /// AUTOMATIC DUAL BOUNDARY EXPANSION: Final method that enforces dual boundary union calculation.
-    /// This method automatically combines primary and secondary header boundaries to ensure
-    /// both header types render completely without truncation at timeline edges.
+    /// TEMPLATE-PURE BOUNDARY CALCULATION: Calculates boundary expansion using template units.
+    /// This method adds simple padding (1 template unit on each side) to ensure
+    /// headers render completely without truncation at timeline edges.
     /// 
-    /// ABC COMPOSITION ENFORCEMENT: Subclasses CANNOT override this method - they must implement
-    /// the abstract boundary methods, and this base class automatically calculates the union.
-    /// This guarantees that all current and future timeline patterns get dual expansion "for free".
+    /// TEMPLATE ARCHITECTURE: Uses template-native approach - no complex boundary calculations.
+    /// Each zoom level's template unit defines the padding: WeekDay=1day, MonthWeek=7days, etc.
+    /// This guarantees consistent expansion across all timeline patterns.
     /// 
-    /// NOTE: While C# doesn't allow 'sealed' on non-override methods, this method should be treated
-    /// as final. Future renderers must implement the abstract boundary calculation methods instead.
+    /// NOTE: This method is final - subclasses should not override boundary calculation.
+    /// Template units provide sufficient boundary expansion for all current patterns.
     /// </summary>
-    /// <returns>Union of primary and secondary boundaries for complete header rendering</returns>
+    /// <returns>Template-unit padded boundaries for complete header rendering</returns>
     public (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
     {
         try

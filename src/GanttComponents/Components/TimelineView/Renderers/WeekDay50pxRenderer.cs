@@ -52,7 +52,7 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()
     {
-        // Use expanded boundaries calculated by base class union logic
+        // Use expanded boundaries calculated by base class template-unit padding
         return RenderDayHeader(StartDate, EndDate);
     }
 

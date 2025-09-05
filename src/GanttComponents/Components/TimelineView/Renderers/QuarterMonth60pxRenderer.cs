@@ -65,7 +65,7 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
     {
         try
         {
-            // Use expanded boundaries calculated by base class union logic
+            // Use expanded boundaries calculated by base class template-unit padding
             return RenderMonthHeader(StartDate, EndDate);
         }
         catch (Exception ex)

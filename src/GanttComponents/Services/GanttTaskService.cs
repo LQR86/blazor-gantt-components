@@ -37,7 +37,6 @@ public class GanttTaskService : IGanttTaskService
         }
         catch (Exception ex)
         {
-            _universalLogger.LogError("Error retrieving all tasks from database", ex);
             _logger.LogError(ex, "Error retrieving all tasks");
             throw;
         }
@@ -169,8 +168,6 @@ public class GanttTaskService : IGanttTaskService
     {
         try
         {
-            _logger.LogInformation("Regenerating all WBS codes");
-
             var allTasks = await GetAllTasksAsync();
             var updatedTasks = await _wbsService.GenerateWbsCodesAsync(allTasks);
 

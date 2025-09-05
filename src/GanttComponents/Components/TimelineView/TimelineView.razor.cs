@@ -218,7 +218,6 @@ public partial class TimelineView : ComponentBase, IDisposable
     // === COMPONENT LIFECYCLE ===
     protected override void OnInitialized()
     {
-        Logger.LogInfo($"TimelineView initialized with {Tasks.Count} tasks");
         I18N.LanguageChanged += OnLanguageChanged;
         CalculateTimelineRange();
     }
@@ -326,7 +325,6 @@ public partial class TimelineView : ComponentBase, IDisposable
             // Get the expanded boundaries from the renderer
             var expandedBounds = tempRenderer.CalculateHeaderBoundaries();
 
-            // Debug logging for boundary expansion
             return (expandedBounds.expandedStart, expandedBounds.expandedEnd);
         }
         catch (Exception ex)

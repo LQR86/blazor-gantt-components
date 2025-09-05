@@ -24,8 +24,6 @@ public class WbsCodeGenerationService : IWbsCodeGenerationService
     {
         try
         {
-            _logger.LogInfo($"Starting WBS code generation for {tasks.Count} tasks");
-
             // Create a lookup for parent-child relationships
             var taskById = tasks.ToDictionary(t => t.Id);
             var childrenByParent = tasks
@@ -47,7 +45,6 @@ public class WbsCodeGenerationService : IWbsCodeGenerationService
                 rootPosition++;
             }
 
-            _logger.LogInfo($"Completed WBS code generation for {tasks.Count} tasks");
             return Task.FromResult(tasks);
         }
         catch (Exception ex)
@@ -139,13 +136,9 @@ public class WbsCodeGenerationService : IWbsCodeGenerationService
     {
         try
         {
-            _logger.LogInfo($"Starting WBS code renumbering for {tasks.Count} tasks (changed task: {changedTaskId})");
-
             // For simplicity, regenerate all WBS codes when hierarchy changes
             // This ensures consistency and is straightforward to implement
             var updatedTasks = await GenerateWbsCodesAsync(tasks);
-
-            _logger.LogInfo($"Completed WBS code renumbering for {tasks.Count} tasks");
 
             return updatedTasks;
         }
@@ -222,8 +215,6 @@ public class WbsCodeGenerationService : IWbsCodeGenerationService
 
         try
         {
-            _logger.LogInfo($"Starting WBS hierarchy validation for {tasks.Count} tasks");
-
             var tasksByWbsCode = new Dictionary<string, GanttTask>();
 
             // Check for duplicate WBS codes and invalid formats
@@ -285,8 +276,6 @@ public class WbsCodeGenerationService : IWbsCodeGenerationService
                     errors.Add($"Task '{task.Name}' (WBS: {task.WbsCode}) is root level but has ParentId: {task.ParentId}");
                 }
             }
-
-            _logger.LogInfo($"Completed WBS hierarchy validation for {tasks.Count} tasks ({errors.Count} errors found)");
 
             return errors;
         }

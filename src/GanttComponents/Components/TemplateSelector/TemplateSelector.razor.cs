@@ -13,7 +13,7 @@ public partial class TemplateSelector
     /// <summary>
     /// Currently selected template.
     /// </summary>
-    [Parameter] public TimelineZoomLevel SelectedTemplate { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px;
+    [Parameter] public TimelineZoomLevel SelectedTemplate { get; set; } = TimelineZoomLevel.MonthWeek;
 
     /// <summary>
     /// Event fired when template selection changes.
@@ -25,10 +25,10 @@ public partial class TemplateSelector
     /// </summary>
     private static readonly TimelineZoomLevel[] AvailableTemplates = new[]
     {
-        TimelineZoomLevel.YearQuarterOptimal70px,
-        TimelineZoomLevel.QuarterMonthOptimal60px,
-        TimelineZoomLevel.MonthWeekOptimal50px,
-        TimelineZoomLevel.WeekDayOptimal50px
+        TimelineZoomLevel.YearQuarter,
+        TimelineZoomLevel.QuarterMonth,
+        TimelineZoomLevel.MonthWeek,
+        TimelineZoomLevel.WeekDay
     };
 
     /// <summary>
@@ -50,10 +50,10 @@ public partial class TemplateSelector
     {
         return template switch
         {
-            TimelineZoomLevel.YearQuarterOptimal70px => "Year-Quarter",
-            TimelineZoomLevel.QuarterMonthOptimal60px => "Quarter-Month",
-            TimelineZoomLevel.MonthWeekOptimal50px => "Month-Week",
-            TimelineZoomLevel.WeekDayOptimal50px => "Week-Day",
+            TimelineZoomLevel.YearQuarter => "Year-Quarter",
+            TimelineZoomLevel.QuarterMonth => "Quarter-Month",
+            TimelineZoomLevel.MonthWeek => "Month-Week",
+            TimelineZoomLevel.WeekDay => "Week-Day",
             _ => template.ToString()
         };
     }
@@ -65,10 +65,10 @@ public partial class TemplateSelector
     {
         return template switch
         {
-            TimelineZoomLevel.YearQuarterOptimal70px => "Strategic planning",
-            TimelineZoomLevel.QuarterMonthOptimal60px => "Quarterly planning",
-            TimelineZoomLevel.MonthWeekOptimal50px => "Monthly planning",
-            TimelineZoomLevel.WeekDayOptimal50px => "Weekly planning",
+            TimelineZoomLevel.YearQuarter => "Strategic planning",
+            TimelineZoomLevel.QuarterMonth => "Quarterly planning",
+            TimelineZoomLevel.MonthWeek => "Monthly planning",
+            TimelineZoomLevel.WeekDay => "Weekly planning",
             _ => ""
         };
     }

@@ -17,43 +17,43 @@ public class TimelineZoomService
             // Using duration-to-pixel mapping with template-native units
 
             // Year-Quarter Template: 24px per quarter (90 days)
-            [TimelineZoomLevel.YearQuarterOptimal70px] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.YearQuarterOptimal70px,
+            [TimelineZoomLevel.YearQuarter] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.YearQuarter,
                 24.0,   // 24px per quarter
                 90.0,   // 90 days per quarter
                 4.0,    // Max zoom: 4.0x
-                "ZoomLevel.YearQuarterOptimal70px",
-                "ZoomLevel.YearQuarterOptimal70px.Description"
+                "ZoomLevel.YearQuarter",
+                "ZoomLevel.YearQuarter.Description"
             ),
 
             // Quarter-Month Template: 25px per month (30 days) - increased for better month abbreviation spacing
-            [TimelineZoomLevel.QuarterMonthOptimal60px] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.QuarterMonthOptimal60px,
+            [TimelineZoomLevel.QuarterMonth] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.QuarterMonth,
                 25.0,   // 25px per month (was 20px) - accommodates "Sep" text with comfortable spacing
                 30.0,   // 30 days per month
                 3.5,    // Max zoom: 3.5x
-                "ZoomLevel.QuarterMonthOptimal60px",
-                "ZoomLevel.QuarterMonthOptimal60px.Description"
+                "ZoomLevel.QuarterMonth",
+                "ZoomLevel.QuarterMonth.Description"
             ),
 
             // Month-Week Template: 28px per week (7 days) - increased for better week date spacing
-            [TimelineZoomLevel.MonthWeekOptimal50px] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.MonthWeekOptimal50px,
+            [TimelineZoomLevel.MonthWeek] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.MonthWeek,
                 28.0,   // 28px per week (was 24px) - provides generous spacing for "12/31" text
                 7.0,    // 7 days per week
                 3.0,    // Max zoom: 3.0x
-                "ZoomLevel.MonthWeekOptimal50px",
-                "ZoomLevel.MonthWeekOptimal50px.Description"
+                "ZoomLevel.MonthWeek",
+                "ZoomLevel.MonthWeek.Description"
             ),
 
             // Week-Day Template: 50px per day (1 day) - significantly increased for week range text
-            [TimelineZoomLevel.WeekDayOptimal50px] = ZoomLevelConfiguration.Create(
-                TimelineZoomLevel.WeekDayOptimal50px,
+            [TimelineZoomLevel.WeekDay] = ZoomLevelConfiguration.Create(
+                TimelineZoomLevel.WeekDay,
                 50.0,   // 50px per day (was 12px) - accommodates "December 30, 2024 - January 5, 2025" text
                 1.0,    // 1 day per day
                 2.5,    // Max zoom: 2.5x
-                "ZoomLevel.WeekDayOptimal50px",
-                "ZoomLevel.WeekDayOptimal50px.Description"
+                "ZoomLevel.WeekDay",
+                "ZoomLevel.WeekDay.Description"
             )
         };
 

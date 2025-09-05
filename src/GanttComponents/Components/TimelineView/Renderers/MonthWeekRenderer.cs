@@ -4,22 +4,21 @@ using GanttComponents.Services;
 namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
-/// MonthWeek 50px level renderer for TimelineView composition architecture.
+/// MonthWeek level renderer for TimelineView composition architecture.
 /// Handles month-week pattern with calculated day width validation.
 /// Primary Header: Month-Year ("February 2025", "March 2025")
 /// Secondary Header: Week start dates ("2/17", "2/24", "3/3") - Monday dates
-/// Cell Width: Calculated week cells based on day width (typically 8px day = 56px week)
 /// Optimized for medium-range planning with weekly breakdown by month.
 /// Includes union expansion for complete header rendering at timeline edges.
 /// </summary>
-public class MonthWeek50pxRenderer : BaseTimelineRenderer
+public class MonthWeekRenderer : BaseTimelineRenderer
 {
     /// <summary>
     /// Constructor for MonthWeek template renderer with dependency injection.
     /// Uses template-based approach: 18px per week with 3.0x max zoom.
     /// Template unit: 1 week (7 days) = 18px base width.
     /// </summary>
-    public MonthWeek50pxRenderer(
+    public MonthWeekRenderer(
         IUniversalLogger logger,
         IGanttI18N i18n,
         DateFormatHelper dateFormatter,

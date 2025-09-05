@@ -438,6 +438,32 @@
     <value>具有最佳60px日单元格的日程安排</value>
   </data>
 
+  <!-- Clean Template Names (Clean Architecture) -->
+  <data name="ZoomLevel.YearQuarter" xml:space="preserve">
+    <value>年-季度</value>
+  </data>
+  <data name="ZoomLevel.YearQuarter.Description" xml:space="preserve">
+    <value>战略概览与季度分解</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonth" xml:space="preserve">
+    <value>季度-月份</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonth.Description" xml:space="preserve">
+    <value>季度规划与月度分解</value>
+  </data>
+  <data name="ZoomLevel.MonthWeek" xml:space="preserve">
+    <value>月-周</value>
+  </data>
+  <data name="ZoomLevel.MonthWeek.Description" xml:space="preserve">
+    <value>月度规划与周分解</value>
+  </data>
+  <data name="ZoomLevel.WeekDay" xml:space="preserve">
+    <value>周-日</value>
+  </data>
+  <data name="ZoomLevel.WeekDay.Description" xml:space="preserve">
+    <value>日程安排与周概览</value>
+  </data>
+
   <!-- Timeline Zoom UI Controls -->
   <data name="zoom.controls.zoom-in" xml:space="preserve">
     <value>放大</value>

@@ -29,7 +29,7 @@ public partial class TimelineView : ComponentBase, IDisposable
     [Parameter, EditorRequired] public int HeaderDayHeight { get; set; } = 24;
     [Parameter] public EventCallback<int?> OnTaskHovered { get; set; }
     [Parameter] public int? HoveredTaskId { get; set; }
-    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px;
+    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeek;
     [Parameter] public double ZoomFactor { get; set; } = 1.0;  // Template-native: 1.0x to template maximum
     [Parameter] public EventCallback<TimelineZoomLevel> OnZoomLevelChanged { get; set; }
     [Parameter] public EventCallback<double> OnZoomFactorChanged { get; set; }
@@ -650,7 +650,7 @@ public partial class TimelineView : ComponentBase, IDisposable
         {
             switch (ZoomLevel)
             {
-                case TimelineZoomLevel.YearQuarterOptimal70px:
+                case TimelineZoomLevel.YearQuarter:
                     // Grid lines at quarter starts
                     var quarterStart = new DateTime(StartDate.Year, ((StartDate.Month - 1) / 3) * 3 + 1, 1);
                     while (quarterStart <= EndDate)
@@ -660,7 +660,7 @@ public partial class TimelineView : ComponentBase, IDisposable
                     }
                     break;
 
-                case TimelineZoomLevel.QuarterMonthOptimal60px:
+                case TimelineZoomLevel.QuarterMonth:
                     // Grid lines at month starts
                     var monthStart = new DateTime(StartDate.Year, StartDate.Month, 1);
                     while (monthStart <= EndDate)
@@ -670,7 +670,7 @@ public partial class TimelineView : ComponentBase, IDisposable
                     }
                     break;
 
-                case TimelineZoomLevel.MonthWeekOptimal50px:
+                case TimelineZoomLevel.MonthWeek:
                     // Grid lines at week starts (Monday)
                     var weekStart = StartDate.AddDays(-(int)StartDate.DayOfWeek + (int)DayOfWeek.Monday);
                     if (weekStart > StartDate) weekStart = weekStart.AddDays(-7);
@@ -681,7 +681,7 @@ public partial class TimelineView : ComponentBase, IDisposable
                     }
                     break;
 
-                case TimelineZoomLevel.WeekDayOptimal50px:
+                case TimelineZoomLevel.WeekDay:
                     // Grid lines at day starts (daily)
                     for (var day = StartDate; day <= EndDate; day = day.AddDays(1))
                     {

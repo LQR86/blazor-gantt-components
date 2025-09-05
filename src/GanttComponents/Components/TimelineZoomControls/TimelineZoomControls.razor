@@ -150,8 +150,8 @@
     
     // Zoom level filtering - for different use cases  
     [Parameter] public IReadOnlyList<TimelineZoomLevel>? VisibleZoomLevels { get; set; }
-    [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.YearQuarterOptimal70px;  // Start from strategic overview
-    [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal50px;    // End at detailed daily planning
+    [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.YearQuarter;  // Start from strategic overview
+    [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDay;    // End at detailed daily planning
     
     // Preset-only approach: Manual zoom controls removed for v0.8.5
     // All zoom control is handled via preset level selection only
@@ -213,16 +213,16 @@
         var implementedLevels = new List<TimelineZoomLevel>
         {
             // Strategic Overview - 0.78px day width → 70px quarters
-            TimelineZoomLevel.YearQuarterOptimal70px,    // Years → Quarters
+            TimelineZoomLevel.YearQuarter,    // Years → Quarters
             
             // Monthly Planning - 2px day width → 60px months  
-            TimelineZoomLevel.QuarterMonthOptimal60px,   // Quarters → Months
+            TimelineZoomLevel.QuarterMonth,   // Quarters → Months
             
             // Weekly Planning - 8px day width → 56px weeks
-            TimelineZoomLevel.MonthWeekOptimal50px,      // Months → Weeks
+            TimelineZoomLevel.MonthWeek,      // Months → Weeks
             
             // Daily Detail - 50px day width → 350px weeks
-            TimelineZoomLevel.WeekDayOptimal50px,        // Weeks → Days
+            TimelineZoomLevel.WeekDay,        // Weeks → Days
         };
         
         // Apply min/max range filtering if needed

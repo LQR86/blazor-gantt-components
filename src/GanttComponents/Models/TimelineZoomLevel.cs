@@ -14,7 +14,7 @@ public enum TimelineZoomLevel
     /// Best for: Long-term strategic planning with quarterly milestones
     /// Day Width Range: 0.27px (1.0x) - 1.07px (4.0x)
     /// </summary>
-    YearQuarterOptimal70px = 23,
+    YearQuarter = 23,
 
     /// <summary>
     /// Quarter-Month Template: 20px per month (30 days), Max Zoom: 3.5x
@@ -23,7 +23,7 @@ public enum TimelineZoomLevel
     /// Best for: Quarterly planning with monthly breakdown
     /// Day Width Range: 0.67px (1.0x) - 2.33px (3.5x)
     /// </summary>
-    QuarterMonthOptimal60px = 27,
+    QuarterMonth = 27,
 
     /// <summary>
     /// Month-Week Template: 18px per week (7 days), Max Zoom: 3.0x
@@ -32,7 +32,7 @@ public enum TimelineZoomLevel
     /// Best for: Monthly planning with weekly breakdown
     /// Day Width Range: 2.57px (1.0x) - 7.71px (3.0x)
     /// </summary>
-    MonthWeekOptimal50px = 30,
+    MonthWeek = 30,
 
     /// <summary>
     /// Week-Day Template: 12px per day (1 day), Max Zoom: 2.5x
@@ -41,5 +41,5 @@ public enum TimelineZoomLevel
     /// Best for: Detailed weekly planning with daily breakdown
     /// Day Width Range: 12px (1.0x) - 30px (2.5x)
     /// </summary>
-    WeekDayOptimal50px = 34
+    WeekDay = 34
 }

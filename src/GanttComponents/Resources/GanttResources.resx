@@ -438,6 +438,32 @@
     <value>Daily scheduling with optimal 60px day cells</value>
   </data>
 
+  <!-- Clean Template Names (Clean Architecture) -->
+  <data name="ZoomLevel.YearQuarter" xml:space="preserve">
+    <value>Year-Quarter</value>
+  </data>
+  <data name="ZoomLevel.YearQuarter.Description" xml:space="preserve">
+    <value>Strategic overview with quarterly breakdown</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonth" xml:space="preserve">
+    <value>Quarter-Month</value>
+  </data>
+  <data name="ZoomLevel.QuarterMonth.Description" xml:space="preserve">
+    <value>Quarterly planning with monthly breakdown</value>
+  </data>
+  <data name="ZoomLevel.MonthWeek" xml:space="preserve">
+    <value>Month-Week</value>
+  </data>
+  <data name="ZoomLevel.MonthWeek.Description" xml:space="preserve">
+    <value>Monthly planning with weekly breakdown</value>
+  </data>
+  <data name="ZoomLevel.WeekDay" xml:space="preserve">
+    <value>Week-Day</value>
+  </data>
+  <data name="ZoomLevel.WeekDay.Description" xml:space="preserve">
+    <value>Daily scheduling with weekly overview</value>
+  </data>
+
 
   <!-- Timeline Zoom UI Controls -->
   <data name="zoom.controls.zoom-in" xml:space="preserve">

@@ -54,7 +54,7 @@ public partial class TimelineView_Export : ComponentBase
     [Parameter, EditorRequired] public int HeaderDayHeight { get; set; } = 24;
 
     /// <summary>Timeline zoom level determining day width and header grouping</summary>
-    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px;
+    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeek;
 
     /// <summary>Additional zoom factor applied to base day width (export typically uses 1.0)</summary>
     [Parameter] public double ZoomFactor { get; set; } = 1.0;

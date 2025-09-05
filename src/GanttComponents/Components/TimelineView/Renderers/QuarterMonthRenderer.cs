@@ -4,22 +4,21 @@ using GanttComponents.Services;
 namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
-/// QuarterMonth 60px level renderer for TimelineView composition architecture.
+/// QuarterMonth level renderer for TimelineView composition architecture.
 /// Handles custom quarter-month pattern with integral day width validation.
 /// Primary Header: Quarter ranges ("Q1 2025", "Q2 2025")
 /// Secondary Header: Month names ("Jan", "Feb", "Mar")
-/// Cell Width: 60px month cells with 2.0px integral day width (2.0px × 30 days = 60px)
 /// Optimized for quarterly planning with monthly breakdown detail.
 /// Includes union expansion for complete header rendering at timeline edges.
 /// </summary>
-public class QuarterMonth60pxRenderer : BaseTimelineRenderer
+public class QuarterMonthRenderer : BaseTimelineRenderer
 {
     /// <summary>
     /// Constructor for QuarterMonth template renderer with dependency injection.
     /// Uses template-based approach: 20px per month with 3.5x max zoom.
     /// Template unit: 1 month (30 days) = 20px base width.
     /// </summary>
-    public QuarterMonth60pxRenderer(
+    public QuarterMonthRenderer(
         IUniversalLogger logger,
         IGanttI18N i18n,
         DateFormatHelper dateFormatter,

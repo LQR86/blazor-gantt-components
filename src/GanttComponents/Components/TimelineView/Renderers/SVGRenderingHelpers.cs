@@ -138,16 +138,16 @@ public static class SVGRenderingHelpers
         var cssClass = zoomLevel switch
         {
             // WeekDay50px - ABC implementation
-            TimelineZoomLevel.WeekDayOptimal50px => isPrimary ? "svg-weekday-50px-primary-text" : "svg-weekday-50px-secondary-text",
+            TimelineZoomLevel.WeekDay => isPrimary ? "svg-weekday-50px-primary-text" : "svg-weekday-50px-secondary-text",
 
             // MonthWeek50px - ABC implementation
-            TimelineZoomLevel.MonthWeekOptimal50px => isPrimary ? "svg-monthweek-50px-primary-text" : "svg-monthweek-50px-secondary-text",
+            TimelineZoomLevel.MonthWeek => isPrimary ? "svg-monthweek-50px-primary-text" : "svg-monthweek-50px-secondary-text",
 
             // QuarterMonth60px - ABC implementation
-            TimelineZoomLevel.QuarterMonthOptimal60px => isPrimary ? "svg-quartermonth-60px-primary-text" : "svg-quartermonth-60px-secondary-text",
+            TimelineZoomLevel.QuarterMonth => isPrimary ? "svg-quartermonth-60px-primary-text" : "svg-quartermonth-60px-secondary-text",
 
             // YearQuarter70px - ABC implementation
-            TimelineZoomLevel.YearQuarterOptimal70px => isPrimary ? "svg-yearquarter-70px-primary-text" : "svg-yearquarter-70px-secondary-text",
+            TimelineZoomLevel.YearQuarter => isPrimary ? "svg-yearquarter-70px-primary-text" : "svg-yearquarter-70px-secondary-text",
 
             // Fallback for any future patterns
             _ => isPrimary ? "svg-primary-text" : "svg-secondary-text"

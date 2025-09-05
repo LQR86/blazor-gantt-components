@@ -41,22 +41,22 @@ public static class RendererFactory
             // Template-Based Renderers - 4 Full Implementations
 
             // Week-Day Template: 12px per day, max 2.5x zoom
-            TimelineZoomLevel.WeekDayOptimal50px => new WeekDay50pxRenderer(
+            TimelineZoomLevel.WeekDay => new WeekDayRenderer(
                 logger, i18n, dateFormatter, startDate, endDate,
                 zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight),
 
             // Month-Week Template: 18px per week, max 3.0x zoom
-            TimelineZoomLevel.MonthWeekOptimal50px => new MonthWeek50pxRenderer(
+            TimelineZoomLevel.MonthWeek => new MonthWeekRenderer(
                 logger, i18n, dateFormatter, startDate, endDate,
                 zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight),
 
             // Quarter-Month Template: 20px per month, max 3.5x zoom
-            TimelineZoomLevel.QuarterMonthOptimal60px => new QuarterMonth60pxRenderer(
+            TimelineZoomLevel.QuarterMonth => new QuarterMonthRenderer(
                 logger, i18n, dateFormatter, startDate, endDate,
                 zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight),
 
             // Year-Quarter Template: 24px per quarter, max 4.0x zoom
-            TimelineZoomLevel.YearQuarterOptimal70px => new YearQuarter90pxRenderer(
+            TimelineZoomLevel.YearQuarter => new YearQuarterRenderer(
                 logger, i18n, dateFormatter, startDate, endDate,
                 zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight),
 

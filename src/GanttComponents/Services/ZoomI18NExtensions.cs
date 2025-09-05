@@ -19,10 +19,10 @@ namespace GanttComponents.Services
             return zoomLevel switch
             {
                 // ABC Composition Architecture - Implemented Levels Only
-                TimelineZoomLevel.YearQuarterOptimal70px => i18n.T("ZoomLevel.YearQuarterOptimal70px"),
-                TimelineZoomLevel.QuarterMonthOptimal60px => i18n.T("ZoomLevel.QuarterMonthOptimal60px"),
-                TimelineZoomLevel.MonthWeekOptimal50px => i18n.T("ZoomLevel.MonthWeekOptimal50px"),
-                TimelineZoomLevel.WeekDayOptimal50px => i18n.T("ZoomLevel.WeekDayOptimal50px"),
+                TimelineZoomLevel.YearQuarter => i18n.T("ZoomLevel.YearQuarter"),
+                TimelineZoomLevel.QuarterMonth => i18n.T("ZoomLevel.QuarterMonth"),
+                TimelineZoomLevel.MonthWeek => i18n.T("ZoomLevel.MonthWeek"),
+                TimelineZoomLevel.WeekDay => i18n.T("ZoomLevel.WeekDay"),
 
                 _ => zoomLevel.ToString()
             };
@@ -39,10 +39,10 @@ namespace GanttComponents.Services
             return zoomLevel switch
             {
                 // ABC Composition Architecture - Implemented Levels Only
-                TimelineZoomLevel.YearQuarterOptimal70px => i18n.T("ZoomLevel.YearQuarterOptimal70px.Description"),
-                TimelineZoomLevel.QuarterMonthOptimal60px => i18n.T("ZoomLevel.QuarterMonthOptimal60px.Description"),
-                TimelineZoomLevel.MonthWeekOptimal50px => i18n.T("ZoomLevel.MonthWeekOptimal50px.Description"),
-                TimelineZoomLevel.WeekDayOptimal50px => i18n.T("ZoomLevel.WeekDayOptimal50px.Description"),
+                TimelineZoomLevel.YearQuarter => i18n.T("ZoomLevel.YearQuarter.Description"),
+                TimelineZoomLevel.QuarterMonth => i18n.T("ZoomLevel.QuarterMonth.Description"),
+                TimelineZoomLevel.MonthWeek => i18n.T("ZoomLevel.MonthWeek.Description"),
+                TimelineZoomLevel.WeekDay => i18n.T("ZoomLevel.WeekDay.Description"),
 
                 _ => string.Empty
             };

@@ -4,22 +4,21 @@ using GanttComponents.Services;
 namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
-/// WeekDay 50px level renderer for TimelineView composition architecture.
+/// WeekDay level renderer for TimelineView composition architecture.
 /// Handles week-day pattern with integral day width validation.
 /// Primary Header: Week ranges ("February 17-23, 2025")
 /// Secondary Header: Day names with numbers ("Mon 17", "Tue 18")
-/// Cell Width: 50px day cells with 50px integral day width
 /// Optimized for detailed weekly planning with daily breakdown.
 /// Includes union expansion for complete header rendering at timeline edges.
 /// </summary>
-public class WeekDay50pxRenderer : BaseTimelineRenderer
+public class WeekDayRenderer : BaseTimelineRenderer
 {
     /// <summary>
     /// Constructor for WeekDay template renderer with dependency injection.
     /// Uses template-based approach: 12px per day with 2.5x max zoom.
     /// Template unit: 1 day = 12px base width.
     /// </summary>
-    public WeekDay50pxRenderer(
+    public WeekDayRenderer(
         IUniversalLogger logger,
         IGanttI18N i18n,
         DateFormatHelper dateFormatter,

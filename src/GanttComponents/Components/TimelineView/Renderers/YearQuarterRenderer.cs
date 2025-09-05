@@ -4,22 +4,21 @@ using GanttComponents.Services;
 namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
-/// YearQuarter 90px level renderer for TimelineView composition architecture.
+/// YearQuarter level renderer for TimelineView composition architecture.
 /// Handles custom year-quarter pattern with integral day width validation.
 /// Primary Header: Year ranges ("2025", "2026")
 /// Secondary Header: Quarter labels ("Q1", "Q2", "Q3", "Q4")
-/// Cell Width: 90px quarter cells with 1.0px integral day width (1.0px × 90 days = 90px)
 /// Optimized for strategic long-term planning with year/quarter overview.
 /// Includes union expansion for complete header rendering at timeline edges.
 /// </summary>
-public class YearQuarter90pxRenderer : BaseTimelineRenderer
+public class YearQuarterRenderer : BaseTimelineRenderer
 {
     /// <summary>
     /// Constructor for YearQuarter template renderer with dependency injection.
     /// Uses template-based approach: 24px per quarter with 4.0x max zoom.
     /// Template unit: 1 quarter (90 days) = 24px base width.
     /// </summary>
-    public YearQuarter90pxRenderer(
+    public YearQuarterRenderer(
         IUniversalLogger logger,
         IGanttI18N i18n,
         DateFormatHelper dateFormatter,

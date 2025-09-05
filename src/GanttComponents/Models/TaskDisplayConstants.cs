@@ -48,14 +48,6 @@ public static class TaskDisplayConstants
     public const TimelineZoomLevel DEFAULT_ZOOM_LEVEL = TimelineZoomLevel.MonthWeek;
 
     /// <summary>
-    /// [OBSOLETE - Template-Pure Migration] Minimum effective day width in pixels to maintain task visibility.
-    /// Legacy constraint from day-width based system. Template-pure approach uses template-unit constraints instead.
-    /// Replaced by MinZoomFactor/MaxZoomFactor in ZoomLevelConfiguration.
-    /// </summary>
-    [Obsolete("Use template-unit constraints via ZoomLevelConfiguration MinZoomFactor instead of day-width constraints")]
-    public const double MIN_EFFECTIVE_DAY_WIDTH = 3.0;
-
-    /// <summary>
     /// Check if a task width meets the minimum display requirement.
     /// </summary>
     /// <param name="width">Task width in pixels</param>

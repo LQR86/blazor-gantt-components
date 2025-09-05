@@ -152,7 +152,6 @@ window.ganttComposer = {
                 }
             });
             
-            console.log('Scroll synchronization initialized between:', gridElementId, 'and', timelineElementId);
         } else {
             console.warn('Could not find scroll containers for synchronization:', {
                 gridContainer: gridScrollContainer,
@@ -177,6 +176,5 @@ window.ganttComposer = {
     enforceRowAlignment: function(composerId) {
         // Parameter-based alignment handles this automatically
         // This function is kept for compatibility but does nothing
-        console.log('Row alignment is now handled via component parameters');
     }
 };

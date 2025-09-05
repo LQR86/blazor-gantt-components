@@ -146,7 +146,7 @@ public partial class TimelineView : ComponentBase, IDisposable
         }
     }
 
-    // Legacy alias - will be removed after cleanup
+    // Day width calculated from template unit dimensions
     protected double DayWidth => TemplateUnitWidth / TemplateUnitDays;
 
     private int TotalHeaderHeight => HeaderMonthHeight + HeaderDayHeight;

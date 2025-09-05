@@ -74,26 +74,26 @@ public void ParseDuration_WithInvalidFormat_ThrowsArgumentException() { }
 ### **1. Simple Fact Test**
 ```csharp
 [Fact]
-public void ZoomLevelConfiguration_WeekDay_HasCorrectBaseDayWidth()
+public void ZoomLevelConfiguration_WeekDay_HasCorrectBaseUnitWidth()
 {
     // Arrange
-    var expectedWidth = 60.0;
+    var expectedWidth = 12.0;  // 12px per day at 1.0x zoom
     
     // Act
     var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.WeekDay);
     
     // Assert
-    Assert.Equal(expectedWidth, config.BaseDayWidth);
+    Assert.Equal(expectedWidth, config.BaseUnitWidth);
 }
 ```
 
 ### **2. Theory Test with Multiple Inputs**
 ```csharp
 [Theory]
-[InlineData(TimelineZoomLevel.WeekDay, 1.0, 60.0)]
-[InlineData(TimelineZoomLevel.MonthDay, 1.0, 25.0)]
-[InlineData(TimelineZoomLevel.MonthWeek, 1.0, 15.0)]
-[InlineData(TimelineZoomLevel.QuarterWeek, 1.0, 8.0)]
+[InlineData(TimelineZoomLevel.WeekDay, 1.0, 12.0)]        // 12px per day
+[InlineData(TimelineZoomLevel.MonthWeek, 1.0, 2.57)]      // 18px per week / 7 days
+[InlineData(TimelineZoomLevel.QuarterMonth, 1.0, 0.67)]   // 20px per month / 30 days  
+[InlineData(TimelineZoomLevel.YearQuarter, 1.0, 0.27)]    // 24px per quarter / 90 days
 public void CalculateEffectiveDayWidth_AllZoomLevels_ReturnsCorrectValues(
     TimelineZoomLevel level, double factor, double expected)
 {
@@ -177,39 +177,39 @@ public class TimelineZoomTests
 {
     [Theory]
     [InlineData(1.0, 25.0)]   // Base factor
-    [InlineData(1.6, 40.0)]   // Backward compatibility
-    [InlineData(0.5, 12.5)]   // Minimum factor
-    [InlineData(3.0, 75.0)]   // Maximum factor
-    public void CalculateEffectiveDayWidth_MonthDay_ScalesCorrectly(
+    [InlineData(1.6, 4.11)]   // 1.6x zoom factor  
+    [InlineData(0.5, 1.29)]   // Below minimum gets clamped to 1.0x
+    [InlineData(3.0, 7.71)]   // Maximum factor for MonthWeek
+    public void CalculateEffectiveDayWidth_MonthWeek_ScalesCorrectly(
         double zoomFactor, double expectedWidth)
     {
         // Arrange
-        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay);
+        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthWeek);
 
         // Act
         var effectiveWidth = config.GetEffectiveDayWidth(zoomFactor);
 
         // Assert
-        Assert.Equal(expectedWidth, effectiveWidth, precision: 1);
+        Assert.Equal(expectedWidth, effectiveWidth, precision: 2);
     }
 
     [Theory]
-    [InlineData(-0.5, 0.5)]   // Below minimum gets clamped
-    [InlineData(0.3, 0.5)]    // Below minimum gets clamped  
-    [InlineData(3.5, 3.0)]    // Above maximum gets clamped
-    [InlineData(5.0, 3.0)]    // Above maximum gets clamped
+    [InlineData(-0.5, 1.0)]   // Below minimum gets clamped to 1.0x
+    [InlineData(0.3, 1.0)]    // Below minimum gets clamped to 1.0x
+    [InlineData(3.5, 3.0)]    // Above maximum gets clamped to 3.0x
+    [InlineData(5.0, 3.0)]    // Above maximum gets clamped to 3.0x
     public void ZoomFactorClamping_OutOfBounds_ClampsToValidRange(
         double input, double expected)
     {
         // Arrange
-        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthDay);
+        var config = TimelineZoomService.GetConfiguration(TimelineZoomLevel.MonthWeek);
 
         // Act
         var clampedWidth = config.GetEffectiveDayWidth(input);
-        var expectedWidth = config.BaseDayWidth * expected;
+        var expectedWidth = (config.BaseUnitWidth * expected) / config.TemplateUnitDays;
 
         // Assert
-        Assert.Equal(expectedWidth, clampedWidth, precision: 1);
+        Assert.Equal(expectedWidth, clampedWidth, precision: 2);
     }
 }
 ```

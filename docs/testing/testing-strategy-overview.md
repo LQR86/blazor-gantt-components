@@ -43,13 +43,13 @@ Our testing strategy employs a **three-tier architecture** designed to balance d
 **Example**:
 ```csharp
 [Theory]
-[InlineData(TimelineZoomLevel.WeekDay, 1.0, 60.0)]
-[InlineData(TimelineZoomLevel.MonthDay, 2.0, 50.0)]
+[InlineData(TimelineZoomLevel.WeekDay, 1.0, 12.0)]        // 12px per day
+[InlineData(TimelineZoomLevel.MonthWeek, 2.0, 5.14)]      // 18px * 2.0 / 7 days
 public void ZoomCalculation_AllLevels_ReturnsCorrectDayWidth(
     TimelineZoomLevel level, double factor, double expected)
 {
     var result = TimelineZoomService.CalculateEffectiveDayWidth(level, factor);
-    Assert.Equal(expected, result, 1);
+    Assert.Equal(expected, result, 2);
 }
 ```
 

@@ -357,7 +357,7 @@ public partial class TimelineView : ComponentBase, IDisposable
         // COORDINATE SYSTEM FIX: Calculate width using template-based coordinate system
         // instead of direct duration to ensure alignment between start and end positions
         var startPixel = DateToPixel(task.StartDate.ToUtcDateTime());
-        var endPixel = DateToPixel(task.EndDate.ToUtcDateTime().AddDays(1)); // +1 for inclusive end date
+        var endPixel = DateToPixel(task.EndDate.ToUtcDateTime()); // Exclusive end date (standard Gantt practice)
         var width = Math.Max(1.0, endPixel - startPixel); // Minimum 1px width
 
         return width;

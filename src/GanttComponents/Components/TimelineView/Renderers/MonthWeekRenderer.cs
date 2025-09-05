@@ -20,7 +20,6 @@ public class MonthWeekRenderer : BaseTimelineRenderer
     /// </summary>
     public MonthWeekRenderer(
         IUniversalLogger logger,
-        IGanttI18N i18n,
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
@@ -28,7 +27,7 @@ public class MonthWeekRenderer : BaseTimelineRenderer
         double zoomFactor,
         int headerMonthHeight,
         int headerDayHeight)
-        : base(logger, i18n, dateFormatter, startDate, endDate,
+        : base(logger, dateFormatter, startDate, endDate,
                zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight)
     {
     }

@@ -29,10 +29,7 @@ builder.Services.AddScoped<IUniversalLogger, UniversalLogger>();
 builder.Services.AddScoped<IWbsCodeGenerationService, WbsCodeGenerationService>();
 builder.Services.AddScoped<ISimpleTaskGeneratorService, SimpleTaskGeneratorService>();
 
-// Add I18N service as singleton to maintain state across components
-builder.Services.AddSingleton<IGanttI18N, GanttI18N>();
-
-// Add DateFormatHelper as scoped service
+// DateFormatHelper configured for English date formatting
 builder.Services.AddScoped<DateFormatHelper>();
 
 var app = builder.Build();

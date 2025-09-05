@@ -15,7 +15,6 @@ public abstract class BaseTimelineRenderer
 {
     // === DEPENDENCY INJECTION ===
     protected IUniversalLogger Logger { get; }
-    protected IGanttI18N I18N { get; }
     protected DateFormatHelper DateFormatter { get; }
 
     // === TIMELINE PROPERTIES ===
@@ -45,21 +44,10 @@ public abstract class BaseTimelineRenderer
     protected double DayWidth => TemplateConfig.GetEffectiveDayWidth(ZoomFactor);
 
     /// <summary>
-    /// Constructor for dependency injection and configuration.
-    /// Includes automatic integral day width validation for visual quality.
-    /// </summary>
-    /// <param name="logger">Universal logger service</param>
-    /// <param name="i18n">Internationalization service</param>
-    /// <param name="dateFormatter">Date formatting helper</param>
-    /// <param name="startDate">Timeline start date</param>
-    /// <param name="endDate">Timeline end date</param>
-    /// <param name="dayWidth">Width of each day in pixels (must be integral)</param>
-    /// <summary>
     /// Constructor for dependency injection and template-based configuration.
     /// Includes automatic integral unit width validation for visual quality.
     /// </summary>
     /// <param name="logger">Universal logger service</param>
-    /// <param name="i18n">Internationalization service</param>
     /// <param name="dateFormatter">Date formatting helper</param>
     /// <param name="startDate">Timeline start date</param>
     /// <param name="endDate">Timeline end date</param>
@@ -69,7 +57,6 @@ public abstract class BaseTimelineRenderer
     /// <param name="headerDayHeight">Height of secondary header</param>
     protected BaseTimelineRenderer(
         IUniversalLogger logger,
-        IGanttI18N i18n,
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
@@ -79,7 +66,6 @@ public abstract class BaseTimelineRenderer
         int headerDayHeight)
     {
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        I18N = i18n ?? throw new ArgumentNullException(nameof(i18n));
         DateFormatter = dateFormatter ?? throw new ArgumentNullException(nameof(dateFormatter));
 
         StartDate = startDate;

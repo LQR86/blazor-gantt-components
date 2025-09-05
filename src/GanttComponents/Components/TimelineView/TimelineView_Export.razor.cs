@@ -36,7 +36,6 @@ public partial class TimelineView_Export : ComponentBase
 {
     // === DEPENDENCY INJECTION ===
     [Inject] private IUniversalLogger Logger { get; set; } = default!;
-    [Inject] private IGanttI18N I18N { get; set; } = default!;
     [Inject] private DateFormatHelper DateFormatter { get; set; } = default!;
 
     // === COMPONENT PARAMETERS (SIMPLIFIED - NO INTERACTIONS) ===
@@ -140,7 +139,6 @@ public partial class TimelineView_Export : ComponentBase
             var tempRenderer = RendererFactory.CreateRenderer(
                 ZoomLevel,
                 Logger,
-                I18N,
                 DateFormatter,
                 StartDate,
                 EndDate,
@@ -213,7 +211,6 @@ public partial class TimelineView_Export : ComponentBase
             currentRenderer = RendererFactory.CreateRenderer(
                 ZoomLevel,
                 Logger,
-                I18N,
                 DateFormatter,
                 StartDate,
                 EndDate,

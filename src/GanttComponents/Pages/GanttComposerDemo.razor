@@ -6,24 +6,23 @@
 @using GanttComponents.Models.Filtering
 @using GanttComponents.Services
 @inject IGanttTaskService TaskService
-@inject IGanttI18N I18N
 
-<PageTitle>@I18N.T("page.title.gantt-composer-demo")</PageTitle>
+<PageTitle>GanttComposer Demo</PageTitle>
 
-<h1>🎯 @I18N.T("demo.composer.title")</h1>
+<h1>🎯 GanttComposer Integration Demo</h1>
 
-<p>@I18N.T("demo.composer.description")</p>
+<p>This page demonstrates the GanttComposer component integrating TaskGrid and TimelineView together.</p>
 
 <div class="demo-controls mb-3">
     <div class="btn-group" role="group">
         <button class="btn btn-outline-primary" @onclick="LoadSampleData">
-            📊 @I18N.T("demo.load-sample-data")
+            📊 Load Sample Data
         </button>
         <button class="btn btn-outline-secondary" @onclick="ToggleDebugAlignment">
-            🔍 @(ShowDebugAlignment ? I18N.T("demo.hide-alignment") : I18N.T("demo.show-alignment"))
+            🔍 @(ShowDebugAlignment ? "Hide Row Alignment" : "Show Row Alignment")
         </button>
         <button class="btn btn-outline-info" @onclick="ClearSelection">
-            ❌ @I18N.T("demo.clear-selection")
+            ❌ Clear Selection
         </button>
     </div>
 </div>
@@ -31,7 +30,7 @@
 @if (Tasks?.Any() == true)
 {
     <div class="demo-info alert alert-info">
-        <strong>@I18N.T("demo.composer.integration-features")</strong>
+        <strong>Integration Features:</strong>
         <ul class="mb-0">
             <li>✅ <strong>Side-by-side layout</strong>: TaskGrid on left, TimelineView on right</li>
             <li>✅ <strong>Shared data</strong>: Same task list displayed in both components</li>
@@ -106,7 +105,7 @@
 else
 {
     <div class="alert alert-warning">
-        @I18N.T("demo.no-tasks-loaded")
+        No tasks loaded. Click "Load Sample Data" to see the GanttComposer in action.
     </div>
 }
 

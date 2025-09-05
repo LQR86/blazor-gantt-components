@@ -2,7 +2,6 @@
 @using GanttComponents.Services
 @using Microsoft.AspNetCore.Components
 @using System.Reflection
-@inject IGanttI18N I18N
 @inject IUniversalLogger Logger
 @implements IDisposable
 
@@ -14,7 +13,7 @@
             <div class="zoom-level-dropdown">
                 @if (EffectiveConfig.ShowLabels)
                 {
-                    <span class="zoom-controls-label">@I18N.T("ZoomControls.ZoomLevel")</span>
+                    <span class="zoom-controls-label">Zoom Level</span>
                 }
                 <select class="zoom-preset-dropdown" 
                         value="@CurrentZoomLevel" 
@@ -23,8 +22,8 @@
                     @foreach (var level in GetVisibleZoomLevels())
                     {
                         var config = TimelineZoomService.GetConfiguration(level);
-                        <option value="@level" title="@I18N.T(config.DescriptionKey)">
-                            @I18N.T(config.DisplayNameKey)
+                        <option value="@level" title="@GetZoomLevelDescription(level)">
+                            @GetZoomLevelDisplayName(level)
                         </option>
                     }
                 </select>
@@ -35,7 +34,7 @@
             <div class="zoom-level-presets">
                 @if (EffectiveConfig.ShowLabels)
                 {
-                    <span class="zoom-controls-label">@I18N.T("ZoomControls.ZoomLevel")</span>
+                    <span class="zoom-controls-label">Zoom Level</span>
                 }
                 
                 @foreach (var level in GetVisibleZoomLevels())
@@ -47,9 +46,9 @@
                     <button type="button" 
                             class="@buttonClass" 
                             disabled="@(isActive || Disabled)"
-                            title="@I18N.T(config.DescriptionKey)"
+                            title="@GetZoomLevelDescription(level)"
                             @onclick="() => OnZoomLevelSelected(level)">
-                        @I18N.T(config.DisplayNameKey)
+                        @GetZoomLevelDisplayName(level)
                     </button>
                 }
             </div>
@@ -61,11 +60,11 @@
         <div class="zoom-current-state">
             @if (EffectiveConfig.ShowLabels)
             {
-                <span class="zoom-controls-label">@I18N.T("ZoomControls.Current")</span>
+                <span class="zoom-controls-label">Current</span>
             }
             
             <div class="zoom-current-display">
-                <span class="zoom-level-name">@I18N.T(TimelineZoomService.GetConfiguration(CurrentZoomLevel).DisplayNameKey)</span>
+                <span class="zoom-level-name">@GetZoomLevelDisplayName(CurrentZoomLevel)</span>
                 @if (EffectiveConfig.ShowZoomFactor)
                 {
                     <span class="zoom-factor-display">@($"{CurrentZoomFactor:P0}")</span>
@@ -83,31 +82,31 @@
         <div class="zoom-quick-actions">
             @if (EffectiveConfig.ShowLabels)
             {
-                <span class="zoom-controls-label">@I18N.T("ZoomControls.QuickActions")</span>
+                <span class="zoom-controls-label">Quick Actions</span>
             }
             
             <div class="zoom-action-buttons">
                 <button type="button" 
                         class="zoom-action-button zoom-in" 
                         disabled="@(Disabled || IsAtMaxZoom())"
-                        title="@I18N.T("ZoomControls.ZoomIn")"
+                        title="Zoom In"
                         @onclick="OnZoomIn">
                     <span class="zoom-icon">+</span>
                     @if (EffectiveConfig.ShowActionLabels)
                     {
-                        <span class="zoom-action-text">@I18N.T("ZoomControls.ZoomIn")</span>
+                        <span class="zoom-action-text">Zoom In</span>
                     }
                 </button>
                 
                 <button type="button" 
                         class="zoom-action-button zoom-out" 
                         disabled="@(Disabled || IsAtMinZoom())"
-                        title="@I18N.T("ZoomControls.ZoomOut")"
+                        title="Zoom Out"
                         @onclick="OnZoomOut">
                     <span class="zoom-icon">−</span>
                     @if (EffectiveConfig.ShowActionLabels)
                     {
-                        <span class="zoom-action-text">@I18N.T("ZoomControls.ZoomOut")</span>
+                        <span class="zoom-action-text">Zoom Out</span>
                     }
                 </button>
             </div>
@@ -242,22 +241,12 @@
         return field?.GetCustomAttributes(typeof(ObsoleteAttribute), false).Length > 0;
     }
     
-    // Component lifecycle - reactive i18n support
+    // Component lifecycle - hardcoded English support
     protected override void OnInitialized()
     {
-        Logger.LogComponentLifecycle("TimelineZoomControls", "OnInitialized - Reactive i18n enabled", new { 
+        Logger.LogComponentLifecycle("TimelineZoomControls", "OnInitialized", new { 
             CurrentZoomLevel, Preset, MinZoomLevel, MaxZoomLevel
         });
-        
-        // Subscribe to language changes to force re-render when locale changes
-        I18N.LanguageChanged += OnLanguageChangedFromService;
-    }
-    
-    private void OnLanguageChangedFromService()
-    {
-        // Force re-render when language changes to update localized zoom level names
-        Logger.LogComponentLifecycle("TimelineZoomControls", "Language changed - forcing re-render", null);
-        InvokeAsync(StateHasChanged);
     }
     
     // Event handlers
@@ -338,9 +327,32 @@
         return result;
     }
     
+    private string GetZoomLevelDisplayName(TimelineZoomLevel level)
+    {
+        return level switch
+        {
+            TimelineZoomLevel.WeekDay => "Week-Day",
+            TimelineZoomLevel.MonthWeek => "Month-Week",
+            TimelineZoomLevel.QuarterMonth => "Quarter-Month",
+            TimelineZoomLevel.YearQuarter => "Year-Quarter",
+            _ => level.ToString()
+        };
+    }
+    
+    private string GetZoomLevelDescription(TimelineZoomLevel level)
+    {
+        return level switch
+        {
+            TimelineZoomLevel.WeekDay => "Weekly view showing individual days",
+            TimelineZoomLevel.MonthWeek => "Monthly view with weekly breakdown",
+            TimelineZoomLevel.QuarterMonth => "Quarterly view with monthly breakdown",
+            TimelineZoomLevel.YearQuarter => "Yearly view with quarterly breakdown",
+            _ => $"{level} zoom level"
+        };
+    }
+    
     public void Dispose()
     {
-        // Unsubscribe from language changes to prevent memory leaks
-        I18N.LanguageChanged -= OnLanguageChangedFromService;
+        // Component cleanup - no longer needed for language changes
     }
 }

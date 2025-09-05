@@ -15,12 +15,11 @@ public class QuarterMonthRenderer : BaseTimelineRenderer
 {
     /// <summary>
     /// Constructor for QuarterMonth template renderer with dependency injection.
-    /// Uses template-based approach: 20px per month with 3.5x max zoom.
-    /// Template unit: 1 month (30 days) = 20px base width.
+    /// Uses template-based approach: 30px per month with 4.0x max zoom.
+    /// Template unit: 1 month (≈30 days) = 30px base width.
     /// </summary>
     public QuarterMonthRenderer(
         IUniversalLogger logger,
-        IGanttI18N i18n,
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
@@ -28,7 +27,7 @@ public class QuarterMonthRenderer : BaseTimelineRenderer
         double zoomFactor,
         int headerMonthHeight,
         int headerDayHeight)
-        : base(logger, i18n, dateFormatter, startDate, endDate,
+        : base(logger, dateFormatter, startDate, endDate,
                zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight)
     {
         ValidateRenderer();

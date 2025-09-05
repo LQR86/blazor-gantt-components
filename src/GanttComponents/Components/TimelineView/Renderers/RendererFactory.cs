@@ -16,7 +16,6 @@ public static class RendererFactory
     /// </summary>
     /// <param name="zoomLevel">The timeline zoom level</param>
     /// <param name="logger">Universal logger service</param>
-    /// <param name="i18n">Internationalization service</param>
     /// <param name="dateFormatter">Date formatting helper</param>
     /// <param name="startDate">Timeline start date</param>
     /// <param name="endDate">Timeline end date</param>
@@ -28,7 +27,6 @@ public static class RendererFactory
     public static BaseTimelineRenderer CreateRenderer(
         TimelineZoomLevel zoomLevel,
         IUniversalLogger logger,
-        IGanttI18N i18n,
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
@@ -42,22 +40,22 @@ public static class RendererFactory
 
             // Week-Day Template: 12px per day, max 2.5x zoom
             TimelineZoomLevel.WeekDay => new WeekDayRenderer(
-                logger, i18n, dateFormatter, startDate, endDate,
+                logger, dateFormatter, startDate, endDate,
                 zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight),
 
             // Month-Week Template: 18px per week, max 3.0x zoom
             TimelineZoomLevel.MonthWeek => new MonthWeekRenderer(
-                logger, i18n, dateFormatter, startDate, endDate,
+                logger, dateFormatter, startDate, endDate,
                 zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight),
 
-            // Quarter-Month Template: 20px per month, max 3.5x zoom
+            // Quarter-Month Template: 30px per month, max 4.0x zoom
             TimelineZoomLevel.QuarterMonth => new QuarterMonthRenderer(
-                logger, i18n, dateFormatter, startDate, endDate,
+                logger, dateFormatter, startDate, endDate,
                 zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight),
 
             // Year-Quarter Template: 24px per quarter, max 4.0x zoom
             TimelineZoomLevel.YearQuarter => new YearQuarterRenderer(
-                logger, i18n, dateFormatter, startDate, endDate,
+                logger, dateFormatter, startDate, endDate,
                 zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight),
 
             // Unsupported levels (future implementations)

@@ -15,7 +15,6 @@ public partial class TimelineView : ComponentBase, IDisposable
 {
     // === DEPENDENCY INJECTION ===
     [Inject] private IUniversalLogger Logger { get; set; } = default!;
-    [Inject] private IGanttI18N I18N { get; set; } = default!;
     [Inject] private DateFormatHelper DateFormatter { get; set; } = default!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
@@ -165,7 +164,6 @@ public partial class TimelineView : ComponentBase, IDisposable
             currentRenderer = RendererFactory.CreateRenderer(
                 ZoomLevel,
                 Logger,
-                I18N,
                 DateFormatter,
                 StartDate,
                 EndDate,
@@ -218,7 +216,6 @@ public partial class TimelineView : ComponentBase, IDisposable
     // === COMPONENT LIFECYCLE ===
     protected override void OnInitialized()
     {
-        I18N.LanguageChanged += OnLanguageChanged;
         CalculateTimelineRange();
     }
 
@@ -307,7 +304,6 @@ public partial class TimelineView : ComponentBase, IDisposable
             var tempRenderer = RendererFactory.CreateRenderer(
                 ZoomLevel,
                 Logger,
-                I18N,
                 DateFormatter,
                 StartDate,
                 EndDate,
@@ -433,16 +429,6 @@ public partial class TimelineView : ComponentBase, IDisposable
         {
             await OnScrollChanged.InvokeAsync(e);
         }
-    }
-
-    private void OnLanguageChanged()
-    {
-        try
-        {
-            InvokeAsync(StateHasChanged);
-        }
-        catch (ObjectDisposedException) { }
-        catch (InvalidOperationException) { }
     }
 
     // === VIEWPORT MANAGEMENT ===
@@ -706,13 +692,6 @@ public partial class TimelineView : ComponentBase, IDisposable
     // === DISPOSAL ===
     public void Dispose()
     {
-        try
-        {
-            if (I18N != null)
-            {
-                I18N.LanguageChanged -= OnLanguageChanged;
-            }
-        }
-        catch (ObjectDisposedException) { }
+        // Component cleanup - no longer needed for language changes
     }
 }

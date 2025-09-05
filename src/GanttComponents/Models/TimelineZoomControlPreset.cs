@@ -96,7 +96,7 @@ public class TimelineZoomControlConfiguration
     public string CssClass { get; set; } = "";
     public bool UseDropdownForPresets { get; set; } = false;
     public int MaxVisiblePresets { get; set; } = 13; // Show all 13 levels by default
-    
+
     // PHASE 2: Continuous Zooming UI Configuration
     public bool ShowZoomFactorSlider { get; set; } = false; // Optional slider for precise zoom control
 

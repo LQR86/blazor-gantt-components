@@ -182,8 +182,9 @@
     [Parameter] public TimelineZoomLevel MinZoomLevel { get; set; } = TimelineZoomLevel.YearQuarter;  // Start from strategic overview
     [Parameter] public TimelineZoomLevel MaxZoomLevel { get; set; } = TimelineZoomLevel.WeekDay;    // End at detailed daily planning
     
-    // Preset-only approach: Manual zoom controls removed for v0.8.5
-    // All zoom control is handled via preset level selection only
+    // Hybrid continuous zooming: Combines template switching with factor adjustment
+    // Priority 1: Continuous factor zoom within template range
+    // Priority 2: Template switching when factor limits reached
     
     // Effective configuration based on preset or custom parameters
     private TimelineZoomControlConfiguration EffectiveConfig

@@ -1,1 +1,0 @@
-we should use the  common preset patterns like week-day/month-week/quarter-month/year-quarter patterns + SVG continuous zooming capability to provide users more choices, better experience

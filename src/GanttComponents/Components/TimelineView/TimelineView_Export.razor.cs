@@ -123,8 +123,8 @@ public partial class TimelineView_Export : ComponentBase
         StartDate = expandedBounds.start;
         EndDate = expandedBounds.end;
 
-        // Calculate dimensions
-        var totalDays = (EndDate - StartDate).Days + 1;
+        // Calculate dimensions using StartDate(inclusive) EndDate(exclusive) semantics
+        var totalDays = (EndDate - StartDate).Days;
         TotalWidth = Math.Max(100, (int)(totalDays * DayWidth));
         TotalHeight = Math.Max(50, Tasks?.Count * RowHeight ?? 0);
     }
@@ -172,11 +172,12 @@ public partial class TimelineView_Export : ComponentBase
     }
 
     /// <summary>
-    /// Calculate task width in pixels. Simplified for export - no complex logic needed.
+    /// Calculate task width in pixels using StartDate(inclusive) EndDate(exclusive) semantics.
+    /// Duration = EndDate - StartDate (no +1 needed for exclusive end date).
     /// </summary>
     protected double CalculateTaskWidth(GanttTask task)
     {
-        var duration = (task.EndDate.Date - task.StartDate.Date).TotalDays + 1;
+        var duration = (task.EndDate.Date - task.StartDate.Date).TotalDays;
         return duration * DayWidth;
     }
 

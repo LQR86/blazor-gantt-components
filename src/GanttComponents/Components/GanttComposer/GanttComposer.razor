@@ -159,8 +159,8 @@
         
         foreach (var task in Tasks)
         {
-            // Calculate pixel width for this task
-            var duration = (task.EndDate.ToUtcDateTime() - task.StartDate.ToUtcDateTime()).TotalDays + 1;
+            // Calculate pixel width using StartDate(inclusive) EndDate(exclusive) semantics
+            var duration = (task.EndDate.ToUtcDateTime() - task.StartDate.ToUtcDateTime()).TotalDays;
             var pixelWidth = duration * dayWidth;
             
             // If below threshold, mark as tiny

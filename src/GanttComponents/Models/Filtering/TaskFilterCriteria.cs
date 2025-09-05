@@ -149,10 +149,10 @@ public class TaskFilterCriteria
         if (ShowOnlyRootTasks && task.ParentId.HasValue)
             return false;
 
-        // Task duration filter
+        // Task duration filter using StartDate(inclusive) EndDate(exclusive) semantics
         if (MinTaskDurationDays.HasValue)
         {
-            var taskDurationDays = (task.EndDate.ToUtcDateTime() - task.StartDate.ToUtcDateTime()).TotalDays + 1;
+            var taskDurationDays = (task.EndDate.ToUtcDateTime() - task.StartDate.ToUtcDateTime()).TotalDays;
             if (taskDurationDays < MinTaskDurationDays.Value)
                 return false;
         }

@@ -294,6 +294,12 @@ public abstract class BaseTimelineRenderer
     /// <param name="endDate">End date of the range (inclusive)</param>
     /// <returns>Width in pixels for the date range</returns>
     /// <exception cref="ArgumentException">Thrown when date range is invalid</exception>
+    /// <summary>
+    /// Calculate coordinate width for a date range using StartDate(inclusive) EndDate(exclusive) semantics.
+    /// </summary>
+    /// <param name="startDate">Start date (inclusive)</param>
+    /// <param name="endDate">End date (exclusive)</param>
+    /// <returns>Width in pixels</returns>
     protected double CalculateCoordinateWidth(DateTime startDate, DateTime endDate)
     {
         if (endDate < startDate)
@@ -301,8 +307,9 @@ public abstract class BaseTimelineRenderer
             throw new ArgumentException($"End date ({endDate:yyyy-MM-dd}) cannot be before start date ({startDate:yyyy-MM-dd})");
         }
 
-        // Calculate inclusive date range in days
-        var days = (endDate.Date - startDate.Date).Days + 1;
+        // Calculate inclusive start, exclusive end date range in days
+        // CORRECTED: No +1 needed for exclusive end date semantics
+        var days = (endDate.Date - startDate.Date).Days;
         return days * DayWidth;
     }
 
@@ -350,12 +357,14 @@ public abstract class BaseTimelineRenderer
     // SoC Enhancement: Base class handles coordinate calculation + validation, renderers focus on logic
 
     /// <summary>
-    /// COORDINATE-SAFE: Creates SVG rectangle with validated positioning.
+    /// COORDINATE-SAFE: Creates SVG rectangle with validated positioning for HEADER CELLS.
+    /// Headers use inclusive end dates (e.g., full weeks, months), so this method
+    /// converts to exclusive semantics for coordinate calculations.
     /// SoC: Base class responsibility = coordinate calculation, renderer responsibility = what to show.
     /// Automatically uses coordinate system and validates consistency in DEBUG builds.
     /// </summary>
     /// <param name="startDate">Start date of the rectangle (inclusive)</param>
-    /// <param name="endDate">End date of the rectangle (inclusive)</param>
+    /// <param name="endDate">End date of the rectangle (inclusive - last day to display)</param>
     /// <param name="y">Y position in pixels</param>
     /// <param name="height">Height in pixels</param>
     /// <param name="cssClass">CSS class for styling</param>
@@ -363,7 +372,8 @@ public abstract class BaseTimelineRenderer
     protected string CreateValidatedSVGRect(DateTime startDate, DateTime endDate, int y, int height, string cssClass)
     {
         var x = CalculateCoordinateX(startDate);
-        var width = CalculateCoordinateWidth(startDate, endDate);
+        // HEADER FIX: Convert inclusive endDate to exclusive for coordinate calculation
+        var width = CalculateCoordinateWidth(startDate, endDate.AddDays(1));
 
         // Automatic validation in DEBUG builds - catches coordinate issues at creation time
         ValidateCoordinateConsistency(startDate, x, $"rect for {cssClass}");
@@ -372,12 +382,13 @@ public abstract class BaseTimelineRenderer
     }
 
     /// <summary>
-    /// COORDINATE-SAFE: Creates SVG text with validated center positioning.
+    /// COORDINATE-SAFE: Creates SVG text with validated center positioning for HEADER CELLS.
+    /// Headers use inclusive end dates, so this method converts to exclusive semantics.
     /// SoC: Base class handles coordinate calculation, renderer provides content and styling.
     /// Automatically centers text within the date range bounds.
     /// </summary>
     /// <param name="startDate">Start date of the text container (inclusive)</param>
-    /// <param name="endDate">End date of the text container (inclusive)</param>
+    /// <param name="endDate">End date of the text container (inclusive - last day to display)</param>
     /// <param name="y">Y position in pixels (typically center of container)</param>
     /// <param name="text">Text content to display</param>
     /// <param name="cssClass">CSS class for text styling</param>
@@ -385,7 +396,8 @@ public abstract class BaseTimelineRenderer
     protected string CreateValidatedSVGText(DateTime startDate, DateTime endDate, int y, string text, string cssClass)
     {
         var x = CalculateCoordinateX(startDate);
-        var width = CalculateCoordinateWidth(startDate, endDate);
+        // HEADER FIX: Convert inclusive endDate to exclusive for coordinate calculation
+        var width = CalculateCoordinateWidth(startDate, endDate.AddDays(1));
         var centerX = x + width / 2;
 
         // Automatic validation in DEBUG builds

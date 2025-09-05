@@ -272,7 +272,7 @@ public partial class TimelineView : ComponentBase, IDisposable
         // Step 2: Get expanded boundaries for SVG canvas sizing
         // The headers need expanded boundaries to prevent truncation, so the SVG canvas must be wide enough
         var expandedBounds = GetExpandedTimelineBounds();
-        var expandedDays = (expandedBounds.end - expandedBounds.start).Days + 1;
+        var expandedDays = (expandedBounds.end - expandedBounds.start).Days;
 
         // CRITICAL FIX: Use expanded boundaries as the unified coordinate system reference
         // This ensures headers and taskbars use the same coordinate system

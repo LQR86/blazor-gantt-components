@@ -4,6 +4,7 @@ namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
 /// Static helper class for SVG rendering utilities shared across timeline renderers.
+/// Contains core coordinate conversion and layout calculation methods.
 /// Extracted from TimelineView.SVGRendering.cs to support composition architecture.
 /// </summary>
 public static class SVGRenderingHelpers
@@ -194,14 +195,14 @@ public static class SVGRenderingHelpers
     // === DATE UTILITIES ===
 
     /// <summary>
-    /// Calculates the number of days between two dates (inclusive).
+    /// Calculate days between start and end using StartDate(inclusive) EndDate(exclusive) semantics.
     /// </summary>
-    /// <param name="startDate">Start date</param>
-    /// <param name="endDate">End date</param>
+    /// <param name="startDate">Start date (inclusive)</param>
+    /// <param name="endDate">End date (exclusive)</param>
     /// <returns>Number of days</returns>
     public static int CalculateDaysBetween(DateTime startDate, DateTime endDate)
     {
-        return (endDate.Date - startDate.Date).Days + 1;
+        return (endDate.Date - startDate.Date).Days;
     }
 
     /// <summary>

@@ -151,8 +151,6 @@ window.timelineView = {
                 behavior: 'smooth'
             });
 
-            console.log(`TimelineView centering: Successfully centered task ${taskId} at position ${Math.max(0, targetScrollLeft)}`);
-
         } catch (error) {
             console.error(`TimelineView centering: Error centering task ${taskId}:`, error);
         }

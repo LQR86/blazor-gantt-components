@@ -4,9 +4,8 @@
 @using GanttComponents.Models
 @using GanttComponents.Services
 @inject IGanttTaskService TaskService
-@inject IGanttI18N I18N
 
-<PageTitle>@I18N.T("page.title.timeline-export-demo")</PageTitle>
+<PageTitle>Timeline Export Demo</PageTitle>
 
 <h1>📄 Timeline Export Component Demo</h1>
 
@@ -15,10 +14,10 @@
 <div class="demo-controls mb-3">
     <div class="btn-group" role="group">
         <button class="btn btn-outline-primary" @onclick="LoadSampleData">
-            📊 @I18N.T("demo.load-sample-data")
+            📊 Load Sample Data
         </button>
         <button class="btn btn-outline-info" @onclick="ClearSelection">
-            ❌ @I18N.T("demo.clear-selection")
+            ❌ Clear Selection
         </button>
     </div>
     
@@ -113,7 +112,7 @@ else
 @code {
     // === STATE MANAGEMENT ===
     private List<GanttTask>? Tasks { get; set; }
-    private TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px;
+    private TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeek;
     private double ZoomFactor { get; set; } = 1.0;
     private int? SelectedTaskId { get; set; }
     private int? HoveredTaskId { get; set; }

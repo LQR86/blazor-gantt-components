@@ -4,7 +4,6 @@
 @using GanttComponents.Models
 @using GanttComponents.Services
 @inject IGanttTaskService TaskService
-@inject IGanttI18N I18N
 @inject IUniversalLogger Logger
 
 <PageTitle>GanttComposer Zoom Integration Validation</PageTitle>
@@ -320,7 +319,7 @@ else
 
 @code {
     private List<GanttTask> Tasks { get; set; } = new();
-    private TimelineZoomLevel CurrentZoomLevel { get; set; } = TimelineZoomLevel.WeekDayOptimal50px;
+    private TimelineZoomLevel CurrentZoomLevel { get; set; } = TimelineZoomLevel.WeekDay;
     private double CurrentZoomFactor { get; set; } = 1.0;
     private bool ShowDebugAlignment { get; set; } = false;
     private int? SelectedTaskId { get; set; }
@@ -533,7 +532,7 @@ else
             
             // Test zoom change performance
             var zoomStart = DateTime.UtcNow;
-            CurrentZoomLevel = TimelineZoomLevel.MonthWeekOptimal50px;
+            CurrentZoomLevel = TimelineZoomLevel.MonthWeek;
             StateHasChanged();
             await Task.Delay(100);
             var zoomTime = (int)(DateTime.UtcNow - zoomStart).TotalMilliseconds;
@@ -585,10 +584,10 @@ else
             
             // Test that zoom controls affect GanttComposer
             var originalLevel = CurrentZoomLevel;
-            HandleZoomLevelChanged(TimelineZoomLevel.YearQuarterOptimal70px);
+            HandleZoomLevelChanged(TimelineZoomLevel.YearQuarter);
             await Task.Delay(100);
             
-            if (CurrentZoomLevel != TimelineZoomLevel.YearQuarterOptimal70px)
+            if (CurrentZoomLevel != TimelineZoomLevel.YearQuarter)
             {
                 integrationWorking = false;
             }

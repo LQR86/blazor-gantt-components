@@ -4,79 +4,53 @@ using GanttComponents.Services;
 namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
-/// MonthWeek 50px level renderer for TimelineView composition architecture.
+/// MonthWeek level renderer for TimelineView composition architecture.
 /// Handles month-week pattern with calculated day width validation.
 /// Primary Header: Month-Year ("February 2025", "March 2025")
 /// Secondary Header: Week start dates ("2/17", "2/24", "3/3") - Monday dates
-/// Cell Width: Calculated week cells based on day width (typically 8px day = 56px week)
 /// Optimized for medium-range planning with weekly breakdown by month.
 /// Includes union expansion for complete header rendering at timeline edges.
 /// </summary>
-public class MonthWeek50pxRenderer : BaseTimelineRenderer
+public class MonthWeekRenderer : BaseTimelineRenderer
 {
     /// <summary>
-    /// Constructor for MonthWeek 50px renderer with dependency injection.
-    /// Uses calculated day width for flexible week cell sizing.
-    /// Union expansion is handled automatically by the base class.
+    /// Constructor for MonthWeek template renderer with dependency injection.
+    /// Uses template-based approach: 18px per week with 3.0x max zoom.
+    /// Template unit: 1 week (7 days) = 18px base width.
     /// </summary>
-    public MonthWeek50pxRenderer(
+    public MonthWeekRenderer(
         IUniversalLogger logger,
-        IGanttI18N i18n,
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
-        double dayWidth,
-        int headerMonthHeight,
-        int headerDayHeight,
         TimelineZoomLevel zoomLevel,
-        double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
-               headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
+        double zoomFactor,
+        int headerMonthHeight,
+        int headerDayHeight)
+        : base(logger, dateFormatter, startDate, endDate,
+               zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight)
     {
-    }
-
-    /// <summary>
-    /// Calculate boundaries for primary header rendering (Month-Year displays).
-    /// MonthWeek pattern: Month headers need month boundaries for complete month coverage.
-    /// </summary>
-    /// <returns>Month boundary dates for primary month header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
-    {
-        var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(StartDate, EndDate);
-        return monthBounds;
-    }
-
-    /// <summary>
-    /// Calculate boundaries for secondary header rendering (Week start dates).
-    /// MonthWeek pattern: Week headers need week boundaries since weeks can cross month boundaries.
-    /// This is the KEY FIX: Week headers that span across months need week boundaries, not month boundaries.
-    /// </summary>
-    /// <returns>Week boundary dates for secondary week header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
-    {
-        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(StartDate, EndDate);
-        return weekBounds;
     }
 
     /// <summary>
     /// Renders the primary header with month-year displays.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
-        // Use expanded boundaries calculated by base class union logic
+        // Use expanded boundaries calculated by base class template-unit padding
         return RenderMonthHeader(StartDate, EndDate);
     }
 
     /// <summary>
     /// Renders the secondary header with week start dates.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()
     {
-        // Use expanded boundaries calculated by base class union logic
+        // Use expanded boundaries calculated by base class template-unit padding
         return RenderWeekHeader(StartDate, EndDate);
     }
 
@@ -94,6 +68,26 @@ public class MonthWeek50pxRenderer : BaseTimelineRenderer
     /// </summary>
     /// <returns>CSS class prefix</returns>
     protected override string GetCSSClass() => "monthweek-50px";
+
+    /// <summary>
+    /// Calculates logical unit boundaries for MonthWeek pattern.
+    /// Uses union of month and week boundaries to ensure both complete months and complete weeks.
+    /// </summary>
+    /// <param name="startDate">Original timeline start date</param>
+    /// <param name="endDate">Original timeline end date</param>
+    /// <returns>Union boundaries that guarantee complete months and weeks</returns>
+    protected override (DateTime start, DateTime end) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate)
+    {
+        // MonthWeek pattern: Union of month and week boundaries
+        var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(startDate, endDate);
+        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(startDate, endDate);
+
+        // Take the widest span (earliest start, latest end)
+        var unionStart = monthBounds.start < weekBounds.start ? monthBounds.start : weekBounds.start;
+        var unionEnd = monthBounds.end > weekBounds.end ? monthBounds.end : weekBounds.end;
+
+        return (unionStart, unionEnd);
+    }
 
     // === HEADER RENDERING METHODS ===
 

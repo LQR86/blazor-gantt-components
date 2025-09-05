@@ -36,7 +36,6 @@ public partial class TimelineView_Export : ComponentBase
 {
     // === DEPENDENCY INJECTION ===
     [Inject] private IUniversalLogger Logger { get; set; } = default!;
-    [Inject] private IGanttI18N I18N { get; set; } = default!;
     [Inject] private DateFormatHelper DateFormatter { get; set; } = default!;
 
     // === COMPONENT PARAMETERS (SIMPLIFIED - NO INTERACTIONS) ===
@@ -54,7 +53,7 @@ public partial class TimelineView_Export : ComponentBase
     [Parameter, EditorRequired] public int HeaderDayHeight { get; set; } = 24;
 
     /// <summary>Timeline zoom level determining day width and header grouping</summary>
-    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px;
+    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeek;
 
     /// <summary>Additional zoom factor applied to base day width (export typically uses 1.0)</summary>
     [Parameter] public double ZoomFactor { get; set; } = 1.0;
@@ -86,7 +85,7 @@ public partial class TimelineView_Export : ComponentBase
         get
         {
             var config = TimelineZoomService.GetConfiguration(ZoomLevel);
-            ValidateBaseDayWidth(config.BaseDayWidth);
+            ValidateBaseUnitWidth(config.BaseUnitWidth);
             var effectiveWidth = config.GetEffectiveDayWidth(ZoomFactor);
             ValidateEffectiveDayWidth(effectiveWidth);
             return effectiveWidth;
@@ -123,8 +122,8 @@ public partial class TimelineView_Export : ComponentBase
         StartDate = expandedBounds.start;
         EndDate = expandedBounds.end;
 
-        // Calculate dimensions
-        var totalDays = (EndDate - StartDate).Days + 1;
+        // Calculate dimensions using StartDate(inclusive) EndDate(exclusive) semantics
+        var totalDays = (EndDate - StartDate).Days;
         TotalWidth = Math.Max(100, (int)(totalDays * DayWidth));
         TotalHeight = Math.Max(50, Tasks?.Count * RowHeight ?? 0);
     }
@@ -140,11 +139,9 @@ public partial class TimelineView_Export : ComponentBase
             var tempRenderer = RendererFactory.CreateRenderer(
                 ZoomLevel,
                 Logger,
-                I18N,
                 DateFormatter,
                 StartDate,
                 EndDate,
-                DayWidth,
                 HeaderMonthHeight,
                 HeaderDayHeight,
                 ZoomFactor
@@ -173,21 +170,22 @@ public partial class TimelineView_Export : ComponentBase
     }
 
     /// <summary>
-    /// Calculate task width in pixels. Simplified for export - no complex logic needed.
+    /// Calculate task width in pixels using StartDate(inclusive) EndDate(exclusive) semantics.
+    /// Duration = EndDate - StartDate (no +1 needed for exclusive end date).
     /// </summary>
     protected double CalculateTaskWidth(GanttTask task)
     {
-        var duration = (task.EndDate.Date - task.StartDate.Date).TotalDays + 1;
+        var duration = (task.EndDate.Date - task.StartDate.Date).TotalDays;
         return duration * DayWidth;
     }
 
     // === VALIDATION METHODS (REUSED) ===
-    private void ValidateBaseDayWidth(double baseDayWidth)
+    private void ValidateBaseUnitWidth(double baseUnitWidth)
     {
-        if (Math.Abs(baseDayWidth - Math.Round(baseDayWidth)) > 0.001)
+        if (Math.Abs(baseUnitWidth - Math.Round(baseUnitWidth)) > 0.001)
         {
             throw new InvalidOperationException(
-                $"Base day width must be integral for proper alignment. Got: {baseDayWidth}");
+                $"Base unit width must be integral for proper alignment. Got: {baseUnitWidth}");
         }
     }
 
@@ -209,15 +207,13 @@ public partial class TimelineView_Export : ComponentBase
     {
         try
         {
-            // PURE COMPOSITION ARCHITECTURE: All zoom levels use BaseTimelineRenderer
+            // TEMPLATE-BASED ARCHITECTURE: All zoom levels use template configurations
             currentRenderer = RendererFactory.CreateRenderer(
                 ZoomLevel,
                 Logger,
-                I18N,
                 DateFormatter,
                 StartDate,
                 EndDate,
-                DayWidth,
                 HeaderMonthHeight,
                 HeaderDayHeight,
                 ZoomFactor

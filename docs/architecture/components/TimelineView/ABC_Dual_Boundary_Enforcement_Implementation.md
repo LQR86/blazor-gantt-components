@@ -19,20 +19,26 @@ protected abstract (DateTime start, DateTime end) CalculatePrimaryBoundaries();
 protected abstract (DateTime start, DateTime end) CalculateSecondaryBoundaries();
 ```
 
-### **2. Automatic Union Calculation (ENFORCED in base class)**
+### **2. Logical Unit Boundary Calculation (TEMPLATE METHOD in base class)**
 ```csharp
-// FINAL METHOD: Subclasses cannot override - ensures dual expansion
-protected (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
+// TEMPLATE METHOD: Base class provides structure, renderers provide implementation
+public (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
 {
-    var primaryBounds = CalculatePrimaryBoundaries();
-    var secondaryBounds = CalculateSecondaryBoundaries();
-    
-    // AUTOMATIC UNION: Take widest span for complete header rendering
-    var unionStart = Math.Min(primaryBounds.start, secondaryBounds.start);
-    var unionEnd = Math.Max(primaryBounds.end, secondaryBounds.end);
-    
-    return (unionStart, unionEnd);
+    try
+    {
+        // DELEGATE to renderer-specific logical unit implementation
+        var (expandedStart, expandedEnd) = GetLogicalUnitBoundaries(StartDate, EndDate);
+        return (expandedStart, expandedEnd);
+    }
+    catch (Exception ex)
+    {
+        // FALLBACK: Use original range if boundary calculation fails
+        return (StartDate, EndDate);
+    }
 }
+
+// ABSTRACT HOOK: Each renderer implements its specific logical units
+protected abstract (DateTime start, DateTime end) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate);
 ```
 
 ## 🎯 **ABC Composition Benefits**

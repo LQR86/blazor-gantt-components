@@ -3,28 +3,55 @@ using System.Globalization;
 namespace GanttComponents.Services;
 
 /// <summary>
-/// Culture-aware date formatting helper for internationalization support.
-/// Provides consistent date display formats across English and Chinese locales.
+/// Date formatting helper for consistent date display formats.
+/// Provides English date display formats for the Gantt components.
 /// </summary>
 public class DateFormatHelper
 {
-    private readonly IGanttI18N _i18n;
-
-    public DateFormatHelper(IGanttI18N i18n)
+    /// <summary>
+    /// Get the date format pattern for a given format key.
+    /// </summary>
+    /// <param name="formatKey">The format key (e.g., "date.short-format")</param>
+    /// <returns>The corresponding date format pattern</returns>
+    private string GetDateFormatPattern(string formatKey)
     {
-        _i18n = i18n ?? throw new ArgumentNullException(nameof(i18n));
+        return formatKey switch
+        {
+            "date.short-format" => "MM/dd/yyyy",
+            "date.month-year" => "MMM yyyy",
+            "date.month-short" => "MMM",
+            "date.day-number" => "%d",
+            "date.quarter-year" => "'Q'q yyyy",
+            "date.quarter-short" => "'Q'q",
+            "date.year" => "yyyy",
+            "date.decade" => "yyyy'-'yyyy",
+            "date.month-year-verbose" => "MMMM yyyy",
+            "date.day-abbrev" => "ddd",
+            "date.month-abbrev" => "MMM",
+            "date.quarter-minimal" => "q",
+            "date.year-short" => "yy",
+            "date.year-minimal" => "y",
+            "date.decade-short" => "yy's'",
+            "date.decade-minimal" => "yy",
+            "date.week-start" => "%d",
+            "date.week-start-day" => "%d MMM",
+            "date.week-range" => "MMM %d, yyyy",
+            "date.day-name-short" => "ddd",
+            "date.day-month-year" => "%d MMM yyyy",
+            _ => "MM/dd/yyyy" // Default fallback
+        };
     }
 
     /// <summary>
-    /// Format a date using culture-specific patterns from I18N translations.
+    /// Format a date using English date patterns.
     /// </summary>
     /// <param name="date">The date to format</param>
-    /// <param name="formatKey">I18N key for the date format pattern (default: "date.short-format")</param>
+    /// <param name="formatKey">Format key for the date format pattern (default: "date.short-format")</param>
     /// <returns>Formatted date string using current culture</returns>
     public string FormatDate(DateTime date, string formatKey = "date.short-format")
     {
-        // Get the format pattern from I18N translations
-        var pattern = _i18n.T(formatKey);
+        // Get the format pattern from English date format patterns
+        var pattern = GetDateFormatPattern(formatKey);
 
         // Handle special quarter formatting since .NET doesn't have a 'q' format specifier
         if (pattern.Contains("q"))
@@ -39,8 +66,8 @@ public class DateFormatHelper
             return HandleCustomDayFormat(date, pattern);
         }
 
-        // Use the correct culture matching the I18N setting instead of system culture
-        var culture = GetCultureInfo(_i18n.CurrentCulture);
+        // Use English culture for consistent formatting
+        var culture = GetCultureInfo("en-US");
         return date.ToString(pattern, culture);
     }
 
@@ -49,22 +76,22 @@ public class DateFormatHelper
     /// </summary>
     /// <param name="date">The date to format</param>
     /// <param name="culture">Specific culture to use for formatting</param>
-    /// <param name="formatKey">I18N key for the date format pattern</param>
+    /// <param name="formatKey">Format key for the date format pattern</param>
     /// <returns>Formatted date string using specified culture</returns>
     public string FormatDate(DateTime date, CultureInfo culture, string formatKey = "date.short-format")
     {
-        var pattern = _i18n.T(formatKey);
+        var pattern = GetDateFormatPattern(formatKey);
         return date.ToString(pattern, culture);
     }
 
     /// <summary>
     /// Get the current date format pattern for display purposes.
     /// </summary>
-    /// <param name="formatKey">I18N key for the date format pattern</param>
+    /// <param name="formatKey">Format key for the date format pattern</param>
     /// <returns>The date format pattern string</returns>
-    public string GetDateFormatPattern(string formatKey = "date.short-format")
+    public string GetCurrentDateFormatPattern(string formatKey = "date.short-format")
     {
-        return _i18n.T(formatKey);
+        return GetDateFormatPattern(formatKey);
     }
 
     /// <summary>
@@ -88,11 +115,11 @@ public class DateFormatHelper
     }
 
     /// <summary>
-    /// Format a date for zoom-aware timeline headers using specified I18N key.
+    /// Format a date for zoom-aware timeline headers using specified format key.
     /// Supports all timeline header units: quarter, year, decade, etc.
     /// </summary>
     /// <param name="date">The date to format</param>
-    /// <param name="formatKey">I18N key for the specific format</param>
+    /// <param name="formatKey">Format key for the specific format</param>
     /// <returns>Formatted date string for zoom-appropriate headers</returns>
     public string FormatTimelineHeader(DateTime date, string formatKey)
     {
@@ -141,8 +168,8 @@ public class DateFormatHelper
         var decadeEnd = decadeStart + 9;
 
         // Get the format pattern and culture
-        var pattern = _i18n.T("date.decade");
-        var culture = GetCultureInfo(_i18n.CurrentCulture);
+        var pattern = GetDateFormatPattern("date.decade");
+        var culture = GetCultureInfo("en-US");
 
         // For decade format, we need to substitute the start and end years
         // Pattern is expected to be like "yyyy'-'yyyy" 
@@ -178,8 +205,8 @@ public class DateFormatHelper
         // Replace 'q' with the quarter number
         var quarterPattern = pattern.Replace("q", quarter.ToString());
 
-        // Use the correct culture matching the I18N setting
-        var culture = GetCultureInfo(_i18n.CurrentCulture);
+        // Use English culture for consistent formatting
+        var culture = GetCultureInfo("en-US");
 
         try
         {
@@ -235,7 +262,7 @@ public class DateFormatHelper
         // If there are other format elements, process them normally
         if (result != dayNumber && result != pattern)
         {
-            var culture = GetCultureInfo(_i18n.CurrentCulture);
+            var culture = GetCultureInfo("en-US");
             try
             {
                 return date.ToString(result, culture);
@@ -251,9 +278,9 @@ public class DateFormatHelper
     }
 
     /// <summary>
-    /// Get CultureInfo from I18N culture string.
+    /// Get CultureInfo from culture string.
     /// </summary>
-    /// <param name="cultureString">Culture string from I18N service (e.g., "en-US", "zh-CN")</param>
+    /// <param name="cultureString">Culture string (e.g., "en-US", "zh-CN")</param>
     /// <returns>Corresponding CultureInfo object</returns>
     private CultureInfo GetCultureInfo(string cultureString)
     {

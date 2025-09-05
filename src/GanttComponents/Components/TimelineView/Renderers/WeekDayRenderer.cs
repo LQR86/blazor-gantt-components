@@ -4,78 +4,53 @@ using GanttComponents.Services;
 namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
-/// WeekDay 50px level renderer for TimelineView composition architecture.
+/// WeekDay level renderer for TimelineView composition architecture.
 /// Handles week-day pattern with integral day width validation.
 /// Primary Header: Week ranges ("February 17-23, 2025")
 /// Secondary Header: Day names with numbers ("Mon 17", "Tue 18")
-/// Cell Width: 50px day cells with 50px integral day width
 /// Optimized for detailed weekly planning with daily breakdown.
 /// Includes union expansion for complete header rendering at timeline edges.
 /// </summary>
-public class WeekDay50pxRenderer : BaseTimelineRenderer
+public class WeekDayRenderer : BaseTimelineRenderer
 {
     /// <summary>
-    /// Constructor for WeekDay 50px renderer with dependency injection.
-    /// Uses integral 50px day width for perfect SVG coordinate calculations.
-    /// Union expansion is handled automatically by the base class.
+    /// Constructor for WeekDay template renderer with dependency injection.
+    /// Uses template-based approach: 12px per day with 2.5x max zoom.
+    /// Template unit: 1 day = 12px base width.
     /// </summary>
-    public WeekDay50pxRenderer(
+    public WeekDayRenderer(
         IUniversalLogger logger,
-        IGanttI18N i18n,
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
-        int headerMonthHeight,
-        int headerDayHeight,
         TimelineZoomLevel zoomLevel,
-        double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate,
-               50.0, // INTEGRAL DAY WIDTH: 50px day width = 350px week cells (50px × 7 days)
-               headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
+        double zoomFactor,
+        int headerMonthHeight,
+        int headerDayHeight)
+        : base(logger, dateFormatter, startDate, endDate,
+               zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight)
     {
-    }
-
-    /// <summary>
-    /// Calculate boundaries for primary header rendering (Week ranges).
-    /// WeekDay pattern: Week headers need week boundaries for complete rendering.
-    /// </summary>
-    /// <returns>Week boundary dates for primary week header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
-    {
-        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(StartDate, EndDate);
-        return weekBounds;
-    }
-
-    /// <summary>
-    /// Calculate boundaries for secondary header rendering (Day names within weeks).
-    /// WeekDay pattern: Day headers need week boundaries for alignment with week structure.
-    /// </summary>
-    /// <returns>Week boundary dates for secondary day header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
-    {
-        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(StartDate, EndDate);
-        return weekBounds;
     }
 
     /// <summary>
     /// Renders the primary header with week ranges.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
-        // Use expanded boundaries calculated by base class union logic
+        // Use expanded boundaries calculated by base class template-unit padding
         return RenderWeekHeader(StartDate, EndDate);
     }
 
     /// <summary>
     /// Renders the secondary header with day names and numbers.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()
     {
-        // Use expanded boundaries calculated by base class union logic
+        // Use expanded boundaries calculated by base class template-unit padding
         return RenderDayHeader(StartDate, EndDate);
     }
 
@@ -93,6 +68,19 @@ public class WeekDay50pxRenderer : BaseTimelineRenderer
     /// </summary>
     /// <returns>CSS class prefix</returns>
     protected override string GetCSSClass() => "weekday-50px";
+
+    /// <summary>
+    /// Calculates logical unit boundaries for WeekDay pattern.
+    /// Ensures timeline range includes complete weeks from Monday to Sunday.
+    /// </summary>
+    /// <param name="startDate">Original timeline start date</param>
+    /// <param name="endDate">Original timeline end date</param>
+    /// <returns>Week boundaries that guarantee complete weeks</returns>
+    protected override (DateTime start, DateTime end) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate)
+    {
+        // WeekDay pattern: Expand to complete week boundaries (Monday to Sunday)
+        return BoundaryCalculationHelpers.GetWeekBoundaries(startDate, endDate);
+    }
 
     // === HEADER RENDERING METHODS ===
 

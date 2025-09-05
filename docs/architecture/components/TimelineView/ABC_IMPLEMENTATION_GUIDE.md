@@ -42,11 +42,24 @@ Timeline renderers were using **single boundary calculation** where one header t
 ```csharp
 public abstract class BaseTimelineRenderer
 {
-    // Template method enforcing ABC pattern
-    protected (DateTime, DateTime) CalculateHeaderBoundaries()
+    // Template method enforcing consistent boundary calculation
+    public (DateTime, DateTime) CalculateHeaderBoundaries()
     {
-        var (primaryStart, primaryEnd) = CalculatePrimaryBoundaries();
-        var (secondaryStart, secondaryEnd) = CalculateSecondaryBoundaries();
+        try
+        {
+            // Delegate to renderer-specific logical unit implementation
+            var (expandedStart, expandedEnd) = GetLogicalUnitBoundaries(StartDate, EndDate);
+            return (expandedStart, expandedEnd);
+        }
+        catch (Exception ex)
+        {
+            // Fallback to original range if boundary calculation fails
+            return (StartDate, EndDate);
+        }
+    }
+    
+    // Abstract method each renderer must implement
+    protected abstract (DateTime start, DateTime end) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate);
         
         // Automatic union calculation - always selects widest span
         var unionStart = primaryStart < secondaryStart ? primaryStart : secondaryStart;

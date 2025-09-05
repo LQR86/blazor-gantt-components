@@ -42,18 +42,10 @@ public static class TaskDisplayConstants
 
     /// <summary>
     /// Default zoom level for preset-only zoom approach.
-    /// MonthWeekOptimal50px level provides optimal balance for most use cases.
+    /// MonthWeek level provides optimal balance for most use cases.
     /// Shows monthly structure with weekly details at perfect 50px cell density.
     /// </summary>
-    public const TimelineZoomLevel DEFAULT_ZOOM_LEVEL = TimelineZoomLevel.MonthWeekOptimal50px;
-
-    /// <summary>
-    /// Minimum effective day width in pixels to maintain task visibility.
-    /// Prevents zoom-out beyond YearQuarter base level (3.0px/day).
-    /// This avoids the need for taskbar hiding strategies while maintaining
-    /// reasonable strategic planning capability at decade-level views.
-    /// </summary>
-    public const double MIN_EFFECTIVE_DAY_WIDTH = 3.0;
+    public const TimelineZoomLevel DEFAULT_ZOOM_LEVEL = TimelineZoomLevel.MonthWeek;
 
     /// <summary>
     /// Check if a task width meets the minimum display requirement.

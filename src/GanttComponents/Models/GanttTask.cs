@@ -24,13 +24,19 @@ public class GanttTask
     public string WbsCode { get; set; } = string.Empty;
 
     /// <summary>
-    /// Task start date (day precision, UTC enforced)
+    /// Task start date (day precision, UTC enforced).
+    /// INCLUSIVE: The task begins at the start of this date.
+    /// For a task starting January 1st, work begins on January 1st.
     /// </summary>
     [Required]
     public GanttDate StartDate { get; set; }
 
     /// <summary>
-    /// Task end date (day precision, UTC enforced)
+    /// Task end date (day precision, UTC enforced).
+    /// EXCLUSIVE: The task ends at the start of this date (this date is not included in work).
+    /// For a task ending January 3rd, work stops at the end of January 2nd.
+    /// Duration = EndDate - StartDate (in days).
+    /// Example: StartDate=Jan 1, EndDate=Jan 3 means 2 days of work (Jan 1 and Jan 2).
     /// </summary>
     [Required]
     public GanttDate EndDate { get; set; }

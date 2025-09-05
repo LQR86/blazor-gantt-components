@@ -54,16 +54,20 @@ var start = startDate.AddDays(-(int)startDate.DayOfWeek);  // FORBIDDEN
 var end = endDate.AddDays(6 - (int)endDate.DayOfWeek);    // FORBIDDEN
 ```
 
-### **4. Union Calculation (AUTOMATIC)**
+### **4. Logical Unit Boundary Expansion (TEMPLATE METHOD)**
 ```csharp
-// ✅ AUTOMATIC: Never override CalculateHeaderBoundaries()
-// The base class handles union calculation automatically
+// ✅ IMPLEMENTED: Template method pattern with delegation
+// BaseTimelineRenderer.CalculateHeaderBoundaries() delegates to abstract method
 
-// ❌ FORBIDDEN: Manual union implementation
-protected override (DateTime, DateTime) CalculateHeaderBoundaries()  // FORBIDDEN
+// ✅ CORRECT: Implement the abstract method in your renderer
+protected override (DateTime, DateTime) GetLogicalUnitBoundaries(DateTime start, DateTime end)
 {
-    // This method is sealed - cannot be overridden
+    // Implement your specific logical unit boundary calculation
+    return BoundaryCalculationHelpers.GetWeekBoundaries(start, end);
 }
+
+// ✅ AUTOMATIC: CalculateHeaderBoundaries() calls your implementation
+// The base class uses template method pattern for consistent behavior
 ```
 
 ---

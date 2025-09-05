@@ -1,27 +1,28 @@
 @page "/gantt-composer-demo"
 @using GanttComponents.Components.GanttComposer
 @using GanttComponents.Components.TimelineZoomControls
+@using GanttComponents.Components.TaskFilter
 @using GanttComponents.Models
+@using GanttComponents.Models.Filtering
 @using GanttComponents.Services
 @inject IGanttTaskService TaskService
-@inject IGanttI18N I18N
 
-<PageTitle>@I18N.T("page.title.gantt-composer-demo")</PageTitle>
+<PageTitle>GanttComposer Demo</PageTitle>
 
-<h1>🎯 @I18N.T("demo.composer.title")</h1>
+<h1>🎯 GanttComposer Integration Demo</h1>
 
-<p>@I18N.T("demo.composer.description")</p>
+<p>This page demonstrates the GanttComposer component integrating TaskGrid and TimelineView together.</p>
 
 <div class="demo-controls mb-3">
     <div class="btn-group" role="group">
         <button class="btn btn-outline-primary" @onclick="LoadSampleData">
-            📊 @I18N.T("demo.load-sample-data")
+            📊 Load Sample Data
         </button>
         <button class="btn btn-outline-secondary" @onclick="ToggleDebugAlignment">
-            🔍 @(ShowDebugAlignment ? I18N.T("demo.hide-alignment") : I18N.T("demo.show-alignment"))
+            🔍 @(ShowDebugAlignment ? "Hide Row Alignment" : "Show Row Alignment")
         </button>
         <button class="btn btn-outline-info" @onclick="ClearSelection">
-            ❌ @I18N.T("demo.clear-selection")
+            ❌ Clear Selection
         </button>
     </div>
 </div>
@@ -29,7 +30,7 @@
 @if (Tasks?.Any() == true)
 {
     <div class="demo-info alert alert-info">
-        <strong>@I18N.T("demo.composer.integration-features")</strong>
+        <strong>Integration Features:</strong>
         <ul class="mb-0">
             <li>✅ <strong>Side-by-side layout</strong>: TaskGrid on left, TimelineView on right</li>
             <li>✅ <strong>Shared data</strong>: Same task list displayed in both components</li>
@@ -37,7 +38,14 @@
             <li>✅ <strong>Row alignment</strong>: Visual confirmation rows line up perfectly</li>
             <li>✅ <strong>Independent operation</strong>: Each component remains fully functional</li>
             <li>✅ <strong>Timeline Zoom Controls</strong>: Full integration with zoom level and factor control</li>
+            <li>✅ <strong>Task Filtering</strong>: Filter tasks with tiny task marker control</li>
         </ul>
+        @if (FilteredTasks != null && FilteredTasks.Count != Tasks.Count)
+        {
+            <div class="mt-2 p-2 bg-warning text-dark rounded">
+                <strong>Filter Active:</strong> Showing @FilteredTasks.Count of @Tasks.Count tasks
+            </div>
+        }
     </div>
 
     <!-- Timeline Zoom Controls Section -->
@@ -50,22 +58,35 @@
                              CurrentZoomFactor="@CurrentZoomFactor"
                              OnZoomLevelChanged="HandleZoomLevelChanged"
                              OnZoomFactorChanged="HandleZoomFactorChanged"
-                             ShowDayWidth="true" />
+                             Preset="TimelineZoomControlPreset.Debug" />
+    </div>
+
+    <!-- Task Filter Section -->
+    <div class="demo-section mb-3">
+        <h4>🎛️ Task Filter Controls</h4>
+        <div class="alert alert-info">
+            <strong>✅ Integrated Filtering:</strong> Filter tasks by various criteria including tiny task visibility control.
+        </div>
+        <TaskFilter FilterCriteria="@CurrentFilterCriteria"
+                   FilterCriteriaChanged="HandleFilterCriteriaChanged"
+                   OnFiltersApplied="HandleFiltersApplied"
+                   InitiallyExpanded="false" />
     </div>
 
     <div class="gantt-composer-container">
-        <GanttComposer Tasks="@Tasks" 
+        <GanttComposer Tasks="@(FilteredTasks ?? Tasks)" 
                       OnTaskSelected="HandleTaskSelection" 
                       ShowDebugAlignment="@ShowDebugAlignment"
                       ZoomLevel="@CurrentZoomLevel"
                       ZoomFactor="@CurrentZoomFactor"
                       OnZoomLevelChanged="HandleZoomLevelChanged"
-                      OnZoomFactorChanged="HandleZoomFactorChanged" />
+                      OnZoomFactorChanged="HandleZoomFactorChanged"
+                      FilterCriteria="@CurrentFilterCriteria" />
     </div>
 
     @if (SelectedTaskId.HasValue)
     {
-        var selectedTask = Tasks.FirstOrDefault(t => t.Id == SelectedTaskId.Value);
+        var selectedTask = (FilteredTasks ?? Tasks)?.FirstOrDefault(t => t.Id == SelectedTaskId.Value);
         if (selectedTask != null)
         {
             <div class="selected-task-info alert alert-success mt-3">
@@ -74,7 +95,8 @@
                 <small>
                     Duration: @selectedTask.Duration | 
                     Start: @selectedTask.StartDate.ToString("yyyy-MM-dd") | 
-                    End: @selectedTask.EndDate.ToString("yyyy-MM-dd")
+                    End: @selectedTask.EndDate.ToString("yyyy-MM-dd") |
+                    Progress: @selectedTask.Progress%
                 </small>
             </div>
         }
@@ -83,7 +105,7 @@
 else
 {
     <div class="alert alert-warning">
-        @I18N.T("demo.no-tasks-loaded")
+        No tasks loaded. Click "Load Sample Data" to see the GanttComposer in action.
     </div>
 }
 
@@ -125,21 +147,27 @@ else
 
 @code {
     private List<GanttTask>? Tasks { get; set; }
+    private List<GanttTask>? FilteredTasks { get; set; }
     private int? SelectedTaskId { get; set; }
     private bool ShowDebugAlignment { get; set; } = false;
     
     // Timeline Zoom Control properties
-    private TimelineZoomLevel CurrentZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px; // Test MonthWeek pattern
+    private TimelineZoomLevel CurrentZoomLevel { get; set; } = TimelineZoomLevel.MonthWeek; // Test MonthWeek pattern
     private double CurrentZoomFactor { get; set; } = 1.0;
+    
+    // Task Filter properties
+    private TaskFilterCriteria CurrentFilterCriteria { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         await LoadSampleData();
+        ApplyFilters(); // Apply initial filters
     }
 
     private async Task LoadSampleData()
     {
         Tasks = await TaskService.GetAllTasksAsync();
+        ApplyFilters(); // Apply filters after loading data
         StateHasChanged();
     }
 
@@ -174,5 +202,31 @@ else
         CurrentZoomFactor = newFactor;
         StateHasChanged();
         // TODO: Wire to GanttComposer when it supports zoom parameters
+    }
+    
+    // Task Filter handlers
+    private void HandleFilterCriteriaChanged(TaskFilterCriteria newCriteria)
+    {
+        CurrentFilterCriteria = newCriteria;
+        ApplyFilters();
+        StateHasChanged();
+    }
+
+    private void HandleFiltersApplied(TaskFilterCriteria appliedCriteria)
+    {
+        CurrentFilterCriteria = appliedCriteria;
+        ApplyFilters();
+        StateHasChanged();
+    }
+    
+    private void ApplyFilters()
+    {
+        if (Tasks == null)
+        {
+            FilteredTasks = null;
+            return;
+        }
+
+        FilteredTasks = Tasks.Where(task => CurrentFilterCriteria.PassesFilter(task)).ToList();
     }
 }

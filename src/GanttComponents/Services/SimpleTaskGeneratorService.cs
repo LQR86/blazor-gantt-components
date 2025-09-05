@@ -29,8 +29,6 @@ public class SimpleTaskGeneratorService : ISimpleTaskGeneratorService
             throw new ArgumentException($"Configuration validation failed: {string.Join(", ", validationErrors)}");
         }
 
-        _logger.LogInfo($"Starting task generation - {config.TotalTaskCount} tasks, depth {config.HierarchyDepth}");
-
         var random = config.RandomSeed.HasValue ? new Random(config.RandomSeed.Value) : new Random();
         var tasks = new List<GanttTask>();
         var taskIdCounter = 1;
@@ -64,7 +62,6 @@ public class SimpleTaskGeneratorService : ISimpleTaskGeneratorService
             GenerateChildTasks(rootTask, tasks, ref taskIdCounter, 1, config, random, tasksPerLevel);
         }
 
-        _logger.LogInfo($"Task generation completed - {tasks.Count} tasks generated");
         return Task.FromResult(tasks);
     }
 
@@ -73,26 +70,21 @@ public class SimpleTaskGeneratorService : ISimpleTaskGeneratorService
         // Generate tasks first (before touching database)
         var tasks = await GenerateTasksAsync(config);
 
-        _logger.LogInfo("Starting database seeding with transaction");
-
         // Use database transaction for safety
         using var transaction = await _context.Database.BeginTransactionAsync();
 
         try
         {
             // Clear existing tasks
-            _logger.LogInfo("Clearing existing tasks before seeding");
             _context.Tasks.RemoveRange(_context.Tasks);
             await _context.SaveChangesAsync();
 
             // Add generated tasks
-            _logger.LogInfo($"Adding {tasks.Count} generated tasks");
             _context.Tasks.AddRange(tasks);
             await _context.SaveChangesAsync();
 
             // Commit transaction
             await transaction.CommitAsync();
-            _logger.LogInfo($"Successfully seeded {tasks.Count} generated tasks");
 
             return tasks;
         }

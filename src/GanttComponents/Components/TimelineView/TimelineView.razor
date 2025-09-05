@@ -27,22 +27,22 @@
              height="@TotalHeight">
             <!-- Timeline Body Group -->
             <g class="svg-timeline-body">
-                <!-- Grid lines for days -->
-                @for (var day = StartDate; day <= EndDate; day = day.AddDays(1))
+                <!-- Grid lines aligned with secondary header boundaries -->
+                @foreach (var date in GetSecondaryGridLineDates())
                 {
-                    var x = DayToPixel(day);
+                    var x = DateToPixel(date);
                     <line x1="@x" y1="0" x2="@x" y2="@TotalHeight" 
                           class="timeline-grid-line" />
                 }
                 
                 <!-- Task bars -->
-                @if (Tasks != null)
+                @if (FilteredTasks != null)
                 {
-                    @for (int i = 0; i < Tasks.Count; i++)
+                    @for (int i = 0; i < FilteredTasks.Count; i++)
                     {
-                        var task = Tasks[i];
+                        var task = FilteredTasks[i];
                         var y = i * RowHeight;
-                        var x = DayToPixel(task.StartDate.ToUtcDateTime());
+                        var x = DateToPixel(task.StartDate.ToUtcDateTime());
                         var width = CalculateTaskWidth(task);
                         var rowIndex = i;
                         
@@ -53,16 +53,34 @@
                               @onmouseenter="() => HoverTask(task.Id)"
                               @onmouseleave="() => HoverTask(null)" />
                         
-                        <!-- Task bar -->
-                        <rect x="@x" y="@(y + TaskBarMargin)" 
-                              width="@width" height="@(TaskBarHeight)"
-                              class="timeline-task-bar"
-                              data-task-id="@task.Id"
-                              @onclick="() => SelectTask(task.Id)"
-                              @onmouseenter="() => HoverTask(task.Id)"
-                              @onmouseleave="() => HoverTask(null)">
-                            <title>@GetTaskTooltip(task)</title>
-                        </rect>
+                        @if (ShouldRenderAsTinyMarker(task, width))
+                        {
+                            <!-- Tiny task marker (red asterisk) for tasks < threshold width -->
+                            <g class="timeline-tiny-task-group" 
+                               data-task-id="@task.Id"
+                               style="cursor: pointer;"
+                               @onclick="() => SelectTask(task.Id)"
+                               @onmouseenter="() => HoverTask(task.Id)"
+                               @onmouseleave="() => HoverTask(null)">
+                                <text x="@(x + 1)" y="@(y + RowHeight/2 + 4)" 
+                                      class="timeline-tiny-task-marker"
+                                      style="fill: red; font-weight: bold; font-size: 12px; pointer-events: none;">*</text>
+                                <title>@GetTaskTooltip(task) (Tiny Task - @width.ToString("F1")px)</title>
+                            </g>
+                        }
+                        else
+                        {
+                            <!-- Regular task bar -->
+                            <rect x="@x" y="@(y + TaskBarMargin)" 
+                                  width="@width" height="@(TaskBarHeight)"
+                                  class="timeline-task-bar"
+                                  data-task-id="@task.Id"
+                                  @onclick="() => SelectTask(task.Id)"
+                                  @onmouseenter="() => HoverTask(task.Id)"
+                                  @onmouseleave="() => HoverTask(null)">
+                                <title>@GetTaskTooltip(task)</title>
+                            </rect>
+                        }
                         
                         <!-- Task label (WBS Code) - TODO: Add text labels -->
                         @* <svg:text x="@(x + 4)" y="@(y + RowHeight/2 + 4)" class="timeline-task-label">@task.WbsCode</svg:text> *@
@@ -305,6 +323,26 @@
 
     .timeline-task-bar:hover {
         fill: var(--gantt-primary-dark, #1565c0);
+    }
+
+    /* Tiny task marker styles */
+    .timeline-tiny-task-group {
+        cursor: pointer;
+    }
+
+    .timeline-tiny-task-group:hover .timeline-tiny-task-marker {
+        fill: var(--gantt-error-dark, #d32f2f);
+        filter: drop-shadow(0 0 2px rgba(211, 47, 47, 0.5));
+    }
+
+    .timeline-tiny-task-marker {
+        fill: var(--gantt-error, #f44336);
+        font-weight: bold;
+        font-size: 12px;
+        font-family: var(--gantt-font-family, system-ui);
+        pointer-events: none;
+        user-select: none;
+        transition: fill 0.2s ease;
     }
 
     .timeline-task-label {

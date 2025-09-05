@@ -4,73 +4,47 @@ using GanttComponents.Services;
 namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
-/// QuarterMonth 60px level renderer for TimelineView composition architecture.
+/// QuarterMonth level renderer for TimelineView composition architecture.
 /// Handles custom quarter-month pattern with integral day width validation.
 /// Primary Header: Quarter ranges ("Q1 2025", "Q2 2025")
 /// Secondary Header: Month names ("Jan", "Feb", "Mar")
-/// Cell Width: 60px month cells with 2.0px integral day width (2.0px × 30 days = 60px)
 /// Optimized for quarterly planning with monthly breakdown detail.
 /// Includes union expansion for complete header rendering at timeline edges.
 /// </summary>
-public class QuarterMonth60pxRenderer : BaseTimelineRenderer
+public class QuarterMonthRenderer : BaseTimelineRenderer
 {
     /// <summary>
-    /// Constructor for QuarterMonth 60px renderer with dependency injection.
-    /// Uses calculated day width for flexible quarter/month cell sizing.
-    /// Union expansion is handled automatically by the base class.
+    /// Constructor for QuarterMonth template renderer with dependency injection.
+    /// Uses template-based approach: 30px per month with 4.0x max zoom.
+    /// Template unit: 1 month (≈30 days) = 30px base width.
     /// </summary>
-    public QuarterMonth60pxRenderer(
+    public QuarterMonthRenderer(
         IUniversalLogger logger,
-        IGanttI18N i18n,
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
-        double dayWidth,
-        int headerMonthHeight,
-        int headerDayHeight,
         TimelineZoomLevel zoomLevel,
-        double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
-               headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
+        double zoomFactor,
+        int headerMonthHeight,
+        int headerDayHeight)
+        : base(logger, dateFormatter, startDate, endDate,
+               zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight)
     {
         ValidateRenderer();
-    }
-
-    /// <summary>
-    /// Calculate boundaries for primary header rendering (Quarter ranges).
-    /// QuarterMonth pattern: Quarter headers need quarter boundaries for complete quarter coverage.
-    /// </summary>
-    /// <returns>Quarter boundary dates for primary quarter header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
-    {
-        var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(StartDate, EndDate);
-        return quarterBounds;
-    }
-
-    /// <summary>
-    /// Calculate boundaries for secondary header rendering (Month names).
-    /// QuarterMonth pattern: Month headers need month boundaries for precise month alignment.
-    /// This ensures months render completely even when timeline spans partial quarters.
-    /// </summary>
-    /// <returns>Month boundary dates for secondary month header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
-    {
-        var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(StartDate, EndDate);
-        return monthBounds;
     }
 
     /// <summary>
     /// Renders the complete headers for QuarterMonth 60px view.
     /// Primary Header: Quarter ranges with year context
     /// Secondary Header: Month abbreviations with perfect 60px cells
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
         try
         {
-            // Use expanded boundaries calculated by base class union logic
+            // Use expanded boundaries calculated by base class template-unit padding
             return RenderQuarterHeader(StartDate, EndDate);
         }
         catch (Exception ex)
@@ -82,14 +56,14 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
 
     /// <summary>
     /// Renders the secondary header with month names.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()
     {
         try
         {
-            // Use expanded boundaries calculated by base class union logic
+            // Use expanded boundaries calculated by base class template-unit padding
             return RenderMonthHeader(StartDate, EndDate);
         }
         catch (Exception ex)
@@ -115,6 +89,26 @@ public class QuarterMonth60pxRenderer : BaseTimelineRenderer
     protected override string GetCSSClass()
     {
         return "quarter-month-60px";
+    }
+
+    /// <summary>
+    /// Calculates logical unit boundaries for QuarterMonth pattern.
+    /// Uses union of quarter and month boundaries to ensure both complete quarters and complete months.
+    /// </summary>
+    /// <param name="startDate">Original timeline start date</param>
+    /// <param name="endDate">Original timeline end date</param>
+    /// <returns>Union boundaries that guarantee complete quarters and months</returns>
+    protected override (DateTime start, DateTime end) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate)
+    {
+        // QuarterMonth pattern: Union of quarter and month boundaries
+        var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(startDate, endDate);
+        var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(startDate, endDate);
+
+        // Take the widest span (earliest start, latest end)
+        var unionStart = quarterBounds.start < monthBounds.start ? quarterBounds.start : monthBounds.start;
+        var unionEnd = quarterBounds.end > monthBounds.end ? quarterBounds.end : monthBounds.end;
+
+        return (unionStart, unionEnd);
     }
 
     // === HEADER RENDERING METHODS ===

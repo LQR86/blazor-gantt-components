@@ -82,22 +82,31 @@ This ensures both month headers and week headers render completely without any t
 
 Excellent question! Let me explain how the **sealed method pattern** makes our dual boundary expansion future-proof and what developers need to do when adding new timeline patterns.
 
-## 🔒 **Sealed Method Pattern Explanation**
+## � **Template Method Pattern Explanation**
 
-### **What is a Sealed Method?**
+### **How the Template Method Works**
 ```csharp
 public abstract class BaseTimelineRenderer
 {
-    // SEALED = Cannot be overridden by subclasses
-    protected sealed (DateTime, DateTime) CalculateHeaderBoundaries()
+    // TEMPLATE METHOD = Common algorithm with customizable steps
+    public (DateTime, DateTime) CalculateHeaderBoundaries()
     {
-        // This logic is GUARANTEED to run for ALL renderers
-        var primaryBounds = CalculatePrimaryBoundaries();    // Abstract - must implement
-        var secondaryBounds = CalculateSecondaryBoundaries(); // Abstract - must implement
-        
-        // AUTOMATIC UNION - No renderer can bypass this
-        var unionStart = DateTime.Min(primaryBounds.start, secondaryBounds.start);
-        var unionEnd = DateTime.Max(primaryBounds.end, secondaryBounds.end);
+        // This logic is CONSISTENT across ALL renderers
+        try
+        {
+            // DELEGATE to renderer-specific implementation
+            var (expandedStart, expandedEnd) = GetLogicalUnitBoundaries(StartDate, EndDate);
+            return (expandedStart, expandedEnd);
+        }
+        catch (Exception ex)
+        {
+            // FALLBACK: Use original range if boundary calculation fails
+            return (StartDate, EndDate);
+        }
+    }
+
+    // ABSTRACT HOOK = Each renderer implements its own logic
+    protected abstract (DateTime start, DateTime end) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate);
         
         return (unionStart, unionEnd);
     }
@@ -128,15 +137,20 @@ public class GoodRenderer : BaseTimelineRenderer
     // FORCED to implement both - compiler error if missing either one
     protected override (DateTime, DateTime) CalculatePrimaryBoundaries()
     {
-        return GetMonthBoundaries(StartDate, EndDate);
-    }
-    
-    protected override (DateTime, DateTime) CalculateSecondaryBoundaries()
+    protected override (DateTime, DateTime) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate)
     {
-        return GetWeekBoundaries(StartDate, EndDate);
+        // MonthWeek uses union of month + week boundaries
+        var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(startDate, endDate);
+        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(startDate, endDate);
+        
+        // Return union of both boundaries
+        return (
+            monthBounds.start < weekBounds.start ? monthBounds.start : weekBounds.start,
+            monthBounds.end > weekBounds.end ? monthBounds.end : weekBounds.end
+        );
     }
     
-    // CalculateHeaderBoundaries() is sealed - automatic union calculation!
+    // CalculateHeaderBoundaries() is AUTOMATIC - calls your GetLogicalUnitBoundaries()!
 }
 ```
 

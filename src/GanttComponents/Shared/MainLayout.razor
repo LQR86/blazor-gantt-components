@@ -1,5 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@using GanttComponents.Components.LanguageSelector
 
 <PageTitle>GanttComponents</PageTitle>
 
@@ -13,9 +12,6 @@
             <div class="top-row-left">
                 <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
             </div>
-            <div class="top-row-right">
-                <LanguageSelector />
-            </div>
         </div>
 
         <article class="content px-4">
@@ -26,5 +22,5 @@
 
 @code {
     // No more cascading parameter management needed!
-    // Each component manages its own I18N subscription via dependency injection
+    // All components now use hardcoded English strings
 }

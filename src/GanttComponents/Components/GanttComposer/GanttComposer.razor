@@ -1,6 +1,7 @@
 @using GanttComponents.Components.TaskGrid
 @using GanttComponents.Components.TimelineView
 @using GanttComponents.Models
+@using GanttComponents.Models.Filtering
 @using GanttComponents.Services
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
@@ -19,7 +20,9 @@
                  HoveredTaskId="@HoveredTaskId"
                  RowHeight="@RowHeight"
                  HeaderHeight="@HeaderHeight"
-                 ShowVerticalScrollbar="false" />
+                 ShowVerticalScrollbar="false"
+                 FilterCriteria="@FilterCriteria"
+                 TinyTaskIds="@GetTinyTaskIds()" />
     </div>
     
     <!-- Draggable splitter at TaskGrid boundary -->
@@ -41,7 +44,8 @@
                      ZoomLevel="@ZoomLevel"
                      ZoomFactor="@ZoomFactor"
                      OnZoomLevelChanged="@OnZoomLevelChanged"
-                     OnZoomFactorChanged="@OnZoomFactorChanged" />
+                     OnZoomFactorChanged="@OnZoomFactorChanged"
+                     FilterCriteria="@FilterCriteria" />
     </div>
 </div>
 
@@ -52,9 +56,10 @@
     [Parameter] public int RowHeight { get; set; } = 32; // Row height for alignment consistency
     [Parameter] public int HeaderHeight { get; set; } = 56; // Total header height (should match TimelineView total)
     [Parameter] public int ContainerHeight { get; set; } = 600; // Container height (configurable)
+    [Parameter] public TaskFilterCriteria? FilterCriteria { get; set; }
     
     // Timeline Zoom Parameters
-    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeekOptimal50px;
+    [Parameter] public TimelineZoomLevel ZoomLevel { get; set; } = TimelineZoomLevel.MonthWeek;
     [Parameter] public double ZoomFactor { get; set; } = 1.6;
     [Parameter] public EventCallback<TimelineZoomLevel> OnZoomLevelChanged { get; set; }
     [Parameter] public EventCallback<double> OnZoomFactorChanged { get; set; }
@@ -137,6 +142,35 @@
         {
             // Fallback if JS interop fails
         }
+    }
+    
+    /// <summary>
+    /// Calculates which tasks are considered "tiny" based on current zoom level
+    /// </summary>
+    private HashSet<int> GetTinyTaskIds()
+    {
+        var tinyTaskIds = new HashSet<int>();
+        
+        if (Tasks == null || FilterCriteria == null) return tinyTaskIds;
+        
+        // Get effective day width for current zoom
+        var config = TimelineZoomService.GetConfiguration(ZoomLevel);
+        var dayWidth = config.GetEffectiveDayWidth(ZoomFactor);
+        
+        foreach (var task in Tasks)
+        {
+            // Calculate pixel width using StartDate(inclusive) EndDate(exclusive) semantics
+            var duration = (task.EndDate.ToUtcDateTime() - task.StartDate.ToUtcDateTime()).TotalDays;
+            var pixelWidth = duration * dayWidth;
+            
+            // If below threshold, mark as tiny
+            if (pixelWidth < FilterCriteria.TinyTaskPixelThreshold)
+            {
+                tinyTaskIds.Add(task.Id);
+            }
+        }
+        
+        return tinyTaskIds;
     }
     
     private async Task HandleTaskSelection(int taskId)

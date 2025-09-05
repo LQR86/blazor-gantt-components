@@ -6,7 +6,7 @@ namespace GanttComponents.Components.TimelineView.Renderers
     /// <summary>
     /// Centralized boundary calculation utilities for timeline header rendering.
     /// Provides consistent period boundary calculations across all timeline patterns.
-    /// Used by dual boundary expansion to ensure proper header alignment.
+    /// Used by template-pure renderers for header alignment and boundary calculations.
     /// </summary>
     public static class BoundaryCalculationHelpers
     {

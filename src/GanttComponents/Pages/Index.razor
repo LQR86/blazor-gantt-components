@@ -1,12 +1,10 @@
 ﻿@page "/"
-@using GanttComponents.Services
-@inject IGanttI18N I18N
 
-<PageTitle>@I18N.T("page.title.home")</PageTitle>
+<PageTitle>Home</PageTitle>
 
-<h1>@I18N.T("home.welcome")</h1>
+<h1>Welcome to Gantt Components</h1>
 
-<p>@I18N.T("home.description")</p>
+<p>A custom Blazor Server implementation of Gantt chart components built from scratch with day-level scheduling precision.</p>
 
 <div class="main-demos mb-4">
     <h3>🎯 Main Components</h3>
@@ -16,7 +14,7 @@
                 <div class="card-body">
                     <h5 class="card-title">TaskGrid Demo</h5>
                     <p class="card-text">Hierarchical task management with WBS codes and tree structure.</p>
-                    <a href="/gantt-demo" class="btn btn-primary">@I18N.T("home.try-demo")</a>
+                    <a href="/gantt-demo" class="btn btn-primary">Try Demo</a>
                 </div>
             </div>
         </div>

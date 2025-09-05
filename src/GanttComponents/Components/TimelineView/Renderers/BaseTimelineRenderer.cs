@@ -6,15 +6,15 @@ using GanttComponents.Utilities;
 namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
-/// Abstract base class for timeline header renderers using template method pattern.
+/// Abstract base class for timeline header renderers using template-based architecture.
 /// Provides common infrastructure for all zoom level implementations while allowing
 /// specific header generation logic in concrete subclasses.
+/// Uses duration-to-pixel mapping instead of day width calculations.
 /// </summary>
 public abstract class BaseTimelineRenderer
 {
     // === DEPENDENCY INJECTION ===
     protected IUniversalLogger Logger { get; }
-    protected IGanttI18N I18N { get; }
     protected DateFormatHelper DateFormatter { get; }
 
     // === TIMELINE PROPERTIES ===
@@ -28,47 +28,50 @@ public abstract class BaseTimelineRenderer
     /// </summary>
     protected DateTime CoordinateSystemStart { get; private set; }
 
-    protected double DayWidth { get; set; }
+    protected ZoomLevelConfiguration TemplateConfig { get; set; }
+    protected double ZoomFactor { get; set; }
     protected int HeaderMonthHeight { get; set; }
     protected int HeaderDayHeight { get; set; }
     protected TimelineZoomLevel ZoomLevel { get; set; }
-    protected double ZoomFactor { get; set; }
 
     // === COMPUTED PROPERTIES ===
     protected int TotalHeaderHeight => HeaderMonthHeight + HeaderDayHeight;
 
     /// <summary>
-    /// Constructor for dependency injection and configuration.
-    /// Includes automatic integral day width validation for visual quality.
+    /// Calculate effective day width using template-based approach.
+    /// Backward compatibility property for existing renderer code.
+    /// </summary>
+    protected double DayWidth => TemplateConfig.GetEffectiveDayWidth(ZoomFactor);
+
+    /// <summary>
+    /// Constructor for dependency injection and template-based configuration.
+    /// Includes automatic integral unit width validation for visual quality.
     /// </summary>
     /// <param name="logger">Universal logger service</param>
-    /// <param name="i18n">Internationalization service</param>
     /// <param name="dateFormatter">Date formatting helper</param>
     /// <param name="startDate">Timeline start date</param>
     /// <param name="endDate">Timeline end date</param>
-    /// <param name="dayWidth">Width of each day in pixels (must be integral)</param>
-    /// <param name="headerMonthHeight">Height of primary header</param>
-    /// <param name="headerDayHeight">Height of secondary header</param>
     /// <param name="zoomLevel">Current zoom level</param>
     /// <param name="zoomFactor">Current zoom factor</param>
+    /// <param name="headerMonthHeight">Height of primary header</param>
+    /// <param name="headerDayHeight">Height of secondary header</param>
     protected BaseTimelineRenderer(
         IUniversalLogger logger,
-        IGanttI18N i18n,
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
-        double dayWidth,
-        int headerMonthHeight,
-        int headerDayHeight,
         TimelineZoomLevel zoomLevel,
-        double zoomFactor)
+        double zoomFactor,
+        int headerMonthHeight,
+        int headerDayHeight)
     {
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        I18N = i18n ?? throw new ArgumentNullException(nameof(i18n));
         DateFormatter = dateFormatter ?? throw new ArgumentNullException(nameof(dateFormatter));
 
         StartDate = startDate;
         EndDate = endDate;
+        ZoomLevel = zoomLevel;
+        ZoomFactor = zoomFactor;
 
         // CRITICAL FIX: Lock in the coordinate system reference to prevent drift
         // This ensures headers and taskbars use the same pixel-to-date conversion
@@ -76,12 +79,9 @@ public abstract class BaseTimelineRenderer
 
         HeaderMonthHeight = headerMonthHeight;
         HeaderDayHeight = headerDayHeight;
-        ZoomLevel = zoomLevel;
-        ZoomFactor = zoomFactor;
 
-        // CRITICAL: Validate integral day width for all renderers (DRY principle)
-        ValidateIntegralDayWidth(dayWidth, zoomLevel, zoomFactor);
-        DayWidth = dayWidth;
+        // Get template configuration for this zoom level
+        TemplateConfig = TimelineZoomService.GetConfiguration(zoomLevel);
     }
 
     /// <summary>
@@ -140,36 +140,32 @@ public abstract class BaseTimelineRenderer
     // === ABSTRACT METHODS FOR SUBCLASSES ===
 
     /// <summary>
-    /// AUTOMATIC DUAL BOUNDARY EXPANSION: Final method that enforces dual boundary union calculation.
-    /// This method automatically combines primary and secondary header boundaries to ensure
-    /// both header types render completely without truncation at timeline edges.
+    /// TEMPLATE-PURE BOUNDARY CALCULATION: Calculates boundary expansion using template units.
+    /// This method adds simple padding (1 template unit on each side) to ensure
+    /// headers render completely without truncation at timeline edges.
     /// 
-    /// ABC COMPOSITION ENFORCEMENT: Subclasses CANNOT override this method - they must implement
-    /// the abstract boundary methods, and this base class automatically calculates the union.
-    /// This guarantees that all current and future timeline patterns get dual expansion "for free".
-    /// 
-    /// NOTE: While C# doesn't allow 'sealed' on non-override methods, this method should be treated
-    /// as final. Future renderers must implement the abstract boundary calculation methods instead.
+    /// TEMPLATE ARCHITECTURE: Uses template-native approach - no complex boundary calculations.
+    /// Each zoom level's template unit defines the padding: WeekDay=1day, MonthWeek=7days, etc.
+    /// This guarantees consistent expansion across all timeline patterns.
+    /// <summary>
+    /// Calculates logical unit boundaries that ensure complete header cells.
+    /// Replaces simple day-based padding with proper logical unit boundary expansion.
+    /// Each renderer implements this based on its specific logical units (weeks, months, quarters, etc.).
     /// </summary>
-    /// <returns>Union of primary and secondary boundaries for complete header rendering</returns>
+    /// <returns>Expanded boundaries that guarantee complete logical units</returns>
     public (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
     {
         try
         {
-            // STEP 1: Get primary header boundaries (e.g., Month boundaries for MonthWeek pattern)
-            var primaryBounds = CalculatePrimaryBoundaries();
-            // STEP 2: Get secondary header boundaries (e.g., Week boundaries for MonthWeek pattern)  
-            var secondaryBounds = CalculateSecondaryBoundaries();
+            // NEW APPROACH: Use logical unit boundaries instead of simple day padding
+            // This ensures complete header cells (full weeks, months, quarters, etc.)
+            var (expandedStart, expandedEnd) = GetLogicalUnitBoundaries(StartDate, EndDate);
 
-            // STEP 3: AUTOMATIC UNION CALCULATION - Take the widest span to ensure both headers fit
-            var unionStart = primaryBounds.start < secondaryBounds.start ? primaryBounds.start : secondaryBounds.start;
-            var unionEnd = primaryBounds.end > secondaryBounds.end ? primaryBounds.end : secondaryBounds.end;
-
-            return (unionStart, unionEnd);
+            return (expandedStart, expandedEnd);
         }
         catch (Exception ex)
         {
-            Logger.LogError($"Error in automatic dual boundary calculation for {GetRendererDescription()}: {ex.Message}");
+            Logger.LogError($"Error in logical unit boundary calculation for {GetRendererDescription()}: {ex.Message}");
 
             // FALLBACK: Use original date range if boundary calculation fails
             return (StartDate, EndDate);
@@ -177,30 +173,14 @@ public abstract class BaseTimelineRenderer
     }
 
     /// <summary>
-    /// ABSTRACT: Calculate boundaries for primary header rendering (e.g., Month, Quarter, Year, Week).
-    /// Each renderer must implement this to define what period boundaries the PRIMARY header needs.
-    /// 
-    /// Examples:
-    /// - MonthWeek: Returns month boundaries (for month headers)
-    /// - QuarterMonth: Returns quarter boundaries (for quarter headers)  
-    /// - WeekDay: Returns week boundaries (for week headers)
-    /// - YearQuarter: Returns year boundaries (for year headers)
+    /// Gets the logical unit boundaries that completely contain the given date range.
+    /// Each renderer implements this based on its header structure requirements.
+    /// For example: WeekDay uses week boundaries, MonthWeek uses union of month+week boundaries.
     /// </summary>
-    /// <returns>Boundary dates for primary header complete rendering</returns>
-    protected abstract (DateTime start, DateTime end) CalculatePrimaryBoundaries();
-
-    /// <summary>
-    /// ABSTRACT: Calculate boundaries for secondary header rendering (e.g., Week, Month, Day, Quarter).
-    /// Each renderer must implement this to define what period boundaries the SECONDARY header needs.
-    /// 
-    /// Examples:
-    /// - MonthWeek: Returns week boundaries (for week headers)
-    /// - QuarterMonth: Returns month boundaries (for month headers)
-    /// - WeekDay: Returns week boundaries (for day headers within weeks)  
-    /// - YearQuarter: Returns quarter boundaries (for quarter headers)
-    /// </summary>
-    /// <returns>Boundary dates for secondary header complete rendering</returns>
-    protected abstract (DateTime start, DateTime end) CalculateSecondaryBoundaries();
+    /// <param name="startDate">Original timeline start date</param>
+    /// <param name="endDate">Original timeline end date</param>
+    /// <returns>Expanded boundaries ensuring complete logical units</returns>
+    protected abstract (DateTime start, DateTime end) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate);
 
     /// <summary>
     /// Renders the primary (top) header for the specific zoom level.
@@ -308,6 +288,12 @@ public abstract class BaseTimelineRenderer
     /// <param name="endDate">End date of the range (inclusive)</param>
     /// <returns>Width in pixels for the date range</returns>
     /// <exception cref="ArgumentException">Thrown when date range is invalid</exception>
+    /// <summary>
+    /// Calculate coordinate width for a date range using StartDate(inclusive) EndDate(exclusive) semantics.
+    /// </summary>
+    /// <param name="startDate">Start date (inclusive)</param>
+    /// <param name="endDate">End date (exclusive)</param>
+    /// <returns>Width in pixels</returns>
     protected double CalculateCoordinateWidth(DateTime startDate, DateTime endDate)
     {
         if (endDate < startDate)
@@ -315,8 +301,9 @@ public abstract class BaseTimelineRenderer
             throw new ArgumentException($"End date ({endDate:yyyy-MM-dd}) cannot be before start date ({startDate:yyyy-MM-dd})");
         }
 
-        // Calculate inclusive date range in days
-        var days = (endDate.Date - startDate.Date).Days + 1;
+        // Calculate inclusive start, exclusive end date range in days
+        // CORRECTED: No +1 needed for exclusive end date semantics
+        var days = (endDate.Date - startDate.Date).Days;
         return days * DayWidth;
     }
 
@@ -364,12 +351,14 @@ public abstract class BaseTimelineRenderer
     // SoC Enhancement: Base class handles coordinate calculation + validation, renderers focus on logic
 
     /// <summary>
-    /// COORDINATE-SAFE: Creates SVG rectangle with validated positioning.
+    /// COORDINATE-SAFE: Creates SVG rectangle with validated positioning for HEADER CELLS.
+    /// Headers use inclusive end dates (e.g., full weeks, months), so this method
+    /// converts to exclusive semantics for coordinate calculations.
     /// SoC: Base class responsibility = coordinate calculation, renderer responsibility = what to show.
     /// Automatically uses coordinate system and validates consistency in DEBUG builds.
     /// </summary>
     /// <param name="startDate">Start date of the rectangle (inclusive)</param>
-    /// <param name="endDate">End date of the rectangle (inclusive)</param>
+    /// <param name="endDate">End date of the rectangle (inclusive - last day to display)</param>
     /// <param name="y">Y position in pixels</param>
     /// <param name="height">Height in pixels</param>
     /// <param name="cssClass">CSS class for styling</param>
@@ -377,7 +366,8 @@ public abstract class BaseTimelineRenderer
     protected string CreateValidatedSVGRect(DateTime startDate, DateTime endDate, int y, int height, string cssClass)
     {
         var x = CalculateCoordinateX(startDate);
-        var width = CalculateCoordinateWidth(startDate, endDate);
+        // HEADER FIX: Convert inclusive endDate to exclusive for coordinate calculation
+        var width = CalculateCoordinateWidth(startDate, endDate.AddDays(1));
 
         // Automatic validation in DEBUG builds - catches coordinate issues at creation time
         ValidateCoordinateConsistency(startDate, x, $"rect for {cssClass}");
@@ -386,12 +376,13 @@ public abstract class BaseTimelineRenderer
     }
 
     /// <summary>
-    /// COORDINATE-SAFE: Creates SVG text with validated center positioning.
+    /// COORDINATE-SAFE: Creates SVG text with validated center positioning for HEADER CELLS.
+    /// Headers use inclusive end dates, so this method converts to exclusive semantics.
     /// SoC: Base class handles coordinate calculation, renderer provides content and styling.
     /// Automatically centers text within the date range bounds.
     /// </summary>
     /// <param name="startDate">Start date of the text container (inclusive)</param>
-    /// <param name="endDate">End date of the text container (inclusive)</param>
+    /// <param name="endDate">End date of the text container (inclusive - last day to display)</param>
     /// <param name="y">Y position in pixels (typically center of container)</param>
     /// <param name="text">Text content to display</param>
     /// <param name="cssClass">CSS class for text styling</param>
@@ -399,7 +390,8 @@ public abstract class BaseTimelineRenderer
     protected string CreateValidatedSVGText(DateTime startDate, DateTime endDate, int y, string text, string cssClass)
     {
         var x = CalculateCoordinateX(startDate);
-        var width = CalculateCoordinateWidth(startDate, endDate);
+        // HEADER FIX: Convert inclusive endDate to exclusive for coordinate calculation
+        var width = CalculateCoordinateWidth(startDate, endDate.AddDays(1));
         var centerX = x + width / 2;
 
         // Automatic validation in DEBUG builds
@@ -440,28 +432,4 @@ public abstract class BaseTimelineRenderer
     /// </summary>
     /// <param name="dayWidth">The day width to validate (in pixels)</param>
     /// <param name="zoomLevel">Current zoom level for error reporting</param>
-    /// <param name="zoomFactor">Current zoom factor for error reporting</param>
-    /// <exception cref="InvalidOperationException">Thrown when day width validation fails</exception>
-    private void ValidateIntegralDayWidth(double dayWidth, TimelineZoomLevel zoomLevel, double zoomFactor)
-    {
-        // VALIDATION 1: Effective day width must be integral (no fractional pixels)
-        if (Math.Abs(dayWidth - Math.Round(dayWidth)) > 0.001)
-        {
-            throw new InvalidOperationException(
-                $"INTEGRAL DAY WIDTH VIOLATION: {zoomLevel} @ {zoomFactor:F1}x = {dayWidth:F3}px effective day width. " +
-                $"Pure SVG TimelineView requires integral effective day widths for clean SVG coordinate calculations. " +
-                $"Try adjusting ZoomFactor to achieve a whole number result, such as {Math.Round(dayWidth):F0}px. " +
-                $"BaseDayWidth × ZoomFactor must result in integral pixel values. " +
-                $"This validation is automatically applied to all renderers in the composition architecture.");
-        }
-
-        // VALIDATION 2: Day width must be positive
-        if (dayWidth <= 0)
-        {
-            throw new InvalidOperationException(
-                $"DAY WIDTH VALIDATION: {zoomLevel} @ {zoomFactor:F1}x = {dayWidth}px. " +
-                $"Effective day width must be positive. " +
-                $"This validation is automatically applied to all renderers in the composition architecture.");
-        }
-    }
 }

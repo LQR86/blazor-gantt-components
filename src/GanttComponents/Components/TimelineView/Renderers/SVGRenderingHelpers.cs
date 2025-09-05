@@ -4,6 +4,7 @@ namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
 /// Static helper class for SVG rendering utilities shared across timeline renderers.
+/// Contains core coordinate conversion and layout calculation methods.
 /// Extracted from TimelineView.SVGRendering.cs to support composition architecture.
 /// </summary>
 public static class SVGRenderingHelpers
@@ -137,16 +138,16 @@ public static class SVGRenderingHelpers
         var cssClass = zoomLevel switch
         {
             // WeekDay50px - ABC implementation
-            TimelineZoomLevel.WeekDayOptimal50px => isPrimary ? "svg-weekday-50px-primary-text" : "svg-weekday-50px-secondary-text",
+            TimelineZoomLevel.WeekDay => isPrimary ? "svg-weekday-50px-primary-text" : "svg-weekday-50px-secondary-text",
 
             // MonthWeek50px - ABC implementation
-            TimelineZoomLevel.MonthWeekOptimal50px => isPrimary ? "svg-monthweek-50px-primary-text" : "svg-monthweek-50px-secondary-text",
+            TimelineZoomLevel.MonthWeek => isPrimary ? "svg-monthweek-50px-primary-text" : "svg-monthweek-50px-secondary-text",
 
             // QuarterMonth60px - ABC implementation
-            TimelineZoomLevel.QuarterMonthOptimal60px => isPrimary ? "svg-quartermonth-60px-primary-text" : "svg-quartermonth-60px-secondary-text",
+            TimelineZoomLevel.QuarterMonth => isPrimary ? "svg-quartermonth-60px-primary-text" : "svg-quartermonth-60px-secondary-text",
 
             // YearQuarter70px - ABC implementation
-            TimelineZoomLevel.YearQuarterOptimal70px => isPrimary ? "svg-yearquarter-70px-primary-text" : "svg-yearquarter-70px-secondary-text",
+            TimelineZoomLevel.YearQuarter => isPrimary ? "svg-yearquarter-70px-primary-text" : "svg-yearquarter-70px-secondary-text",
 
             // Fallback for any future patterns
             _ => isPrimary ? "svg-primary-text" : "svg-secondary-text"
@@ -194,14 +195,14 @@ public static class SVGRenderingHelpers
     // === DATE UTILITIES ===
 
     /// <summary>
-    /// Calculates the number of days between two dates (inclusive).
+    /// Calculate days between start and end using StartDate(inclusive) EndDate(exclusive) semantics.
     /// </summary>
-    /// <param name="startDate">Start date</param>
-    /// <param name="endDate">End date</param>
+    /// <param name="startDate">Start date (inclusive)</param>
+    /// <param name="endDate">End date (exclusive)</param>
     /// <returns>Number of days</returns>
     public static int CalculateDaysBetween(DateTime startDate, DateTime endDate)
     {
-        return (endDate.Date - startDate.Date).Days + 1;
+        return (endDate.Date - startDate.Date).Days;
     }
 
     /// <summary>

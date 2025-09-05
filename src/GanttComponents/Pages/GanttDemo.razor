@@ -3,16 +3,15 @@
 @using GanttComponents.Components.TaskGrid
 @using GanttComponents.Services
 @inject IGanttTaskService TaskService
-@inject IGanttI18N I18N
 
-<PageTitle>@I18N.T("page.title.gantt-demo")</PageTitle>
+<PageTitle>Gantt Demo</PageTitle>
 
-<h1>@I18N.T("demo.gantt.title")</h1>
+<h1>📊 Gantt Demo</h1>
 
 <div class="demo-container">
     <div class="demo-section">
-        <h3>@I18N.T("demo.gantt.taskgrid-section")</h3>
-        <p>@I18N.T("demo.gantt.taskgrid-description")</p>
+        <h3>TaskGrid Section</h3>
+        <p>Interactive hierarchical task grid with WBS codes, tree structure, and selection handling.</p>
         
         <div class="grid-container">
             <TaskGrid Tasks="@SampleTasks" 
@@ -24,15 +23,15 @@
     @if (SelectedTaskInfo != null)
     {
         <div class="demo-section">
-            <h4>@I18N.T("demo.selected-task")</h4>
+            <h4>Selected Task Details</h4>
             <div class="task-info">
-                <p><strong>@I18N.T("task.id"):</strong> @SelectedTaskInfo.Id</p>
-                <p><strong>@I18N.T("task.wbs-code"):</strong> @SelectedTaskInfo.WbsCode</p>
-                <p><strong>@I18N.T("task.name"):</strong> @SelectedTaskInfo.Name</p>
-                <p><strong>@I18N.T("task.start-date"):</strong> @SelectedTaskInfo.StartDate.ToString("MM/dd/yyyy")</p>
-                <p><strong>@I18N.T("task.end-date"):</strong> @SelectedTaskInfo.EndDate.ToString("MM/dd/yyyy")</p>
-                <p><strong>@I18N.T("task.duration"):</strong> @SelectedTaskInfo.Duration</p>
-                <p><strong>@I18N.T("task.progress"):</strong> @SelectedTaskInfo.Progress%</p>
+                <p><strong>ID:</strong> @SelectedTaskInfo.Id</p>
+                <p><strong>WBS Code:</strong> @SelectedTaskInfo.WbsCode</p>
+                <p><strong>Task Name:</strong> @SelectedTaskInfo.Name</p>
+                <p><strong>Start Date:</strong> @SelectedTaskInfo.StartDate.ToString("MM/dd/yyyy")</p>
+                <p><strong>End Date:</strong> @SelectedTaskInfo.EndDate.ToString("MM/dd/yyyy")</p>
+                <p><strong>Duration:</strong> @SelectedTaskInfo.Duration</p>
+                <p><strong>Progress:</strong> @SelectedTaskInfo.Progress%</p>
                 <p><strong>Dependencies:</strong> @(SelectedTaskInfo.Predecessors ?? "None")</p>
             </div>
         </div>

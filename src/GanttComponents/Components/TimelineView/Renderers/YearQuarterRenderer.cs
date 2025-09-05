@@ -4,71 +4,45 @@ using GanttComponents.Services;
 namespace GanttComponents.Components.TimelineView.Renderers;
 
 /// <summary>
-/// YearQuarter 90px level renderer for TimelineView composition architecture.
+/// YearQuarter level renderer for TimelineView composition architecture.
 /// Handles custom year-quarter pattern with integral day width validation.
 /// Primary Header: Year ranges ("2025", "2026")
 /// Secondary Header: Quarter labels ("Q1", "Q2", "Q3", "Q4")
-/// Cell Width: 90px quarter cells with 1.0px integral day width (1.0px × 90 days = 90px)
 /// Optimized for strategic long-term planning with year/quarter overview.
 /// Includes union expansion for complete header rendering at timeline edges.
 /// </summary>
-public class YearQuarter90pxRenderer : BaseTimelineRenderer
+public class YearQuarterRenderer : BaseTimelineRenderer
 {
     /// <summary>
-    /// Constructor for YearQuarter 90px renderer with dependency injection.
-    /// Uses calculated day width for flexible year/quarter cell sizing.
-    /// Union expansion is handled automatically by the base class.
+    /// Constructor for YearQuarter template renderer with dependency injection.
+    /// Uses template-based approach: 24px per quarter with 4.0x max zoom.
+    /// Template unit: 1 quarter (90 days) = 24px base width.
     /// </summary>
-    public YearQuarter90pxRenderer(
+    public YearQuarterRenderer(
         IUniversalLogger logger,
-        IGanttI18N i18n,
         DateFormatHelper dateFormatter,
         DateTime startDate,
         DateTime endDate,
-        double dayWidth,
-        int headerMonthHeight,
-        int headerDayHeight,
         TimelineZoomLevel zoomLevel,
-        double zoomFactor)
-        : base(logger, i18n, dateFormatter, startDate, endDate, dayWidth,
-               headerMonthHeight, headerDayHeight, zoomLevel, zoomFactor)
+        double zoomFactor,
+        int headerMonthHeight,
+        int headerDayHeight)
+        : base(logger, dateFormatter, startDate, endDate,
+               zoomLevel, zoomFactor, headerMonthHeight, headerDayHeight)
     {
         ValidateRenderer();
     }
 
     /// <summary>
-    /// Calculate boundaries for primary header rendering (Year ranges).
-    /// YearQuarter pattern: Year headers need year boundaries for complete year coverage.
-    /// </summary>
-    /// <returns>Year boundary dates for primary year header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculatePrimaryBoundaries()
-    {
-        var yearBounds = BoundaryCalculationHelpers.GetYearBoundaries(StartDate, EndDate);
-        return yearBounds;
-    }
-
-    /// <summary>
-    /// Calculate boundaries for secondary header rendering (Quarter labels).
-    /// YearQuarter pattern: Quarter headers need quarter boundaries for precise quarter alignment.
-    /// Since quarters fit perfectly within years, this maintains natural alignment.
-    /// </summary>
-    /// <returns>Quarter boundary dates for secondary quarter header complete rendering</returns>
-    protected override (DateTime start, DateTime end) CalculateSecondaryBoundaries()
-    {
-        var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(StartDate, EndDate);
-        return quarterBounds;
-    }
-
-    /// <summary>
     /// Renders the primary header with year ranges.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for primary header</returns>
     protected override string RenderPrimaryHeader()
     {
         try
         {
-            // Use expanded boundaries calculated by base class union logic
+            // Use expanded boundaries calculated by base class template-unit padding
             return RenderYearHeader(StartDate, EndDate);
         }
         catch (Exception ex)
@@ -80,14 +54,14 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
 
     /// <summary>
     /// Renders the secondary header with quarter labels.
-    /// Uses automatic dual boundary expansion from base class.
+    /// Uses template-unit padding from base class.
     /// </summary>
     /// <returns>SVG markup for secondary header</returns>
     protected override string RenderSecondaryHeader()
     {
         try
         {
-            // Use expanded boundaries calculated by base class union logic
+            // Use expanded boundaries calculated by base class template-unit padding
             return RenderQuarterHeader(StartDate, EndDate);
         }
         catch (Exception ex)
@@ -113,6 +87,26 @@ public class YearQuarter90pxRenderer : BaseTimelineRenderer
     protected override string GetCSSClass()
     {
         return "year-quarter-90px";
+    }
+
+    /// <summary>
+    /// Calculates logical unit boundaries for YearQuarter pattern.
+    /// Uses union of year and quarter boundaries to ensure both complete years and complete quarters.
+    /// </summary>
+    /// <param name="startDate">Original timeline start date</param>
+    /// <param name="endDate">Original timeline end date</param>
+    /// <returns>Union boundaries that guarantee complete years and quarters</returns>
+    protected override (DateTime start, DateTime end) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate)
+    {
+        // YearQuarter pattern: Union of year and quarter boundaries
+        var yearBounds = BoundaryCalculationHelpers.GetYearBoundaries(startDate, endDate);
+        var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(startDate, endDate);
+
+        // Take the widest span (earliest start, latest end)
+        var unionStart = yearBounds.start < quarterBounds.start ? yearBounds.start : quarterBounds.start;
+        var unionEnd = yearBounds.end > quarterBounds.end ? yearBounds.end : quarterBounds.end;
+
+        return (unionStart, unionEnd);
     }
 
     // === HEADER RENDERING METHODS ===

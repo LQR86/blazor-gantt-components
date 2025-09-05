@@ -89,6 +89,26 @@ public class YearQuarterRenderer : BaseTimelineRenderer
         return "year-quarter-90px";
     }
 
+    /// <summary>
+    /// Calculates logical unit boundaries for YearQuarter pattern.
+    /// Uses union of year and quarter boundaries to ensure both complete years and complete quarters.
+    /// </summary>
+    /// <param name="startDate">Original timeline start date</param>
+    /// <param name="endDate">Original timeline end date</param>
+    /// <returns>Union boundaries that guarantee complete years and quarters</returns>
+    protected override (DateTime start, DateTime end) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate)
+    {
+        // YearQuarter pattern: Union of year and quarter boundaries
+        var yearBounds = BoundaryCalculationHelpers.GetYearBoundaries(startDate, endDate);
+        var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(startDate, endDate);
+
+        // Take the widest span (earliest start, latest end)
+        var unionStart = yearBounds.start < quarterBounds.start ? yearBounds.start : quarterBounds.start;
+        var unionEnd = yearBounds.end > quarterBounds.end ? yearBounds.end : quarterBounds.end;
+
+        return (unionStart, unionEnd);
+    }
+
     // === HEADER RENDERING METHODS ===
 
     /// <summary>

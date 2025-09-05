@@ -147,32 +147,40 @@ public abstract class BaseTimelineRenderer
     /// TEMPLATE ARCHITECTURE: Uses template-native approach - no complex boundary calculations.
     /// Each zoom level's template unit defines the padding: WeekDay=1day, MonthWeek=7days, etc.
     /// This guarantees consistent expansion across all timeline patterns.
-    /// 
-    /// NOTE: This method is final - subclasses should not override boundary calculation.
-    /// Template units provide sufficient boundary expansion for all current patterns.
+    /// <summary>
+    /// Calculates logical unit boundaries that ensure complete header cells.
+    /// Replaces simple day-based padding with proper logical unit boundary expansion.
+    /// Each renderer implements this based on its specific logical units (weeks, months, quarters, etc.).
     /// </summary>
-    /// <returns>Template-unit padded boundaries for complete header rendering</returns>
+    /// <returns>Expanded boundaries that guarantee complete logical units</returns>
     public (DateTime expandedStart, DateTime expandedEnd) CalculateHeaderBoundaries()
     {
         try
         {
-            // Template-pure approach: Simple padding based on template units
-            // Add 1 template unit on each side to ensure headers render completely
-            var paddingDays = TemplateConfig.TemplateUnitDays;
-
-            var expandedStart = StartDate.AddDays(-paddingDays);
-            var expandedEnd = EndDate.AddDays(paddingDays);
+            // NEW APPROACH: Use logical unit boundaries instead of simple day padding
+            // This ensures complete header cells (full weeks, months, quarters, etc.)
+            var (expandedStart, expandedEnd) = GetLogicalUnitBoundaries(StartDate, EndDate);
 
             return (expandedStart, expandedEnd);
         }
         catch (Exception ex)
         {
-            Logger.LogError($"Error in template-unit boundary calculation for {GetRendererDescription()}: {ex.Message}");
+            Logger.LogError($"Error in logical unit boundary calculation for {GetRendererDescription()}: {ex.Message}");
 
             // FALLBACK: Use original date range if boundary calculation fails
             return (StartDate, EndDate);
         }
     }
+
+    /// <summary>
+    /// Gets the logical unit boundaries that completely contain the given date range.
+    /// Each renderer implements this based on its header structure requirements.
+    /// For example: WeekDay uses week boundaries, MonthWeek uses union of month+week boundaries.
+    /// </summary>
+    /// <param name="startDate">Original timeline start date</param>
+    /// <param name="endDate">Original timeline end date</param>
+    /// <returns>Expanded boundaries ensuring complete logical units</returns>
+    protected abstract (DateTime start, DateTime end) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate);
 
     /// <summary>
     /// Renders the primary (top) header for the specific zoom level.

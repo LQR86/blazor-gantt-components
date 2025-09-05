@@ -69,6 +69,19 @@ public class WeekDayRenderer : BaseTimelineRenderer
     /// <returns>CSS class prefix</returns>
     protected override string GetCSSClass() => "weekday-50px";
 
+    /// <summary>
+    /// Calculates logical unit boundaries for WeekDay pattern.
+    /// Ensures timeline range includes complete weeks from Monday to Sunday.
+    /// </summary>
+    /// <param name="startDate">Original timeline start date</param>
+    /// <param name="endDate">Original timeline end date</param>
+    /// <returns>Week boundaries that guarantee complete weeks</returns>
+    protected override (DateTime start, DateTime end) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate)
+    {
+        // WeekDay pattern: Expand to complete week boundaries (Monday to Sunday)
+        return BoundaryCalculationHelpers.GetWeekBoundaries(startDate, endDate);
+    }
+
     // === HEADER RENDERING METHODS ===
 
     /// <summary>

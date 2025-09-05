@@ -91,6 +91,26 @@ public class QuarterMonthRenderer : BaseTimelineRenderer
         return "quarter-month-60px";
     }
 
+    /// <summary>
+    /// Calculates logical unit boundaries for QuarterMonth pattern.
+    /// Uses union of quarter and month boundaries to ensure both complete quarters and complete months.
+    /// </summary>
+    /// <param name="startDate">Original timeline start date</param>
+    /// <param name="endDate">Original timeline end date</param>
+    /// <returns>Union boundaries that guarantee complete quarters and months</returns>
+    protected override (DateTime start, DateTime end) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate)
+    {
+        // QuarterMonth pattern: Union of quarter and month boundaries
+        var quarterBounds = BoundaryCalculationHelpers.GetQuarterBoundaries(startDate, endDate);
+        var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(startDate, endDate);
+
+        // Take the widest span (earliest start, latest end)
+        var unionStart = quarterBounds.start < monthBounds.start ? quarterBounds.start : monthBounds.start;
+        var unionEnd = quarterBounds.end > monthBounds.end ? quarterBounds.end : monthBounds.end;
+
+        return (unionStart, unionEnd);
+    }
+
     // === HEADER RENDERING METHODS ===
 
     /// <summary>

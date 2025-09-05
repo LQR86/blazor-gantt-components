@@ -69,6 +69,26 @@ public class MonthWeekRenderer : BaseTimelineRenderer
     /// <returns>CSS class prefix</returns>
     protected override string GetCSSClass() => "monthweek-50px";
 
+    /// <summary>
+    /// Calculates logical unit boundaries for MonthWeek pattern.
+    /// Uses union of month and week boundaries to ensure both complete months and complete weeks.
+    /// </summary>
+    /// <param name="startDate">Original timeline start date</param>
+    /// <param name="endDate">Original timeline end date</param>
+    /// <returns>Union boundaries that guarantee complete months and weeks</returns>
+    protected override (DateTime start, DateTime end) GetLogicalUnitBoundaries(DateTime startDate, DateTime endDate)
+    {
+        // MonthWeek pattern: Union of month and week boundaries
+        var monthBounds = BoundaryCalculationHelpers.GetMonthBoundaries(startDate, endDate);
+        var weekBounds = BoundaryCalculationHelpers.GetWeekBoundaries(startDate, endDate);
+
+        // Take the widest span (earliest start, latest end)
+        var unionStart = monthBounds.start < weekBounds.start ? monthBounds.start : weekBounds.start;
+        var unionEnd = monthBounds.end > weekBounds.end ? monthBounds.end : weekBounds.end;
+
+        return (unionStart, unionEnd);
+    }
+
     // === HEADER RENDERING METHODS ===
 
     /// <summary>
